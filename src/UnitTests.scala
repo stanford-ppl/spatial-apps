@@ -41,6 +41,7 @@ object SimpleSequential extends SpatialApp {
 }
 
 
+// Args: 16
 object DeviceMemcpy extends SpatialApp {
   import IR._
 
@@ -73,7 +74,7 @@ object DeviceMemcpy extends SpatialApp {
   }
 }
 
-
+// Args: 16
 object SimpleTileLoadStore extends SpatialApp {
   import IR._
 
@@ -331,7 +332,7 @@ object SimpleReduce extends SpatialApp { // Args: 72
 }
 
 
-
+// Args: 192
 object Niter extends SpatialApp {
   import IR._
   
