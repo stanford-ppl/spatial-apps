@@ -2,7 +2,7 @@ import spatial._
 import org.virtualized._
 import forge._
 
-object LedStreamingTest extends SpatialApp {
+object SwitchStreamingTest extends SpatialApp {
   import IR._
 
   override val target = targets.DE1
@@ -18,17 +18,18 @@ object LedStreamingTest extends SpatialApp {
   @virtualize
   def main() {
     // LEDR example
+    val inputSwitch = target.SliderSwitch
+    val input = StreamIn[UINT32](inputSwitch)
     val outputLEDR: Bus = target.LEDR
     val output = StreamOut[UINT32](outputLEDR)
     // Switch example
     // val inputSwitch = target.SliderSwitch
     // val input = StreamIn[UINT32](inputSwitch)
     Accel(*) {
-      // val switchVal = input.value()
+      val switchVal = input.value()
       // Assign to a value of switch
-      // outputLEDR := swtichVal
+      output := switchVal
       // Assign to a constant
-      output := 8
     }
   }
 }
