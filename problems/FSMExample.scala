@@ -41,6 +41,25 @@ object FSMExample extends SpatialApp {
         swInput.value()
       }
     }
+
+      // Version 2
+      /*FSM[Boolean]{state => true }{state =>
+        if (state) {
+          Foreach(0 until H, 0 until W){(i,j) =>
+            val pixel = input.value
+            output := BGR(pixel.b, pixel.g, pixel.r)
+          }
+        }
+        else {
+          Foreach(0 until H, 0 until W) {(i,j) =>
+            val pixel = input.value
+            val gray = (pixel.r.to[UINT8], pixel.g.to[UINT8] + pixel.b.to[UINT8]) / 3
+            output := BGR(gray.to[UINT5], gray.to[UINT6], gray.to[UINT5])
+          }
+        }
+      }{state => !state }*/
+    }
+
   }
 }
 
