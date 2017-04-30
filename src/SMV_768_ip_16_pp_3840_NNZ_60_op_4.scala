@@ -1,16 +1,16 @@
 import spatial._
 import org.virtualized._
 
-object SMV extends SpatialApp {  // Regression (Sparse) // Args: 768
+object SMV_768_ip_16_pp_3840_NNZ_60_op_4 extends SpatialApp {  // Regression (Sparse) // Args: 768
   import IR._
 
   type T = Int //FixPt[Signed,B16,B16]
 
-  val pp = 3840
-  val NNZ = 60
+val pp = 3840
+val NNZ = 60
 
-  val ip = 16
-  val op = 4
+val ip = 16
+val op = 4
 
   val tileSize = 384
 
@@ -35,8 +35,8 @@ object SMV extends SpatialApp {  // Regression (Sparse) // Args: 768
     val v = DRAM[Int](pp)
     val out = DRAM[Int](N)
 
-    //val op = op (1 -> 6)
-    //val ip = ip (1 -> 96)
+val op = 4
+val ip = 16
     val stPar    = ip (1 -> 1)
 
     setMem(aC, AC.flatten)
@@ -45,11 +45,11 @@ object SMV extends SpatialApp {  // Regression (Sparse) // Args: 768
     setMem(v, V)
 
     Accel {
-      Foreach(N by tileSize par op){ rowchunk =>
+      Foreach(N by tileSize){ rowchunk =>
         val smvresult = SRAM[Int](tileSize)
         val smvtileSizes = SRAM[Int](tileSize)
         smvtileSizes load sizes(rowchunk :: rowchunk+tileSize par ip)
-        Foreach(tileSize by 1){row =>
+        Foreach(tileSize by 1 par op){row =>
           val csrCols = SRAM[Int](tileSize)
           val csrData = SRAM[Int](tileSize)
           val vecGathered = SRAM[Int](tileSize)
@@ -68,8 +68,9 @@ object SMV extends SpatialApp {  // Regression (Sparse) // Args: 768
           }{_+_}
 
           smvresult(row) = acc.value
+
         }
-        out(rowchunk::rowchunk+tileSize par stPar) store smvresult
+      out(rowchunk::rowchunk+tileSize par stPar) store smvresult
       }
     }
     val smvresult = getMem(out)

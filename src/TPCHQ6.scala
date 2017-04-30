@@ -45,10 +45,10 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 384
   val MAX_DISC = 9999
   val margin = 1
 
-  val innerPar = 16
-  val outerPar = 4
+  val ip = 2 //16
+  val op = 1 // 4
 
-  val tileSize = 2000
+  val ts = 2000
 
   @virtualize
   def tpchq6[T:Type:Num](datesIn: Array[Int], quantsIn: Array[Int], disctsIn: Array[T], pricesIn: Array[T]): T = {
@@ -63,9 +63,9 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 384
     val maxDateIn = MAX_DATE
     val out = ArgOut[T]
 
-    val ts = tileSize (96 -> 96 -> 192000)
-    val op = outerPar (1 -> 6)
-    val ip = innerPar (1 -> 384)
+    //val ts = tileSize (96 -> 96 -> 192000)
+    //val op = outerPar (1 -> 6)
+    //val ip = innerPar (1 -> 384)
     val lp = 16 (1 -> 384)
 
     setMem(dates, datesIn)
