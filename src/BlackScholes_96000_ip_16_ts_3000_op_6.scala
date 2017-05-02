@@ -1,15 +1,15 @@
 import spatial._
 import org.virtualized._
 
-object BlackScholes extends SpatialApp {
+object BlackScholes_96000_ip_16_ts_3000_op_6 extends SpatialApp {
   import IR._
 
   type T = FixPt[TRUE, _16, _16]
 
   val margin = 0.5f // Validates true if within +/- margin
-  val ip = 16
-  val op = 1
-  val ts = 2000
+val ip = 16
+val op = 6
+val ts = 3000
 
   final val inv_sqrt_2xPI = 0.39894228040143270286f
 

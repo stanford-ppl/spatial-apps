@@ -34,27 +34,27 @@ import spatial._
 */
 
 
-object SGD extends SpatialApp { // Regression (Dense) // Args: 40 32 0.0001
+object SGD_40_32_0d0001_ip_16_ts_10_D_16_op_12 extends SpatialApp { // Regression (Dense) // Args: 40 32 0.0001
   import IR._
 
   type T = FixPt[TRUE, _16, _16]
-  val D = 16
+val D = 16
   val margin = 1
 
-  val ip = 16
-  val op = 12
+val ip = 16
+val op = 12
 
-  val ts = 192
+val ts = 10
 
   @virtualize
   def sgd_onept[T: Type : Num](x_in: Array[T], y_in: Array[T], alpha: T, epochs: Int, nn: Int) = {
     val E = ArgIn[Int]
     val N = ArgIn[Int]
     val A = ArgIn[T]
-    //val D = modelSize
+val D = 16
 
-    //val ip = innerPar(1 -> 1)
-    //val op = outerPar(1 -> 1)
+val ip = 16
+val op = 12
 
     setArg(E, epochs)
     setArg(N, nn)
@@ -113,7 +113,7 @@ object SGD extends SpatialApp { // Regression (Dense) // Args: 40 32 0.0001
     val E = args(0).to[Int]
     val N = args(1).to[Int]
     val A = args(2).to[T] // Should be somewhere around 0.0001 for point-wise sgd
-    //val D = modelSize
+val D = 16
 
     val sX = Array.fill(N) {
       Array.fill(D) {

@@ -1,22 +1,22 @@
 import spatial._
 import org.virtualized._
 
-object Kmeans extends SpatialApp { // Regression (Dense) // Args: 2 40
+object Kmeans_1536_20_ip_16_D_96_pts_per_load_1_op_1 extends SpatialApp { // Regression (Dense) // Args: 2 40
   import IR._
 
   type X = Int
 
-  val numcents = 20
+  val num_cents = 20
   val dim = 96
   val pts_per_ld = 1 // ???
 
-  val ip = 16
-  val op = 1
+val ip = 16
+val op = 1
 
   val element_max = 10
   val margin = (element_max * 0.2).to[X]
 
-  val MAXK = numcents
+  val MAXK = num_cents
   val MAXD = dim
 
   @virtualize
@@ -46,18 +46,17 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 2 40
     // setArg(D, numDims)
 
     val points = DRAM[T](N, D)    // Input points
-    val centroids = DRAM[T](numcents*dim) // Output centroids
+    val centroids = DRAM[T](num_cents*dim) // Output centroids
     // val init_cents = DRAM[T](K,D) // Output centroids
     setMem(points, points_in)
     // setMem(init_cents, cent_inits)
 
     Accel { Sequential { // TODO: Remove this Sequential wrapper once David fixes Accel analysis
-      val origCts = SRAM[T](MAXK, MAXD) // PIR Version
       val cts = SRAM[T](MAXK, MAXD)
       val newCents = SRAM[T](MAXK,MAXD)
 
       // Load initial centroids (from points)
-      origCts load points(0::K, 0::D par 16) // PIR Version
+      cts load points(0::K, 0::D par 16)
 
       // // Initialize newCents
       // Foreach(K by 1, D by 1) {(i,j) => newCents(i,j) = cts(i,j)} 
@@ -67,9 +66,9 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 2 40
       Sequential.Foreach(iters by 1){epoch =>
 
         // Flush centroid accumulator
-        /*Foreach(K by 1, D par P0){(ct,d) =>
+        Foreach(K by 1, D par P0){(ct,d) =>
           newCents(ct,d) = 0.to[T]
-        }*/ // PIR
+        }
 
         // For each set of points
         Foreach(N by BN par PX){i =>
@@ -79,28 +78,13 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 2 40
           // For each point in this set
           MemFold(newCents)(BN par PX){pt =>
             // Find the index of the closest centroid
-            /*val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
+            val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
             val minCent = Reduce(accum)(K par PX){ct =>
               val dist = Reg[T](0.to[T])
               Reduce(dist)(D par P2){d => (pts(pt,d) - cts(ct,d)) ** 2 }{_+_}
               pack(ct, dist.value)
             }{(a,b) =>
               mux(a._2 < b._2, a, b)
-            }*/
-            // PIR Version
-            val minCent = Reg[Int]
-            val minDist = Reg[T](100000.to[T])
-            Foreach(K par PX){ct =>
-              val dist = Reduce(Reg[T])(D par P2){d =>
-                val cent = mux(epoch == 0, origCts(ct,d), cts(ct,d))
-                (pts(pt,d) - cent) ** 2
-              }{_+_}
-
-              Pipe {
-                val d = dist.value
-                minDist := min(minDist.value, d)
-                minCent := mux(minDist.value == d, ct, minCent.value)
-              }
             }
 
             // Store this point to the set of accumulators
@@ -108,11 +92,10 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 2 40
             Foreach(K by 1, D par P2){(ct,d) =>
               //val elem = mux(d == DM1, 1.to[T], pts(pt, d)) // fix for vanishing mux
               val elem = pts(pt,d)
-              localCent(ct, d) = mux(ct == minCent.value, elem, 0.to[T])
+              localCent(ct, d) = mux(ct == minCent.value._1, elem, 0.to[T])
             }
             localCent
           }{_+_} // Add the current point to the accumulators for this centroid
-          ()
         }
 
         val centCount = SRAM[T](MAXK)
@@ -141,8 +124,8 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 2 40
   def main() {
     val iters = args(0).to[Int]
     val N = args(1).to[Int]
-    val K = numcents //args(2).to[SInt];
-    val D = dim //args(3).to[SInt];
+    val K = num_cents //args(2).to[SInt];
+val D = 96
 
     val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + i }}
     val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + (i*N/K) }}

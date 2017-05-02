@@ -1,7 +1,7 @@
 import org.virtualized._
 import spatial._
 
-object GDA extends SpatialApp { // Regression (Dense) // Args: 64
+object GDA_384000_ip_16_ts_3000_op_10 extends SpatialApp { // Regression (Dense) // Args: 64
   import IR._
 
   type X = Int
@@ -10,16 +10,16 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   val C = MAXC
   val margin = 1
 
-  val ip = 2
-  val op = 2
+val ip = 16
+val op = 10
 
-  val ts = 20
+val ts = 3000
 
   @virtualize
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
     val rTileSize = ts(96 -> 19200)
-    //val op = outerPar(1 -> 8)
-    //val ip = innerPar(1 -> 12)
+val op = 10
+val ip = 16
     val subLoopPar = ip(1 -> 16)
     val prodLoopPar = ip(1 -> 96)
     val outerAccumPar = ip(1 -> 1)

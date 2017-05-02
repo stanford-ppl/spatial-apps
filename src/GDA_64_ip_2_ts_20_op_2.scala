@@ -1,7 +1,7 @@
 import org.virtualized._
 import spatial._
 
-object GDA extends SpatialApp { // Regression (Dense) // Args: 64
+object GDA_64_ip_2_ts_20_op_2 extends SpatialApp { // Regression (Dense) // Args: 64
   import IR._
 
   type X = Int
@@ -10,16 +10,16 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   val C = MAXC
   val margin = 1
 
-  val ip = 2
-  val op = 2
+val ip = 2
+val op = 2
 
-  val ts = 20
+val ts = 20
 
   @virtualize
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
     val rTileSize = ts(96 -> 19200)
-    //val op = outerPar(1 -> 8)
-    //val ip = innerPar(1 -> 12)
+val op = 2
+val ip = 2
     val subLoopPar = ip(1 -> 16)
     val prodLoopPar = ip(1 -> 96)
     val outerAccumPar = ip(1 -> 1)
@@ -49,8 +49,8 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
       val mu0Tile = SRAM[T](MAXC)
       val mu1Tile = SRAM[T](MAXC)
       Parallel {
-        mu0Tile load mu0(0 :: C par 16) // Load mu0
-        mu1Tile load mu1(0 :: C par 16) // Load mu1
+        mu0Tile load mu0(0 :: C par ip) // Load mu0
+        mu1Tile load mu1(0 :: C par ip) // Load mu1
       }
 
       val sigmaOut = SRAM[T](MAXC, MAXC)
@@ -60,8 +60,8 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
         val gdaXtile = SRAM[T](rTileSize, MAXC)
         val blk = Reg[Int]
         Parallel {
-          gdaYtile load y(r :: r + rTileSize par 16)
-          gdaXtile load x(r :: r + rTileSize, 0 :: C par 16) // Load tile of x
+          gdaYtile load y(r :: r + rTileSize par ip)
+          gdaXtile load x(r :: r + rTileSize, 0 :: C par ip) // Load tile of x
           Pipe {
             blk := min(R.value - r, rTileSize)
           }
@@ -82,7 +82,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
         }{_+_}
       }{_+_}
 
-      sigma(0 :: C, 0 :: C par 16) store sigmaOut
+      sigma(0 :: C, 0 :: C par ip) store sigmaOut
     }
 
     getMem(sigma)
