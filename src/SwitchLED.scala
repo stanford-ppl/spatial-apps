@@ -1,7 +1,7 @@
 import org.virtualized._
 import spatial._
 
-object SwitchHostIO extends SpatialApp {
+object SwitchLED extends SpatialApp {
   import IR._
 
   override val target = targets.DE1
@@ -9,14 +9,12 @@ object SwitchHostIO extends SpatialApp {
 
   @virtualize 
   def main() { 
-    val io1 = HostIO[Int]
+    val leds = target.LEDR
+    val ledOutput = StreamOut[Int](leds)
     val switch = target.SliderSwitch
     val swInput = StreamIn[Int](switch)
     Accel(*) {
-      io1 := swInput.value()
+      ledOutput := swInput.value()
     }
-
-    val r1 = getArg(io1)
-    println("received: " + r1)
   }
 }
