@@ -2,15 +2,15 @@ import spatial._
 import org.virtualized._
 import spatial.targets.DE1
 
-object StreamingSobel extends SpatialApp { 
+object BOStreamingSobel extends SpatialApp { 
   import IR._
 
   override val target = DE1
 
   val Kh = 3
   val Kw = 3
-  val Rmax = 24
-  val Cmax = 42
+  val Rmax = 240
+  val Cmax = 320
 
   type Int16 = FixPt[TRUE,_16,_0]
   type UInt8 = FixPt[FALSE,_8,_0]
@@ -27,7 +27,7 @@ object StreamingSobel extends SpatialApp {
     setArg(C, cols)
 
     val imgIn  = StreamIn[Pixel16](target.VideoCamera)
-    val imgOut = StreamOut[Pixel16](target.VGA)
+    val imgOut = BufferedOut[Pixel16](target.VGA)
 
     Accel {
       val kh = RegFile[Int16](Kh, Kw)
@@ -55,10 +55,8 @@ object StreamingSobel extends SpatialApp {
       }
 
       val sr = RegFile[Int16](Kh, Kw)
-      val fifoIn = FIFO[Int16](Cmax)
-      val fifoOut = FIFO[Int16](Cmax)
+      val fifoIn = FIFO[Int16](128)
       val lb = LineBuffer[Int16](Kh, Cmax)
-      val submitReady = FIFO[Bool](3)
 
       Stream(*) { _ =>
         val pixel = imgIn.value()
@@ -81,20 +79,11 @@ object StreamingSobel extends SpatialApp {
               val vert = Reduce(Reg[Int16])(Kh by 1, Kw by 1) { (i, j) =>
                 val number = mux(r < Kh-1 || c < Kw-1, 0.to[Int16], sr(i, j))
                 number * kv(i, j)
-              }{_+_};
+              }{_+_}
 
-              fifoOut.enq( abs(horz.value) + abs(vert.value) ) // Technically should be sqrt(horz**2 + vert**2)
+              val pixelOut = abs(horz.value) + abs(vert.value)
+              imgOut(r,c) = Pixel16(pixelOut(10::6).as[UInt5], pixelOut(10::5).as[UInt6], pixelOut(10::6).as[UInt5])
             }
-            submitReady.enq(true)
-          }
-        }
-
-        Pipe {
-          Pipe{ submitReady.deq() }
-          Foreach(0 until Cmax) {i => 
-            val pixelOut = fifoOut.deq()
-            // Ignore MSB - pixelOut is a signed number that's definitely positive, so MSB is always 0
-            imgOut := Pixel16(pixelOut(10::6).as[UInt5], pixelOut(10::5).as[UInt6], pixelOut(10::6).as[UInt5])
           }
         }
       }
