@@ -536,27 +536,26 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
         def buf_getb(): UInt8 = {
           if (read_position_idx.value < 0.to[Int]) {
             current_read_byte := pgetc()
-          //   read_position := 0x80.to[UInt8]
-          //   read_position_idx := 7.to[Int]
+            read_position := 0x80.to[UInt8]
+            read_position_idx := 7.to[Int]
           }
-          // val ret = if ((current_read_byte.value & read_position.value.as[UInt8]) == 0.to[UInt8]){
-          //             0.to[UInt8]
-          //           } else {
-          //             1.to[UInt8]
-          //           }
-          // if (read_position_idx.value == 0.to[Int]){read_position_idx := -1} else {read_position := read_position.value >> 1; read_position_idx :-= 1}
-          // ret
-          0.to[UInt8]
+          val ret = if ((current_read_byte.value & read_position.value.as[UInt8]) == 0.to[UInt8]){
+                      0.to[UInt8]
+                    } else {
+                      1.to[UInt8]
+                    }
+          if (read_position_idx.value == 0.to[Int]){read_position_idx := -1} else {read_position := read_position.value >> 1; read_position_idx :-= 1}
+          ret
         }
         def buf_getv(n: UInt8): UInt8 = {
-          // val ret = Reg[UInt8](0)
-          // val p = n - 1 - read_position_idx.value.as[UInt8]
-          // if (read_position_idx.value > 23.to[Int]) { // Not sure how this is ever possible
-          //   val rv = Reg[UInt8](0)
-          //   rv := current_read_byte.value
-          //   Fold(rv)(p.as[Int] by 1){_ => Reg[UInt8](0)}{(a,b) => a << 1} 
-          //   // rv = (current_read_byte << p);  /* Manipulate buffer */
-          //   current_read_byte := pgetc().as[UInt8]
+          val ret = Reg[UInt8](0)
+          val p = n - 1 - read_position_idx.value.as[UInt8]
+          if (read_position_idx.value > 23.to[Int]) { // Not sure how this is ever possible
+            val rv = Reg[UInt8](0)
+            // val shifter = Reduce(Reg[UInt8](1))(p.as[Int] by 1){i => 2}{_*_}
+            rv := current_read_byte.value
+            // rv = (current_read_byte << p);  /* Manipulate buffer */
+            // current_read_byte := pgetc().as[UInt8]
           //   val new_rv = Reg[UInt8](0)
           //   new_rv := current_read_byte.value
           //   Fold(new_rv)((8 - p).as[Int] by 1){_ => Reg[UInt8](0)}{(a,b) => a >> 1}
@@ -565,10 +564,9 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
           //   read_position := Reduce(Reg[UInt8](1))(read_position_idx - 1 by 1){_ => Reg[UInt8](0)}{(a,b) => a << 1}
           //   ret := (final_rv)// & lmask[n])
           //   // more specifically here
-  
-          // }
-          // ret.value
-          0.to[UInt8]
+            rv.value
+          }
+          else {ret.value}
         }
         def DecodeHuffman(tbl_no: Index, use_dc: Boolean): UInt8 = {
           val code = Reg[UInt8](0)
@@ -630,7 +628,7 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
 
       jpeg_init_decompress()
 
-      // decode_start()
+      decode_start()
 
 
     }
