@@ -638,6 +638,36 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
   }
 }
 
+object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
+  override val target = AWS_F1
+  type UInt8 = FixPt[FALSE, _8, _0]
+  type UInt2 = FixPt[FALSE, _2, _0]
+  type UInt16 = FixPt[FALSE, _16, _0]
+  type UInt = FixPt[FALSE, _32, _0]
+
+  @virtualize
+  def main() = {
+
+
+    Accel{
+      val inPMV = LUT[UInt16](2,2,2)(45,  207,
+                                     70,  41,
+
+                                     4,   180,
+                                     120, 216)
+      val inmvfs = LUT[UInt16](2,2)(232, 200, 
+                                    32,  240)
+      val outPMV = LUT[UInt16](2,2,2)(1566, 206,
+                                      70,   41,
+
+                                      1566, 206,
+                                      120, 216)
+      val outmvfs = LUT[UInt16](2,2)(0, 200,
+                                     0, 240)
+    }
+
+  }
+}
 
 
 
