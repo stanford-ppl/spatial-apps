@@ -31,7 +31,6 @@ trait SpatialStreamInterpreter {
   def prog(): Unit
   def inputs: Map[Bus, List[MetaAny[_]]]
   def outs: List[Bus]
-  def forceExit(): scala.Boolean
 
   private var __stagingArgs = scala.Array[java.lang.String]()
   override def stagingArgs = scala.Array[java.lang.String]("--interpreter") ++ __stagingArgs
@@ -57,7 +56,6 @@ trait SpatialStreamInterpreter {
 
     __stagingArgs ++= args
 
-    Config.forceExit = () => forceExit()
     Config.exit = () => exit()
 
     inputs.foreach { case (bus, content) =>
@@ -90,10 +88,6 @@ object StreamInOutMultInterpreter extends SpatialStream with SpatialStreamInterp
   val inputs = Map[Bus, List[MetaAny[_]]](
     (In1 -> List[Int](3, 4, 2, 6))
   )
-
-
-  def forceExit() =
-    Streams.streamsOut(Out1).size == 4
   
 
 }
