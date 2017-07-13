@@ -8,7 +8,11 @@ trait ParticleFilter extends SpatialStream {
 
   type SReal = FltPt[_32,_0]
 
-  @struct case class SQuaternion(r: SReal)
+  @struct case class SQuaternion(r: SReal, i: SReal, j: SReal, k: SReal)
+  @struct case class SVec3(x: SReal, y: SReal, z: SReal)
+  @struct case class SState(v: SVec3, p: SVec3)
+  @struct case class SParticle(w: SReal, q: SQuaternion, st: SState)  
+
 
   val N: scala.Int = 10
 
@@ -27,8 +31,11 @@ trait ParticleFilter extends SpatialStream {
       val lastV = Reg[SQuaternion]
       val lastIMU = Reg[SReal]
 
+
       Foreach(N by 1)(x => {
-        state(x) = SQuaternion(random[SReal])
+        val g1 = gaussian(0.0, 1.0)
+        val g2 = gaussian(0.0, 1.0)        
+        state(x) = SQuaternion(g1._1, g1._2, g2._1, g2._2)
       })
       
       Stream(*)(x => {
@@ -49,36 +56,55 @@ trait ParticleFilter extends SpatialStream {
           println(fifoV.deq())
           ()
         }
-      }}{state => state + 1}
+      }}{x => x + 1}
 
     }
   }
 
   //Box-Muller
   //http://www.design.caltech.edu/erik/Misc/Gaussian.html
-  def gaussian(mean: SReal, variance: SReal) = {
-    val r = random[SReal](1.0)
-/*    val x1 = Reg[SReal](true)
-    f 
-    while ( w >= 1.0 );
-         do {
-                 x1 = 2.0 * ranf() - 1.0;
-                 x2 = 2.0 * ranf() - 1.0;
-                 w = x1 * x1 + x2 * x2;
-         } 
+  @virtualize def gaussian(mean: SReal, variance: SReal) = {
 
-         w = sqrt( (-2.0 * log( w ) ) / w );
-         y1 = x1 * w;
-         y2 = x2 * w;
- */
-    r
+    val x1 = Reg[SReal]
+    val x2 = Reg[SReal]
+    val w = Reg[SReal]
+    do {
+      x1 := 2.0 * random[SReal](1.0) - 1.0
+      x2 := 2.0 * random[SReal](1.0) - 1.0
+      w := (x1 * x1 + x2 * x2)
+      false
+    } while (w.value >= 1.0)
+
+    w := sqrt( (-2.0 * log(w.value) ) / w )
+    val y1 = x1 * w
+    val y2 = x2 * w
+
+    (y1, y2)
+    
   }
+
+  def quatMult(q1: SQuaternion, q2: SQuaternion) = {
+    SQuaternion(
+      q1.r*q2.r - q1.i*q2.i - q1.j*q2.j - q1.k*q2.k,
+      q1.r*q2.i + q1.i*q2.r + q1.j*q2.k - q1.k*q2.j,
+      q1.r*q2.j - q1.i*q2.k + q1.j*q2.r + q1.k*q2.i,
+      q1.r*q2.k + q1.i*q2.j - q1.j*q2.i + q1.k*q2.r
+    )
+  }
+
+  def quatInverse(q: SQuaternion) = {
+    val n = q.r*q.r + q.i*q.i + q.j*q.j + q.k*q.k
+    SQuaternion(q.r/n, -q.i/n, -q.j/n, q.j/n)
+  }
+
+  def localAngleToQuat(v: SVec3): SQuaternion =
+    ???
 
   val outs = List(Out1)
 
 
   val inputs = Map[Bus, List[MetaAny[_]]](
-    (In1 -> List[SReal](3f, 4f, 2f, 6f).map(SQuaternion.apply)),
+    (In1 -> List[SReal](3f, 4f, 2f, 6f).map(x => SQuaternion(x, x, x, x))),
     (In2 -> List[SReal](3f, 4f, 2f, 6f))
   )
   
