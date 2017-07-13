@@ -10,45 +10,47 @@ trait ParticleFilter extends SpatialStream {
 
   @struct case class SQuaternion(r: SReal)
 
-  
+  val N: scala.Int = 10
+
   @virtualize def prog() = {
 
-    val in  = StreamIn[SQuaternion](In1)
-    val in2  = StreamIn[SReal](In2)    
+    val inIMU  = StreamIn[SReal](In2)        
+    val inV  = StreamIn[SQuaternion](In1)
     val out = StreamOut[SQuaternion](Out1)
-//    val p = 100 (1 -> 100)
+    val p = 100 (1 -> 100)
 
     Accel(*) {
       val i = Reg[Int]
       i := i + 1
-      breakpoint()
-      //val state = SRAM[SQuaternion](100)
-/*     
-      Stream(*)(x =>
-        f(in)
-          Foreach(state.length by 1 par p)(x => {
-            state(x) = ...
-          })
-      )
+      val state = SRAM[SQuaternion](N)
 
-      Stream(*)(x =>
-        g(in2)
-      )
-      
+      val fifoV = FIFO[SQuaternion](100)
+      val fifoIMU = FIFO[SReal](100)
 
- */
+      breakpoint
+
+
+      Foreach(N by 1)(x => {
+        state(x) = SQuaternion(random[SReal])
+      })
+
+      out := state(i)
+
+      Stream(*)(x => {
+        breakpoint
+        fifoV.enq(inV)
+      })
+
+      Stream(*)(x => {
+        breakpoint
+        fifoIMU.enq(inIMU)
+      })
+
       /*
-
-      Foreach(99 by 1)(x => {
-        if (i.value == 0)
-          state(i) = SQuaternion(random[SReal])
-        else
-          state(i) = SQuaternion(0.0)
+      Stream(*)(x => {
+        fifoIMU.enq(inIMU)        
       })
        */
-
-      val rg: SReal  = gaussian(0.0, 1f)
-      out := SQuaternion(rg)
     }
   }
 
@@ -75,8 +77,9 @@ trait ParticleFilter extends SpatialStream {
   val outs = List(Out1)
 
 
-  val inputs = Map[Bus, List[Exp[_]]](
-    (In1 -> List[SReal](3f, 4f, 2f, 6f).map(SQuaternion.apply).map(_.s))
+  val inputs = Map[Bus, List[MetaAny[_]]](
+    (In1 -> List[SReal](3f, 4f, 2f, 6f).map(SQuaternion.apply)),
+    (In2 -> List[SReal](3f, 4f, 2f, 6f))
   )
   
   def forceExit() =
