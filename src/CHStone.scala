@@ -650,6 +650,7 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
 
     val NUMEL = 2048
     val MV_FIELD = 0
+    val ERROR = 255
     val inRdBfr_data = loadCSV1D[UInt8]("/remote/regression/data/machsuite/mpeg2_inRdBfr.csv", ",")
     val inRdBfr_dram = DRAM[UInt8](NUMEL)
     setMem(inRdBfr_dram, inRdBfr_data)
@@ -670,6 +671,36 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
                                       120, 216)
       val outmvfs = LUT[UInt16](2,2)(0, 200,
                                      0, 240)
+      val MVtab0 = LUT[UInt](8,2)(ERROR, 0, 
+                                 3, 3, 
+                                 2, 2, 
+                                 2, 2,
+                                 1, 1, 
+                                 1, 1, 
+                                 1, 1, 
+                                 1, 1)
+
+      val MVtab1 = LUT[UInt](8,2)(ERROR, 0, 
+                                 ERROR, 0, 
+                                 ERROR, 0, 
+                                 7, 6,  
+                                 6, 6, 
+                                 5, 6, 
+                                 4, 5, 
+                                 4, 5)
+
+      val MVtab2 = LUT[UInt](12,2)(16, 9, 
+                                 15, 9, 
+                                 14, 9, 
+                                 13, 9, 
+                                 12, 9, 
+                                 11, 9,
+                                 10, 8, 
+                                 10, 8, 
+                                 9, 8, 
+                                 9, 8, 
+                                 8, 8, 
+                                 8, 8)
 
       val dmvector = RegFile[UInt16](2)
       val motion_vertical_field_select = RegFile[UInt16](2,2)
@@ -678,7 +709,7 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
       val ld_Rdbfr = SRAM[UInt8](2048)
       val ld_Bfr = Reg[UInt](68157440)
       val ld_Incnt = Reg[Int](0)
-      val ld_Rdptr = Reg[Int](2047)
+      val ld_Rdptr = Reg[Int](2048)
       val ld_Rdmax = Reg[Int](2047)
       val motion_vector_count = Reg[Int](1)
       val mv_format = Reg[Int](0)
@@ -686,36 +717,42 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
       val s = Reg[Int](0)
 
       def Fill_Buffer(): Unit = {
+
         ld_Rdbfr load inRdBfr_dram(0::2048)
         ld_Rdptr := 0
         // TODO: Some padding crap if file is not aligned, which is impossible since benchmark hardcodes 2048-element read
       }
       def Flush_Buffer(n: UInt): Unit = {
         Foreach(n.to[Int] by 1){_ => ld_Bfr := ld_Bfr << 1}
+
         ld_Incnt := ld_Incnt - n.to[Int]
         val Incnt = ld_Incnt
+        Pipe{println("  in flushbuf, ldbfr " + ld_Bfr.value + " n = " + n + " branching based on " + ld_Incnt.value + " and " + ld_Rdptr.value)}
 
         if (Incnt <= 24) {
           if (ld_Rdptr < 2044) {
+            println("   flushbranch1")
             Foreach(Incnt until 25 by 8){ i => 
               val tmp = Reg[UInt]
               tmp := ld_Rdbfr(ld_Rdptr).to[UInt]
               Foreach(24-i by 1){j => tmp := tmp << 1}
               ld_Bfr := ld_Bfr | tmp.value
+              ld_Incnt := i
             }
           } else {
+            println("   flushbranch2")
             Foreach(Incnt until 25 by 8){i => 
               if (ld_Rdptr >= 2047) {Fill_Buffer()}
               val tmp = Reg[UInt]
               tmp := ld_Rdbfr(ld_Rdptr).to[UInt]
-              println("  Extracted " + tmp.value)
               ld_Rdptr :+= 1
               Foreach(24-i by 1){j => tmp := tmp << 1}
-              ld_Bfr := ld_Bfr | tmp.value                
+              ld_Bfr := ld_Bfr | tmp.value
+              ld_Incnt := i           
             }
           }
           ld_Rdptr :+= 24
-        }
+        } else { println("   flushnobranch") }
       }
       def InitializeBuffer(): Unit = {
         // Regs all set to initial value to begin with
@@ -724,19 +761,68 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
       def Show_Bits(n: UInt): UInt = {
         val tmp = Reg[UInt]
         tmp := ld_Bfr.value
+        println("in showbits, doing shifty shit on " + tmp.value)
         Foreach(((32 - n)%32).to[Int] by 1){_ => tmp := tmp >> 1}
         tmp.value
       }
       def Get_Bits(n: UInt): UInt = {
         val bits = Show_Bits(n)
+        // println(" in getbits, showed " + n + " bits as " + bits)
         Flush_Buffer(n)
         bits
       }
+      def Get_motion_code(): UInt = {
+        if (Get_Bits(1) == 0.to[UInt]) {
+          0.to[UInt]
+        } else {
+          val code = Reg[Int](0)
+          code := Show_Bits(9).to[Int]
+          println("showed bits " + code.value)
+          if (code.value >= 64) {
+            println("branch1")
+            code := code.value >> 6
+            Flush_Buffer(MVtab0(code.value,1))
+            val tmp = Get_Bits(1)
+            val read = MVtab0(code.value,0)
+            if (tmp == 1.to[UInt]) { -read } else { read }
+          } else if (code.value >= 24) {
+            code := code.value >> 3
+            println("branch2 " + code.value)
+            Flush_Buffer(MVtab1(code.value,1))
+            val tmp = Get_Bits(1)
+            val read = MVtab1(code.value,0)
+            println("mvtab1 is " + read + " tmp is " + tmp)
+            if (tmp == 1.to[UInt]) { -read } else { read }
+          } else {
+            code :-= 12
+            if (code < 0) {
+              0.to[UInt]
+            } else {
+              Flush_Buffer (MVtab2(code.value,0))
+              println("branch3")
+              val tmp = Get_Bits(1)
+              val read = MVtab2(code.value,1)
+              if (tmp == 1.to[UInt]) { -read } else { read }
+            }
+          }
+
+        }
+
+      }
+      def motion_vector(): Unit = {
+        val motion_code = Get_motion_code()
+        println(" motion code " + motion_code)
+      }
+
       def motion_vectors(): Unit = {
         val motion_vertical_field_select = RegFile[UInt](2,2)
-        if (motion_vector_count.value != 1) {
+        if (motion_vector_count.value == 1) {
           if (mv_format.value == MV_FIELD && !dmv.value) {
-            Foreach(2 by 1) { i => motion_vertical_field_select(i,s.value) = Get_Bits(1.to[UInt]) }
+            val tmp = Get_Bits(1.to[UInt])
+            Foreach(2 by 1) { i => 
+              motion_vertical_field_select(i,s.value) = tmp
+            }
+            motion_vector()
           }
         }
       }
