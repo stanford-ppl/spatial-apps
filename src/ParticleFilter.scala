@@ -3,6 +3,7 @@ import org.virtualized._
 import spatial.SpatialCompiler
 import spatial.interpreter.Interpreter
 import spatial.interpreter.Streams
+import spatial.metadata._
 
 trait ParticleFilter extends SpatialStream {
 
@@ -11,7 +12,7 @@ trait ParticleFilter extends SpatialStream {
   val initP: (scala.Double, scala.Double, scala.Double)               = (0.0, 0.0, 0.0)
   val initQ: (scala.Double, scala.Double, scala.Double, scala.Double) = (1.0, 0.0, 0.0, 0.0)
   val initTime: scala.Double                                          = 0.0
-  val covGyro: scala.Double = 1.0
+  val covGyro: scala.Double = 0.01
 
   type Real         = FltPt[_32, _0]
   type Time         = Real
@@ -33,13 +34,13 @@ trait ParticleFilter extends SpatialStream {
   case class Mat(h: scala.Int, w: scala.Int, x: Array[Real]) { self =>
     def *(y: Mat) = MatMult(self, y)
     def +(y: Mat) = MatAdd(self, y)
-    def -(y: Mat) = MatMin(self, y)
+    def -(y: Mat) = MatSub(self, y)
     def t         = transpose(self)
   }
 
-  implicit class FIFOpeek[T](x: FIFO[T]) {
-    def peek: T = ???
-  }
+//  implicit class FIFOpeek[T](x: FIFO[T]) {
+//    def peek: T = ???
+//  }
 
   implicit class Vec3Ops(x: Vec3) {
     def *(y: Real) = Vec3(x.x*y, x.y*y, x.z*y)
@@ -51,14 +52,19 @@ trait ParticleFilter extends SpatialStream {
     def *(y: Real) = Quat(x.r*y, x.i*y, x.j*y, x.k*y)
     def *(y: Quat) = QuatMult(x, y)
     def rotateBy(q: Quat) = q*x
+    def rotate(v: Vec3): Vec3 = {
+      val inv = x.inverse
+      val nq = (x*Quat(0.0, v.x, v.y, v.z))*inv
+      Vec3(nq.i, nq.j, nq.k)
+    }
     def inverse = QuatInverse(x)
   }
 
 
   @virtualize def prog() = {
 
-    val inIMU = StreamIn[IMU](In2)
-    val inV   = StreamIn[Vicon](In1)
+    val inIMU = StreamIn[IMU](In1)
+    val inV   = StreamIn[Vicon](In2)
     val out   = StreamOut[POSE](Out1)
     val parFactor = N (1 -> N)
 
@@ -89,33 +95,34 @@ trait ParticleFilter extends SpatialStream {
             fifoIMU.enq(inIMU)
           })
 
-          FSM[Boolean](x => x)(x => {
+          FSM.fsm[Boolean](true, (x => x), (x => {
             if ((fifoV.empty && !fifoIMU.empty) || (!fifoIMU.empty && !fifoV.empty && fifoIMU.peek.t < fifoV.peek.t))
               updateFromIMU(fifoIMU.deq(), lastTime, lastO, particles, parFactor)
             else if (!fifoV.empty)
               updateFromV(fifoV.deq(), lastTime, lastO, particles, parFactor)
 
             out := averagePOSE(particles)
-
-          })(x => fifoV.empty && fifoIMU.empty)
+          }) , (x => (!fifoV.empty || !fifoIMU.empty)), style=SeqPipe)
+          
         }
       }
     }
   }
 
-  @virtualize def updateAttitude(dt: Time, lastO: Reg[Omega], particles: SRAM1[Particle], parFactor: Int) = {
+  @virtualize def updateAttitudeAndAcc(x: Acceleration, dt: Time, lastO: Reg[Omega], particles: SRAM1[Particle], parFactor: Int) = {
     Foreach(N by 1 par parFactor)(i => {
       val pp = particles(i)
       val nq = sampleAtt(pp.q, lastO, dt)
-      particles(i) = Particle(pp.w, nq, pp.st, pp.lastA)
+      particles(i) = Particle(pp.w, nq, pp.st, nq.rotate(x))
     })
   }
+
 
   def updateFromIMU(x: IMU, lastTime: Reg[Time], lastO: Reg[Omega], particles: SRAM1[Particle], parFactor: Int) = {
     val dt = x.t - lastTime
     lastTime := x.t
     lastO := x.g
-    updateAttitude(dt, lastO, particles, parFactor)
+    updateAttitudeAndAcc(x.a, dt, lastO, particles, parFactor)
   }
 
   def sampleAtt(q: Quat, om: Omega, dt: Time): Quat = {
@@ -147,11 +154,11 @@ trait ParticleFilter extends SpatialStream {
     val w  = Reg[Real]
     val w2 = Reg[Real]
 
-    FSM[Boolean](x => x)(x => {
+    FSM.fsm[Boolean]((true), (x => x), (x => {
       x1 := 2.0 * random[Real](1.0) - 1.0
       x2 := 2.0 * random[Real](1.0) - 1.0
       w := (x1 * x1 + x2 * x2)
-    })(x => w.value >= 1.0)
+    }), (x => w.value >= 1.0), style=SeqPipe)
 
     w2 := sqrt((-2.0 * log(w.value)) / w)
 
@@ -192,7 +199,7 @@ trait ParticleFilter extends SpatialStream {
   def MatAdd(a: Mat, b: Mat): Mat =
     ???
 
-  def MatMin(a: Mat, b: Mat): Mat =
+  def MatSub(a: Mat, b: Mat): Mat =
     ???
 
   def kalmanPredict(xp: Mat, sp: Mat, f: Mat, u: Mat, q: Mat) = {
@@ -216,15 +223,17 @@ trait ParticleFilter extends SpatialStream {
     (x, sig, (za, s))
   }
 
-  def averagePOSE(x: SRAM[Particle]): POSE = {
-    ???
+  def averagePOSE(x: SRAM1[Particle]): POSE = {
+    //TODO FIX THAT, VERY INCORRECT
+    val p = x(0)
+    POSE(p.st.p, p.q)
   }
 
   val outs = List(Out1)
 
   val inputs = Map[Bus, List[MetaAny[_]]](
-    (In1 -> List[Real](3f, 4f, 2f, 6f).map(x => Quat(x, x, x, x))),
-    (In2 -> List[Real](3f, 4f, 2f, 6f))
+    (In1 -> List[Real](3f, 4f, 2f, 6f).map(x => IMU(x/10, Vec3(x, x, x), Vec3(x/100, x/100, x/100)))),
+    (In2 -> List[Real]().map(x => Quat(x, x, x, x)))  
   )
 
 }
