@@ -649,6 +649,7 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
   def main() = {
 
     val NUMEL = 2048
+    val MV_FIELD = 0
     val inRdBfr_data = loadCSV1D[UInt8]("/remote/regression/data/machsuite/mpeg2_inRdBfr.csv", ",")
     val inRdBfr_dram = DRAM[UInt8](NUMEL)
     setMem(inRdBfr_dram, inRdBfr_data)
@@ -679,15 +680,19 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
       val ld_Incnt = Reg[Int](0)
       val ld_Rdptr = Reg[Int](2047)
       val ld_Rdmax = Reg[Int](2047)
+      val motion_vector_count = Reg[Int](1)
+      val mv_format = Reg[Int](0)
+      val dmv = Reg[Boolean](false)
+      val s = Reg[Int](0)
 
       def Fill_Buffer(): Unit = {
         ld_Rdbfr load inRdBfr_dram(0::2048)
-        ld_Rdptr := 2048
+        ld_Rdptr := 0
         // TODO: Some padding crap if file is not aligned, which is impossible since benchmark hardcodes 2048-element read
       }
-      def Flush_Buffer(n: Int): Unit = {
-        ld_Bfr := n.to[UInt]
-        ld_Incnt := ld_Incnt - n
+      def Flush_Buffer(n: UInt): Unit = {
+        Foreach(n.to[Int] by 1){_ => ld_Bfr := ld_Bfr << 1}
+        ld_Incnt := ld_Incnt - n.to[Int]
         val Incnt = ld_Incnt
 
         if (Incnt <= 24) {
@@ -695,25 +700,45 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
             Foreach(Incnt until 25 by 8){ i => 
               val tmp = Reg[UInt]
               tmp := ld_Rdbfr(ld_Rdptr).to[UInt]
-              Foreach(24-Incnt by 1){j => tmp := tmp << 1}
+              Foreach(24-i by 1){j => tmp := tmp << 1}
               ld_Bfr := ld_Bfr | tmp.value
             }
           } else {
             Foreach(Incnt until 25 by 8){i => 
-              if (ld_Rdptr >= 2048) {Fill_Buffer()}
+              if (ld_Rdptr >= 2047) {Fill_Buffer()}
               val tmp = Reg[UInt]
               tmp := ld_Rdbfr(ld_Rdptr).to[UInt]
-              Foreach(24-Incnt by 1){j => tmp := tmp << 1}
+              println("  Extracted " + tmp.value)
+              ld_Rdptr :+= 1
+              Foreach(24-i by 1){j => tmp := tmp << 1}
               ld_Bfr := ld_Bfr | tmp.value                
             }
           }
           ld_Rdptr :+= 24
         }
-        println(" ld_rdptr = " + ld_Rdptr.value + " ldbfr = " + ld_Bfr.value)
       }
       def InitializeBuffer(): Unit = {
         // Regs all set to initial value to begin with
         Flush_Buffer(0)
+      }
+      def Show_Bits(n: UInt): UInt = {
+        val tmp = Reg[UInt]
+        tmp := ld_Bfr.value
+        Foreach(((32 - n)%32).to[Int] by 1){_ => tmp := tmp >> 1}
+        tmp.value
+      }
+      def Get_Bits(n: UInt): UInt = {
+        val bits = Show_Bits(n)
+        Flush_Buffer(n)
+        bits
+      }
+      def motion_vectors(): Unit = {
+        val motion_vertical_field_select = RegFile[UInt](2,2)
+        if (motion_vector_count.value != 1) {
+          if (mv_format.value == MV_FIELD && !dmv.value) {
+            Foreach(2 by 1) { i => motion_vertical_field_select(i,s.value) = Get_Bits(1.to[UInt]) }
+          }
+        }
       }
 
       Foreach(2 by 1){i =>
@@ -727,6 +752,7 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
       }
 
       InitializeBuffer()
+      motion_vectors()
 
     }
 
