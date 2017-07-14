@@ -958,6 +958,14 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
 }
 
+/*
+  Implementation based on http://cs.stanford.edu/people/karpathy/visml/ising_example.html
+   pi(x) = exp(J* 𝚺x_j*x_i + J_b * 𝚺b_i*x_i)        
+   let x' = x with one entry flipped
+   Prob(accept x') ~ min(1, pi(x')/pi(x)) = exp(-2*J*𝚺x_j*x_i)*exp(-2*J_b*𝚺b_i*x_i)
+  Use args 100 0.4 0 to get a nice looking lava lamp pattern
+*/
+
 object Gibbs_Ising2D extends SpatialApp { // DISABLED Regression (Dense) // Args: 200 0.3 2
   type T = FixPt[TRUE,_32,_32]
   type PROB = FixPt[FALSE, _0, _16]
