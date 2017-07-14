@@ -745,7 +745,7 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
               if (ld_Rdptr >= 2047) {Fill_Buffer()}
               val tmp = Reg[UInt]
               tmp := ld_Rdbfr(ld_Rdptr).to[UInt]
-              ld_Rdptr :+= 1
+              ld_Rdptr :+= 1 
               Foreach(24-i by 1){j => tmp := tmp << 1}
               ld_Bfr := ld_Bfr | tmp.value
               ld_Incnt := i           
