@@ -7,12 +7,12 @@ import spatial.metadata._
 
 trait ParticleFilter extends SpatialStream {
 
-  val N: scala.Int                                                    = 10
+  val N: scala.Int                                                    = 1
   val initV: (scala.Double, scala.Double, scala.Double)               = (0.0, 0.0, 0.0)
   val initP: (scala.Double, scala.Double, scala.Double)               = (0.0, 0.0, 0.0)
   val initQ: (scala.Double, scala.Double, scala.Double, scala.Double) = (1.0, 0.0, 0.0, 0.0)
   val initCov =
-    createMat66(List.tabulate[Real](36)(i => 0.0):_*)
+    createMat66(List.tabulate[Real](36)(i => 0.0): _*)
 
   val initTime: scala.Double  = 0.0
   val covGyro: scala.Double   = 0.01
@@ -58,12 +58,12 @@ trait ParticleFilter extends SpatialStream {
   }
 
   def createMat36(elems: Real*): Mat36 = {
-    def v(i: scala.Int) = Vec3(elems(i), elems(i + 3), elems(i + 6))
+    def v(i: scala.Int) = Vec3(elems(i), elems(i + 6), elems(i + 12))
     Mat36(v(0), v(1), v(2), v(3), v(4), v(5))
   }
 
   def createMat63(elems: Real*): Mat63 = {
-    def v(i: scala.Int) = Vec6(elems(0), elems(i + 6), elems(i + 12), elems(i + 18), elems(i + 24), elems(i + 30))
+    def v(i: scala.Int) = Vec6(elems(0), elems(i + 3), elems(i + 6), elems(i + 9), elems(i + 12), elems(i + 15))
     Mat63(v(0), v(1), v(2))
   }
 
@@ -119,12 +119,13 @@ trait ParticleFilter extends SpatialStream {
       createVec6(List.tabulate(6)(x => m(y, x)): _*)
     def apply(y: scala.Int, x: scala.Int) = col(x)(y)
     def t: Mat63 =
-      createMat63(List.tabulate(18)(i => m(i % 6, i / 3)): _*)
+      createMat63(List.tabulate(18)(i => m(i % 3, i / 3)): _*)
     def *(y: Mat66): Mat36 =
       mult(6, col _, y.row(_))
     def *(y: Mat63): Mat33 =
       mult(6, col _, y.row(_))
-    def *(y: Vec6): Vec3 = ???
+    def *(y: Vec6): Vec3 =
+      mult(6, col _, y(_))
   }
 
   implicit class Mat66Ops(m: Mat66) {
@@ -145,9 +146,9 @@ trait ParticleFilter extends SpatialStream {
     def *(y: Mat66): Mat66 = mult(6, col _, y.row(_))
     def *(y: Mat63): Mat63 = mult(6, col _, y.row(_))
     def +(y: Mat66): Mat66 =
-      createMat66(List.tabulate(36)(i => m(i / 6, i % 6) + y(i / 6, i % 3)): _*)
+      createMat66(List.tabulate(36)(i => m(i / 6, i % 6) + y(i / 6, i % 6)): _*)
     def -(y: Mat66): Mat66 =
-      createMat66(List.tabulate(36)(i => m(i / 6, i % 6) - y(i / 6, i % 3)): _*)
+      createMat66(List.tabulate(36)(i => m(i / 6, i % 6) - y(i / 6, i % 6)): _*)
   }
 
   implicit class Mat63Ops(m: Mat63) {
@@ -160,7 +161,7 @@ trait ParticleFilter extends SpatialStream {
       createVec3(List.tabulate(3)(x => m(y, x)): _*)
     def apply(y: scala.Int, x: scala.Int) = col(x)(y)
     def t: Mat36 =
-      createMat36(List.tabulate(18)(i => m(i % 3, i / 6)): _*)
+      createMat36(List.tabulate(18)(i => m(i % 6, i / 6)): _*)
     def *(y: Vec3): Vec6   = mult(3, col _, y(_))
     def *(y: Mat33): Mat63 = mult(3, col _, y.row(_))
     def *(y: Mat36): Mat66 = mult(3, col _, y.row(_))
@@ -174,7 +175,7 @@ trait ParticleFilter extends SpatialStream {
       createMat33(elems: _*)
     }
     def outerProd(y: Vec6): Mat36 = {
-      val elems = List.tabulate(18)(i => x(i / 3) * y(i % 6))
+      val elems = List.tabulate(18)(i => x(i / 6) * y(i % 6))
       createMat36(elems: _*)
     }
 
@@ -202,7 +203,7 @@ trait ParticleFilter extends SpatialStream {
       createMat66(elems: _*)
     }
     def outerProd(y: Vec3): Mat63 = {
-      val elems = List.tabulate(18)(i => x(i / 6) * y(i % 3))
+      val elems = List.tabulate(18)(i => x(i / 3) * y(i % 3))
       createMat63(elems: _*)
     }
 
@@ -220,7 +221,7 @@ trait ParticleFilter extends SpatialStream {
   implicit class QuatOps(x: Quat) {
     def *(y: Real)        = Quat(x.r * y, x.i * y, x.j * y, x.k * y)
     def *(y: Quat)        = QuatMult(x, y)
-    def dot(y: Quat) = x.r*y.r + x.i*y.i + x.j*y.j + x.k*y.k
+    def dot(y: Quat)      = x.r * y.r + x.i * y.i + x.j * y.j + x.k * y.k
     def rotateBy(q: Quat) = q * x
     def rotate(v: Vec3): Vec3 = {
       val inv = x.inverse
@@ -251,7 +252,7 @@ trait ParticleFilter extends SpatialStream {
         Foreach(N by 1 par parFactor)(x => {
           val initQuat = Quat(initQ._1, initQ._2, initQ._3, initQ._4)
           particles(x) = Particle(
-            1 / N.toDouble,
+            Math.log(1.0 / N),
             initQuat,
             State(Vec6(initV._1, initV._2, initV._3, initP._1, initP._2, initP._3), initCov),
             Vec3(0.0, 0.0, 0.0),
@@ -278,6 +279,8 @@ trait ParticleFilter extends SpatialStream {
                 updateFromV(fifoV.deq(), lastTime, lastO, particles, parFactor)
 
               out := averagePOSE(particles, parFactor)
+              normWeights(particles, parFactor)
+              resample(particles, parFactor)
             }),
             (x => (!fifoV.empty || !fifoIMU.empty)),
             style = SeqPipe
@@ -312,42 +315,15 @@ trait ParticleFilter extends SpatialStream {
       val pp = particles(i)
       val nq = sampleAtt(pp.q, lastO, dt)
       val F =
-        createMat66(1,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0,
-                    0,
-                    0,
-                    dt,
-                    0,
-                    0,
-                    1,
-                    0,
-                    0,
-                    0,
-                    dt,
-                    0,
-                    0,
-                    1,
-                    0,
-                    0,
-                    0,
-                    dt,
-                    0,
-                    0,
-                    1)
+        createMat66(
+          1, 0, 0, 0, 0, 0,
+          0, 1, 0, 0, 0, 0,
+          0, 0, 1, 0, 0, 0,
+          dt, 0, 0, 1, 0, 0,
+          0, dt, 0, 0, 1, 0,
+          0, 0, dt, 0, 0, 1
+        )
+
       val U = Vec6(
         pp.lastA.x * dt,
         pp.lastA.y * dt,
@@ -359,50 +335,25 @@ trait ParticleFilter extends SpatialStream {
       val rotMatrix = rotationMatrix(pp.lastQ)
       val covFixAcc = (rotMatrix * rotMatrix.t) * (covAcc * dt * dt)
       val Q = createMat66(
-        covFixAcc(0, 0),
-        covFixAcc(0, 1),
-        covFixAcc(0, 2),
-        0,
-        0,
-        0,
-        covFixAcc(1, 0),
-        covFixAcc(1, 1),
-        covFixAcc(1, 2),
-        0,
-        0,
-        0,
-        covFixAcc(2, 0),
-        covFixAcc(2, 1),
-        covFixAcc(2, 2),
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        covFixAcc(0, 0), covFixAcc(0, 1), covFixAcc(0, 2), 0, 0, 0,
+        covFixAcc(1, 0), covFixAcc(1,1), covFixAcc(1, 2), 0, 0, 0,
+        covFixAcc(2, 0), covFixAcc(2, 1), covFixAcc(2, 2), 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0
       )
 
+      val nla        = accO.map(x => nq.rotate(x)).getOrElse(pp.lastA)
+      val nlq        = accO.map(x => nq).getOrElse(pp.lastQ)
       val (nx, nsig) = kalmanPredict(pp.st.x, pp.st.sig, F, U, Q)
-      val nv = vicon.map(x => {
-//        val ns = kalmanUpdate()
-        likelihoodPOSE(x)
+      val np = vicon.map(x => {
+        val h: Mat36          = createMat36(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        val r: Mat33          = createMat33(covViconP, 0, 0, 0, covViconP, 0, 0, 0, covViconP)
+        val (nx2, nsig2, lik) = kalmanUpdate(nx, nsig, x.p, h, r)
+        val nw                = pp.w + likelihoodPOSE(x, lik._1, nq, lik._2)
+        Particle(nw, nq, State(nx, nsig2), nla, nlq)
       })
-      particles(i) = Particle(pp.w, nq, pp.st, accO.map(x => nq.rotate(x)).getOrElse(pp.lastA), accO.map(x => nq).getOrElse(pp.lastQ))
+      particles(i) = np.getOrElse(Particle(pp.w, nq, pp.st, nla, nlq))
     })
   }
 
@@ -419,7 +370,13 @@ trait ParticleFilter extends SpatialStream {
     update(None, Some(x.pose), dt, lastO, particles, parFactor)
   }
 
-  def likelihoodPOSE(x: POSE) = ()
+  def likelihoodPOSE(measurement: POSE, expectedPosMeasure: Position, quatState: Quat, covPos: Mat33) = {
+    val wPos                = normalLogPdf(measurement.p, expectedPosMeasure, covPos)
+    val covViconQMat: Mat33 = createMat33(covViconQ, 0, 0, 0, covViconQ, 0, 0, 0, covViconQ)
+    val error               = quatToLocalAngle(measurement.q.rotateBy(quatState.inverse))
+    val wQuat               = normalLogPdf(error, Vec3(0, 0, 0), covViconQMat)
+    wPos + wQuat
+  }
 
   def sampleAtt(q: Quat, om: Omega, dt: Time): Quat = {
     val withNoise  = gaussianVec(om, covGyro)
@@ -471,6 +428,15 @@ trait ParticleFilter extends SpatialStream {
     Quat(q.r, -q.i, -q.j, q.j) * (1 / n)
   }
 
+  //TODO ???
+  def normWeights(particles: SRAM1[Particle], parFactor: Int) = {}
+  //TODO ???
+  def resample(particles: SRAM1[Particle], parFactor: Int) = {}
+  //TODO ???
+  def normalLogPdf(measurement: Vec3, state: Vec3, cov: Mat33): Real = {
+    0
+  }
+
   def norm(v: Vec3) =
     v.x * v.x + v.y * v.y + v.z * v.z
 
@@ -480,6 +446,12 @@ trait ParticleFilter extends SpatialStream {
     val sl   = sin(l)
     val nrot = v * (l / n)
     Quat(cos(l), nrot.x, nrot.y, nrot.z)
+  }
+
+  def quatToLocalAngle(q: Quat): Vec3 = {
+    val n = acos(q.r) * 2
+    val s = n / sin(n / 2)
+    Vec3(q.i * s, q.j * s, q.k * s)
   }
 
   def kalmanPredict(xp: Vec6, sigp: Mat66, f: Mat66, u: Vec6, q: Mat66) = {
@@ -494,16 +466,11 @@ trait ParticleFilter extends SpatialStream {
     val (a31, a32, a33) = (a(2, 0), a(2, 1), a(2, 2))
 
     val A = createMat33(
-      a33 * a22 - a32 * a23,
-      -(a33 * a12 - a32 * a13),
-      a23 * a12 - a22 * a13,
-      -(a33 * a21 - a31 * a23),
-      a33 * a11 - a31 * a13,
-      -(a23 * a11 - a21 * a13),
-      a32 * a21 - a31 * a22,
-      -(a32 * a11 - a31 * a12),
-      a22 * a11 - a21 * a12
+      a33*a22-a32*a23, -(a33*a12-a32*a13), a23*a12-a22*a13,
+      -(a33*a21-a31*a23), a33*a11-a31*a13, -(a23*a11-a21*a13),
+      a32*a21-a31*a22, -(a32*a11-a31*a12), a22*a11-a21*a12
     )
+  
     val det = a11 * (a33 * a22 - a32 * a23) - a21 * (a33 * a12 - a32 * a13) + a31 * (a23 * a12 - a22 * a13)
     A * (1 / det)
   }
@@ -520,19 +487,19 @@ trait ParticleFilter extends SpatialStream {
   @virtualize def averagePOSE(particles: SRAM1[Particle], parFactor: Int): POSE = {
     val firstQ = particles(0).q
     val accumP = Reg[Vec3](Vec3(0, 0, 0))
-    val accumQ = Reg[Quat](Quat(0, 0, 0, 0))    
+    val accumQ = Reg[Quat](Quat(0, 0, 0, 0))
     val pos = Reduce(accumP)(N by 1 par parFactor)(i => {
       val p = particles(i)
-      p.st.x.vec3a*p.w
-    })(_+_)
+      p.st.x.vec3a * p.w
+    })(_ + _)
     val q = Reduce(accumQ)(N by 1 par parFactor)(i => {
       val p = particles(i)
       if (firstQ.dot(p.q) > 0.0)
-        p.q*p.w
+        p.q * exp(p.w)
       else
-        p.q*(-p.w)
-    })(_+_)
-    
+        p.q * (exp(-p.w))
+    })(_ + _)
+
     POSE(pos, q)
   }
 
