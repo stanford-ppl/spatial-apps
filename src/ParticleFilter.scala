@@ -57,7 +57,7 @@ trait ParticleFilter extends SpatialStream {
 
   def createReg(a: scala.Int, b: scala.Int, elems: Seq[Real]): RegFile2[Real] = {
     val r = RegFile[Real](a, b)
-    Parallel {
+    Pipe {
       List
         .tabulate(a*b)(i => i)
         .foreach(i => r(i/b, i%b) = elems(i))
@@ -301,10 +301,10 @@ trait ParticleFilter extends SpatialStream {
     
     @virtualize def reg = {
       val rg = RegFile[Real](3)
-      Parallel {
-        rg(0) = x(0)
-        rg(1) = x(1)
-        rg(2) = x(2) 
+      Pipe {
+        List
+          .tabulate(3)(i => i)
+          .foreach(i => rg(i) = x(i))       
       }
       rg
     }
@@ -347,13 +347,10 @@ trait ParticleFilter extends SpatialStream {
 
     @virtualize def reg = {
       val rg = RegFile[Real](6)
-      Parallel {
-        rg(0) = x(0)
-        rg(1) = x(1)
-        rg(2) = x(2) 
-        rg(3) = x(3)
-        rg(4) = x(4)
-        rg(5) = x(5)        
+      Pipe {
+        List
+          .tabulate(6)(i => i)
+          .foreach(i => rg(i) = x(i))
       }
       rg
     }
