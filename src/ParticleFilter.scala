@@ -100,6 +100,8 @@ trait ParticleFilter extends SpatialStream {
       createMat33(List.tabulate(9)(i => m(i / 3, i % 3) + y(i / 3, i % 3)): _*)
     def *(y: Real) =
       createMat33(List.tabulate(9)(i => m(i / 3, i % 3) * y): _*)
+    def *(y: Vec3): Vec3 =
+      mult(3, col _, y(_))    
     def *(y: Mat33): Mat33 =
       mult(3, col _, y.row(_))
     def *(y: Mat36): Mat36 =
@@ -170,6 +172,7 @@ trait ParticleFilter extends SpatialStream {
   def createVec3(elems: Real*) = Vec3(elems(0), elems(1), elems(2))
   implicit class Vec3Ops(x: Vec3) {
     def *(y: Real) = Vec3(x.x * y, x.y * y, x.z * y)
+    def dot(y: Vec3)      = x.x * y.x + x.x * y.y + x.z * y.z
     def outerProd(y: Vec3): Mat33 = {
       val elems = List.tabulate(9)(i => x(i / 3) * y(i % 3))
       createMat33(elems: _*)
@@ -428,13 +431,52 @@ trait ParticleFilter extends SpatialStream {
     Quat(q.r, -q.i, -q.j, q.j) * (1 / n)
   }
 
-  //TODO ???
-  def normWeights(particles: SRAM1[Particle], parFactor: Int) = {}
-  //TODO ???
-  def resample(particles: SRAM1[Particle], parFactor: Int) = {}
-  //TODO ???
+  def normWeights(particles: SRAM1[Particle], parFactor: Int) = {
+    val totalWeight = Reg[Real](0)
+    Reduce(totalWeight)(N by 1 par parFactor)(i => particles(i).w)(_+_)
+    Foreach(N by 1 par parFactor)(i => {
+      val p = particles(i)
+      particles(i) = Particle(p.w/totalWeight, p.q, p.st, p.lastA, p.lastQ)
+    })    
+  }
+
+  @virtualize def resample(particles: SRAM1[Particle], parFactor: Int) = {
+
+    val weights = SRAM[Real](N)
+    val out = SRAM[Particle](N)
+
+    val u = random[Real](1.0)
+
+    Foreach(N by 1 par parFactor)(i => {
+      if (i == 0)
+        weights(i) = particles(i).w
+      else
+        weights(i) = weights(i-1) + particles(i).w
+    })
+
+    val k = Reg[Int](0)
+    Foreach(N by 1 par parFactor)(i => {
+      val b = weights(k)*N < i.to[Real] +u
+      FSM[Boolean, Boolean](b)(x => x)(x =>
+        k := k + 1)(x => weights(i)*N < i.to[Real]+u)
+
+      out(i) = particles(k)
+    })
+
+    Foreach(N by 1 par parFactor)(i => {
+      val p = out(i)
+      particles(i) = Particle(log(1.0/N), p.q, p.st, p.lastA, p.lastQ)
+    })
+
+  }
+
   def normalLogPdf(measurement: Vec3, state: Vec3, cov: Mat33): Real = {
-    0
+    val e = (measurement-state)
+    val a = (1.0/2)*log(det(cov))
+    val b = e.dot(inv(cov)*e)
+    val pi2:Real = PI*2.0
+    val c = log(pi2)*3.0
+    a + b - c
   }
 
   def norm(v: Vec3) =
@@ -460,6 +502,13 @@ trait ParticleFilter extends SpatialStream {
     (xm, sigm)
   }
 
+  def det(a: Mat33): Real = {
+    val (a11, a12, a13) = (a(0, 0), a(0, 1), a(0, 2))
+    val (a21, a22, a23) = (a(1, 0), a(1, 1), a(1, 2))
+    val (a31, a32, a33) = (a(2, 0), a(2, 1), a(2, 2))
+    a11 * (a33 * a22 - a32 * a23) - a21 * (a33 * a12 - a32 * a13) + a31 * (a23 * a12 - a22 * a13)
+  }
+
   def inv(a: Mat33): Mat33 = {
     val (a11, a12, a13) = (a(0, 0), a(0, 1), a(0, 2))
     val (a21, a22, a23) = (a(1, 0), a(1, 1), a(1, 2))
@@ -471,8 +520,7 @@ trait ParticleFilter extends SpatialStream {
       a32*a21-a31*a22, -(a32*a11-a31*a12), a22*a11-a21*a12
     )
   
-    val det = a11 * (a33 * a22 - a32 * a23) - a21 * (a33 * a12 - a32 * a13) + a31 * (a23 * a12 - a22 * a13)
-    A * (1 / det)
+    A * (1 / det(a))
   }
 
   def kalmanUpdate(xm: Vec6, sigm: Mat66, z: Vec3, h: Mat36, r: Mat33) = {
