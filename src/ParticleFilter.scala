@@ -720,7 +720,7 @@ trait ParticleFilter extends SpatialStream {
       if (firstQ.dot(p.q) > 0.0)
         p.q * exp(p.w)
       else
-        p.q * (exp(-p.w))
+        p.q * -(exp(p.w))
     })(_ + _)
 
     POSE(pos, q)
