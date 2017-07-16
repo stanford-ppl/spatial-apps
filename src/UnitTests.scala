@@ -313,19 +313,22 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
 
 
 // Args: None
-object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: none
+object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: 11
 
 
   val tileSize = 16
   val I = 5
   val N = 192
 
-  def multiplexedwrtest[W:Type:Num](w: Array[W], i: Array[W]): Array[W] = {
+  def multiplexedwrtest[W:Type:Num](w: Array[W], i: Array[W], step_in: Int): (Array[W], Array[Int]) = {
     val T = param(tileSize)
     val P = param(4)
     val weights = DRAM[W](N)
     val inputs  = DRAM[W](N)
     val weightsResult = DRAM[W](N*I)
+    val varstep_dram = DRAM[Int](32)
+    val step = ArgIn[Int]
+    setArg(step, step_in)
     setMem(weights, w)
     setMem(inputs,i)
     Accel {
@@ -345,17 +348,22 @@ object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: n
           weightsResult(i*I+x*T::i*I+x*T+T par 16) store wt //s1 read
         }
       }
+      val varstep = SRAM[Int](32)
+      Foreach(32 by 1) { i => varstep(i) = 0}
+      Foreach(32 by step){i => varstep(i) = step}
+      varstep_dram store varstep
 
     }
-    getMem(weightsResult)
+    (getMem(weightsResult), getMem(varstep_dram))
   }
 
   @virtualize
   def main() = {
     val w = Array.tabulate(N){ i => i % 256}
     val i = Array.tabulate(N){ i => i % 256 }
+    val step_in = args(0).to[Int]
 
-    val result = multiplexedwrtest(w, i)
+    val (result1, result2) = multiplexedwrtest(w, i, step_in)
 
     val gold = Array.tabulate(N/tileSize) { k =>
       Array.tabulate(I){ j => 
@@ -364,10 +372,12 @@ object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: n
         in.zip(wt){_+_}
       }.flatten
     }.flatten
+    val varstep_gold = Array.tabulate(32){i => if (i % step_in == 0) step_in else 0}
     printArray(gold, "gold: ");
-    printArray(result, "result: ");
+    printArray(result1, "result: ");
+    printArray(result2, "variable step:")
 
-    val cksum = gold.zip(result){_==_}.reduce{_&&_}
+    val cksum = gold.zip(result1){_==_}.reduce{_&&_} && varstep_gold.zip(result2){_==_}.reduce{_&&_}
     println("PASS: " + cksum  + " (MultiplexedWriteTest)")
   }
 }
