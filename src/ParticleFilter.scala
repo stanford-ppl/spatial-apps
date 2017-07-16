@@ -60,7 +60,7 @@ trait ParticleFilter extends SpatialStream {
     Pipe {
       List
         .tabulate(a*b)(i => i)
-        .foreach(i => r(i/b, i%b) = elems(i))
+        .foreach(i => Pipe { r(i/b, i%b) = elems(i) })
     }
     r
   }
@@ -304,7 +304,7 @@ trait ParticleFilter extends SpatialStream {
       Pipe {
         List
           .tabulate(3)(i => i)
-          .foreach(i => rg(i) = x(i))       
+          .foreach(i => Pipe { rg(i) = x(i) })
       }
       rg
     }
@@ -350,7 +350,7 @@ trait ParticleFilter extends SpatialStream {
       Pipe {
         List
           .tabulate(6)(i => i)
-          .foreach(i => rg(i) = x(i))
+          .foreach(i => Pipe{rg(i) = x(i)})
       }
       rg
     }
