@@ -4,6 +4,7 @@ import spatial.SpatialCompiler
 import spatial.interpreter.Interpreter
 import spatial.interpreter.Streams
 import spatial.metadata._
+import collection.mutable.Map
 
 trait ParticleFilter extends SpatialStream {
 
@@ -11,8 +12,7 @@ trait ParticleFilter extends SpatialStream {
   val initV: (scala.Double, scala.Double, scala.Double)               = (0.0, 0.0, 0.0)
   val initP: (scala.Double, scala.Double, scala.Double)               = (0.0, 0.0, 0.0)
   val initQ: (scala.Double, scala.Double, scala.Double, scala.Double) = (1.0, 0.0, 0.0, 0.0)
-  val initCov =
-    createMat66(List.tabulate[Real](36)(i => 0.0): _*)
+  val initCov = 0.00001
 
   val initTime: scala.Double  = 0.0
   val covGyro: scala.Double   = 0.01
@@ -34,16 +34,18 @@ trait ParticleFilter extends SpatialStream {
   //where Vec3 is 3x1
   @struct case class Vec3(x: Real, y: Real, z: Real)
   @struct case class Vec6(a: Real, b: Real, c: Real, d: Real, e: Real, f: Real)
-  @struct case class Mat33(a: Vec3, b: Vec3, c: Vec3)
-  @struct case class Mat63(a: Vec6, b: Vec6, c: Vec6)
-  @struct case class Mat36(a: Vec3, b: Vec3, c: Vec3, d: Vec3, e: Vec3, f: Vec3)
-  @struct case class Mat66(a: Vec6, b: Vec6, c: Vec6, d: Vec6, e: Vec6, f: Vec6)
+
+  case class Mat33(reg: RegFile2[Real])
+  case class Mat63(reg: RegFile2[Real])
+  case class Mat36(reg: RegFile2[Real])
+  case class Mat66(reg: RegFile2[Real])
 
   @struct case class IMU(t: Time, a: Acceleration, g: Omega)
-  @struct case class POSE(p: Position, q: Attitude)
+  @struct case class POSE(p: Vec3, q: Attitude)
   @struct case class Vicon(t: Time, pose: POSE)
+  @struct case class Sigma(a: Vec6, b: Vec6, c: Vec6, d: Vec6, e: Vec6, f: Vec6)      
+  @struct case class State(x: Vec6, sig: Sigma)
   //x(v1, v2, v3, p1, p2, p3)
-  @struct case class State(x: Vec6, sig: Mat66)
   @struct case class Particle(w: Real, q: Quat, st: State, lastA: Acceleration, lastQ: Quat)
 
   /* Mat33(
@@ -52,136 +54,260 @@ trait ParticleFilter extends SpatialStream {
    6, 7, 8
    )
    */
-  def createMat33(elems: Real*): Mat33 = {
-    def v(i: scala.Int) = Vec3(elems(i), elems(i + 3), elems(i + 6))
-    Mat33(v(0), v(1), v(2))
-  }
 
-  def createMat36(elems: Real*): Mat36 = {
-    def v(i: scala.Int) = Vec3(elems(i), elems(i + 6), elems(i + 12))
-    Mat36(v(0), v(1), v(2), v(3), v(4), v(5))
-  }
-
-  def createMat63(elems: Real*): Mat63 = {
-    def v(i: scala.Int) = Vec6(elems(0), elems(i + 3), elems(i + 6), elems(i + 9), elems(i + 12), elems(i + 15))
-    Mat63(v(0), v(1), v(2))
-  }
-
-  def createMat66(elems: Real*): Mat66 = {
-    def v(i: scala.Int) = Vec6(elems(0), elems(i + 6), elems(i + 12), elems(i + 18), elems(i + 24), elems(i + 30))
-    Mat66(v(0), v(1), v(2), v(3), v(4), v(5))
-  }
-
-  def mult(B: scala.Int, col: scala.Int => Vec3, row: scala.Int => Vec3): Mat33 =
-    List.tabulate(B)(i => col(i).outerProd(row(i))).reduce(_ + _)
-  def mult(B: scala.Int, col: scala.Int => Vec3, row: scala.Int => Vec6): Mat36 =
-    List.tabulate(B)(i => col(i).outerProd(row(i))).reduce(_ + _)
-  def mult(B: scala.Int, col: scala.Int => Vec3, row: scala.Int => Real): Vec3 =
-    List.tabulate(B)(i => col(i) * row(i)).reduce(_ + _)
-  def mult(B: scala.Int, col: scala.Int => Vec6, row: scala.Int => Vec3): Mat63 =
-    List.tabulate(B)(i => col(i).outerProd(row(i))).reduce(_ + _)
-  def mult(B: scala.Int, col: scala.Int => Vec6, row: scala.Int => Vec6): Mat66 =
-    List.tabulate(B)(i => col(i).outerProd(row(i))).reduce(_ + _)
-  def mult(B: scala.Int, col: scala.Int => Vec6, row: scala.Int => Real): Vec6 =
-    List.tabulate(B)(i => col(i) * row(i)).reduce(_ + _)
-
-  implicit class Mat33Ops(m: Mat33) {
-    def col(x: scala.Int) = x match {
-      case 0 => m.a
-      case 1 => m.b
-      case 2 => m.c
+  def createReg(a: scala.Int, b: scala.Int, elems: Seq[Real]): RegFile2[Real] = {
+    val r = RegFile[Real](a, b)
+    Parallel {
+      List
+        .tabulate(a*b)(i => i)
+        .foreach(i => r(i/b, i%b) = elems(i))
     }
-    def row(y: scala.Int) =
-      createVec3(List.tabulate(3)(x => m(y, x)): _*)
-    def apply(y: scala.Int, x: scala.Int) = col(x)(y)
+    r
+  }
+  def createMat33(elems: Real*): Mat33 =
+    Mat33(createReg(3, 3, elems))    
+
+  def createMat36(elems: Real*): Mat36 =
+    Mat36(createReg(3, 6, elems))
+
+  def createMat63(elems: Real*): Mat63 =
+    Mat63(createReg(6, 3, elems))    
+
+  def createMat66(elems: Real*): Mat66 = 
+    Mat66(createReg(6, 6, elems))        
+
+  def add(h: scala.Int, w: scala.Int, from: RegFile2[Real], to: RegFile2[Real]) = {
+    Foreach(h by 1, w by 1) { (i, j) =>
+      to(i, j) = to(i, j) + from(i, j)
+    }
+  }
+
+  def add(h: scala.Int, from: RegFile1[Real], to: RegFile1[Real]) = {
+    Foreach(h by 1) { i =>
+      to(i) = to(i) + from(i)
+    }
+  }
+  
+  def zero(h: scala.Int, w: scala.Int, out: RegFile2[Real]) = {
+    Foreach(h by 1, w by 1) { (i, j) =>
+      out(i, j) = 0
+    }
+  }
+
+  def mult3(b: scala.Int, cols: RegFile2[Real], rows: RegFile1[Real]): Vec3 = {
+    val a: scala.Int = 3
+    val sum = RegFile[Real](a)
+    Foreach(b by 1) { i => {
+      val col = Vec3(cols(0, i), cols(1, i), cols(2, i))
+      val row = rows(i)
+      val out = (col*row).reg
+      add(a, out, sum)
+    }}
+    Vec3(sum(0), sum(1), sum(2))
+  }
+
+  def mult6(b: scala.Int, cols: RegFile2[Real], rows: RegFile1[Real]): Vec6 = {
+    val a: scala.Int = 6
+    val sum = RegFile[Real](a)
+    Foreach(b by 1) { i => {
+      val col = Vec6(cols(0, i), cols(1, i), cols(2, i), cols(3, i), cols(4, i), cols(5, i))
+      val row = rows(i)
+      val out = (col*row).reg
+      add(a, out, sum)
+    }}
+    Vec6(sum(0), sum(1), sum(2), sum(3), sum(4), sum(5))
+  }
+  
+  def mult33(b: scala.Int, cols: RegFile2[Real], rows: RegFile2[Real]): Mat33 = {
+    val a: scala.Int = 3
+    val c: scala.Int = 3
+    val sum = RegFile[Real](a, c)
+    Foreach(b by 1) { i => {
+      val out = RegFile[Real](a, c)
+      val col = Vec3(cols(0, i), cols(1, i), cols(2, i))
+      val row = Vec3(rows(i, 0), rows(i, 1), rows(i, 2))
+      col.outerProd(row, out)
+      add(a, c, out, sum)
+    }}
+    Mat33(sum)
+  }
+
+  def mult36(b: scala.Int, cols: RegFile2[Real], rows: RegFile2[Real]): Mat36 = {
+    val a: scala.Int = 3
+    val c: scala.Int = 6
+    val sum = RegFile[Real](a, c)
+    Foreach(b by 1) { i => {
+      val out = RegFile[Real](a, c)
+      val col = Vec3(cols(0, i), cols(1, i), cols(2, i))
+      val row = Vec6(rows(i, 0), rows(i, 1), rows(i, 2), rows(i, 3), rows(i, 4), rows(i, 5))      
+      col.outerProd(row, out)
+      add(a, c, out, sum)
+    }}
+    Mat36(sum)
+  }
+
+  def mult63(b: scala.Int, cols: RegFile2[Real], rows: RegFile2[Real]): Mat63 = {
+    val a: scala.Int = 6
+    val c: scala.Int = 3
+    val sum = RegFile[Real](a, c)
+    Foreach(b by 1) { i => {
+      val out = RegFile[Real](a, c)
+      val col = Vec6(cols(0, i), cols(1, i), cols(2, i), cols(3, i), cols(4, i), cols(5, i))      
+      val row = Vec3(rows(i, 0), rows(i, 1), rows(i, 2))            
+      col.outerProd(row, out)
+      add(a, c, out, sum)
+    }}
+    Mat63(sum)
+  }
+  
+  def mult66(b: scala.Int, cols: RegFile2[Real], rows: RegFile2[Real]): Mat66 = {
+    val a: scala.Int = 6
+    val c: scala.Int = 6
+    val sum = RegFile[Real](a, c)
+    Foreach(b by 1) { i => {
+      val out = RegFile[Real](a, c)
+      val col = Vec6(cols(0, i), cols(1, i), cols(2, i), cols(3, i), cols(4, i), cols(5, i))
+      val row = Vec6(rows(i, 0), rows(i, 1), rows(i, 2), rows(i, 3), rows(i, 4), rows(i, 5))            
+      col.outerProd(row, out)
+      add(a, c, out, sum)
+    }}
+    Mat66(sum)
+  }
+
+  def transposeReg(a:scala.Int, b:scala.Int, r: RegFile2[Real]): RegFile2[Real] = {
+    val out = RegFile[Real](b, a)
+    Foreach(a by 1, b by 1){ (i, j) =>      
+      out(j, i) = r(i, j)
+    }
+    out
+  }
+
+  def addRegs(a:scala.Int, b:scala.Int, r1: RegFile2[Real], r2: RegFile2[Real]): RegFile2[Real] = {
+    val out = RegFile[Real](b, a)
+    Foreach(a by 1, b by 1){ (i, j) =>      
+      out(i, j) = r1(i, j) + r2(i, j)
+    }
+    out
+  }
+
+  def subRegs(a:scala.Int, b:scala.Int, r1: RegFile2[Real], r2: RegFile2[Real]): RegFile2[Real] = {
+    val out = RegFile[Real](b, a)
+    Foreach(a by 1, b by 1){ (i, j) =>      
+      out(i, j) = r1(i, j) - r2(i, j)
+    }
+    out
+  }
+
+  def multReg(a:scala.Int, b:scala.Int, r: RegFile2[Real], factor: Real): RegFile2[Real] = {
+    Foreach(a by 1, b by 1){ (i, j) =>      
+      r(i, j) = r(i, j) * factor
+    }
+    r
+  }
+  
+  implicit class Mat33Ops(m: Mat33) {
+
+    def apply(y: scala.Int, x: scala.Int) =
+      m.reg(y, x)
+
     def t: Mat33 =
-      createMat33(List.tabulate(9)(i => m(i % 3, i / 3)): _*)
+      Mat33(transposeReg(3, 3, m.reg))
+
     def +(y: Mat33): Mat33 =
-      createMat33(List.tabulate(9)(i => m(i / 3, i % 3) + y(i / 3, i % 3)): _*)
-    def *(y: Real) =
-      createMat33(List.tabulate(9)(i => m(i / 3, i % 3) * y): _*)
+      Mat33(addRegs(3, 3, m.reg, y.reg))
+
+    def *(y: Real): Mat33 =
+      Mat33(multReg(3, 3, m.reg, y))
     def *(y: Vec3): Vec3 =
-      mult(3, col _, y(_))    
+      mult3(3, m.reg, y.reg)
     def *(y: Mat33): Mat33 =
-      mult(3, col _, y.row(_))
+      mult33(3, m.reg, y.reg)
     def *(y: Mat36): Mat36 =
-      mult(3, col _, y.row(_))
+      mult36(3, m.reg, y.reg)
   }
 
   implicit class Mat36Ops(m: Mat36) {
-    def col(x: scala.Int) = x match {
-      case 0 => m.a
-      case 1 => m.b
-      case 2 => m.c
-      case 3 => m.d
-      case 4 => m.e
-      case 5 => m.f
-    }
-    def row(y: scala.Int) =
-      createVec6(List.tabulate(6)(x => m(y, x)): _*)
-    def apply(y: scala.Int, x: scala.Int) = col(x)(y)
-    def t: Mat63 =
-      createMat63(List.tabulate(18)(i => m(i % 3, i / 3)): _*)
-    def *(y: Mat66): Mat36 =
-      mult(6, col _, y.row(_))
-    def *(y: Mat63): Mat33 =
-      mult(6, col _, y.row(_))
-    def *(y: Vec6): Vec3 =
-      mult(6, col _, y(_))
-  }
+    def apply(y: scala.Int, x: scala.Int) =
+      m.reg(y, x)
 
-  implicit class Mat66Ops(m: Mat66) {
-    def col(x: scala.Int) = x match {
-      case 0 => m.a
-      case 1 => m.b
-      case 2 => m.c
-      case 3 => m.d
-      case 4 => m.e
-      case 5 => m.f
-    }
-    def row(y: scala.Int) =
-      createVec6(List.tabulate(6)(x => m(y, x)): _*)
-    def apply(y: scala.Int, x: scala.Int) = col(x)(y)
-    def t: Mat66 =
-      createMat66(List.tabulate(36)(i => m(i % 6, i / 6)): _*)
-    def *(y: Vec6): Vec6   = mult(6, col _, y(_))
-    def *(y: Mat66): Mat66 = mult(6, col _, y.row(_))
-    def *(y: Mat63): Mat63 = mult(6, col _, y.row(_))
-    def +(y: Mat66): Mat66 =
-      createMat66(List.tabulate(36)(i => m(i / 6, i % 6) + y(i / 6, i % 6)): _*)
-    def -(y: Mat66): Mat66 =
-      createMat66(List.tabulate(36)(i => m(i / 6, i % 6) - y(i / 6, i % 6)): _*)
+    def t: Mat63 =
+      Mat63(transposeReg(6, 3, m.reg))
+    def *(y: Mat66): Mat36 =
+      mult36(6, m.reg, y.reg)      
+    def *(y: Mat63): Mat33 =
+      mult33(3, m.reg, y.reg)   
+    def *(y: Vec6): Vec3 =      
+      mult3(6, m.reg, y.reg)
   }
 
   implicit class Mat63Ops(m: Mat63) {
-    def col(x: scala.Int) = x match {
-      case 0 => m.a
-      case 1 => m.b
-      case 2 => m.c
-    }
-    def row(y: scala.Int) =
-      createVec3(List.tabulate(3)(x => m(y, x)): _*)
-    def apply(y: scala.Int, x: scala.Int) = col(x)(y)
+
+    def apply(y: scala.Int, x: scala.Int) =
+      m.reg(y, x)
+
     def t: Mat36 =
-      createMat36(List.tabulate(18)(i => m(i % 6, i / 6)): _*)
-    def *(y: Vec3): Vec6   = mult(3, col _, y(_))
-    def *(y: Mat33): Mat63 = mult(3, col _, y.row(_))
-    def *(y: Mat36): Mat66 = mult(3, col _, y.row(_))
+      Mat36(transposeReg(3, 6, m.reg))      
+    def *(y: Mat33): Mat63 =
+      mult63(3, m.reg, y.reg)             
+    def *(y: Mat36): Mat66 =
+      mult66(3, m.reg, y.reg)
+    def *(y: Vec3): Vec6   =
+      mult6(3, m.reg, y.reg)
+    
   }
+  
+  implicit class Mat66Ops(m: Mat66) {
+
+    def apply(y: scala.Int, x: scala.Int) =
+      m.reg(y, x)
+    
+    def t: Mat66 =
+      Mat66(transposeReg(6, 6, m.reg))
+
+    def *(y: Vec6): Vec6   =
+      mult6(6, m.reg, y.reg)      
+    def *(y: Mat66): Mat66 =
+      mult66(6, m.reg, y.reg)         
+    def *(y: Mat63): Mat63 =
+      mult63(6, m.reg, y.reg)               
+    def +(y: Mat66): Mat66 =
+      Mat66(addRegs(6, 6, m.reg, y.reg))    
+    def -(y: Mat66): Mat66 =
+      Mat66(subRegs(6, 6, m.reg, y.reg))          
+  }
+
 
   def createVec3(elems: Real*) = Vec3(elems(0), elems(1), elems(2))
   implicit class Vec3Ops(x: Vec3) {
     def *(y: Real) = Vec3(x.x * y, x.y * y, x.z * y)
     def dot(y: Vec3)      = x.x * y.x + x.x * y.y + x.z * y.z
-    def outerProd(y: Vec3): Mat33 = {
-      val elems = List.tabulate(9)(i => x(i / 3) * y(i % 3))
-      createMat33(elems: _*)
-    }
-    def outerProd(y: Vec6): Mat36 = {
-      val elems = List.tabulate(18)(i => x(i / 6) * y(i % 6))
-      createMat36(elems: _*)
-    }
+   
 
+    def outerProd(y: Vec3, out: RegFile2[Real]) = {
+      val xr = x.reg
+      val yr = y.reg      
+      Foreach(9 by 1) { i => 
+        out((i / 3), (i % 3)) = xr(i / 3) * yr(i % 3)
+      }
+    }
+    
+    def outerProd(y: Vec6, out: RegFile2[Real]) = {
+      val xr = x.reg
+      val yr = y.reg      
+      Foreach(18 by 1) { i => 
+        out((i / 6), (i % 6)) = xr(i / 6) * yr(i % 6)
+      }
+    }
+    
+    @virtualize def reg = {
+      val rg = RegFile[Real](3)
+      Parallel {
+        rg(0) = x(0)
+        rg(1) = x(1)
+        rg(2) = x(2) 
+      }
+      rg
+    }
     def apply(i: scala.Int) = i match {
       case 0 => x.x
       case 1 => x.y
@@ -193,6 +319,7 @@ trait ParticleFilter extends SpatialStream {
   }
 
   def createVec6(elems: Real*) = Vec6(elems(0), elems(1), elems(2), elems(3), elems(4), elems(5))
+
   implicit class Vec6Ops(x: Vec6) {
     def vec3a = Vec3(x.a, x.b, x.c)
     def *(y: Real): Vec6 =
@@ -201,15 +328,35 @@ trait ParticleFilter extends SpatialStream {
       createVec6(List.tabulate(6)(i => x(i) + y(i)): _*)
     def -(y: Vec6): Vec6 =
       createVec6(List.tabulate(6)(i => x(i) - y(i)): _*)
-    def outerProd(y: Vec6): Mat66 = {
-      val elems = List.tabulate(36)(i => x(i / 6) * y(i % 6))
-      createMat66(elems: _*)
-    }
-    def outerProd(y: Vec3): Mat63 = {
-      val elems = List.tabulate(18)(i => x(i / 3) * y(i % 3))
-      createMat63(elems: _*)
+
+    def outerProd(y: Vec6, out: RegFile2[Real]) = {
+      val xr = x.reg
+      val yr = y.reg
+      Foreach(36 by 1) { i => 
+        out((i / 6), (i % 6)) = xr(i / 6) * yr(i % 6)
+      }
     }
 
+    def outerProd(y: Vec3, out: RegFile2[Real]) = {
+      val xr = x.reg
+      val yr = y.reg      
+      Foreach(18 by 1) { i => 
+        out((i / 3), (i % 3)) = xr(i / 3) * yr(i % 3)
+      }
+    }
+
+    @virtualize def reg = {
+      val rg = RegFile[Real](6)
+      Parallel {
+        rg(0) = x(0)
+        rg(1) = x(1)
+        rg(2) = x(2) 
+        rg(3) = x(3)
+        rg(4) = x(4)
+        rg(5) = x(5)        
+      }
+      rg
+    }
     def apply(i: scala.Int) = i match {
       case 0 => x.a
       case 1 => x.b
@@ -219,6 +366,24 @@ trait ParticleFilter extends SpatialStream {
       case 5 => x.c
     }
 
+  }
+
+  def fromMat66(x: Mat66): Sigma = {
+    def row(i: scala.Int): Vec6 = Vec6(x.reg(i, 0), x.reg(i, 1), x.reg(i, 2), x.reg(i, 3), x.reg(i, 4), x.reg(i, 5))
+    Sigma(row(0), row(1), row(2), row(3), row(4), row(5))
+  }
+
+  implicit class SigmaOps(sig: Sigma) {
+    def toMat66: Mat66 = 
+      createMat66(List.tabulate(36)(i => sig(i/6, i%6)):_*)
+    def apply(y: scala.Int, x: scala.Int) = (x match {
+      case 0 => sig.a
+      case 1 => sig.b
+      case 2 => sig.c
+      case 3 => sig.d
+      case 4 => sig.e
+      case 5 => sig.f        
+    })(y)
   }
 
   implicit class QuatOps(x: Quat) {
@@ -254,13 +419,26 @@ trait ParticleFilter extends SpatialStream {
 
         Foreach(N by 1 par parFactor)(x => {
           val initQuat = Quat(initQ._1, initQ._2, initQ._3, initQ._4)
-          particles(x) = Particle(
-            Math.log(1.0 / N),
-            initQuat,
-            State(Vec6(initV._1, initV._2, initV._3, initP._1, initP._2, initP._3), initCov),
-            Vec3(0.0, 0.0, 0.0),
-            initQuat
-          )
+          Parallel {
+            particles(x) = Particle(
+              Math.log(1.0 / N),
+              initQuat,
+              State(
+                Vec6(initV._1, initV._2, initV._3, initP._1, initP._2, initP._3),
+                Sigma(
+                  Vec6(initCov, 0, 0, 0, 0, 0),
+                  Vec6(0, initCov, 0, 0, 0, 0),
+                  Vec6(0, 0, initCov, 0, 0, 0),
+                  Vec6(0, 0, 0, initCov, 0, 0),
+                  Vec6(0, 0, 0, 0, initCov, 0),
+                  Vec6(0, 0, 0, 0, 0, initCov)
+                )
+              ),
+              Vec3(0.0, 0.0, 0.0),
+              initQuat
+            )
+
+          }
         })
 
         Parallel {
@@ -348,15 +526,15 @@ trait ParticleFilter extends SpatialStream {
 
       val nla        = accO.map(x => nq.rotate(x)).getOrElse(pp.lastA)
       val nlq        = accO.map(x => nq).getOrElse(pp.lastQ)
-      val (nx, nsig) = kalmanPredict(pp.st.x, pp.st.sig, F, U, Q)
+      val (nx, nsig) = kalmanPredict(pp.st.x, pp.st.sig.toMat66, F, U, Q)
       val np = vicon.map(x => {
         val h: Mat36          = createMat36(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
         val r: Mat33          = createMat33(covViconP, 0, 0, 0, covViconP, 0, 0, 0, covViconP)
         val (nx2, nsig2, lik) = kalmanUpdate(nx, nsig, x.p, h, r)
         val nw                = pp.w + likelihoodPOSE(x, lik._1, nq, lik._2)
-        Particle(nw, nq, State(nx, nsig2), nla, nlq)
+        Particle(nw, nq, State(nx, fromMat66(nsig2)), nla, nlq)
       })
-      particles(i) = np.getOrElse(Particle(pp.w, nq, pp.st, nla, nlq))
+      particles(i) = np.getOrElse(Particle(pp.w, nq, State(nx, fromMat66(nsig)), nla, nlq))
     })
   }
 
@@ -551,16 +729,18 @@ trait ParticleFilter extends SpatialStream {
     POSE(pos, q)
   }
 
+}
+
+object ParticleFilterInterpreter extends ParticleFilter with SpatialStreamInterpreter {
+
   val outs = List(Out1)
 
-  val inputs = Map[Bus, List[MetaAny[_]]](
+  val inputs = collection.immutable.Map[Bus, List[MetaAny[_]]](
     (In1 -> List[Real](3f, 4f, 2f, 6f).map(x => IMU(x / 10, Vec3(x, x, x), Vec3(x / 100, x / 100, x / 100)))),
     (In2 -> List[Real]().map(x => Quat(x, x, x, x)))
   )
 
 }
-
-object ParticleFilterInterpreter extends ParticleFilter with SpatialStreamInterpreter
 
 object ParticleFilterCompiler extends ParticleFilter with SpatialApp {
   def main() =
