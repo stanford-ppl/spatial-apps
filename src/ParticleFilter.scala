@@ -734,7 +734,7 @@ object ParticleFilterInterpreter extends ParticleFilter with SpatialStreamInterp
 
   val inputs = collection.immutable.Map[Bus, List[MetaAny[_]]](
     (In1 -> List[Real](3f, 4f, 2f, 6f).map(x => IMU(x / 10, Vec3(x, x, x), Vec3(x / 100, x / 100, x / 100)))),
-    (In2 -> List[Real]().map(x => Quat(x, x, x, x)))
+    (In2 -> List[Real](3f, 2f).map(x => Vicon(0.5f, POSE(Vec3(x, x, x), Quat(x, x, x, x)))))
   )
 
 }
