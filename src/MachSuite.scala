@@ -679,14 +679,16 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
 
       // Build score matrix
       Foreach(length+1 by 1){ r =>
-        Foreach(length+1 by 1) { c => // Bug #151
+        Sequential.Foreach(length+1 by 1) { c => // Bug #151, should be able to remove previous_result reg when fixed
+          val previous_result = Reg[nw_tuple]
           val update = if (r == 0) (nw_tuple(-c.as[Int16], 0)) else if (c == 0) (nw_tuple(-r.as[Int16], 1)) else {
             val match_score = mux(seqa_sram_raw(c-1) == seqb_sram_raw(r-1), MATCH_SCORE.to[Int16], MISMATCH_SCORE.to[Int16])
             val from_top = score_matrix(r-1, c).score + GAP_SCORE
-            val from_left = score_matrix(r, c-1).score + GAP_SCORE
+            val from_left = previous_result.score + GAP_SCORE
             val from_diag = score_matrix(r-1, c-1).score + match_score
             mux(from_left >= from_top && from_left >= from_diag, nw_tuple(from_left, SKIPB), mux(from_top >= from_diag, nw_tuple(from_top,SKIPA), nw_tuple(from_diag, ALIGN)))
           }
+          previous_result := update
           score_matrix(r,c) = update
         }
       }
@@ -1714,7 +1716,8 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: none
     val training_sets =   163
     val sets_to_do = ArgIn[Int]
     // setArg(sets_to_do, args(0).to[Int])
-    setArg(sets_to_do, training_sets)
+    // setArg(sets_to_do, training_sets)
+    setArg(sets_to_do, 20)
     val nodes_per_layer =  64
     val layers =            2
     val learning_rate =  0.01.to[T]
@@ -2064,7 +2067,7 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: none
     println("Results: W1 " + cksumW1 + ", W2 " + cksumW2 + ", W3 " + cksumW3 + ", B1 " + cksumB1 + ", B2 " + cksumB2 + ", B3 " + cksumB3)
 
     val cksum = /*cksumW1 &&*/ cksumW2 && cksumW3 /*&& cksumB1*/ && cksumB2 && cksumB3
-    println("PASS: " + cksum + " (Backprop) * seems like this may be saturating, need to revisit when floats are implemented")
+    println("PASS: " + cksum + " (Backprop) * seems like this may be saturating, need to revisit when floats are implemented, and add full 163 training points")
 
   }
 }
