@@ -94,9 +94,16 @@ trait ParticleFilter extends SpatialStream {
     }
   }
 
+  def zero(h: scala.Int, out: RegFile1[Real]) = {
+    Foreach(h by 1) { i =>
+      out(i) = 0
+    }
+  }
+  
   def mult3(b: scala.Int, cols: RegFile2[Real], rows: RegFile1[Real]): Vec3 = {
     val a: scala.Int = 3
     val sum = RegFile[Real](a)
+    zero(a, sum)
     Foreach(b by 1) { i => {
       val col = Vec3(cols(0, i), cols(1, i), cols(2, i))
       val row = rows(i)
@@ -109,6 +116,7 @@ trait ParticleFilter extends SpatialStream {
   def mult6(b: scala.Int, cols: RegFile2[Real], rows: RegFile1[Real]): Vec6 = {
     val a: scala.Int = 6
     val sum = RegFile[Real](a)
+    zero(a, sum)    
     Foreach(b by 1) { i => {
       val col = Vec6(cols(0, i), cols(1, i), cols(2, i), cols(3, i), cols(4, i), cols(5, i))
       val row = rows(i)
@@ -122,6 +130,7 @@ trait ParticleFilter extends SpatialStream {
     val a: scala.Int = 3
     val c: scala.Int = 3
     val sum = RegFile[Real](a, c)
+    zero(a, c, sum)
     Foreach(b by 1) { i => {
       val out = RegFile[Real](a, c)
       val col = Vec3(cols(0, i), cols(1, i), cols(2, i))
@@ -136,6 +145,7 @@ trait ParticleFilter extends SpatialStream {
     val a: scala.Int = 3
     val c: scala.Int = 6
     val sum = RegFile[Real](a, c)
+    zero(a, c, sum)    
     Foreach(b by 1) { i => {
       val out = RegFile[Real](a, c)
       val col = Vec3(cols(0, i), cols(1, i), cols(2, i))
@@ -149,7 +159,8 @@ trait ParticleFilter extends SpatialStream {
   def mult63(b: scala.Int, cols: RegFile2[Real], rows: RegFile2[Real]): Mat63 = {
     val a: scala.Int = 6
     val c: scala.Int = 3
-    val sum = RegFile[Real](a, c)
+    val sum = RegFile[Real](a, c) 
+    zero(a, c, sum)   
     Foreach(b by 1) { i => {
       val out = RegFile[Real](a, c)
       val col = Vec6(cols(0, i), cols(1, i), cols(2, i), cols(3, i), cols(4, i), cols(5, i))      
@@ -164,6 +175,7 @@ trait ParticleFilter extends SpatialStream {
     val a: scala.Int = 6
     val c: scala.Int = 6
     val sum = RegFile[Real](a, c)
+    zero(a, c, sum)    
     Foreach(b by 1) { i => {
       val out = RegFile[Real](a, c)
       val col = Vec6(cols(0, i), cols(1, i), cols(2, i), cols(3, i), cols(4, i), cols(5, i))
@@ -175,7 +187,7 @@ trait ParticleFilter extends SpatialStream {
   }
 
   def transposeReg(a:scala.Int, b:scala.Int, r: RegFile2[Real]): RegFile2[Real] = {
-    val out = RegFile[Real](b, a)
+    val out = RegFile[Real](b, a)    
     Foreach(a by 1, b by 1){ (i, j) =>      
       out(j, i) = r(i, j)
     }
@@ -183,7 +195,7 @@ trait ParticleFilter extends SpatialStream {
   }
 
   def addRegs(a:scala.Int, b:scala.Int, r1: RegFile2[Real], r2: RegFile2[Real]): RegFile2[Real] = {
-    val out = RegFile[Real](b, a)
+    val out = RegFile[Real](a, b)
     Foreach(a by 1, b by 1){ (i, j) =>      
       out(i, j) = r1(i, j) + r2(i, j)
     }
@@ -191,7 +203,7 @@ trait ParticleFilter extends SpatialStream {
   }
 
   def subRegs(a:scala.Int, b:scala.Int, r1: RegFile2[Real], r2: RegFile2[Real]): RegFile2[Real] = {
-    val out = RegFile[Real](b, a)
+    val out = RegFile[Real](a, b)
     Foreach(a by 1, b by 1){ (i, j) =>      
       out(i, j) = r1(i, j) - r2(i, j)
     }
@@ -451,15 +463,20 @@ trait ParticleFilter extends SpatialStream {
             true,
             (x => x),
             (x => {
-              if ((fifoV.empty && !fifoIMU.empty) || (!fifoIMU.empty && !fifoV.empty && fifoIMU.peek.t < fifoV.peek.t))
-                updateFromIMU(fifoIMU.deq(), lastTime, lastO, particles, parFactor)
-              else if (!fifoV.empty)
-                updateFromV(fifoV.deq(), lastTime, lastO, particles, parFactor)
+              if ((fifoV.empty && !fifoIMU.empty) || (!fifoIMU.empty && !fifoV.empty && fifoIMU.peek.t < fifoV.peek.t)) {
+                val imu = fifoIMU.deq() 
+                updateFromIMU(imu, lastTime, lastO, particles, parFactor)
+              }
+              else if (!fifoV.empty) {
+                val v = fifoV.deq() 
+                updateFromV(v, lastTime, lastO, particles, parFactor)
+              }
 
               out := averagePOSE(particles, parFactor)
               normWeights(particles, parFactor)
               resample(particles, parFactor)
             }),
+            //(x => true)
             (x => (!fifoV.empty || !fifoIMU.empty)),
             style = SeqPipe
           )
@@ -606,12 +623,15 @@ trait ParticleFilter extends SpatialStream {
     Quat(q.r, -q.i, -q.j, q.j) * (1 / n)
   }
 
-  def normWeights(particles: SRAM1[Particle], parFactor: Int) = {
+  @virtualize def normWeights(particles: SRAM1[Particle], parFactor: Int) = {
     val totalWeight = Reg[Real](0)
-    Reduce(totalWeight)(N by 1 par parFactor)(i => particles(i).w)(_+_)
+    val max = Reg[Real](0)
+    Reduce(max)(N by 1 par parFactor)(i => particles(i).w)( (x, y) => if (x > y) x else y)
+    Reduce(totalWeight)(N by 1 par parFactor)(i => exp(particles(i).w - max))(_+_)
+    totalWeight := max + log(totalWeight)
     Foreach(N by 1 par parFactor)(i => {
       val p = particles(i)
-      particles(i) = Particle(p.w/totalWeight, p.q, p.st, p.lastA, p.lastQ)
+      particles(i) = Particle(p.w - totalWeight, p.q, p.st, p.lastA, p.lastQ)
     })    
   }
 
@@ -622,18 +642,17 @@ trait ParticleFilter extends SpatialStream {
 
     val u = random[Real](1.0)
 
-    Foreach(N by 1 par parFactor)(i => {
+    Foreach(N by 1)(i => {
       if (i == 0)
-        weights(i) = particles(i).w
+        weights(i) = exp(particles(i).w)
       else
-        weights(i) = weights(i-1) + particles(i).w
+        weights(i) = weights(i-1) + exp(particles(i).w)
     })
 
     val k = Reg[Int](0)
-    Foreach(N by 1 par parFactor)(i => {
-      val b = weights(k)*N < i.to[Real] +u
-      FSM[Boolean, Boolean](b)(x => x)(x =>
-        k := k + 1)(x => weights(i)*N < i.to[Real]+u)
+    Foreach(N by 1)(i => {
+      val b = weights(k)*N < i.to[Real] + u
+      FSM[Boolean, Boolean](b)(x => x)(x => k := k + 1)(x => weights(k)*N < i.to[Real]+u)
 
       out(i) = particles(k)
     })
