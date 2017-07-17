@@ -78,6 +78,7 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
 		    }
 
 				Pipe{sha_digest(0) = sha_digest(0) + A}
+        Pipe{println("sha_digest 0 is " + sha_digest(0))}
 				Pipe{sha_digest(1) = sha_digest(1) + B}
 				Pipe{sha_digest(2) = sha_digest(2) + C}
 				Pipe{sha_digest(3) = sha_digest(3) + D}
@@ -649,12 +650,15 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
   def main() = {
 
     val NUMEL = 2048
+    val mvscale = 1
     val MV_FIELD = 0
     val ERROR = 255
     val inRdBfr_data = loadCSV1D[UInt8]("/remote/regression/data/machsuite/mpeg2_inRdBfr.csv", ",")
     val inRdBfr_dram = DRAM[UInt8](NUMEL)
     setMem(inRdBfr_dram, inRdBfr_data)
 
+    val motion_vertical_field_select_dram = DRAM[UInt16](32)
+    val PMV_dram = DRAM[UInt16](32)
 
     Accel{
       val inPMV = LUT[UInt16](2,2,2)(45,  207,
@@ -664,14 +668,7 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
                                      120, 216)
       val inmvfs = LUT[UInt16](2,2)(232, 200, 
                                     32,  240)
-      val outPMV = LUT[UInt16](2,2,2)(1566, 206,
-                                      70,   41,
-
-                                      1566, 206,
-                                      120, 216)
-      val outmvfs = LUT[UInt16](2,2)(0, 200,
-                                     0, 240)
-      val MVtab0 = LUT[UInt](8,2)(ERROR, 0, 
+      val MVtab0 = LUT[Int](8,2)(ERROR, 0, 
                                  3, 3, 
                                  2, 2, 
                                  2, 2,
@@ -680,7 +677,7 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
                                  1, 1, 
                                  1, 1)
 
-      val MVtab1 = LUT[UInt](8,2)(ERROR, 0, 
+      val MVtab1 = LUT[Int](8,2)(ERROR, 0, 
                                  ERROR, 0, 
                                  ERROR, 0, 
                                  7, 6,  
@@ -689,7 +686,7 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
                                  4, 5, 
                                  4, 5)
 
-      val MVtab2 = LUT[UInt](12,2)(16, 9, 
+      val MVtab2 = LUT[Int](12,2)(16, 9, 
                                  15, 9, 
                                  14, 9, 
                                  13, 9, 
@@ -702,7 +699,7 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
                                  8, 8, 
                                  8, 8)
 
-      val dmvector = RegFile[UInt16](2)
+      val dmvector = RegFile[Int](2)
       val motion_vertical_field_select = RegFile[UInt16](2,2)
       val PMV = RegFile[UInt16](2,2,2)
 
@@ -713,6 +710,8 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
       val ld_Rdmax = Reg[Int](2047)
       val motion_vector_count = Reg[Int](1)
       val mv_format = Reg[Int](0)
+      val h_r_size = Reg[Int](200)
+      val v_r_size = Reg[Int](200)
       val dmv = Reg[Boolean](false)
       val s = Reg[Int](0)
 
@@ -720,27 +719,26 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
 
         ld_Rdbfr load inRdBfr_dram(0::2048)
         ld_Rdptr := 0
-        // TODO: Some padding crap if file is not aligned, which is impossible since benchmark hardcodes 2048-element read
+        // TODO: Some padding crap if file is not aligned
       }
       def Flush_Buffer(n: UInt): Unit = {
         Foreach(n.to[Int] by 1){_ => ld_Bfr := ld_Bfr << 1}
 
         ld_Incnt := ld_Incnt - n.to[Int]
         val Incnt = ld_Incnt
-        Pipe{println("  in flushbuf, ldbfr " + ld_Bfr.value + " n = " + n + " branching based on " + ld_Incnt.value + " and " + ld_Rdptr.value)}
+        // Pipe{println("  in flushbuf, ldbfr " + ld_Bfr.value + " n = " + n + " branching based on " + ld_Incnt.value + " and " + ld_Rdptr.value)}
 
         if (Incnt <= 24) {
           if (ld_Rdptr < 2044) {
-            println("   flushbranch1")
+            // println("   flushbranch1")
             Foreach(Incnt until 25 by 8){ i => 
               val tmp = Reg[UInt]
               tmp := ld_Rdbfr(ld_Rdptr).to[UInt]
               Foreach(24-i by 1){j => tmp := tmp << 1}
               ld_Bfr := ld_Bfr | tmp.value
-              ld_Incnt := i
             }
           } else {
-            println("   flushbranch2")
+            // println("   flushbranch2")
             Foreach(Incnt until 25 by 8){i => 
               if (ld_Rdptr >= 2047) {Fill_Buffer()}
               val tmp = Reg[UInt]
@@ -748,58 +746,56 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
               ld_Rdptr :+= 1 
               Foreach(24-i by 1){j => tmp := tmp << 1}
               ld_Bfr := ld_Bfr | tmp.value
-              ld_Incnt := i           
             }
           }
-          ld_Rdptr :+= 24
-        } else { println("   flushnobranch") }
+          ld_Incnt := (8-Incnt) + 24
+        } else {}
       }
       def InitializeBuffer(): Unit = {
         // Regs all set to initial value to begin with
-        Flush_Buffer(0)
+        Flush_Buffer(0.to[UInt])
       }
       def Show_Bits(n: UInt): UInt = {
         val tmp = Reg[UInt]
         tmp := ld_Bfr.value
-        println("in showbits, doing shifty shit on " + tmp.value)
         Foreach(((32 - n)%32).to[Int] by 1){_ => tmp := tmp >> 1}
+        // Pipe{println("showed " + n+  " bits as " + tmp.value)}
         tmp.value
       }
       def Get_Bits(n: UInt): UInt = {
         val bits = Show_Bits(n)
-        // println(" in getbits, showed " + n + " bits as " + bits)
-        Flush_Buffer(n)
+        Flush_Buffer(n.to[UInt])
         bits
       }
-      def Get_motion_code(): UInt = {
-        if (Get_Bits(1) == 0.to[UInt]) {
-          0.to[UInt]
+      def Get_motion_code(): Int = {
+        if (Get_Bits(1) != 0.to[UInt]) {
+          0.to[Int]
         } else {
           val code = Reg[Int](0)
           code := Show_Bits(9).to[Int]
-          println("showed bits " + code.value)
+          // println("showed bits " + code.value)
           if (code.value >= 64) {
-            println("branch1")
             code := code.value >> 6
-            Flush_Buffer(MVtab0(code.value,1))
+            // println("branch1 " + code.value)
+            Flush_Buffer(MVtab0(code.value,1).to[UInt])
             val tmp = Get_Bits(1)
             val read = MVtab0(code.value,0)
             if (tmp == 1.to[UInt]) { -read } else { read }
           } else if (code.value >= 24) {
             code := code.value >> 3
-            println("branch2 " + code.value)
-            Flush_Buffer(MVtab1(code.value,1))
+            // println("branch2 " + code.value)
+            Flush_Buffer(MVtab1(code.value,1).to[UInt])
             val tmp = Get_Bits(1)
             val read = MVtab1(code.value,0)
-            println("mvtab1 is " + read + " tmp is " + tmp)
+            // println("mvtab1 is " + read + " tmp is " + tmp)
             if (tmp == 1.to[UInt]) { -read } else { read }
           } else {
             code :-= 12
             if (code < 0) {
-              0.to[UInt]
+              0.to[Int]
             } else {
-              Flush_Buffer (MVtab2(code.value,0))
-              println("branch3")
+              Flush_Buffer (MVtab2(code.value,0).to[UInt])
+              // println("branch3 " + code.value)
               val tmp = Get_Bits(1)
               val read = MVtab2(code.value,1)
               if (tmp == 1.to[UInt]) { -read } else { read }
@@ -809,9 +805,55 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
         }
 
       }
-      def motion_vector(): Unit = {
-        val motion_code = Get_motion_code()
-        println(" motion code " + motion_code)
+
+      def decode_motion_vector(pmv_id0: Int, pred_id: Int, motion_code: Int, motion_residual: UInt, r_size: Reg[Int], full_pel_vector: Boolean): Unit = {
+        r_size := r_size.value % 32
+        val lim = Reg[Int](16)
+        Foreach(r_size by 1) { _ => lim := lim << 1 }
+        val vec = Reg[Int](0)
+        val tmp = PMV(pmv_id0, s.value, pred_id)
+        vec := mux(full_pel_vector,  tmp >> 1, tmp).to[Int]
+        // Pipe{println("motion code " + motion_code + ", vec " + vec.value + ", lim " + lim.value)}
+        if (motion_code > 0.to[Int]) {
+          val tmp = Reg[Int](0)
+          tmp := motion_code - 1
+          Foreach(r_size by 1){_ => tmp := tmp.value << 1}
+          vec := vec + (tmp.value) + motion_residual.to[Int] + 1
+          // Pipe{println("  now vec " + vec.value + " .. + " + tmp.value + " " + motion_residual)}
+          if (vec.value >= lim.value.to[Int]) {vec :=  vec.value - (lim.value + lim.value)}
+        } else if (motion_code < 0.to[Int]) {
+          val tmp = Reg[Int](0)
+          tmp := -motion_code - 1
+          Foreach(r_size by 1){_ => tmp << 1}
+          vec := vec - tmp.value + motion_residual.to[Int] + 1;
+          if (vec.value < -(lim.value.to[Int])) {vec := vec.value + lim.value + lim.value}
+        }
+        // println("new pmv at " + pmv_id0 + "," + s.value + "," + pred_id + " = " + mux(full_pel_vector, vec.value << 1, vec.value))
+        PMV(pmv_id0, s.value, pred_id) = mux(full_pel_vector, vec.value << 1, vec.value).to[UInt16]
+      }
+
+      def Get_dmvector(): Int = {
+        if (Get_Bits(1) != 0.to[UInt]) {
+          mux(Get_Bits (1) != 0.to[UInt], -1.to[Int], 1.to[Int])
+        } else {
+          0.to[Int]
+        }
+      }
+      def motion_vector(full_pel_vector: Boolean, pmv_id0: Int): Unit = {
+        // Get horizontal
+        val h_motion_code = Get_motion_code()
+        val h_motion_residual = if (h_r_size.value != 0.to[Int] && h_motion_code != 0.to[Int]) {Get_Bits(h_r_size.value.to[UInt])} else 0.to[UInt]
+        // println(" motion code " + h_motion_code + ", residual " + h_motion_residual)
+        decode_motion_vector(pmv_id0, 0.to[Int], h_motion_code, h_motion_residual, h_r_size, full_pel_vector)        
+        if (dmv.value) { dmvector(0) = Get_dmvector () }
+
+        // Get vertical
+        val v_motion_code = Get_motion_code ();
+        val v_motion_residual = if (v_r_size.value != 0.to[Int] && v_motion_code != 0.to[Int]) {Get_Bits(v_r_size.value.to[UInt])} else 0.to[UInt]
+        if (mvscale == 1) { Pipe{ PMV(pmv_id0, s.value, 1) = PMV(pmv_id0, s.value, 1) >> 1 /* DIV 2 */}}
+        Pipe{decode_motion_vector(pmv_id0, 1.to[Int], v_motion_code, v_motion_residual, v_r_size, full_pel_vector)}
+        if (mvscale == 1) { Pipe{ PMV(pmv_id0, s.value, 1) = PMV(pmv_id0, s.value, 1) << 1 /* MUL 2 */}}
+        if (dmv) { dmvector(1) = Get_dmvector () }
       }
 
       def motion_vectors(): Unit = {
@@ -822,8 +864,16 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
             Foreach(2 by 1) { i => 
               motion_vertical_field_select(i,s.value) = tmp
             }
-            motion_vector()
+            motion_vector(false, 0.to[Int])
+            /* update other motion vector predictors */
+            Pipe{PMV(1, s.value, 0) = PMV(0, s.value, 0)}
+            Pipe{PMV(1, s.value, 1) = PMV(0, s.value, 1)}
           }
+        } else {
+          motion_vertical_field_select(0, s.value) = Get_Bits (1)
+          motion_vector (false, 0.to[Int])
+          motion_vertical_field_select(1, s.value) = Get_Bits (1)
+          motion_vector (false, 1.to[Int])
         }
       }
 
@@ -840,7 +890,38 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
       InitializeBuffer()
       motion_vectors()
 
+      val PMV_aligned = SRAM[UInt16](32)
+      val motion_vertical_field_select_aligned = SRAM[UInt16](32)
+
+
+      Foreach(2 by 1) { i => 
+        Foreach(2 by 1) { j => 
+          motion_vertical_field_select_aligned(i*2 + j) = motion_vertical_field_select(i,j)
+          // println("mot_vert_fs " + i + "," + j + " = " + motion_vertical_field_select(i,j))
+          Foreach(2 by 1) { k => 
+            PMV_aligned(i*2*2 + j*2 + k) = PMV(i,j,k)
+            // println("  pmv " + i + "," + j + "," + k + " = " + PMV(i,j,k))
+          }
+        }
+      }
+
+      PMV_dram store PMV_aligned
+      motion_vertical_field_select_dram store motion_vertical_field_select_aligned
     }
+
+    val pmv_gold = Array[UInt16](1566, 206, 70, 41, 1566, 206, 120, 216)
+    val mvfs_gold = Array[UInt16](0, 200, 0, 240)
+    val mvfs_result = getMem(motion_vertical_field_select_dram)
+    val pmv_result = getMem(PMV_dram)
+
+    printArray(pmv_result, "PMV:")
+    printArray(mvfs_result, "MVFS:")
+    val pmv_cksum = Array.tabulate[Boolean](8){i => pmv_gold(i) === pmv_result(i)}.reduce{_&&_}
+    val mvfs_cksum = Array.tabulate[Boolean](4){i => pmv_gold(i) === pmv_result(i)}.reduce{_&&_}
+    val cksum = pmv_cksum && mvfs_cksum
+
+    println("PASS: " + cksum + " (MPEG2)")
+
 
   }
 }
