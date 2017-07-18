@@ -257,6 +257,12 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
         Pipe{scan_ptr :+= 1}
         tmp
       }
+      // def read_byte_staged(): UInt8 = {
+      //   val tmp = jpg_sram(scan_ptr)
+      //   Pipe{scan_ptr :+= 1}
+      //   tmp
+      // }
+      // val read_byte = fun[Unit, UInt8]((x:Unit) => read_byte_staged())
 
       def read_markers(): Unit = {
         val unread_marker = Reg[UInt8](0)
