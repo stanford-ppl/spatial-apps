@@ -3,7 +3,6 @@ import org.virtualized._      // virtualized needed for function defines
 import spatial.targets.DE1    // de1 specific target
 
 object SILIComm extends SpatialApp {
-
   override val target = targets.DE1;
 
   type BIT = FixPt[FALSE,_1,_0]

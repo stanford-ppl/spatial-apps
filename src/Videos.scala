@@ -399,9 +399,7 @@ object Grayscale extends SpatialApp {
 }
 
 
-object FifoVideo extends SpatialApp { 
-
-
+object FifoVideo extends SpatialApp {
   override val target = DE1
 
   val Kh = 3
