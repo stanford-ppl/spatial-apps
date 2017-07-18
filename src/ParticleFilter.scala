@@ -243,7 +243,7 @@ trait ParticleFilter extends SpatialStream {
       m.reg(y, x)
 
     def t: Mat63 =
-      Mat63(transposeReg(6, 3, m.reg))
+      Mat63(transposeReg(3, 6, m.reg))
     def *(y: Mat66): Mat36 =
       mult36(6, m.reg, y.reg)      
     def *(y: Mat63): Mat33 =
@@ -258,7 +258,7 @@ trait ParticleFilter extends SpatialStream {
       m.reg(y, x)
 
     def t: Mat36 =
-      Mat36(transposeReg(3, 6, m.reg))      
+      Mat36(transposeReg(6, 3, m.reg))      
     def *(y: Mat33): Mat63 =
       mult63(3, m.reg, y.reg)             
     def *(y: Mat36): Mat66 =
@@ -565,11 +565,13 @@ trait ParticleFilter extends SpatialStream {
     update(None, Some(x.pose), dt, lastO, particles, parFactor)
   }
 
-  def likelihoodPOSE(measurement: POSE, expectedPosMeasure: Position, quatState: Quat, covPos: Mat33) = {
+  @virtualize def likelihoodPOSE(measurement: POSE, expectedPosMeasure: Position, quatState: Quat, covPos: Mat33) = {
     val wPos                = normalLogPdf(measurement.p, expectedPosMeasure, covPos)
     val covViconQMat: Mat33 = createMat33(covViconQ, 0, 0, 0, covViconQ, 0, 0, 0, covViconQ)
     val error               = quatToLocalAngle(measurement.q.rotateBy(quatState.inverse))
     val wQuat               = normalLogPdf(error, Vec3(0, 0, 0), covViconQMat)
+    println("wPos: " + wPos)
+    println("wQuat: " + wQuat)
     wPos + wQuat
   }
 
@@ -625,10 +627,10 @@ trait ParticleFilter extends SpatialStream {
 
   @virtualize def normWeights(particles: SRAM1[Particle], parFactor: Int) = {
     val totalWeight = Reg[Real](0)
-    val max = Reg[Real](0)
-    Reduce(max)(N by 1 par parFactor)(i => particles(i).w)( (x, y) => if (x > y) x else y)
-    Reduce(totalWeight)(N by 1 par parFactor)(i => exp(particles(i).w - max))(_+_)
-    totalWeight := max + log(totalWeight)
+    val maxR = Reg[Real](0)
+    Reduce(maxR)(N by 1 par parFactor)(i => particles(i).w)((x,y) => max(x,y))
+    Reduce(totalWeight)(N by 1 par parFactor)(i => exp(particles(i).w - maxR))(_+_)
+    totalWeight := maxR + log(totalWeight)
     Foreach(N by 1 par parFactor)(i => {
       val p = particles(i)
       particles(i) = Particle(p.w - totalWeight, p.q, p.st, p.lastA, p.lastQ)
@@ -666,7 +668,7 @@ trait ParticleFilter extends SpatialStream {
 
   def normalLogPdf(measurement: Vec3, state: Vec3, cov: Mat33): Real = {
     val e = (measurement-state)
-    val a = (1.0/2)*log(det(cov))
+    val a = (-1.0/2)*log(det(cov))
     val b = e.dot(inv(cov)*e)
     val pi2:Real = PI*2.0
     val c = log(pi2)*3.0
@@ -685,7 +687,8 @@ trait ParticleFilter extends SpatialStream {
   }
 
   def quatToLocalAngle(q: Quat): Vec3 = {
-    val n = acos(q.r) * 2
+    val r: Real = min(q.r, 1.0)
+    val n = acos(r) * 2
     val s = n / sin(n / 2)
     Vec3(q.i * s, q.j * s, q.k * s)
   }
@@ -753,7 +756,7 @@ object ParticleFilterInterpreter extends ParticleFilter with SpatialStreamInterp
 
   val inputs = collection.immutable.Map[Bus, List[MetaAny[_]]](
     (In1 -> List[Real](3f, 4f, 2f, 6f).map(x => IMU(x / 10, Vec3(x, x, x), Vec3(x / 100, x / 100, x / 100)))),
-    (In2 -> List[Real](3f, 2f).map(x => Vicon(0.5f, POSE(Vec3(x, x, x), Quat(x, x, x, x)))))
+    (In2 -> List[Real](3f, 2f).map(x => Vicon(0.5f, POSE(Vec3(x, x, x), Quat(1, 0, 0, 0)))))
   )
 
 }
