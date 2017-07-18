@@ -20,7 +20,7 @@ trait ParticleFilter extends SpatialStream {
   val covViconP: scala.Double = 0.01
   val covViconQ: scala.Double = 0.01
 
-  type Real         = FltPt[_32, _0]
+  type Real         = FltPt[_16, _16]
   type Time         = Real
   type Position     = Vec3
   type Velocity     = Vec3
