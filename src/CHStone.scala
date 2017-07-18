@@ -78,7 +78,7 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
 		    }
 
 				Pipe{sha_digest(0) = sha_digest(0) + A}
-        Pipe{println("sha_digest 0 is " + sha_digest(0))}
+        // Pipe{println("sha_digest 0 is " + sha_digest(0))}
 				Pipe{sha_digest(1) = sha_digest(1) + B}
 				Pipe{sha_digest(2) = sha_digest(2) + C}
 				Pipe{sha_digest(3) = sha_digest(3) + D}
