@@ -3,18 +3,16 @@ import org.virtualized._
 import spatial.targets.DE1
 
 object MovingBox extends SpatialApp {
-
-
   override val target = DE1
+
   val Cmax = 320
   val Rmax = 240
-
 
   @struct case class Pixel16(b: UInt5, g: UInt6, r: UInt5)
 
   @virtualize
   def convolveVideoStream(): Unit = {
-    val imgOut = BufferedOut[Pixel16](target.VGA)
+    val imgOut = BufferedOut[Pixel16](DE1.VGA)
     val dwell = ArgIn[Int]
     val d = args(0).to[Int]
     setArg(dwell, d)
@@ -44,8 +42,6 @@ object MovingBox extends SpatialApp {
 }
 
 object ColoredLines extends SpatialApp { // try arg = 100
-
-
   override val target = DE1
   val Cmax = 320
   val Rmax = 240
@@ -135,8 +131,6 @@ object LinebufRaster extends SpatialApp { // try arg = 100
 
 
 object ColorSelect extends SpatialApp { // try arg = 100
-
-
   override val target = DE1
   val Cmax = 320
   val Rmax = 240
