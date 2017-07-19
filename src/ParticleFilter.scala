@@ -1,8 +1,7 @@
 import spatial.dsl._
 import org.virtualized._
 import spatial.SpatialCompiler
-import spatial.interpreter.Interpreter
-import spatial.interpreter.Streams
+import spatial.interpreter._
 import spatial.metadata._
 import collection.mutable.Map
 
@@ -20,7 +19,7 @@ trait ParticleFilter extends SpatialStream {
   val covViconP: scala.Double = 0.01
   val covViconQ: scala.Double = 0.01
 
-  type Real         = FltPt[_16, _16]
+  type Real         = Float
   type Time         = Real
   type Position     = Vec3
   type Velocity     = Vec3
@@ -54,7 +53,6 @@ trait ParticleFilter extends SpatialStream {
    6, 7, 8
    )
    */
-
   def createReg(a: scala.Int, b: scala.Int, elems: Seq[Real]): RegFile2[Real] = {
     val r = RegFile[Real](a, b)
     Pipe {
@@ -570,8 +568,8 @@ trait ParticleFilter extends SpatialStream {
     val covViconQMat: Mat33 = createMat33(covViconQ, 0, 0, 0, covViconQ, 0, 0, 0, covViconQ)
     val error               = quatToLocalAngle(measurement.q.rotateBy(quatState.inverse))
     val wQuat               = normalLogPdf(error, Vec3(0, 0, 0), covViconQMat)
-    println("wPos: " + wPos)
-    println("wQuat: " + wQuat)
+//    println("wPos: " + wPos)
+//    println("wQuat: " + wQuat)
     wPos + wQuat
   }
 
@@ -627,7 +625,7 @@ trait ParticleFilter extends SpatialStream {
 
   @virtualize def normWeights(particles: SRAM1[Particle], parFactor: Int) = {
     val totalWeight = Reg[Real](0)
-    val maxR = Reg[Real](0)
+    val maxR = Reg[Real](particles(0).w)
     Reduce(maxR)(N by 1 par parFactor)(i => particles(i).w)((x,y) => max(x,y))
     Reduce(totalWeight)(N by 1 par parFactor)(i => exp(particles(i).w - maxR))(_+_)
     totalWeight := maxR + log(totalWeight)
@@ -670,8 +668,7 @@ trait ParticleFilter extends SpatialStream {
     val e = (measurement-state)
     val a = (-1.0/2)*log(det(cov))
     val b = e.dot(inv(cov)*e)
-    val pi2:Real = PI*2.0
-    val c = log(pi2)*3.0
+    val c = Math.log((Math.PI*2.0))*3.0
     a + b - c
   }
 
@@ -732,20 +729,22 @@ trait ParticleFilter extends SpatialStream {
   @virtualize def averagePOSE(particles: SRAM1[Particle], parFactor: Int): POSE = {
     val firstQ = particles(0).q
     val accumP = Reg[Vec3](Vec3(0, 0, 0))
-    val accumQ = Reg[Quat](Quat(0, 0, 0, 0))
-    val pos = Reduce(accumP)(N by 1 par parFactor)(i => {
-      val p = particles(i)
-      p.st.x.vec3a * p.w
+    val accumQ = Reg[Quat](Quat(0, 0, 0, 0))    
+    Parallel {
+      Reduce(accumP)(N by 1 par parFactor)(i => {
+        val p = particles(i)
+      p.st.x.vec3a * exp(p.w)
     })(_ + _)
-    val q = Reduce(accumQ)(N by 1 par parFactor)(i => {
-      val p = particles(i)
-      if (firstQ.dot(p.q) > 0.0)
-        p.q * exp(p.w)
-      else
-        p.q * -(exp(p.w))
-    })(_ + _)
-
-    POSE(pos, q)
+      
+      Reduce(accumQ)(N by 1 par parFactor)(i => {
+        val p = particles(i)
+        if (firstQ.dot(p.q) > 0.0)
+          p.q * exp(p.w)
+        else
+          p.q * -(exp(p.w))
+      })(_ + _)
+    }
+    POSE(accumP, accumQ)
   }
 
 }
@@ -761,7 +760,4 @@ object ParticleFilterInterpreter extends ParticleFilter with SpatialStreamInterp
 
 }
 
-object ParticleFilterCompiler extends ParticleFilter with SpatialApp {
-  def main() =
-    prog()
-}
+object ParticleFilterCompiler extends ParticleFilter with SpatialStreamCompiler
