@@ -76,9 +76,9 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
         val temp_slice = SRAM[Int](COLS,ROWS)
         MemReduce(temp_slice)(-1 until 2 by 1) { slice => 
           val local_slice = SRAM[Int](COLS,ROWS)
-          val lb = LineBuffer[Int](3,ROWS)
           Foreach(COLS+1 by 1 par loop_col){ i => 
-            lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS par par_load)
+            val lb = LineBuffer[Int](3,ROWS)
+            lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS)
             Foreach(ROWS+1 by 1 par loop_row) {j => 
               val sr = RegFile[Int](3,3)
               Foreach(3 by 1 par 3) {k => sr(k,*) <<= lb(k,j%ROWS)}
@@ -336,7 +336,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
     val coltile = 64
     val par_load = 16
     val par_store = 16
-    val row_par = 2 (1 -> 1 -> 8)
+    val row_par = 1 (1 -> 1 -> 8)
     val tile_par = 2 (1 -> 1 -> 4)
     val mean_par = window/2 (1 -> 1 -> window/2)
     val data = loadCSV2D[T]("/remote/regression/data/slacsample2d.csv", ",", "\n")
@@ -449,6 +449,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val density = 10
     val lj1 = 1.5.to[T]
     val lj2 = 2.to[T]
+
     val par_load = 16
     val par_store = 16
     val loop_grid0_x = 8 (1 -> 1 -> 16)
