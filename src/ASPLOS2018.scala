@@ -37,11 +37,11 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
    	val ROWS = 16 // Leading dim
    	val COLS = 32
     val HEIGHT = 32
-    val par_load = 16
-    val par_store = 16
+    val par_load = 1
+    val par_store = 1
     val loop_height = 1 (1 -> 1 -> 8)
     val loop_row = 1 (1 -> 1 -> 8)
-    val loop_col = 2 (1 -> 1 -> 8)
+    val loop_col = 1 (1 -> 1 -> 8)
     // val num_slices = ArgIn[Int]
     // setArg(num_slices, args(0).to[Int])
     val num_slices = HEIGHT
@@ -450,8 +450,8 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val lj1 = 1.5.to[T]
     val lj2 = 2.to[T]
 
-    val par_load = 16
-    val par_store = 16
+    val par_load = 1
+    val par_store = 1
     val loop_grid0_x = 8 (1 -> 1 -> 16)
     val loop_grid0_y = 8 (1 -> 1 -> 16)
     val loop_grid0_z = 8 (1 -> 1 -> 16)
