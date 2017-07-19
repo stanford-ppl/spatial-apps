@@ -2,6 +2,7 @@ import spatial.dsl._
 import org.virtualized._
 import spatial.targets._
 
+// Rework
 object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -36,6 +37,8 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
    	val ROWS = 16 // Leading dim
    	val COLS = 32
     val HEIGHT = 32
+    val par_load = 16
+    val par_store = 16
     val loop_height = 1 (1 -> 1 -> 8)
     val loop_row = 1 (1 -> 1 -> 8)
     val loop_col = 2 (1 -> 1 -> 8)
@@ -75,7 +78,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
           val local_slice = SRAM[Int](COLS,ROWS)
           val lb = LineBuffer[Int](3,ROWS)
           Foreach(COLS+1 by 1 par loop_col){ i => 
-            lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS)
+            lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS par par_load)
             Foreach(ROWS+1 by 1 par loop_row) {j => 
               val sr = RegFile[Int](3,3)
               Foreach(3 by 1 par 3) {k => sr(k,*) <<= lb(k,j%ROWS)}
@@ -100,7 +103,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
 
       }
 
-      result_dram store result_sram
+      result_dram(0::HEIGHT, 0::COLS, 0::ROWS par par_store) store result_sram
 
 
    	}
@@ -168,6 +171,9 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
 
     val SKIPB = 0
     val SKIPA = 1
+    val PX = 1 // Parallelized in MachSuite even though it is WRONG
+    val par_load = 16
+    val par_store = 16
     val ALIGN = 2
     val MATCH_SCORE = 1
     val MISMATCH_SCORE = -1
@@ -210,14 +216,14 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
       val seqa_fifo_aligned = FIFO[Int8](length*2)
       val seqb_fifo_aligned = FIFO[Int8](length*2)
 
-      seqa_sram_raw load seqa_dram_raw
-      seqb_sram_raw load seqb_dram_raw
+      seqa_sram_raw load seqa_dram_raw(0::length par par_load)
+      seqb_sram_raw load seqb_dram_raw(0::length par par_load)
 
       val score_matrix = SRAM[nw_tuple](length+1,length+1)
 
       // Build score matrix
-      Foreach(length+1 by 1){ r =>
-        Sequential.Foreach(length+1 by 1) { c => // Bug #151, should be able to remove previous_result reg when fixed
+      Foreach(length+1 by 1 par PX){ r =>
+        Sequential.Foreach(length+1 by 1 par PX) { c => // Bug #151, should be able to remove previous_result reg when fixed
           val previous_result = Reg[nw_tuple]
           val update = if (r == 0) (nw_tuple(-c.as[Int16], 0)) else if (c == 0) (nw_tuple(-r.as[Int16], 1)) else {
             val match_score = mux(seqa_sram_raw(c-1) == seqb_sram_raw(r-1), MATCH_SCORE.to[Int16], MISMATCH_SCORE.to[Int16])
@@ -235,6 +241,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
       val b_addr = Reg[Int](length)
       val a_addr = Reg[Int](length)
       val done_backtrack = Reg[Bit](false)
+      // par PX
       FSM[Int](state => state != doneState) { state =>
         if (state == traverseState) {
           if (score_matrix(b_addr,a_addr).ptr == ALIGN.to[Int16]) {
@@ -264,8 +271,8 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
       }
 
       Parallel{
-        seqa_dram_aligned store seqa_fifo_aligned
-        seqb_dram_aligned store seqb_fifo_aligned
+        seqa_dram_aligned(0::2*length par par_store) store seqa_fifo_aligned
+        seqb_dram_aligned(0::2*length par par_store) store seqb_fifo_aligned
       }
 
     }
@@ -316,6 +323,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
   }
 }      
 
+// Rework
 object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
 
   type T = FixPt[TRUE,_16,_16]
@@ -324,7 +332,13 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
   def main() {
     type T = FixPt[TRUE,_16,_16]
     val rowtile = 16
+    val window = 16
     val coltile = 64
+    val par_load = 16
+    val par_store = 16
+    val row_par = 2 (1 -> 1 -> 8)
+    val tile_par = 2 (1 -> 1 -> 4)
+    val mean_par = window/2 (1 -> 1 -> window/2)
     val data = loadCSV2D[T]("/remote/regression/data/slacsample2d.csv", ",", "\n")
     val memrows = ArgIn[Int]
     val memcols = ArgIn[Int]
@@ -335,24 +349,23 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
     val risingEdges = DRAM[Int](memrows)
     // val fallingEdges = DRAM[Int](memrows)
 
-    val window = 16
 
     Accel {
       val sr = RegFile[T](1,window)
-      val rawdata = SRAM[T](coltile)
-      val results = SRAM[Int](rowtile)
       // Work on each row
-      Sequential.Foreach(memrows by rowtile) { r => 
-        Sequential.Foreach(rowtile by 1) { rr => 
+      Sequential.Foreach(memrows by rowtile par tile_par) { r => 
+        val results = SRAM[Int](rowtile)
+        Foreach(rowtile by 1 par row_par) { rr => 
           // Work on each tile of a row
           val globalMax = Reduce(Reg[Tuple2[Int,T]](pack(0.to[Int], -1000.to[T])))(memcols by coltile) { c =>
+            val rawdata = SRAM[T](coltile)
             // Load tile from row
-            rawdata load srcmem(r + rr, c::c+coltile)
+            rawdata load srcmem(r + rr, c::c+coltile par par_load)
             // Scan through tile to get deriv
             val localMax = Reduce(Reg[Tuple2[Int,T]](pack(0.to[Int], -1000.to[T])))(coltile by 1) { j =>
               sr(0,*) <<= rawdata(j)
-              val mean_right = Reduce(Reg[T](0.to[T]))(window/2 by 1) { k => sr(0,k) }{_+_} / window.to[T]
-              val mean_left = Reduce(Reg[T](0.to[T]))(window/2 by 1) { k => sr(0,k+window/2) }{_+_} / window.to[T]
+              val mean_right = Reduce(Reg[T](0.to[T]))(window/2 by 1 par mean_par) { k => sr(0,k) }{_+_} / window.to[T]
+              val mean_left = Reduce(Reg[T](0.to[T]))(window/2 by 1 par mean_par) { k => sr(0,k+window/2) }{_+_} / window.to[T]
               val slope = (mean_right - mean_left) / (window/2).to[T]
               val idx = j + c
               mux(idx < window, pack(idx, 0.to[T]), pack(idx,slope))
@@ -361,7 +374,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
           }{(a,b) => mux(a._2 > b._2, a, b)}
           results(rr) = globalMax._1
         }
-        risingEdges(r::r+rowtile) store results
+        risingEdges(r::r+rowtile par par_store) store results
       }
     }
 
@@ -379,6 +392,8 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
   }
 }
 
+
+// Rework
 object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -434,6 +449,16 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val density = 10
     val lj1 = 1.5.to[T]
     val lj2 = 2.to[T]
+    val par_load = 16
+    val par_store = 16
+    val loop_grid0_x = 8 (1 -> 1 -> 16)
+    val loop_grid0_y = 8 (1 -> 1 -> 16)
+    val loop_grid0_z = 8 (1 -> 1 -> 16)
+    val loop_grid1_x = 8 (1 -> 1 -> 16)
+    val loop_grid1_y = 8 (1 -> 1 -> 16)
+    val loop_grid1_z = 8 (1 -> 1 -> 16)
+    val loop_p = 8 (1 -> 1 -> 16)
+    val loop_q = 8 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
@@ -467,10 +492,10 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
       val force_y_sram = SRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
       val force_z_sram = SRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
 
-      dvec_x_sram load dvec_x_dram
-      dvec_y_sram load dvec_y_dram
-      dvec_z_sram load dvec_z_dram
-      npoints_sram load npoints_dram
+      dvec_x_sram load dvec_x_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load)
+      dvec_y_sram load dvec_y_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load)
+      dvec_z_sram load dvec_z_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load)
+      npoints_sram load npoints_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE par par_load)
 
       // Iterate over each block
       Foreach(BLOCK_SIDE by 1, BLOCK_SIDE by 1, BLOCK_SIDE by 1) { (b0x, b0y, b0z) => 
@@ -551,6 +576,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
   }
 }      
 
+// Rework
 object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -567,6 +593,11 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
 
     val FFT_SIZE = 1024
     val numiter = (scala.math.log(FFT_SIZE) / scala.math.log(2)).to[Int]
+    val par_load = 16
+    val par_store = 16
+    val outer = 8 (1 -> 1 -> 16)
+    val middle = 8 (1 -> 1 -> 16)
+    val inner = 8 (1 -> 1 -> 16)
 
     val data_real = loadCSV1D[T]("/remote/regression/data/machsuite/fft_strided_real.csv", "\n")
     val data_img = loadCSV1D[T]("/remote/regression/data/machsuite/fft_strided_img.csv", "\n")
@@ -591,18 +622,19 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
       val data_twid_real_sram = SRAM[T](FFT_SIZE/2)
       val data_twid_img_sram = SRAM[T](FFT_SIZE/2)
 
-      data_real_sram load data_real_dram
-      data_img_sram load data_img_dram
-      data_twid_real_sram load data_twid_real_dram
-      data_twid_img_sram load data_twid_img_dram
+      data_real_sram load data_real_dram(0::FFT_SIZE par par_load)
+      data_img_sram load data_img_dram(0::FFT_SIZE par par_load)
+      data_twid_real_sram load data_twid_real_dram(0::FFT_SIZE/2 par par_load)
+      data_twid_img_sram load data_twid_img_dram(0::FFT_SIZE/2 par par_load)
 
-      val span = Reg[Int](FFT_SIZE)
-      Foreach(0 until numiter) { log => 
-        span := span >> 1
+      Foreach(0 until numiter par outer) { log => 
+        val span = Reg[Int](FFT_SIZE)
+        span.reset
+        Foreach(log + 1 by 1){_ => span := span >> 1}
         val num_sections = Reduce(Reg[Int](1))(0 until log){i => 2}{_*_}
-        Foreach(0 until num_sections) { section => 
+        Foreach(0 until num_sections par middle) { section => 
           val base = span*(2*section+1)
-          Sequential.Foreach(0 until span by 1) { offset => 
+          Foreach(0 until span by 1 par inner) { offset =>  // Was sequential
             val odd = base + offset
             val even = odd ^ span
 
@@ -624,8 +656,8 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
           }
         }
       }
-      result_real_dram store data_real_sram
-      result_img_dram store data_img_sram
+      result_real_dram (0::FFT_SIZE par par_store) store data_real_sram
+      result_img_dram(0::FFT_SIZE par par_store)  store data_img_sram
     }
 
     val result_real = getMem(result_real_dram)
@@ -646,7 +678,7 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
 
   }
 }
-
+// Rework
 object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -720,6 +752,10 @@ object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
     val transitions = raw_transitions.reshape(N_STATES, N_STATES)
     val emissions = raw_emissions.reshape(N_STATES, N_TOKENS)
 
+    val par_load = 16
+    val par_store = 16
+    val PX = 1 // Cannot parallelize safely
+
     val correct_path = Array[Int](27,27,27,27,27,31,63,63,63,63,47,4,38,38,38,38,7,7,7,
                                   7,7,7,7,7,2,2,2,43,52,52,43,43,43,43,43,44,44,32,9,9,
                                   15,45,45,45,45,45,45,0,55,55,55,30,13,13,13,13,13,13,
@@ -751,14 +787,14 @@ object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
       val path_sram = SRAM[Int](N_OBS)
 
       Parallel{
-        obs_sram load obs_dram
-        init_sram load init_dram
-        transitions_sram load transitions_dram
-        emissions_sram load emissions_dram
+        obs_sram load obs_dram(0::N_OBS par par_load)
+        init_sram load init_dram(0::N_STATES par par_load)
+        transitions_sram load transitions_dram(0::N_STATES, 0::N_STATES par par_load)
+        emissions_sram load emissions_dram(0::N_STATES, 0::N_TOKENS par par_load)
       }
 
       // from --> to
-      Sequential.Foreach(0 until steps_to_take) { step => 
+      Foreach(0 until steps_to_take par PX) { step => 
         val obs = obs_sram(step)
         Sequential.Foreach(0 until N_STATES) { to => 
           val emission = emissions_sram(to, obs)
@@ -806,7 +842,8 @@ object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
   }
 }
 
-object Gibbs_Ising2D extends SpatialApp { // DISABLED Regression (Dense) // Args: 200 0.3 2
+// Rework
+object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3 2
   type T = FixPt[TRUE,_32,_32]
   type PROB = FixPt[FALSE, _0, _16]
   @virtualize
