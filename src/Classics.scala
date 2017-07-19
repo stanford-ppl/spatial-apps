@@ -966,7 +966,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   Use args 100 0.4 0 to get a nice looking lava lamp pattern
 */
 
-object Gibbs_Ising2D extends SpatialApp { // DISABLED Regression (Dense) // Args: 200 0.3 2
+object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3 2
   type T = FixPt[TRUE,_32,_32]
   type PROB = FixPt[FALSE, _0, _16]
   @virtualize
