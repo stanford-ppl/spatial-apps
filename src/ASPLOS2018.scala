@@ -36,6 +36,9 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
    	val ROWS = 16 // Leading dim
    	val COLS = 32
     val HEIGHT = 32
+    val loop_height = 1 (1 -> 1 -> 8)
+    val loop_row = 1 (1 -> 1 -> 8)
+    val loop_col = 2 (1 -> 1 -> 8)
     // val num_slices = ArgIn[Int]
     // setArg(num_slices, args(0).to[Int])
     val num_slices = HEIGHT
@@ -65,16 +68,16 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
                                       0,  0,  0)
 
       val result_sram = SRAM[Int](HEIGHT,COLS,ROWS)
-      val temp_slice = SRAM[Int](COLS,ROWS)
 
-      Foreach(num_slices by 1) { p => 
+      Foreach(num_slices by 1 par loop_height) { p => 
+        val temp_slice = SRAM[Int](COLS,ROWS)
         MemReduce(temp_slice)(-1 until 2 by 1) { slice => 
           val local_slice = SRAM[Int](COLS,ROWS)
           val lb = LineBuffer[Int](3,ROWS)
-          val sr = RegFile[Int](3,3)
-          Foreach(COLS+1 by 1){ i => 
+          Foreach(COLS+1 by 1 par loop_col){ i => 
             lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS)
-            Foreach(ROWS+1 by 1) {j => 
+            Foreach(ROWS+1 by 1 par loop_row) {j => 
+              val sr = RegFile[Int](3,3)
               Foreach(3 by 1 par 3) {k => sr(k,*) <<= lb(k,j%ROWS)}
               val temp = Reduce(Reg[Int](0))(3 by 1, 3 by 1){(r,c) => sr(r,c) * filter(slice+1,r,c)}{_+_}
               // For final version, make wr_value a Mux1H instead of a unique writer per val
@@ -312,165 +315,6 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
 
   }
 }      
-
-object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
-
-
-  /*
-
-                    ←       N_OBS            →
-
-          State 63 ----- State 63 ----- State 63                
-        /  .        \ /            \ /                     P(obs | state) = emission_probs   
-       /   .         X              X                                         (N_STATES x N_TOKENS)
-      /    .        / \            / \                        
-     O----State k  ----- State k  ----- State k  ...            
-      \    .        \ /            \ /                          
-       \   .         X              X                          shortest path to (state, obs) = llike
-        \  .        / \            / \                                                          (N_OBS x N_STATES)
-          State 0  ----- State 0  ----- State 0                  
-      ↑               ↑                                                           
-    init_states     transition_probs                        
-     (N_STATES)       (N_STATES x N_STATES)
-
-            obs_vec
-             (N_OBS, max value = N_TOKENS)
-
-
-  TODO: Eliminate backprop step and do everything feed-forward
-  MachSuite Concerns:
-    - Constructing path step by step seems to give the wrong result because they do extra math in the backprop step. 
-           Why do you need to do math when going backwards? I thought you just read off the result
-
-  */
-
-  type T = FixPt[TRUE,_16,_16]
-
-  @virtualize
-  def main() = {
-    // Setup dimensions of problem
-    val N_STATES = 64
-    val N_TOKENS = 64
-    val N_OBS = 140
-
-    // debugging
-    val steps_to_take = N_OBS //ArgIn[Int] //
-    // setArg(steps_to_take, args(0).to[Int])
-
-    // Setup data
-    val init_states = Array[T](4.6977033615112305.to[T],3.6915655136108398.to[T],4.8652229309082031.to[T],4.7658410072326660.to[T],
-      4.0006790161132812.to[T],3.9517300128936768.to[T],3.4640796184539795.to[T],3.4600069522857666.to[T],4.2856273651123047.to[T],
-      3.6522088050842285.to[T],4.8189344406127930.to[T],3.8075556755065918.to[T],3.8743767738342285.to[T],5.4135279655456543.to[T],
-      4.9173111915588379.to[T],3.6458325386047363.to[T],5.8528852462768555.to[T],11.3210048675537109.to[T],4.9971127510070801.to[T],
-      5.1006979942321777.to[T],3.5980830192565918.to[T],5.3161897659301758.to[T],3.4544019699096680.to[T],3.7314746379852295.to[T],
-      4.9998908042907715.to[T],3.4898567199707031.to[T],4.2091164588928223.to[T],3.5122559070587158.to[T],3.9326364994049072.to[T],
-      7.2767667770385742.to[T],3.6539671421051025.to[T],4.0916681289672852.to[T],3.5044839382171631.to[T],4.5234117507934570.to[T],
-      3.7673256397247314.to[T],4.0265331268310547.to[T],3.7147023677825928.to[T],6.7589721679687500.to[T],3.5749390125274658.to[T],
-      3.7701597213745117.to[T],3.5728175640106201.to[T],5.0258340835571289.to[T],4.9390106201171875.to[T],5.7208223342895508.to[T],
-      6.3652114868164062.to[T],3.5838112831115723.to[T],5.0102572441101074.to[T],4.0017414093017578.to[T],4.2373661994934082.to[T],
-      3.8841004371643066.to[T],5.3679313659667969.to[T],3.9980680942535400.to[T],3.5181968212127686.to[T],4.7306714057922363.to[T],
-      5.5075111389160156.to[T],5.1880970001220703.to[T],4.8259010314941406.to[T],4.2589011192321777.to[T],5.6381106376647949.to[T],
-      3.4522385597229004.to[T],3.5920252799987793.to[T],4.2071061134338379.to[T],5.0856294631958008.to[T],6.0637059211730957.to[T])
-
-    val obs_vec = Array[Int](0,27,49,52,20,31,63,63,29,0,47,4,38,38,38,38,4,43,7,28,31,
-                         7,7,7,57,2,2,43,52,52,43,3,43,13,54,44,51,32,9,9,15,45,21,
-                         33,61,45,62,0,55,15,55,30,13,13,53,13,13,50,57,57,34,26,21,
-                         43,7,12,41,41,41,17,17,30,41,8,58,58,58,31,52,54,54,54,54,
-                         54,54,15,54,54,54,54,52,56,52,21,21,21,28,18,18,15,40,1,62,
-                         40,6,46,24,47,2,2,53,41,0,55,38,5,57,57,57,57,14,57,34,37,
-                         57,30,30,5,1,5,62,25,59,5,2,43,30,26,38,38)
-
-    val raw_transitions = loadCSV1D[T]("/remote/regression/data/machsuite/viterbi_transition.csv", "\n")
-    val raw_emissions = loadCSV1D[T]("/remote/regression/data/machsuite/viterbi_emission.csv", "\n")
-    val transitions = raw_transitions.reshape(N_STATES, N_STATES)
-    val emissions = raw_emissions.reshape(N_STATES, N_TOKENS)
-
-    val correct_path = Array[Int](27,27,27,27,27,31,63,63,63,63,47,4,38,38,38,38,7,7,7,
-                                  7,7,7,7,7,2,2,2,43,52,52,43,43,43,43,43,44,44,32,9,9,
-                                  15,45,45,45,45,45,45,0,55,55,55,30,13,13,13,13,13,13,
-                                  57,57,21,21,21,21,7,41,41,41,41,17,17,30,41,41,58,58,
-                                  58,31,54,54,54,54,54,54,54,54,54,54,54,54,52,52,52,21,
-                                  21,21,28,18,18,40,40,40,40,40,40,46,46,2,2,2,53,53,53,
-                                  55,38,57,57,57,57,57,57,57,57,57,57,30,30,5,5,5,5,5,5,
-                                  5,5,30,30,26,38,38)
-    // Handle DRAMs
-    val init_dram = DRAM[T](N_STATES)
-    val obs_dram = DRAM[Int](N_OBS)
-    val transitions_dram = DRAM[T](N_STATES,N_STATES)
-    val emissions_dram = DRAM[T](N_STATES,N_TOKENS)
-    // val llike_dram = DRAM[T](N_OBS,N_STATES)
-    val path_dram = DRAM[Int](N_OBS)
-    setMem(init_dram,init_states)
-    setMem(obs_dram, obs_vec)
-    setMem(transitions_dram,transitions)
-    setMem(emissions_dram,emissions)
-
-
-    Accel{
-      // Load data structures
-      val obs_sram = SRAM[Int](N_OBS)
-      val init_sram = SRAM[T](N_STATES)
-      val transitions_sram = SRAM[T](N_STATES,N_STATES)
-      val emissions_sram = SRAM[T](N_STATES,N_TOKENS)
-      val llike_sram = SRAM[T](N_OBS, N_STATES)
-      val path_sram = SRAM[Int](N_OBS)
-
-      Parallel{
-        obs_sram load obs_dram
-        init_sram load init_dram
-        transitions_sram load transitions_dram
-        emissions_sram load emissions_dram
-      }
-
-      // from --> to
-      Sequential.Foreach(0 until steps_to_take) { step => 
-        val obs = obs_sram(step)
-        Sequential.Foreach(0 until N_STATES) { to => 
-          val emission = emissions_sram(to, obs)
-          val best_hop = Reg[T](0x4000)
-          best_hop.reset
-          Reduce(best_hop)(0 until N_STATES) { from => 
-            val base = llike_sram((step-1) % N_OBS, from) + transitions_sram(from,to)
-            base + emission
-          } { (a,b) => mux(a < b, a, b)}
-          llike_sram(step,to) = mux(step == 0, emission + init_sram(to), best_hop)
-        }
-      }
-
-      // to <-- from
-      Sequential.Foreach(steps_to_take-1 until -1 by -1) { step => 
-        val from = path_sram(step+1)
-        val min_pack = Reg[Tup2[Int, T]](pack(-1.to[Int], (0x4000).to[T]))
-        min_pack.reset
-        Reduce(min_pack)(0 until N_STATES){ to => 
-          val jump_cost = mux(step == steps_to_take-1, 0.to[T], transitions_sram(to, from))
-          val p = llike_sram(step,to) + jump_cost
-          pack(to,p)
-        }{(a,b) => mux(a._2 < b._2, a, b)}
-        path_sram(step) = min_pack._1
-      }
-
-      // Store results
-      // llike_dram store llike_sram
-      path_dram store path_sram
-    }
-
-    // Get data structures
-    // val llike = getMatrix(llike_dram)
-    val path = getMem(path_dram)
-
-    // Print data structures
-    // printMatrix(llike, "log-likelihood")
-    printArray(path, "path taken")
-    printArray(correct_path, "correct path")
-
-    // Check results
-    val cksum = correct_path.zip(path){_ == _}.reduce{_&&_}
-    println("PASS: " + cksum + " (Viterbi)")
-
-  }
-}
 
 object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
 
