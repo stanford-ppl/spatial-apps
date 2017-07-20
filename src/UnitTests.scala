@@ -313,22 +313,19 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
 
 
 // Args: None
-object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: 11
+object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: none
 
 
   val tileSize = 16
   val I = 5
   val N = 192
 
-  def multiplexedwrtest[W:Type:Num](w: Array[W], i: Array[W], step_in: Int): (Array[W], Array[Int]) = {
+  def multiplexedwrtest[W:Type:Num](w: Array[W], i: Array[W]): Array[W] = {
     val T = param(tileSize)
     val P = param(4)
     val weights = DRAM[W](N)
     val inputs  = DRAM[W](N)
     val weightsResult = DRAM[W](N*I)
-    val varstep_dram = DRAM[Int](32)
-    val step = ArgIn[Int]
-    setArg(step, step_in)
     setMem(weights, w)
     setMem(inputs,i)
     Accel {
@@ -348,22 +345,17 @@ object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: 1
           weightsResult(i*I+x*T::i*I+x*T+T par 16) store wt //s1 read
         }
       }
-      val varstep = SRAM[Int](32)
-      Foreach(32 by 1) { i => varstep(i) = 0}
-      Foreach(32 by step){i => varstep(i) = step}
-      varstep_dram store varstep
 
     }
-    (getMem(weightsResult), getMem(varstep_dram))
+    getMem(weightsResult)
   }
 
   @virtualize
   def main() = {
     val w = Array.tabulate(N){ i => i % 256}
     val i = Array.tabulate(N){ i => i % 256 }
-    val step_in = args(0).to[Int]
 
-    val (result1, result2) = multiplexedwrtest(w, i, step_in)
+    val result = multiplexedwrtest(w, i)
 
     val gold = Array.tabulate(N/tileSize) { k =>
       Array.tabulate(I){ j => 
@@ -372,12 +364,10 @@ object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: 1
         in.zip(wt){_+_}
       }.flatten
     }.flatten
-    val varstep_gold = Array.tabulate(32){i => if (i % step_in == 0) step_in else 0}
     printArray(gold, "gold: ");
-    printArray(result1, "result: ");
-    printArray(result2, "variable step:")
+    printArray(result, "result: ");
 
-    val cksum = gold.zip(result1){_==_}.reduce{_&&_} && varstep_gold.zip(result2){_==_}.reduce{_&&_}
+    val cksum = gold.zip(result){_==_}.reduce{_&&_}
     println("PASS: " + cksum  + " (MultiplexedWriteTest)")
   }
 }
@@ -645,7 +635,7 @@ object MemTest2D extends SpatialApp { // Regression (Unit) // Args: 7
 
 object FifoLoad extends SpatialApp { // Regression (Unit) // Args: 192
 
-
+  @virtualize
   def fifoLoad[T:Type:Num](srcHost: Array[T], N: Int) = {
     val tileSize = 16 (64 -> 64)
 
@@ -662,7 +652,8 @@ object FifoLoad extends SpatialApp { // Regression (Unit) // Args: 192
         f1 load srcFPGA(i::i + tileSize par 16)
         val b1 = SRAM[T](tileSize)
         Foreach(tileSize by 1) { i =>
-          b1(i) = f1.deq()
+          b1(i) = f1.peek()
+          f1.deq()
         }
         dstFPGA(i::i + tileSize par 16) store b1
       }
@@ -2003,8 +1994,10 @@ object FifoStackFSM extends SpatialApp { // Regression (Unit) // Args: none
         if (state == init || state == fill) {
           stack_almost.push(stack_almost.numel)
         } else {
-          Pipe{            
-            stack_accum_almost := stack_accum_almost + stack_almost.pop()
+          Pipe{
+            val x = stack_almost.peek
+            stack_accum_almost := stack_accum_almost + x
+            stack_almost.pop()
           }
         }
       } { state => mux(state == 0, fill, mux(stack_almost.almostFull() && state == fill, drain, mux(stack_almost.almostEmpty() && state == drain, done, state))) }
