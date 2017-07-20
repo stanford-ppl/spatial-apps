@@ -1,12 +1,11 @@
 import spatial.dsl._
 import org.virtualized._
-import spatial.SpatialCompiler
-import spatial.interpreter.Interpreter
+import spatial.interpreter._
 
-object StreamInOutAdd extends SpatialStream {
+trait StreamInOutAdd extends SpatialStream {
   import spatial.targets.DE1
 
-  @virtualize def prog(): Unit = {
+  @virtualize def prog() = {
     val in  = StreamIn[Int](DE1.GPInput1)
     val out = StreamOut[Int](DE1.GPOutput1)
     Accel(*) {
