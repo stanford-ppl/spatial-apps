@@ -37,10 +37,10 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
    	val ROWS = 16 // Leading dim
    	val COLS = 32
     val HEIGHT = 32
-    val par_load = 1
-    val par_store = 1
-    val loop_height = 1 (1 -> 1 -> 8)
-    val loop_row = 1 (1 -> 1 -> 8)
+    val par_load = 16
+    val par_store = 16
+    val loop_height = 2 (1 -> 1 -> 8)
+    val loop_row = 2 (1 -> 1 -> 8)
     val loop_col = 1 (1 -> 1 -> 8)
     // val num_slices = ArgIn[Int]
     // setArg(num_slices, args(0).to[Int])
@@ -336,7 +336,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
     val coltile = 64
     val par_load = 16
     val par_store = 16
-    val row_par = 1 (1 -> 1 -> 8)
+    val row_par = 2 (1 -> 1 -> 8)
     val tile_par = 2 (1 -> 1 -> 4)
     val mean_par = window/2 (1 -> 1 -> window/2)
     val data = loadCSV2D[T]("/remote/regression/data/slacsample2d.csv", ",", "\n")
@@ -351,7 +351,6 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
 
 
     Accel {
-      val sr = RegFile[T](1,window)
       // Work on each row
       Sequential.Foreach(memrows by rowtile par tile_par) { r => 
         val results = SRAM[Int](rowtile)
@@ -363,6 +362,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
             rawdata load srcmem(r + rr, c::c+coltile par par_load)
             // Scan through tile to get deriv
             val localMax = Reduce(Reg[Tuple2[Int,T]](pack(0.to[Int], -1000.to[T])))(coltile by 1) { j =>
+              val sr = RegFile[T](1,window)
               sr(0,*) <<= rawdata(j)
               val mean_right = Reduce(Reg[T](0.to[T]))(window/2 by 1 par mean_par) { k => sr(0,k) }{_+_} / window.to[T]
               val mean_left = Reduce(Reg[T](0.to[T]))(window/2 by 1 par mean_par) { k => sr(0,k+window/2) }{_+_} / window.to[T]
@@ -450,8 +450,8 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val lj1 = 1.5.to[T]
     val lj2 = 2.to[T]
 
-    val par_load = 1
-    val par_store = 1
+    val par_load = 2 // Wider data type
+    val par_store = 2 // Wider data type
     val loop_grid0_x = 8 (1 -> 1 -> 16)
     val loop_grid0_y = 8 (1 -> 1 -> 16)
     val loop_grid0_z = 8 (1 -> 1 -> 16)
