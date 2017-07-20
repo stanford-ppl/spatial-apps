@@ -123,6 +123,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
  }
 }
 
+// No opportunities for par
 object NW extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -323,7 +324,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
   }
 }      
 
-// Rework
+// good
 object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
 
   type T = FixPt[TRUE,_16,_16]
@@ -450,8 +451,8 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val lj1 = 1.5.to[T]
     val lj2 = 2.to[T]
 
-    val par_load = 2 // Wider data type
-    val par_store = 2 // Wider data type
+    val par_load = 8 // Wider data type
+    val par_store = 8 // Wider data type
     val loop_grid0_x = 8 (1 -> 1 -> 16)
     val loop_grid0_y = 8 (1 -> 1 -> 16)
     val loop_grid0_z = 8 (1 -> 1 -> 16)
@@ -594,11 +595,11 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
 
     val FFT_SIZE = 1024
     val numiter = (scala.math.log(FFT_SIZE) / scala.math.log(2)).to[Int]
-    val par_load = 16
+    val par_load = 1
     val par_store = 16
-    val outer = 8 (1 -> 1 -> 16)
-    val middle = 8 (1 -> 1 -> 16)
-    val inner = 8 (1 -> 1 -> 16)
+    val outer = 1 (1 -> 1 -> 16)
+    val middle = 1 (1 -> 1 -> 16)
+    val inner = 1 (1 -> 1 -> 16)
 
     val data_real = loadCSV1D[T]("/remote/regression/data/machsuite/fft_strided_real.csv", "\n")
     val data_img = loadCSV1D[T]("/remote/regression/data/machsuite/fft_strided_img.csv", "\n")
@@ -679,7 +680,7 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
 
   }
 }
-// Rework
+// No opportunities for par
 object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -831,7 +832,7 @@ object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
     // val llike = getMatrix(llike_dram)
     val path = getMem(path_dram)
 
-    // Print data structures
+    // Print data structuress_
     // printMatrix(llike, "log-likelihood")
     printArray(path, "path taken")
     printArray(correct_path, "correct path")
@@ -884,6 +885,9 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
     val grid_init = (0::ROWS, 0::COLS){(i,j) => if ((i+j)%2 == 0) -1.to[Int] else 1.to[Int]}
     // // Square
     // val grid_init = (0::ROWS, 0::COLS){(i,j) => if (i > ROWS/4 && i < 3*ROWS/4 && j > COLS/4 && j < 3*COLS/4) -1.to[Int] else 1.to[Int]}
+
+    val par_load = 16
+    val par_store = 16
 
     // Square
     val bias_matrix = (0::ROWS, 0::COLS){(i,j) => if (i > ROWS/4 && i < 3*ROWS/4 && j > COLS/4 && j < 3*COLS/4) -1.to[Int] else 1.to[Int]}
@@ -952,8 +956,8 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
       val grid_sram = SRAM[Int](ROWS,COLS)
       val bias_sram = SRAM[Int](ROWS,COLS)
       exp_sram load exp_lut
-      grid_sram load grid_dram
-      bias_sram load bias_dram
+      grid_sram load grid_dram(0::ROWS, 0::COLS par par_load)
+      bias_sram load bias_dram(0::ROWS, 0::COLS par par_load)
 
       Foreach(iters by 1) { iter =>
         Sequential.Foreach(ROWS by 1) { i => 
@@ -969,12 +973,13 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
             val pi_x = exp_sram(sum+4) * mux((bias_sram(i,j) * self) < 0, exp_posbias, exp_negbias)
             val threshold = min(1.to[T], pi_x)
             val rng = unif[_16]()
+            println("thresh " + threshold + " and sliced " + threshold(31::16).as[PROB] )
             val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(31::16).as[PROB], 1.to[T], 0.to[T]))
             grid_sram(i,j) = mux(flip == 1.to[T], -self, self)
           }
         }
       }
-      grid_dram store grid_sram
+      grid_dram(0::ROWS, 0::COLS par par_store) store grid_sram
     }
 
     val result = getMatrix(grid_dram)
