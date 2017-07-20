@@ -41,7 +41,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
     val par_store = 16
     val loop_height = 2 (1 -> 1 -> 8)
     val loop_row = 2 (1 -> 1 -> 8)
-    val loop_col = 1 (1 -> 1 -> 8)
+    val loop_col = 2 (1 -> 1 -> 8)
     // val num_slices = ArgIn[Int]
     // setArg(num_slices, args(0).to[Int])
     val num_slices = HEIGHT

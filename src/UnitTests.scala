@@ -651,9 +651,9 @@ object FifoLoad extends SpatialApp { // Regression (Unit) // Args: 192
       Sequential.Foreach(size by tileSize) { i =>
         f1 load srcFPGA(i::i + tileSize par 16)
         val b1 = SRAM[T](tileSize)
-        Foreach(tileSize by 1) { i =>
-          b1(i) = f1.peek()
-          f1.deq()
+        Sequential.Foreach(tileSize by 1) { i =>
+          Pipe{b1(i) = f1.peek()}
+          Pipe{f1.deq()}
         }
         dstFPGA(i::i + tileSize par 16) store b1
       }
@@ -1995,9 +1995,11 @@ object FifoStackFSM extends SpatialApp { // Regression (Unit) // Args: none
           stack_almost.push(stack_almost.numel)
         } else {
           Pipe{
-            val x = stack_almost.peek
-            stack_accum_almost := stack_accum_almost + x
-            stack_almost.pop()
+            Pipe{ 
+              val x = stack_almost.peek
+              stack_accum_almost := stack_accum_almost + x
+            }
+            Pipe{stack_almost.pop()}
           }
         }
       } { state => mux(state == 0, fill, mux(stack_almost.almostFull() && state == fill, drain, mux(stack_almost.almostEmpty() && state == drain, done, state))) }
