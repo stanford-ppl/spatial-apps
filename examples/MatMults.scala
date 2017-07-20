@@ -44,7 +44,7 @@ object MatMult_outer extends SpatialApp { // Regression (Dense) // Args: 32 128 
         val tileC = SRAM[T](bm, bn)
         tileC load c(i::i+bm, j::j+bn par ip)
         MemFold(tileC)(P by bp) { k =>
-          val tileA = SRAM[T](bm, bp) 
+          val tileA = SRAM[T](bm, bp)
           val tileB = SRAM[T](bp, bn)
           val accum = SRAM[T](bm, bn)
           Parallel {
@@ -215,11 +215,11 @@ object MatMult_inner extends SpatialApp { // Regression (Dense) // Args: 32 128 
                                P      |                   |
                                       |                   |
                                       |                   |
-                                      |                   |     
+                                      |                   |
                                       |                   |
           (k)                         |___________________|
           ↓                        x
-                      P          
+                      P
           ___kc_________________       ___________________
          |         |            |     |                   |
          |         |            |     |                   |
@@ -230,14 +230,14 @@ object MatMult_inner extends SpatialApp { // Regression (Dense) // Args: 32 128 
          |         |            |     |                   |
          | tileA   |            |     | tileC             |
          |_________|____________|     |___________________|
-          
-                
-                         
-             
+
+
+
+
     ###########
     # LAYER 2 #
     ##################
-        # outer pipe #                     
+        # outer pipe #
         ##############                              N
                                        ___________________
                                       |                   |
@@ -247,7 +247,7 @@ object MatMult_inner extends SpatialApp { // Regression (Dense) // Args: 32 128 
                                   P   .                   .
                                       .                   .
                                       .                   .
-                                      .                   .     
+                                      .                   .
                                       .                   .
                                       .....................
                                x
@@ -267,7 +267,7 @@ object MatMult_inner extends SpatialApp { // Regression (Dense) // Args: 32 128 
     ###########
     # LAYER 2 #
     ##################
-        # inner pipe #                     
+        # inner pipe #
         ##############
                                   (local_n)
                                       ↓
@@ -279,7 +279,7 @@ object MatMult_inner extends SpatialApp { // Regression (Dense) // Args: 32 128 
                                       .                   .
                                       .                   .
                                       .                   .
-                                      .                   .     
+                                      .                   .
                                       .                   .
                                       .....................
                         x
@@ -299,7 +299,7 @@ object MatMult_inner extends SpatialApp { // Regression (Dense) // Args: 32 128 
     ###########
     # LAYER 3 #
     ###########
-                                 
+
 
                                              (compute_n)
                                      ↓ ↓
@@ -311,11 +311,11 @@ object MatMult_inner extends SpatialApp { // Regression (Dense) // Args: 32 128 
                                      .                   .
                                      .                   .
     (compute_m)                      .                   .
-    |                                .                   .     
+    |                                .                   .
     | (accum_m)                      .                   .
     |  |                             .....................
     |  | (compute_k)           x
-    |  | ↓     
+    |  | ↓
     |  ↳ ____kc___ ............      ___ ................
     ↳   |o        |            .    |o o|               .
     ↳   |o        |            .    |o o|               .
@@ -359,8 +359,8 @@ object GEMM_MemoryHierarchy extends SpatialApp { // Regression (Dense) // Args: 
     val b = (0::p, 0::n){(i,j) => ((i*n + j)%8).to[T] }
     val c = (0::m, 0::n){(i,j) => 0.to[T] }
 
-    val A_dram = DRAM[T](M, P) 
-    val B_dram = DRAM[T](P, N) 
+    val A_dram = DRAM[T](M, P)
+    val B_dram = DRAM[T](P, N)
     val C_dram = DRAM[T](M, N)
 
     val n_r        = 4 // rank-1 updated width/height
@@ -375,7 +375,7 @@ object GEMM_MemoryHierarchy extends SpatialApp { // Regression (Dense) // Args: 
     setMem(C_dram, c)
 
     Accel {
-      // **LAYER 1** ON-CHIP MEMORY 
+      // **LAYER 1** ON-CHIP MEMORY
       val tileC = SRAM[T](M, N)
       tileC load C_dram(0::M, 0::N par 16)
 
@@ -391,7 +391,7 @@ object GEMM_MemoryHierarchy extends SpatialApp { // Regression (Dense) // Args: 
         //      *outer*
         Foreach(M by m_c) { local_m =>
           val tileA_ip = SRAM[T](m_c, k_c)
-          val tileB_pj = SRAM[T](k_c, n_r) 
+          val tileB_pj = SRAM[T](k_c, n_r)
 
           // DATA MOVEMENT
           Foreach(m_c by 1, k_c by 1 par min(16,k_c)) { (copy_m, copy_k) => tileA_ip(copy_m, copy_k) = tileA(local_m + copy_m, copy_k) }
@@ -404,18 +404,18 @@ object GEMM_MemoryHierarchy extends SpatialApp { // Regression (Dense) // Args: 
             // Loaded local store level of tileB_pj
 
 
-            // **LAYER 3** ACCUMULATOR (REGISTER LEVEL)     
+            // **LAYER 3** ACCUMULATOR (REGISTER LEVEL)
             val tileC_acc = RegFile[T](n_r,n_r)
             Foreach(m_c by n_r){ accum_m =>
               // DATA MOVEMENT
-              Foreach(n_r by 1, n_r by 1 par n_r) { (copy_m, copy_n) => 
-                // tileC_acc(copy_m, copy_n) = tileC(local_m + accum_m + copy_m, local_n + copy_n) 
-                tileC_acc(copy_m, copy_n) = tileC(local_m + accum_m + copy_m, local_n + copy_n) 
+              Foreach(n_r by 1, n_r by 1 par n_r) { (copy_m, copy_n) =>
+                // tileC_acc(copy_m, copy_n) = tileC(local_m + accum_m + copy_m, local_n + copy_n)
+                tileC_acc(copy_m, copy_n) = tileC(local_m + accum_m + copy_m, local_n + copy_n)
               }
 
               MemFold(tileC_acc)(k_c by 1) { compute_k =>
                 val tileC_partial = RegFile[T](n_r,n_r)
-                Foreach(n_r by 1, n_r by 1 par n_r) { (compute_m, compute_n) => 
+                Foreach(n_r by 1, n_r by 1 par n_r) { (compute_m, compute_n) =>
                   tileC_partial(compute_m, compute_n) = tileA_ip(compute_m, compute_k) * tileB_pj(compute_k, compute_n)
                 }
                 tileC_partial
@@ -432,8 +432,8 @@ object GEMM_MemoryHierarchy extends SpatialApp { // Regression (Dense) // Args: 
       C_dram(0::M, 0::N par 16) store tileC
     }
     val result = getMatrix(C_dram)
-  
-    val gold = (0::m, 0::n){(i,j) => 
+
+    val gold = (0::m, 0::n){(i,j) =>
       Array.tabulate(p){k => a(i,k) * a(k,j)}.reduce{_+_}
     }
 
