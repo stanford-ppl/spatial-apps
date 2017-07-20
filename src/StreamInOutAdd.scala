@@ -3,11 +3,10 @@ import org.virtualized._
 import spatial.interpreter._
 
 trait StreamInOutAdd extends SpatialStream {
-  import spatial.targets.DE1
 
   @virtualize def prog() = {
-    val in  = StreamIn[Int](DE1.GPInput1)
-    val out = StreamOut[Int](DE1.GPOutput1)
+    val in  = StreamIn[Int](In1)
+    val out = StreamOut[Int](Out1)
     Accel(*) {
       out := in + 4
     }
