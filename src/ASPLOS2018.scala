@@ -2166,6 +2166,8 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
     val SHA_BLOCKSIZE = 64
 
     val PX = 1 
+    val par_load = 16
+    val par_store = 16
 
     val CONST1 = 0x5a827999L
     val CONST2 = 0x6ed9eba1L
@@ -2210,6 +2212,14 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
           W(i) = if (i < 16) {sha_data(i)} else {W(i-3) ^ W(i-8) ^ W(i-14) ^ W(i-16)}
         }
 
+        // Foreach(5 by 1 par 5){i => 
+        //   val tmp = sha_digest(i)
+        //   if (i == 0) A := tmp 
+        //   else if (i == 1) B := tmp
+        //   else if (i == 2) C := tmp
+        //   else if (i == 3) D := tmp
+        //   else E := tmp
+        // }
         A := sha_digest(0)
         B := sha_digest(1)
         C := sha_digest(2)
@@ -2233,12 +2243,9 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
           E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
         }
 
-        Pipe{sha_digest(0) = sha_digest(0) + A}
-        // Pipe{println("sha_digest 0 is " + sha_digest(0))}
-        Pipe{sha_digest(1) = sha_digest(1) + B}
-        Pipe{sha_digest(2) = sha_digest(2) + C}
-        Pipe{sha_digest(3) = sha_digest(3) + D}
-        Pipe{sha_digest(4) = sha_digest(4) + E}
+        Foreach(5 by 1 par 5){i => 
+          sha_digest(i) = sha_digest(i) + mux(i == 0, A, mux(i == 1, B, mux(i == 2, C, mux(i == 3, D, E))))
+        }
       }
       def sha_update(count: Index): Unit = {
         if (count_lo + (count << 3) < count_lo) {count_hi :+= 1}
@@ -2261,15 +2268,9 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
 
       }
 
-      // Pipe{sha_digest(0) = 0x67452301L.to[ULong]}
-      // Pipe{sha_digest(1) = 0xefcdab89L.to[ULong]}
-      // Pipe{sha_digest(2) = 0x98badcfeL.to[ULong]}
-      // Pipe{sha_digest(3) = 0x10325476L.to[ULong]}
-      // Pipe{sha_digest(4) = 0xc3d2e1f0L.to[ULong]}
-
       Sequential.Foreach(len by BLOCK_SIZE) { chunk => 
         val count = min(BLOCK_SIZE.to[Int], (len - chunk))
-        buffer load text_dram(chunk::chunk+count)
+        buffer load text_dram(chunk::chunk+count par par_load)
         sha_update(count)
 
         // def byte_reverse(x: ULong): ULong = {
@@ -2284,18 +2285,18 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
         sha_data(count_final) = 0x80
         if (count_final > 56) {
           Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
-          Sequential(sha_transform())
+          sha_transform()
           sha_data(14) = 0
         } else {
           Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
         }
-        Pipe{sha_data(14) = hi_bit_count}
-        Pipe{sha_data(15) = lo_bit_count}
+        Foreach(14 until 16 by 1){i => 
+          sha_data(i) = if (i == 14) hi_bit_count else lo_bit_count
+        }
         sha_transform()
       }
 
-
-      hash_dram store sha_digest
+      hash_dram(0::16 par par_store) store sha_digest
     }
 
     val hashed_result = getMem(hash_dram)
