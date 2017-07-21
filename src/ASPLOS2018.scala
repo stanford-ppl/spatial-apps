@@ -1982,6 +1982,9 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
       0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
     )
     
+    val par_load = 16
+    val par_store = 16
+
     // Create DRAMs
     val plaintext_dram = DRAM[UInt8](16)
     val key_dram = DRAM[UInt8](32)
@@ -2002,7 +2005,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
     Accel{
       // Setup data structures
       val plaintext_flat = SRAM[UInt8](16)
-      val plaintext_sram = SRAM[UInt8](4,4)
+      val plaintext_sram = RegFile[UInt8](4,4)
       val sbox_sram = SRAM[UInt8](256)
       val key_sram = SRAM[UInt8](32)
       // val mix_lut = LUT[Int](4,4)(
@@ -2087,16 +2090,17 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
       }
 
       // Load structures
+
       Parallel {
-        plaintext_flat load plaintext_dram // TODO: Allow dram loads to reshape (gh issue #83)
-        sbox_sram load sbox_dram
-        key_sram load key_dram
+        plaintext_flat load plaintext_dram(0::16 par par_load) // TODO: Allow dram loads to reshape (gh issue #83)
+        sbox_sram load sbox_dram(0::256 par par_load)
+        key_sram load key_dram(0::32 par par_load)
       }
 
       // gh issue #83
-      Foreach(4 by 1, 4 by 1){(i,j) => 
+      Foreach(4 by 1, 4 by 1 par 4){(i,j) => 
         plaintext_sram(i,j) = plaintext_flat(j*4+i) // MachSuite flattens columnwise... Why????
-      } 
+      }
 
       // Do AES
       Sequential.Foreach(niter by 1) { round => 
@@ -2153,6 +2157,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
   }
 }
 
+// Waiting on issue #182
 object SHA extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
