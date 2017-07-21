@@ -2165,6 +2165,8 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
     val BLOCK_SIZE = 8192
     val SHA_BLOCKSIZE = 64
 
+    val PX = 1 
+
     val CONST1 = 0x5a827999L
     val CONST2 = 0x6ed9eba1L
     val CONST3 = 0x8f1bbcdcL
@@ -2186,7 +2188,10 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
 
     Accel{
       val buffer = SRAM[Int8](BLOCK_SIZE)
-      val sha_digest = RegFile[ULong](5)
+      val sha_digest = RegFile[ULong](5, List(0x67452301L.to[ULong], 0xefcdab89L.to[ULong], 
+                                              0x98badcfeL.to[ULong], 0x10325476L.to[ULong], 
+                                              0xc3d2e1f0L.to[ULong])
+                                     )
       val sha_data = SRAM[ULong](16)
       val count_lo = Reg[Int](0)
       val count_hi = Reg[Int](0)
@@ -2201,7 +2206,7 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
         val D = Reg[ULong]
         val E = Reg[ULong]
 
-        Foreach(80 by 1) { i =>
+        Foreach(80 by 1 par PX) { i =>
           W(i) = if (i < 16) {sha_data(i)} else {W(i-3) ^ W(i-8) ^ W(i-14) ^ W(i-16)}
         }
 
@@ -2211,19 +2216,19 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
         D := sha_digest(3)
         E := sha_digest(4)
 
-        Sequential.Foreach(20 by 1) { i => 
+        Foreach(20 by 1) { i => 
           val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST1 + ((B & C) | (~B & D))
           E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
         }
-        Sequential.Foreach(20 until 40 by 1) { i => 
+        Foreach(20 until 40 by 1) { i => 
           val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST2 + (B ^ C ^ D)
           E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
         }
-        Sequential.Foreach(40 until 60 by 1) { i => 
+        Foreach(40 until 60 by 1) { i => 
           val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST3 + ((B & C) | (B & D) | (C & D))
           E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
         }
-        Sequential.Foreach(60 until 80 by 1) { i => 
+        Foreach(60 until 80 by 1) { i => 
           val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST4 + (B ^ C ^ D)
           E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
         }
@@ -2239,16 +2244,16 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
         if (count_lo + (count << 3) < count_lo) {count_hi :+= 1}
         count_lo :+= count << 3
         count_hi :+= count >> 29
-        Sequential.Foreach(0 until count by SHA_BLOCKSIZE) { base => 
+        Foreach(0 until count by SHA_BLOCKSIZE) { base => 
           val numel = min(count - base, SHA_BLOCKSIZE.to[Index])
           // TODO: Can make this one writer only
           if (numel == SHA_BLOCKSIZE) {Pipe{
-            Sequential.Foreach(SHA_BLOCKSIZE/4 by 1){ i => 
+            Foreach(SHA_BLOCKSIZE/4 by 1){ i => 
               sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
             }
             sha_transform()
           }} else {
-            Sequential(0 until numel by 1) { i => 
+            Foreach(0 until numel by 1) { i => 
               sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
             }         
           }
