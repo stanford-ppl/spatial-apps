@@ -87,7 +87,7 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
   val innerPar = 4
   val outerPar = 2
 
-  val tileSize = 1920
+  val tileSize = 64
 
   @virtualize
   def dotproduct[T:Type:Num](aIn: Array[T], bIn: Array[T]): T = {
