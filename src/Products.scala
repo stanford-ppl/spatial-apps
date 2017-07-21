@@ -5,11 +5,11 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
 
   type X = FixPt[TRUE,_32,_0]
 
-  val ip = 256
+  val ip = 4
   val op = 1
 
-  val tileSize1 = 192
-  val tileSize2 = 96
+  val tileSize1 = 64
+  val tileSize2 = 64
 
   @virtualize
   def outerproduct[T:Type:Num](a: Array[T], b: Array[T]) = {
@@ -84,8 +84,8 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
 
   type X = FixPt[TRUE,_32,_0]
 
-  val innerPar = 96
-  val outerPar = 1
+  val innerPar = 4
+  val outerPar = 2
 
   val tileSize = 1920
 
