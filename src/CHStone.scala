@@ -10,9 +10,11 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
 
   @virtualize
   def main() = {
-  	// Setup off-chip data
-  	val BLOCK_SIZE = 8192
-  	val SHA_BLOCKSIZE = 64
+    // Setup off-chip data
+    val BLOCK_SIZE = 8192
+    val SHA_BLOCKSIZE = 64
+
+    val PX = 1 
 
     val CONST1 = 0x5a827999L
     val CONST2 = 0x6ed9eba1L
@@ -33,122 +35,125 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
     // printArray(data_text, "text as data: ")
     setMem(text_dram, data_text)
 
-  	Accel{
-  		val buffer = SRAM[Int8](BLOCK_SIZE)
-  		val sha_digest = RegFile[ULong](5)
-  		val sha_data = SRAM[ULong](16)
-  		val count_lo = Reg[Int](0)
-  		val count_hi = Reg[Int](0)
+    Accel{
+      val buffer = SRAM[Int8](BLOCK_SIZE)
+      val sha_digest = RegFile[ULong](5, List(0x67452301L.to[ULong], 0xefcdab89L.to[ULong], 
+                                              0x98badcfeL.to[ULong], 0x10325476L.to[ULong], 
+                                              0xc3d2e1f0L.to[ULong])
+                                     )
+      val sha_data = SRAM[ULong](16)
+      val count_lo = Reg[Int](0)
+      val count_hi = Reg[Int](0)
 
-  		def asLong(r: Reg[ULong]): ULong = {r.value.apply(31::0).as[ULong]}
+      def asLong(r: Reg[ULong]): ULong = {r.value.apply(31::0).as[ULong]}
 
-  		def sha_transform(): Unit = {
-	      val W = SRAM[ULong](80)
-		    val A = Reg[ULong]
-		    val B = Reg[ULong]
-		    val C = Reg[ULong]
-		    val D = Reg[ULong]
-		    val E = Reg[ULong]
+      def sha_transform(): Unit = {
+        val W = SRAM[ULong](80)
+        val A = Reg[ULong]
+        val B = Reg[ULong]
+        val C = Reg[ULong]
+        val D = Reg[ULong]
+        val E = Reg[ULong]
 
-	      Foreach(80 by 1) { i =>
-	      	W(i) = if (i < 16) {sha_data(i)} else {W(i-3) ^ W(i-8) ^ W(i-14) ^ W(i-16)}
-	      }
-
-				A := sha_digest(0)
-				B := sha_digest(1)
-				C := sha_digest(2)
-				D := sha_digest(3)
-				E := sha_digest(4)
-
-		    Sequential.Foreach(20 by 1) { i => 
-		    	val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST1 + ((B & C) | (~B & D))
-		    	E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
-		    }
-		    Sequential.Foreach(20 until 40 by 1) { i => 
-		    	val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST2 + (B ^ C ^ D)
-		    	E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
-		    }
-		    Sequential.Foreach(40 until 60 by 1) { i => 
-		    	val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST3 + ((B & C) | (B & D) | (C & D))
-		    	E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
-		    }
-		    Sequential.Foreach(60 until 80 by 1) { i => 
-		    	val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST4 + (B ^ C ^ D)
-		    	E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
-		    }
-
-				Pipe{sha_digest(0) = sha_digest(0) + A}
-        // Pipe{println("sha_digest 0 is " + sha_digest(0))}
-				Pipe{sha_digest(1) = sha_digest(1) + B}
-				Pipe{sha_digest(2) = sha_digest(2) + C}
-				Pipe{sha_digest(3) = sha_digest(3) + D}
-				Pipe{sha_digest(4) = sha_digest(4) + E}
-  		}
-  		def sha_update(count: Index): Unit = {
-	  		if (count_lo + (count << 3) < count_lo) {count_hi :+= 1}
-				count_lo :+= count << 3
-    		count_hi :+= count >> 29
-    		Sequential.Foreach(0 until count by SHA_BLOCKSIZE) { base => 
-    			val numel = min(count - base, SHA_BLOCKSIZE.to[Index])
-    			// TODO: Can make this one writer only
-    			if (numel == SHA_BLOCKSIZE) {Pipe{
-			      Sequential.Foreach(SHA_BLOCKSIZE/4 by 1){ i => 
-			        sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
-			      }
-			      sha_transform()
-		      }} else {
-						Sequential(0 until numel by 1) { i => 
-			        sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
-						}	      	
-		      }
-				}
-
-  		}
-
-			Pipe{sha_digest(0) = 0x67452301L.to[ULong]}
-			Pipe{sha_digest(1) = 0xefcdab89L.to[ULong]}
-			Pipe{sha_digest(2) = 0x98badcfeL.to[ULong]}
-			Pipe{sha_digest(3) = 0x10325476L.to[ULong]}
-			Pipe{sha_digest(4) = 0xc3d2e1f0L.to[ULong]}
-
-  		Sequential.Foreach(len by BLOCK_SIZE) { chunk => 
-  			val count = min(BLOCK_SIZE.to[Int], (len - chunk))
-	  		buffer load text_dram(chunk::chunk+count)
-	  		sha_update(count)
-
-	  		// def byte_reverse(x: ULong): ULong = {
-	  		// 	byte_pack(x(31::24).as[Int8],x(23::16).as[Int8],x(15::8).as[Int8],x(7::0).as[Int8]).as[ULong]
-	  		// }
-
-				// Final sha
-				// TODO: This last bit is probably wrong for any input that is not size 8192
-				val lo_bit_count = count_lo.value.to[ULong]
-				val hi_bit_count = count_hi.value.to[ULong]
-    		val count_final = ((lo_bit_count.to[Int8] >> 3) & 0x3f.to[Int8]).to[Int]
-    		sha_data(count_final) = 0x80
-    		if (count_final > 56) {
-    			Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
-    			Sequential(sha_transform())
-    			sha_data(14) = 0
-    		} else {
-    			Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
+        Foreach(80 by 1 par PX) { i =>
+          W(i) = if (i < 16) {sha_data(i)} else {W(i-3) ^ W(i-8) ^ W(i-14) ^ W(i-16)}
         }
-    		Pipe{sha_data(14) = hi_bit_count}
-    		Pipe{sha_data(15) = lo_bit_count}
-    		sha_transform()
-  		}
+
+        A := sha_digest(0)
+        B := sha_digest(1)
+        C := sha_digest(2)
+        D := sha_digest(3)
+        E := sha_digest(4)
+
+        Foreach(20 by 1) { i => 
+          val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST1 + ((B & C) | (~B & D))
+          E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
+        }
+        Foreach(20 until 40 by 1) { i => 
+          val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST2 + (B ^ C ^ D)
+          E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
+        }
+        Foreach(40 until 60 by 1) { i => 
+          val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST3 + ((B & C) | (B & D) | (C & D))
+          E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
+        }
+        Foreach(60 until 80 by 1) { i => 
+          val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST4 + (B ^ C ^ D)
+          E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
+        }
+
+        Pipe{sha_digest(0) = sha_digest(0) + A}
+        // Pipe{println("sha_digest 0 is " + sha_digest(0))}
+        Pipe{sha_digest(1) = sha_digest(1) + B}
+        Pipe{sha_digest(2) = sha_digest(2) + C}
+        Pipe{sha_digest(3) = sha_digest(3) + D}
+        Pipe{sha_digest(4) = sha_digest(4) + E}
+      }
+      def sha_update(count: Index): Unit = {
+        if (count_lo + (count << 3) < count_lo) {count_hi :+= 1}
+        count_lo :+= count << 3
+        count_hi :+= count >> 29
+        Foreach(0 until count by SHA_BLOCKSIZE) { base => 
+          val numel = min(count - base, SHA_BLOCKSIZE.to[Index])
+          // TODO: Can make this one writer only
+          if (numel == SHA_BLOCKSIZE) {Pipe{
+            Foreach(SHA_BLOCKSIZE/4 by 1){ i => 
+              sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
+            }
+            sha_transform()
+          }} else {
+            Foreach(0 until numel by 1) { i => 
+              sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
+            }         
+          }
+        }
+
+      }
+
+      // Pipe{sha_digest(0) = 0x67452301L.to[ULong]}
+      // Pipe{sha_digest(1) = 0xefcdab89L.to[ULong]}
+      // Pipe{sha_digest(2) = 0x98badcfeL.to[ULong]}
+      // Pipe{sha_digest(3) = 0x10325476L.to[ULong]}
+      // Pipe{sha_digest(4) = 0xc3d2e1f0L.to[ULong]}
+
+      Sequential.Foreach(len by BLOCK_SIZE) { chunk => 
+        val count = min(BLOCK_SIZE.to[Int], (len - chunk))
+        buffer load text_dram(chunk::chunk+count)
+        sha_update(count)
+
+        // def byte_reverse(x: ULong): ULong = {
+        //  byte_pack(x(31::24).as[Int8],x(23::16).as[Int8],x(15::8).as[Int8],x(7::0).as[Int8]).as[ULong]
+        // }
+
+        // Final sha
+        // TODO: This last bit is probably wrong for any input that is not size 8192
+        val lo_bit_count = count_lo.value.to[ULong]
+        val hi_bit_count = count_hi.value.to[ULong]
+        val count_final = ((lo_bit_count.to[Int8] >> 3) & 0x3f.to[Int8]).to[Int]
+        sha_data(count_final) = 0x80
+        if (count_final > 56) {
+          Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
+          Sequential(sha_transform())
+          sha_data(14) = 0
+        } else {
+          Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
+        }
+        Pipe{sha_data(14) = hi_bit_count}
+        Pipe{sha_data(15) = lo_bit_count}
+        sha_transform()
+      }
 
 
-  		hash_dram store sha_digest
-  	}
+      hash_dram store sha_digest
+    }
 
-  	val hashed_result = getMem(hash_dram)
-  	val hashed_gold = Array[ULong](1754467640L,1633762310L,3755791939L,3062269980L,2187536409L,0,0,0,0,0,0,0,0,0,0,0)
-  	printArray(hashed_gold, "Expected: ")
-  	printArray(hashed_result, "Got: ")
+    val hashed_result = getMem(hash_dram)
+    val hashed_gold = Array[ULong](1754467640L,1633762310L,3755791939L,3062269980L,2187536409L,0,0,0,0,0,0,0,0,0,0,0)
+    printArray(hashed_gold, "Expected: ")
+    printArray(hashed_result, "Got: ")
 
-  	val cksum = hashed_gold == hashed_result
-  	println("PASS: " + cksum + " (SHA)")
+    val cksum = hashed_gold == hashed_result
+    println("PASS: " + cksum + " (SHA)")
 
   }
 }
