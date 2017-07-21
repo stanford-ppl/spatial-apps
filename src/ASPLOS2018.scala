@@ -2261,11 +2261,11 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
 
       }
 
-      Pipe{sha_digest(0) = 0x67452301L.to[ULong]}
-      Pipe{sha_digest(1) = 0xefcdab89L.to[ULong]}
-      Pipe{sha_digest(2) = 0x98badcfeL.to[ULong]}
-      Pipe{sha_digest(3) = 0x10325476L.to[ULong]}
-      Pipe{sha_digest(4) = 0xc3d2e1f0L.to[ULong]}
+      // Pipe{sha_digest(0) = 0x67452301L.to[ULong]}
+      // Pipe{sha_digest(1) = 0xefcdab89L.to[ULong]}
+      // Pipe{sha_digest(2) = 0x98badcfeL.to[ULong]}
+      // Pipe{sha_digest(3) = 0x10325476L.to[ULong]}
+      // Pipe{sha_digest(4) = 0xc3d2e1f0L.to[ULong]}
 
       Sequential.Foreach(len by BLOCK_SIZE) { chunk => 
         val count = min(BLOCK_SIZE.to[Int], (len - chunk))
