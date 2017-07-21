@@ -963,7 +963,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
    pi(x) = exp(J* 𝚺x_j*x_i + J_b * 𝚺b_i*x_i)        
    let x' = x with one entry flipped
    Prob(accept x') ~ min(1, pi(x')/pi(x)) = exp(-2*J*𝚺x_j*x_i)*exp(-2*J_b*𝚺b_i*x_i)
-  Use args 100 0.4 0 to get a nice looking lava lamp pattern
+  Use args 100 0.4 0 to get a nice looking lava lamp pattern, or 0.8 for scala
 */
 
 object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3 2
@@ -1131,7 +1131,7 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
     }.reduce{_+_}
     println("Found " + blips_inside + " blips inside the bias region and " + blips_outside + " blips outside the bias region")
     val cksum = (blips_inside + blips_outside) < (ROWS*COLS/8)
-    println("PASS: " + cksum + " (Gibbs_Ising2D)")
+    println("PASS: " + cksum + " (Gibbs_Ising2D) * Scala and Chisel selection of J seem to not agree")
 
   }
 }

@@ -1002,7 +1002,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
         val b1z_start = max(0.to[Int],b0z-1.to[Int])
         val b1z_end = min(BLOCK_SIDE.to[Int], b0z+2.to[Int])
         MemReduce(b0_cube_forces)(b1x_start until b1x_end by 1, b1y_start until b1y_end by 1, b1z_start until b1z_end by 1) { (b1x, b1y, b1z) => 
-          val b1_cube_contributions = SRAM[XYZ](density)
+          val b1_cube_contributions = SRAM.buffer[XYZ](density)
           // Iterate over points in b0
           val p_range = npoints_sram(b0x, b0y, b0z)
           val q_range = npoints_sram(b1x, b1y, b1z)
