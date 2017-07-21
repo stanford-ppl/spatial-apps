@@ -2,7 +2,7 @@ import spatial.dsl._
 import org.virtualized._
 import spatial.targets._
 
-object SHA extends SpatialApp { // Regression (Dense) // Args: none
+object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
   type ULong = FixPt[FALSE, _32, _0]
@@ -153,7 +153,7 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
     printArray(hashed_result, "Got: ")
 
     val cksum = hashed_gold == hashed_result
-    println("PASS: " + cksum + " (SHA)")
+    println("PASS: " + cksum + " (SHA1)")
 
   }
 }
