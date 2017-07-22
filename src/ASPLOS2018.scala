@@ -1540,6 +1540,8 @@ object BlackScholes extends SpatialApp {
     val B  = tileSize (96 -> 96 -> 19200)
     val OP = outerPar (1 -> 2)
     val IP = innerPar (1 -> 96)
+    val par_load = 16
+    val par_store = 16
 
     val size = stypes.length; bound(size) = 9995328
 
@@ -1571,19 +1573,19 @@ object BlackScholes extends SpatialApp {
         val optpriceBlk = SRAM[Float](B)
 
         Parallel {
-          typeBlk   load types(i::i+B par IP)
-          priceBlk  load prices(i::i+B par IP)
-          strikeBlk load strike(i::i+B par IP)
-          rateBlk   load rate(i::i+B par IP)
-          volBlk    load vol(i::i+B par IP)
-          timeBlk   load times(i::i+B par IP)
+          typeBlk   load types(i::i+B par par_load)
+          priceBlk  load prices(i::i+B par par_load)
+          strikeBlk load strike(i::i+B par par_load)
+          rateBlk   load rate(i::i+B par par_load)
+          volBlk    load vol(i::i+B par par_load)
+          timeBlk   load times(i::i+B par par_load)
         }
 
         Foreach(B par IP){ j =>
           val price = BlkSchlsEqEuroNoDiv(priceBlk(j), strikeBlk(j), rateBlk(j), volBlk(j), timeBlk(j), typeBlk(j))
           optpriceBlk(j) = price
         }
-        optprice(i::i+B par IP) store optpriceBlk
+        optprice(i::i+B par par_store) store optpriceBlk
       }
     }
     getMem(optprice)
@@ -1611,6 +1613,7 @@ object BlackScholes extends SpatialApp {
   }
 }
 
+// good, can parallelize/pipeline stages with diminishing returns probably
 object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -1652,6 +1655,9 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
     val levels = STOP-START //ArgIn[Int]
     // setArg(levels, args(0).to[Int])
 
+    val par_load = 16
+    val par_store = 16
+
     val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/sort_data.csv", "\n")
 
     val data_dram = DRAM[Int](numel)
@@ -1664,7 +1670,7 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
       val lower_fifo = FIFO[Int](numel/2)
       val upper_fifo = FIFO[Int](numel/2)
 
-      data_sram load data_dram
+      data_sram load data_dram(0::numel par par_load)
 
 
       FSM[Int,Int](1){m => m < levels} { m =>
@@ -1674,28 +1680,20 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
           val to = min(i+m+m-1, STOP.to[Int])
           val lower_tmp = Reg[Int](0)
           val upper_tmp = Reg[Int](0)
-          Foreach(from until mid+1 by 1){ i => if (i == from) {lower_tmp := data_sram(i)} else {lower_fifo.enq(data_sram(i))} }
-          Foreach(mid+1 until to+1 by 1){ j => if (j == mid+1) {upper_tmp := data_sram(j)} else {upper_fifo.enq(data_sram(j))} }
+          Foreach(from until mid+1 by 1){ i => lower_fifo.enq(data_sram(i)) }
+          Foreach(mid+1 until to+1 by 1){ j => upper_fifo.enq(data_sram(j)) }
           Sequential.Foreach(from until to+1 by 1) { k => 
-            if (lower_tmp < upper_tmp) {
-              Pipe{
-                data_sram(k) = lower_tmp
-                val next_lower = if (lower_fifo.empty) {0x7FFFFFFF.to[Int]} else {lower_fifo.deq()}
-                lower_tmp := next_lower
-              }
-            } else {
-              Pipe {
-                data_sram(k) = upper_tmp
-                val next_upper = if (upper_fifo.empty) {0x7FFFFFFF.to[Int]} else {upper_fifo.deq()}
-                upper_tmp := next_upper
-              }
-            }
+            data_sram(k) = 
+              if (lower_fifo.empty) { upper_fifo.deq() }
+              else if (upper_fifo.empty) { lower_fifo.deq() }
+              else if (lower_fifo.peek < upper_fifo.peek) { lower_fifo.deq() }
+              else { upper_fifo.deq() }
           }
         }{ i => i + m + m }
       }{ m => m + m}
 
       // sorted_dram store data_sram
-      data_dram store data_sram
+      data_dram(0::numel par par_store) store data_sram
     }
 
     val sorted_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/sort_gold.csv", "\n")
@@ -1723,7 +1721,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
   Used https://www.browserling.com/tools/text-to-hex to convert string to hex, and then converted hex to dec                                                               
                            
   Machsuite, and therefore this implementation, will hang infinitely if the first char of the pattern appears later on
-   in the pattern... -____-                                                                  
+   in the pattern and it also gets the same WRONG answer for pattern "these" ... -____-                                                                  
                                                                                                            
  */
 
@@ -1734,7 +1732,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
     val raw_string = argon.lang.String.string2num(raw_string_data(0))
     val raw_pattern = argon.lang.String.string2num(raw_string_pattern)
     val par_load = 16
-    val outer_par = 4 (1 -> 1 -> 16)
+    val outer_par = 6 (1 -> 1 -> 16)
     val STRING_SIZE_NUM = raw_string.length.to[Int]
     val PATTERN_SIZE_NUM = raw_pattern.length.to[Int]
     val STRING_SIZE = ArgIn[Int]
@@ -1920,7 +1918,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   }
 }
 
-// good
+// good, but pipelining vs area
 object AES extends SpatialApp { // Regression (Dense) // Args: 50
   override val target = AWS_F1
 
@@ -1976,6 +1974,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
     
     val par_load = 16
     val par_store = 16
+    val outer_par = 1 (1 -> 1 -> 4)
 
     // Setup
     val num_bytes = ArgIn[Int]
@@ -2010,7 +2009,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
       //    1, 1, 2, 3,
       //    3, 1, 1, 2
       //  )
-      val rcon = Reg[UInt8](1)
+      val rcon = Reg.buffer[UInt8](1)
 
       // Specify methods
       def expand_key(): Unit = {
@@ -2101,7 +2100,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
       // Load structures
       sbox_sram load sbox_dram(0::256 par par_load)
 
-      Sequential.Foreach(num_bytes by 16){block_id => 
+      Foreach(num_bytes by 16 par outer_par){block_id => 
         plaintext_flat load plaintext_dram(0::16 par par_load) // TODO: Allow dram loads to reshape (gh issue #83)
         key_sram load key_dram(0::32 par par_load)
         rcon := 1
@@ -2140,160 +2139,160 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
         // }
 
-        // /* Partially pipelined version */
-        // // Round 0
-        // add_round_key(0)
-
-        // // Rounds 1 - 7
-        // Sequential.Foreach(1 until 8 by 1) { round => 
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{mix_columns()}
-        //   if ((round % 2) == 0) {
-        //     Pipe{expand_key()}
-        //   }
-        //   add_round_key(round)
-        // }
-        // // Rounds 8 - 14
-        // Sequential.Foreach(8 until 14 by 1) { round => 
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{mix_columns()}
-        //   if ((round % 2) == 0) {
-        //     Pipe{expand_key()}
-        //   }
-        //   add_round_key(round)
-        // }
-        // // Round 14
-        // Pipe {
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{expand_key()}
-        //   add_round_key(14)
-        // }
-
-
-        /* Totally pipelined version */
+        /* Partially pipelined version */
         // Round 0
         add_round_key(0)
-        
-        // Round 1
-        Pipe{
-          Pipe{substitute_bytes()}
+
+        // Rounds 1 - 7
+        Sequential.Foreach(1 until 8 by 1) { round => 
+          substitute_bytes()
           Pipe{shift_rows()}
           Pipe{mix_columns()}
-          add_round_key(1)
+          if ((round % 2) == 0) {
+            Pipe{expand_key()}
+          }
+          add_round_key(round)
         }
-
-        // Round 2
-        Pipe{
-          Pipe{substitute_bytes()}
+        // Rounds 8 - 14
+        Sequential.Foreach(8 until 14 by 1) { round => 
+          substitute_bytes()
           Pipe{shift_rows()}
           Pipe{mix_columns()}
-          Pipe{expand_key()}
-          add_round_key(2)
+          if ((round % 2) == 0) {
+            Pipe{expand_key()}
+          }
+          add_round_key(round)
         }
-
-        // Round 3
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          add_round_key(3)
-        }
-
-        // Round 4
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          Pipe{expand_key()}
-          add_round_key(4)
-        }
-
-        // Round 5
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          add_round_key(5)
-        }
-
-        // Round 6
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          Pipe{expand_key()}
-          add_round_key(6)
-        }
-
-        // Round 7
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          add_round_key(7)
-        }
-
-        // Round 8
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          Pipe{expand_key()}
-          add_round_key(8)
-        }
-
-        // Round 9
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          add_round_key(9)
-        }
-
-        // Round 10
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          Pipe{expand_key()}
-          add_round_key(10)
-        }
-
-        // Round 11
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          add_round_key(11)
-        }
-
-        // Round 12
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          Pipe{expand_key()}
-          add_round_key(12)
-        }
-
-        // Round 13
-        Pipe{
-          Pipe{substitute_bytes()}
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          add_round_key(13)
-        }
-
         // Round 14
-        Pipe{
-          Pipe{substitute_bytes()}
+        Pipe {
+          substitute_bytes()
           Pipe{shift_rows()}
           Pipe{expand_key()}
           add_round_key(14)
         }
+
+
+        // /* Totally pipelined version */
+        // // Round 0
+        // add_round_key(0)
+        
+        // // Round 1
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(1)
+        // }
+
+        // // Round 2
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(2)
+        // }
+
+        // // Round 3
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(3)
+        // }
+
+        // // Round 4
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(4)
+        // }
+
+        // // Round 5
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(5)
+        // }
+
+        // // Round 6
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(6)
+        // }
+
+        // // Round 7
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(7)
+        // }
+
+        // // Round 8
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(8)
+        // }
+
+        // // Round 9
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(9)
+        // }
+
+        // // Round 10
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(10)
+        // }
+
+        // // Round 11
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(11)
+        // }
+
+        // // Round 12
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(12)
+        // }
+
+        // // Round 13
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(13)
+        // }
+
+        // // Round 14
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{expand_key()}
+        //   add_round_key(14)
+        // }
 
         // Reshape plaintext_sram (gh issue # 83)
         val ciphertext_flat = SRAM[Int](16)
