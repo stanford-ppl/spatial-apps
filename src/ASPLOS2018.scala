@@ -1711,6 +1711,7 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
   }
 }
 
+// No opportunities for par
 object KMP extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -1788,6 +1789,13 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: none
     }
 
     val gold_nmatches = 12
+    var count = 0
+    val pattern_length = raw_string_pattern.length
+    val string_length = raw_string_data.apply(0).length
+    for (i <- 0 until string_length) {
+      val substr = raw_string_data.apply(0).apply(i,i+pattern_length)
+      println("sub " + substr)
+    }
     val computed_nmatches = getArg(nmatches)
 
     println("Expected " + gold_nmatches + " matches")
