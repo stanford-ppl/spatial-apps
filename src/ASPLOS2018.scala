@@ -1730,6 +1730,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: none
     val raw_string_pattern = "bull"//Array[Int](98,117,108,108)
     val raw_string = argon.lang.String.string2num(raw_string_data(0))
     val raw_pattern = argon.lang.String.string2num(raw_string_pattern)
+    val par_load = 16
     val STRING_SIZE_NUM = raw_string.length.to[Int]
     val PATTERN_SIZE_NUM = raw_pattern.length.to[Int]
     val STRING_SIZE = ArgIn[Int]
@@ -1749,8 +1750,8 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: none
       val kmp_next = SRAM[Int](4) // Conveniently sized
       val num_matches = Reg[Int](0)
 
-      string_sram load string_dram
-      pattern_sram load pattern_dram
+      string_sram load string_dram(0::STRING_SIZE par par_load)
+      pattern_sram load pattern_dram(0::PATTERN_SIZE) // too tiny for par
 
       // Init kmp_next
       val k = Reg[Int](0)
@@ -1797,37 +1798,10 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: none
   }
 }      
 
+// good
 object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
 /*
 
-optiQL
-trait TPCHQ6Trait extends TPCHBaseTrait {
-  val queryName = "Q6"
-
-  def query() = {
-    val lineItems = loadLineItems()
-    tic(lineItems.size)
-
-    //FIXME: infix_&& fails to resolve automatically
-    val q = lineItems Where (l => infix_&&(l.l_shipdate >= Date("1994-01-01"), infix_&&(l.l_shipdate < Date("1995-01-01"), infix_&&(l.l_discount >= 0.05, infix_&&(l.l_discount <= 0.07, l.l_quantity < 24)))))
-    val revenue = q.Sum(l => l.l_extendedprice * l.l_discount)
-
-    toc(revenue)
-    println(revenue)
-  }
-}
-
-
-SQL:
-SELECT
-    sum(l_extendedprice * l_discount) as revenue
-FROM
-    lineitem
-WHERE
-    l_shipdate >= date '1994-01-01'
-    AND l_shipdate < date '1994-01-01' + interval '1' year
-    AND l_discount between 0.06 - 0.01 AND 0.06 + 0.01
-    AND l_quantity < 24;
 
 */
 
@@ -1859,8 +1833,9 @@ WHERE
 
     val ts = tileSize (96 -> 96 -> 192000)
     val op = outerPar (1 -> 6)
-    val ip = innerPar (1 -> 384)
-    val lp = 16 (1 -> 384)
+    val par_load = 16
+    val par_store = 16
+    val ip = 16 (1 -> 384)
 
     setMem(dates, datesIn)
     setMem(quants, quantsIn)
@@ -1878,10 +1853,10 @@ WHERE
         val disctsTile = SRAM[T](ts)
         val pricesTile = SRAM[T](ts)
         Parallel {
-          datesTile  load dates(i::i+ts par lp)
-          quantsTile load quants(i::i+ts par lp)
-          disctsTile load discts(i::i+ts par lp)
-          pricesTile load prices(i::i+ts par lp)
+          datesTile  load dates(i::i+ts par par_load)
+          quantsTile load quants(i::i+ts par par_load)
+          disctsTile load discts(i::i+ts par par_load)
+          pricesTile load prices(i::i+ts par par_load)
         }
         Reduce(Reg[T])(ts par ip){ j =>
           val date  = datesTile(j)
@@ -1931,7 +1906,8 @@ WHERE
   }
 }
 
-object AES extends SpatialApp { // Regression (Dense) // Args: none
+// good
+object AES extends SpatialApp { // Regression (Dense) // Args: 50
   override val target = AWS_F1
 
   /*
@@ -1945,6 +1921,8 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
   @virtualize
   def main() = {
     // Setup off-chip data
+    // val text_in = "the sharkmoster"
+    // val plaintext = argon.lang.String.string2num(text_in)
     val plaintext = Array[UInt8](0,17,34,51,68,85,102,119,136,153,170,187,204,221,238,255)
     val key = Array.tabulate(32){i => i.to[UInt8]}
     val sbox = Array[UInt8]( // 256 elements
@@ -1985,11 +1963,15 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
     val par_load = 16
     val par_store = 16
 
+    // Setup
+    val num_bytes = ArgIn[Int]
+    setArg(num_bytes, 16*args(0).to[Int])
+
     // Create DRAMs
     val plaintext_dram = DRAM[UInt8](16)
     val key_dram = DRAM[UInt8](32)
     val sbox_dram = DRAM[UInt8](256)
-    val ciphertext_dram = DRAM[UInt8](16)
+    val ciphertext_dram = DRAM[Int](num_bytes)
 
     // Transfer data to DRAMs
     setMem(plaintext_dram, plaintext)
@@ -2004,10 +1986,10 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
 
     Accel{
       // Setup data structures
-      val plaintext_flat = SRAM[UInt8](16)
-      val plaintext_sram = RegFile[UInt8](4,4)
+      val plaintext_flat = SRAM.buffer[UInt8](16)
+      val plaintext_sram = RegFile.buffer[UInt8](4,4)
       val sbox_sram = SRAM[UInt8](256)
-      val key_sram = SRAM[UInt8](32)
+      val key_sram = SRAM.buffer[UInt8](32)
       // val mix_lut = LUT[Int](4,4)(
       //    2, 3, 1, 1,
       //    1, 2, 3, 1,
@@ -2018,35 +2000,48 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
 
       // Specify methods
       def expand_key(): Unit = {
-        Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
-        Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
-        Pipe{key_sram(2) = key_sram(2) ^ sbox_sram(key_sram(31).as[UInt16].as[Int])}
-        Pipe{key_sram(3) = key_sram(3) ^ sbox_sram(key_sram(28).as[UInt16].as[Int])}
+        val addr_lut = LUT[Int](4)(29, 30, 31, 28)
+        Foreach(4 by 1) { i => 
+          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i == 0, rcon.value, 0)
+        }
+        // Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
+        // Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
+        // Pipe{key_sram(2) = key_sram(2) ^ sbox_sram(key_sram(31).as[UInt16].as[Int])}
+        // Pipe{key_sram(3) = key_sram(3) ^ sbox_sram(key_sram(28).as[UInt16].as[Int])}
         rcon := (((rcon)<<1) ^ ((((rcon)>>7) & 1) * 0x1b))
 
         Sequential.Foreach(4 until 16 by 4) {i =>
-          Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
-          Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
-          Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
-          Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          Sequential.Foreach(4 by 1) {j => 
+            key_sram(i+j) = key_sram(i+j) ^ key_sram(i - 4 + j)
+          }
+          // Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+          // Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+          // Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+          // Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
         }
       
-        Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
-        Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
-        Pipe{key_sram(18) = key_sram(18) ^ sbox_sram(key_sram(14).as[UInt16].as[Int])}
-        Pipe{key_sram(19) = key_sram(19) ^ sbox_sram(key_sram(15).as[UInt16].as[Int])}
+        Sequential.Foreach(16 until 20 by 1){i => 
+          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i-4).to[Int])
+        }
+        // Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
+        // Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
+        // Pipe{key_sram(18) = key_sram(18) ^ sbox_sram(key_sram(14).as[UInt16].as[Int])}
+        // Pipe{key_sram(19) = key_sram(19) ^ sbox_sram(key_sram(15).as[UInt16].as[Int])}
 
         Sequential.Foreach(20 until 32 by 4) {i => 
-          Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
-          Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
-          Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
-          Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          Sequential.Foreach(4 by 1) { j => 
+            key_sram(i+j) = key_sram(i+j) ^ key_sram(i - 4 + j)
+          }
+          // Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+          // Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+          // Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+          // Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
         }
       }
 
       def shift_rows(): Unit = {
         Sequential.Foreach(4 by 1){ i => 
-          val row = RegFile[UInt8](4)
+          val row = RegFile[UInt8](4) 
           Foreach(4 by 1){ j => 
             val col_addr = (j - i) % 4
             row(col_addr) = plaintext_sram(i,j)
@@ -2072,13 +2067,13 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
       def mix_columns(): Unit = {
         Sequential.Foreach(4 by 1){j => 
           val col = RegFile[UInt8](4)
-          Sequential.Foreach(4 by 1) { i => col(i) = plaintext_sram(i,j) }
+          Foreach(4 by 1 par 4) { i => col(i) = plaintext_sram(i,j) }
           val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
           // val e = col(0) ^ col(1) ^ col(2) ^ col(3)
-          Pipe{plaintext_sram(0,j) = col(0) ^ e ^ rj_xtime(col(0) ^ col(1))}
-          Pipe{plaintext_sram(1,j) = col(1) ^ e ^ rj_xtime(col(1) ^ col(2))}
-          Pipe{plaintext_sram(2,j) = col(2) ^ e ^ rj_xtime(col(2) ^ col(3))}
-          Pipe{plaintext_sram(3,j) = col(3) ^ e ^ rj_xtime(col(3) ^ col(0))}
+          Foreach(4 by 1) { i => 
+            val id1 = (i+1)%4
+            plaintext_sram(i,j) = col(i) ^ e ^ rj_xtime(col(i) ^ col(id1))
+          }
         }
       }
 
@@ -2090,51 +2085,210 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
       }
 
       // Load structures
+      sbox_sram load sbox_dram(0::256 par par_load)
 
-      Parallel {
+      Sequential.Foreach(num_bytes by 16){block_id => 
         plaintext_flat load plaintext_dram(0::16 par par_load) // TODO: Allow dram loads to reshape (gh issue #83)
-        sbox_sram load sbox_dram(0::256 par par_load)
         key_sram load key_dram(0::32 par par_load)
-      }
+        rcon := 1
 
-      // gh issue #83
-      Foreach(4 by 1, 4 by 1 par 4){(i,j) => 
-        plaintext_sram(i,j) = plaintext_flat(j*4+i) // MachSuite flattens columnwise... Why????
-      }
+        // gh issue #83
+        Sequential.Foreach(4 by 1 par 1){i => 
+          Sequential.Foreach(4 by 1 par 1){j => 
+            plaintext_sram(i,j) = plaintext_flat(j*4+i) // MachSuite flattens columnwise... Why????
+          }
+        }
 
-      // Do AES
-      Sequential.Foreach(niter by 1) { round => 
-        // SubBytes
-        if (round > 0) {
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
+
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
+
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
+
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
+
+        //   // AddRoundKey
+        //   add_round_key(round)
+
+        // }
+
+        // /* Partially pipelined version */
+        // // Round 0
+        // add_round_key(0)
+
+        // // Rounds 1 - 7
+        // Sequential.Foreach(1 until 8 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Rounds 8 - 14
+        // Sequential.Foreach(8 until 14 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Round 14
+        // Pipe {
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{expand_key()}
+        //   add_round_key(14)
+        // }
+
+
+        /* Totally pipelined version */
+        // Round 0
+        add_round_key(0)
+        
+        // Round 1
+        Pipe{
           Pipe{substitute_bytes()}
-        }
-
-        // ShiftRows
-        if (round > 0) {
           Pipe{shift_rows()}
-        }
-
-        // MixColumns
-        if (round > 0 && round < 14 ) {
           Pipe{mix_columns()}
+          add_round_key(1)
         }
 
-        // Expand key
-        if (round > 0 && ((round % 2) == 0)) {
+        // Round 2
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
           Pipe{expand_key()}
+          add_round_key(2)
         }
 
-        // AddRoundKey
-        add_round_key(round)
+        // Round 3
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(3)
+        }
 
+        // Round 4
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          Pipe{expand_key()}
+          add_round_key(4)
+        }
+
+        // Round 5
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(5)
+        }
+
+        // Round 6
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          Pipe{expand_key()}
+          add_round_key(6)
+        }
+
+        // Round 7
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(7)
+        }
+
+        // Round 8
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          Pipe{expand_key()}
+          add_round_key(8)
+        }
+
+        // Round 9
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(9)
+        }
+
+        // Round 10
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          Pipe{expand_key()}
+          add_round_key(10)
+        }
+
+        // Round 11
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(11)
+        }
+
+        // Round 12
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          Pipe{expand_key()}
+          add_round_key(12)
+        }
+
+        // Round 13
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(13)
+        }
+
+        // Round 14
+        Pipe{
+          Pipe{substitute_bytes()}
+          Pipe{shift_rows()}
+          Pipe{expand_key()}
+          add_round_key(14)
+        }
+
+        // Reshape plaintext_sram (gh issue # 83)
+        val ciphertext_flat = SRAM[Int](16)
+        Sequential.Foreach(4 by 1, 4 by 1) {(i,j) => 
+          ciphertext_flat(j*4+i) = plaintext_sram(i,j).as[Int]
+        }
+
+        ciphertext_dram(block_id::block_id+16 par par_store) store ciphertext_flat
       }
-
-      // Reshape plaintext_sram (gh issue # 83)
-      Foreach(4 by 1, 4 by 1) {(i,j) => 
-        plaintext_flat(j*4+i) = plaintext_sram(i,j)
-      }
-
-      ciphertext_dram store plaintext_flat
 
       // // Debugging
       // key_debug store key_sram
@@ -2142,7 +2296,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
     }
 
     val ciphertext = getMem(ciphertext_dram)
-    val ciphertext_gold = Array[UInt8](142,162,183,202,81,103,69,191,234,252,73,144,75,73,96,137)
+    val ciphertext_gold = Array.fill(args(0).to[Int])(Array[Int](142,162,183,202,81,103,69,191,234,252,73,144,75,73,96,137)).flatten
 
     printArray(ciphertext_gold, "Expected: ")
     printArray(ciphertext, "Got: ")
@@ -2158,7 +2312,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 // Waiting on issue #182
-object SHA extends SpatialApp { // Regression (Dense) // Args: none
+object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
   type ULong = FixPt[FALSE, _32, _0]
@@ -2310,7 +2464,7 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
     printArray(hashed_result, "Got: ")
 
     val cksum = hashed_gold == hashed_result
-    println("PASS: " + cksum + " (SHA)")
+    println("PASS: " + cksum + " (SHA1)")
 
   }
 }
