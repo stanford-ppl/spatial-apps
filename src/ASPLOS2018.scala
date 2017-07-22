@@ -510,7 +510,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
         val b1z_start = max(0.to[Int],b0z-1.to[Int])
         val b1z_end = min(BLOCK_SIDE.to[Int], b0z+2.to[Int])
         MemReduce(b0_cube_forces)(b1x_start until b1x_end by 1, b1y_start until b1y_end by 1, b1z_start until b1z_end by 1) { (b1x, b1y, b1z) => 
-          val b1_cube_contributions = SRAM[XYZ](density)
+          val b1_cube_contributions = SRAM.buffer[XYZ](density)
           // Iterate over points in b0
           val p_range = npoints_sram(b0x, b0y, b0z)
           val q_range = npoints_sram(b1x, b1y, b1z)
@@ -1711,8 +1711,8 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
   }
 }
 
-// No opportunities for par
-object KMP extends SpatialApp { // Regression (Dense) // Args: none
+// good
+object KMP extends SpatialApp { // Regression (Dense) // Args: the
   override val target = AWS_F1
 
 
@@ -1721,17 +1721,20 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: none
   Knuth-Morris-Pratt
 
   Used https://www.browserling.com/tools/text-to-hex to convert string to hex, and then converted hex to dec                                                               
-                                                                                             
+                           
+  Machsuite, and therefore this implementation, will hang infinitely if the first char of the pattern appears later on
+   in the pattern... -____-                                                                  
                                                                                                            
  */
 
   @virtualize
   def main() = {
     val raw_string_data = loadCSV1D[MString]("/remote/regression/data/machsuite/kmp_string.csv", "\n")
-    val raw_string_pattern = "bull"//Array[Int](98,117,108,108)
+    val raw_string_pattern = args(0).to[MString]//"bull"//Array[Int](98,117,108,108)
     val raw_string = argon.lang.String.string2num(raw_string_data(0))
     val raw_pattern = argon.lang.String.string2num(raw_string_pattern)
     val par_load = 16
+    val outer_par = 4 (1 -> 1 -> 16)
     val STRING_SIZE_NUM = raw_string.length.to[Int]
     val PATTERN_SIZE_NUM = raw_pattern.length.to[Int]
     val STRING_SIZE = ArgIn[Int]
@@ -1746,12 +1749,9 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: none
     setMem(pattern_dram, raw_pattern)
 
     Accel{
-      val string_sram = SRAM[Int8](32411) // Conveniently sized
       val pattern_sram = SRAM[Int8](4) // Conveniently sized
       val kmp_next = SRAM[Int](4) // Conveniently sized
-      val num_matches = Reg[Int](0)
 
-      string_sram load string_dram(0::STRING_SIZE par par_load)
       pattern_sram load pattern_dram(0::PATTERN_SIZE) // too tiny for par
 
       // Init kmp_next
@@ -1767,34 +1767,40 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: none
         kmp_next(q) = k
       }
 
-      // Scan string
-      val q = Reg[Int](0)
-      Sequential.Foreach(0 until STRING_SIZE) { i => 
-        // val whileCond = Reg[Bit](false)
-        FSM[Int](state => state != 1) { state => 
-          // whileCond := (q > 0) && (pattern_sram(i) != pattern_sram(q))
-          if ((q > 0) && (string_sram(i) != pattern_sram(q))) q := kmp_next(q)
-        }{state => mux((q > 0) && (string_sram(i) != pattern_sram(q)), 0, 1)}
-        if (pattern_sram(q) == string_sram(i)) { q :+= 1 }
-        if (q >= PATTERN_SIZE) {
-          Pipe{
-            num_matches :+= 1
-            val bump = kmp_next(q - 1)
-            q := bump
+      // Scan string portions
+      val global_matches = Sequential.Reduce(Reg[Int](0))(STRING_SIZE by (STRING_SIZE/outer_par) by STRING_SIZE/outer_par par outer_par) {chunk => 
+        val num_matches = Reg[Int](0)
+        num_matches.reset
+        val string_sram = SRAM[Int8](32411) // Conveniently sized
+        string_sram load string_dram(chunk::chunk + (STRING_SIZE/outer_par) + (PATTERN_SIZE-1) par par_load)
+        val q = Reg[Int](0)
+        Sequential.Foreach(0 until STRING_SIZE/outer_par + PATTERN_SIZE-1 by 1) { i => 
+          // val whileCond = Reg[Bit](false)
+          FSM[Int](state => state != 1) { state => 
+            // whileCond := (q > 0) && (pattern_sram(i) != pattern_sram(q))
+            if ((q > 0) && (string_sram(i) != pattern_sram(q))) q := kmp_next(q)
+          }{state => mux((q > 0) && (string_sram(i) != pattern_sram(q)), 0, 1)}
+          if (pattern_sram(q) == string_sram(i)) { q :+= 1 }
+          if (q >= PATTERN_SIZE) {
+            Pipe{
+              num_matches :+= 1
+              val bump = kmp_next(q - 1)
+              q := bump
+            }
           }
         }
-      }
+        num_matches
+      }{_+_}
 
-      nmatches := num_matches
+      nmatches := global_matches
     }
 
-    val gold_nmatches = 12
-    var count = 0
+    var gold_nmatches = 0
     val pattern_length = raw_string_pattern.length
     val string_length = raw_string_data.apply(0).length
     for (i <- 0 until string_length) {
       val substr = raw_string_data.apply(0).apply(i,i+pattern_length)
-      println("sub " + substr)
+      if (substr == raw_string_pattern) gold_nmatches = gold_nmatches + 1
     }
     val computed_nmatches = getArg(nmatches)
 
