@@ -85,6 +85,33 @@ trait RaoBlackParticleFilter extends SpatialStream {
     SQuat(q.r, -q.i, -q.j, q.j) * (1 / n)
   }
 
+  def initParticles(particles: SRAM1[Particle], states: SRAM2[SReal], covs: SRAM3[SReal], parFactor: Int) = {
+    Foreach(0::N par parFactor)(x => {
+
+      Pipe {
+        Pipe { states(x, 0) = initV._1 }
+        Pipe { states(x, 1) = initV._2 }
+        Pipe { states(x, 2) = initV._3 }
+        Pipe { states(x, 3) = initP._1 }
+        Pipe { states(x, 4) = initP._2 }
+        Pipe { states(x, 5) = initP._3 }
+      }
+
+      val initSQuat = SQuat(initQ._1, initQ._2, initQ._3, initQ._4)
+      
+      Parallel {
+        particles(x) = Particle(
+          math.log(1.0 / N),
+          initSQuat,
+          SVec3(0.0, 0.0, 0.0),
+          initSQuat
+        )
+        Foreach(0::6)(i =>
+          covs(x, i, i) = initCov
+        )
+      }
+    })
+  }
   
 
   @virtualize def prog() = {
@@ -107,33 +134,9 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
       Sequential {
 
-        Foreach(0::N par parFactor)(x => {
-
-          Pipe {
-            Pipe { states(x, 0) = initV._1 }
-            Pipe { states(x, 1) = initV._2 }
-            Pipe { states(x, 2) = initV._3 }
-            Pipe { states(x, 3) = initP._1 }
-            Pipe { states(x, 4) = initP._2 }
-            Pipe { states(x, 5) = initP._3 }
-          }
-
-          val initSQuat = SQuat(initQ._1, initQ._2, initQ._3, initQ._4)          
-          
-          Parallel {
-            particles(x) = Particle(
-              math.log(1.0 / N),
-              initSQuat,
-              SVec3(0.0, 0.0, 0.0),
-              initSQuat
-            )
-            Foreach(0::6)(i =>
-              covs(x, i, i) = initCov
-            )
-          }
-        })
-
+        initParticles(particles, states, covs, parFactor)
         Parallel {
+
           Stream(*)(x => {
             fifoV.enq(inV)
           })
@@ -154,7 +157,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
             out := SVicon(lastSTime, averageSPOSE(particles, states, parFactor))
             normWeights(particles, parFactor)
-            resample(particles, parFactor)
+            resample(particles, states, covs, parFactor)
           })(x => (!fifoV.empty || !fifoSIMU.empty))
 
         }
@@ -164,15 +167,9 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   def rotationMatrix(q: SQuat) =
     Matrix(3, 3, List(
-      1.0 - 2.0 * (q.j ** 2 + q.k ** 2),
-      2.0 * (q.i * q.j - q.k * q.r),
-      2.0 * (q.i * q.k + q.j * q.r),
-      2.0 * (q.i * q.j + q.k * q.r),
-      1.0 - 2.0 * (q.i ** 2 + q.k ** 2),
-      2.0 * (q.j * q.k - q.i * q.r),
-      2.0 * (q.i * q.k - q.j * q.r),
-      2.0 * (q.j * q.k + q.i * q.r),
-      1.0 - 2.0 * (q.i ** 2 + q.j ** 2)
+      1.0 - 2.0 * (q.j ** 2 + q.k ** 2), 2.0 * (q.i * q.j - q.k * q.r), 2.0 * (q.i * q.k + q.j * q.r),
+      2.0 * (q.i * q.j + q.k * q.r), 1.0 - 2.0 * (q.i ** 2 + q.k ** 2), 2.0 * (q.j * q.k - q.i * q.r),
+      2.0 * (q.i * q.k - q.j * q.r), 2.0 * (q.j * q.k + q.i * q.r), 1.0 - 2.0 * (q.i ** 2 + q.j ** 2)
     ))
 
   @virtualize
@@ -186,15 +183,18 @@ trait RaoBlackParticleFilter extends SpatialStream {
     parFactor: Int) = {
 
     Foreach(0::N par parFactor)(i => {
+
       val pp = particles(i)
       val nq =
         if (dt > 0.00001)
           sampleAtt(pp.q, lastO, dt)
         else
           pp.q
+
       val X: Option[SReal] = None
       val Sdt: Option[SReal] = Some(dt)
       val S1: Option[SReal] = Some(1)
+
       val F =
         Matrix.sparse(6, 6, IndexedSeq[Option[SReal]](
           S1, X, X, X, X, X,
@@ -227,7 +227,6 @@ trait RaoBlackParticleFilter extends SpatialStream {
       val state = Matrix.fromSRAM1(6, states, i)
       val cov = Matrix.fromSRAM2(6, 6, covs, i)
       
-
       val nla        = accO.map(x => nq.rotate(x)).getOrElse(pp.lastA)
       val nlq        = accO.map(x => nq).getOrElse(pp.lastQ)
 
@@ -251,7 +250,6 @@ trait RaoBlackParticleFilter extends SpatialStream {
         nx2.loadTo(states, i)
         nsig2.loadTo(covs, i)        
         particles(i) = Particle(nw, nq, nla, nlq)
-
       }
       else {
         nx.loadTo(states, i)
@@ -293,7 +291,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   def gaussianVec(mean: Vec, variance: SReal) = {
     val reg = RegFile[SReal](3)
-    Foreach(0::2)(i => {
+    Foreach(0::3)(i => {
       val g1 = gaussian()
       Pipe {
         Pipe { reg(i*2) = g1._1 }
@@ -342,10 +340,12 @@ trait RaoBlackParticleFilter extends SpatialStream {
     })
   }
 
-  @virtualize def resample(particles: SRAM1[Particle], parFactor: Int) = {
+  @virtualize def resample(particles: SRAM1[Particle], states: SRAM2[SReal], covs: SRAM3[SReal], parFactor: Int) = {
 
     val weights = SRAM[SReal](N)
     val out = SRAM[Particle](N)
+    val outStates = SRAM[SReal](N, 6)
+    val outCovs = SRAM[SReal](N, 6, 6)    
 
     val u = random[SReal](1.0)
 
@@ -359,13 +359,27 @@ trait RaoBlackParticleFilter extends SpatialStream {
     val k = Reg[Int](0)
     Foreach(0::N)(i => {
       val b = weights(k)*N < i.to[SReal] + u
+
       FSM[Boolean, Boolean](b)(x => x)(x => k := k + 1)(x => weights(k)*N < i.to[SReal]+u)
 
+      Foreach(0::6)(x => {
+        outStates(i, x) = states(k, x)
+      })
+      Foreach(0::6, 0::6)( (y, x) => {
+        outCovs(i, y, x) = covs(k, y, x)
+      })
+      
       out(i) = particles(k)
     })
 
     Foreach(0::N par parFactor)(i => {
       val p = out(i)
+      Foreach(0::6)(x => {
+        states(i, x) = outStates(i, x)
+      })
+      Foreach(0::6, 0::6)( (y, x) => {
+        covs(i, y, x) = outCovs(i, y, x)
+      })
       particles(i) = Particle(log(1.0/N), p.q, p.lastA, p.lastQ)
     })
 
@@ -409,11 +423,11 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   @virtualize def averageSPOSE(particles: SRAM1[Particle], states: SRAM2[SReal], parFactor: Int): SPOSE = {
     val firstQ = particles(0).q
-    val accumP = RegFile[SReal](3, List[SReal](0, 0, 0))//(SVec3(0, 0, 0))
+    val accumP = RegFile[SReal](3, List[SReal](0, 0, 0))
     val accumQ = Reg[SQuat](SQuat(0, 0, 0, 0))
     Parallel {
       Foreach(0::N par parFactor, 0::3)((i,j) => {
-        accumP(j) = accumP(j) + states(i, j+3)
+        accumP(j) = accumP(j) + exp(particles(i).w) * states(i, j+3)
       })
       
       Reduce(accumQ)(0::N par parFactor)(i => {
