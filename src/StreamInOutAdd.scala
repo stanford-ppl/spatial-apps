@@ -6,7 +6,7 @@ trait StreamInOutAdd extends SpatialStream {
 
   @virtualize def prog() = {
     val in  = StreamIn[Int](In1)
-    val out = StreamOut[Int](Out1)
+    val out = StreamOut[Int](Out1)    
     Accel(*) {
       out := in + 4
     }
