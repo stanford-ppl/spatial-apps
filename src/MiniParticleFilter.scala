@@ -77,7 +77,7 @@ trait MiniParticleFilter extends SpatialStream {
     Accel {
 
       val weights = SRAM[Weight](N)
-      val states = SRAM[Real](N, 6)
+      val states = SRAM[Real](N, 4)
       val dt = 0.1
 
       Sequential {
@@ -89,7 +89,7 @@ trait MiniParticleFilter extends SpatialStream {
           updateFromAcc(inAcc, dt, states, parFactor)
 
           if (i == 5)
-            updateFromGPS(inGPS, states, parFactor)
+            updateFromGPS(inGPS, weights, states, parFactor)
 
           out := averagePos(weights, states, parFactor)
 
@@ -107,15 +107,20 @@ trait MiniParticleFilter extends SpatialStream {
 
     Foreach(0::N par parFactor)(i => {
       val nq = sampleVel(acc, dt, covAcc)
-      val v = Matrix.fromSRAM1(6, states, i)
-      val dv = Matrix(6, 1, List(nq(0), nq(1), nq(2), v(0, 0) * dt, v(1, 0) * dt, v(2, 0) * dt))
+      val v = Matrix.fromSRAM1(4, states, i)
+      val dv = Matrix(4, 1, List(nq(0), nq(1), v(0, 0) * dt, v(1, 0) * dt))
       val nv = v + dv
       v.loadTo(states, i)
     })
   }
 
-  def updateFromGPS(pos: Position, states: SRAM2[Real], parFactor: Int) = {
-//      unnormalizedGaussianLogPdf(toMatrix(acc), expe, covPos)
+  def updateFromGPS(pos: Position, weights: SRAM1[Real], states: SRAM2[Real], parFactor: Int) = {
+    val covPos = Matrix.eye(2, covGPS)
+    Foreach(0::N par parFactor)(i => {
+      val state = Matrix.fromSRAM1(2, states, i, 2)
+      val lik = unnormalizedGaussianLogPdf(toMatrix(pos), state, covPos)
+      weights(i) = weights(i) * lik
+    })
   }
 
 
@@ -126,7 +131,6 @@ trait MiniParticleFilter extends SpatialStream {
   }
 
   def gaussianVec(mean: Vec, variance: Real) = {
-    val reg = RegFile[Real](3)
     val g1 = gaussian()
     Vec(g1._1, g1._2) * sqrt(variance) + mean
   }
@@ -173,7 +177,7 @@ trait MiniParticleFilter extends SpatialStream {
   @virtualize def resample(weights: SRAM1[Weight], states: SRAM2[Real], parFactor: Int) = {
 
     val cweights = SRAM[Real](N)
-    val outStates = SRAM[Real](N, 6)
+    val outStates = SRAM[Real](N, 4)
 
     val u = random[Real](1.0)
 
@@ -189,7 +193,7 @@ trait MiniParticleFilter extends SpatialStream {
       val b = cweights(k)*N < i.to[Real] + u
       FSM[Boolean, Boolean](b)(x => x)(x => k := k + 1)(x => cweights(k)*N < i.to[Real]+u)
 
-      Foreach(0::6)(x => {
+      Foreach(0::4)(x => {
         outStates(i, x) = states(k, x)
       })
 
@@ -197,7 +201,7 @@ trait MiniParticleFilter extends SpatialStream {
 
     Foreach(0::N par parFactor)(i => {
 
-      Foreach(0::6)(x => {
+      Foreach(0::4)(x => {
         states(i, x) = outStates(i, x)
       })
 
@@ -215,8 +219,8 @@ trait MiniParticleFilter extends SpatialStream {
   @virtualize def averagePos(weights: SRAM1[Real], states: SRAM2[Real], parFactor: Int): Vec2 = {
     val accumP = RegFile[Real](2, List[Real](0, 0))
     Parallel {
-      Foreach(0::N par parFactor, 0::3)((i,j) => {
-        accumP(j) = accumP(j) + exp(weights(i))*states(i, j+3)
+      Foreach(0::N par parFactor, 0::2)((i,j) => {
+        accumP(j) = accumP(j) + exp(weights(i))*states(i, j+2)
       })
     }
     Vec2(accumP(0), accumP(1))
