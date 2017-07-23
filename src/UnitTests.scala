@@ -2051,6 +2051,41 @@ object FifoStackFSM extends SpatialApp { // Regression (Unit) // Args: none
   }
 }
 
+
+object LaneMaskPar extends SpatialApp { // Regression (Unit) // Args: 13
+/* 
+  This app is for testing the valids that get passed to each child of a metapipe,
+  and before this bug was caught in MD_Grid, the enable for all stages was computed
+  based on the current counter value for stage 0
+*/
+
+  @virtualize
+  def main() {
+
+    val x = ArgIn[Int] // Should NOT be multiple of 4
+    val y = ArgOut[Int]
+    setArg(x, args(0).to[Int])
+
+    Accel {
+      y := Reduce(Reg[Int](0))(x by 1 par 4) {i => 
+        val dummy = Reg.buffer[Int]
+        Pipe{dummy := i}
+        Foreach(4 by 1){j => dummy := j}
+        Pipe{dummy := i}
+        dummy.value
+      }{_+_}
+      
+    }
+
+    val gold = Array.tabulate(x){i => i}.reduce{_+_}
+    println("Wanted " + gold)
+    println("Got " + getArg(y))
+
+    val cksum = gold == getArg(y)
+    println("PASS: " + cksum + " (LaneMaskPar)")
+  }
+}
+
 object FixPtInOutArg extends SpatialApp {  // Regression (Unit) // Args: -1.5
 
   type T = FixPt[TRUE,_28,_4]

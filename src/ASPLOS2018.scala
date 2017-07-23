@@ -394,7 +394,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 
-// good
+// rework
 object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -453,14 +453,14 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
 
     val par_load = 8 // Wider data type
     val par_store = 8 // Wider data type
-    val loop_grid0_x = 8 (1 -> 1 -> 16)
-    val loop_grid0_y = 8 (1 -> 1 -> 16)
-    val loop_grid0_z = 8 (1 -> 1 -> 16)
-    val loop_grid1_x = 8 (1 -> 1 -> 16)
-    val loop_grid1_y = 8 (1 -> 1 -> 16)
-    val loop_grid1_z = 8 (1 -> 1 -> 16)
-    val loop_p = 8 (1 -> 1 -> 16)
-    val loop_q = 8 (1 -> 1 -> 16)
+    val loop_grid0_x = 1 (1 -> 1 -> 16)
+    val loop_grid0_y = 2 (1 -> 1 -> 16)
+    val loop_grid0_z = 1 (1 -> 1 -> 16)
+    val loop_grid1_x = 1 (1 -> 1 -> 16)
+    val loop_grid1_y = 1 (1 -> 1 -> 16)
+    val loop_grid1_z = 1 (1 -> 1 -> 16)
+    val loop_p =       1 (1 -> 1 -> 16)
+    val loop_q =       2 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
@@ -500,7 +500,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
       npoints_sram load npoints_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE par par_load)
 
       // Iterate over each block
-      Foreach(BLOCK_SIDE by 1, BLOCK_SIDE by 1, BLOCK_SIDE by 1) { (b0x, b0y, b0z) => 
+      Foreach(BLOCK_SIDE by 1 par loop_grid0_x){b0x => Foreach(BLOCK_SIDE by 1 par loop_grid0_y){b0y => Foreach(BLOCK_SIDE by 1 par loop_grid0_z){b0z => 
         // Iterate over each point in this block, considering boundaries
         val b0_cube_forces = SRAM[XYZ](density)
         val b1x_start = max(0.to[Int],b0x-1.to[Int])
@@ -509,17 +509,17 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
         val b1y_end = min(BLOCK_SIDE.to[Int], b0y+2.to[Int])
         val b1z_start = max(0.to[Int],b0z-1.to[Int])
         val b1z_end = min(BLOCK_SIDE.to[Int], b0z+2.to[Int])
-        MemReduce(b0_cube_forces)(b1x_start until b1x_end by 1, b1y_start until b1y_end by 1, b1z_start until b1z_end by 1) { (b1x, b1y, b1z) => 
+        MemReduce(b0_cube_forces)(b1x_start until b1x_end by 1, b1y_start until b1y_end by 1, b1z_start until b1z_end by 1 par loop_grid1_z) { (b1x, b1y, b1z) => 
           val b1_cube_contributions = SRAM.buffer[XYZ](density)
           // Iterate over points in b0
           val p_range = npoints_sram(b0x, b0y, b0z)
           val q_range = npoints_sram(b1x, b1y, b1z)
-          Foreach(0 until p_range) { p_idx =>
+          Foreach(0 until p_range par loop_p) { p_idx =>
             val px = dvec_x_sram(b0x, b0y, b0z, p_idx)
             val py = dvec_y_sram(b0x, b0y, b0z, p_idx)
             val pz = dvec_z_sram(b0x, b0y, b0z, p_idx)
             val q_sum = Reg[XYZ](XYZ(0.to[T], 0.to[T], 0.to[T]))
-            Reduce(q_sum)(0 until q_range) { q_idx => 
+            Reduce(q_sum)(0 until q_range par loop_q) { q_idx => 
               val qx = dvec_x_sram(b1x, b1y, b1z, q_idx)
               val qy = dvec_y_sram(b1x, b1y, b1z, q_idx)
               val qz = dvec_z_sram(b1x, b1y, b1z, q_idx)
@@ -546,10 +546,10 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
           force_y_sram(b0x,b0y,b0z,i) = b0_cube_forces(i).y
           force_z_sram(b0x,b0y,b0z,i) = b0_cube_forces(i).z
         }
-      }
-      force_x_dram store force_x_sram
-      force_y_dram store force_y_sram
-      force_z_dram store force_z_sram
+      }}}
+      force_x_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load) store force_x_sram
+      force_y_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load) store force_y_sram
+      force_z_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load) store force_z_sram
 
     }
 
@@ -1470,9 +1470,6 @@ object BlackScholes extends SpatialApp {
 
 
   val margin = 0.5f // Validates true if within +/- margin
-  val innerPar = 16
-  val outerPar = 1
-  val tileSize = 2000
 
   final val inv_sqrt_2xPI = 0.39894228040143270286f
 
@@ -1537,9 +1534,9 @@ object BlackScholes extends SpatialApp {
     svolatility: Array[Float],
     stimes:      Array[Float]
   ): Array[Float] = {
-    val B  = tileSize (96 -> 96 -> 19200)
-    val OP = outerPar (1 -> 2)
-    val IP = innerPar (1 -> 96)
+    val B  = 2048 (96 -> 96 -> 19200)
+    val OP = 1 (1 -> 2)
+    val IP = 16 (1 -> 96)
     val par_load = 16
     val par_store = 16
 
