@@ -274,7 +274,7 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
       Pipe { y1 := x1.value + 6 }
       Pipe { y2 := x2.value + 8 }
       val reg = Reg[Int](0) // Nbuffered reg with multi writes, note that it does not do what you think!
-      Foreach(3 by 1) {i => 
+      Sequential.Foreach(3 by 1) {i => 
         Pipe{reg :+= 1}
         Pipe{y4 := reg}
         Pipe{reg :+= 1}
@@ -299,18 +299,17 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
     val r5 = getMem(m2)
     val g6 = data(3)
     val r6 = getArg(y3)
-    val g7 = 1
+    val g7 = 5
     val r7 = getArg(y4)
-    val g8 = 2
+    val g8 = 6
     val r8 = getArg(y5)
     println("expected: " + g1 + ", " + g2 + ", " + g3 + ", " + g4 + ", "+ g6 + ", " + g7 + ", " + g8)
     println("received: " + r1 + ", " + r2 + ", " + r3 + ", " + r4 + ", "+ r6 + ", " + r7 + ", " + r8)
     printArray(r5, "Mem: ")
-    val cksum = r1 == g1 && r2 == g2 && r3 == g3 && r4 == g4 && r6 == g6 && data.zip(r5){_==_}.reduce{_&&_} //&& r7 == g7 && r8 == g8
-    println("PASS: " + cksum + " (MixedIOTest) * Note that Scala does not handle the multiple writes in NBufFF correctly")
+    val cksum = r1 == g1 && r2 == g2 && r3 == g3 && r4 == g4 && r6 == g6 && data.zip(r5){_==_}.reduce{_&&_} && r7 == g7 && r8 == g8
+    println("PASS: " + cksum + " (MixedIOTest) ")
   }
 }
-
 
 // Args: None
 object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: none
@@ -2446,7 +2445,7 @@ object MultiWriteBuffer extends SpatialApp { // Regression (Unit) // Args: none
     Accel {
       val accum = SRAM[Int](R, C)
       MemReduce(accum)(1 until (R+1)) { row =>
-        val sram_seq = SRAM[Int](R, C)
+        val sram_seq = SRAM.buffer[Int](R, C)
          Foreach(0 until R, 0 until C) { (r, c) =>
             sram_seq(r,c) = 0
          }
