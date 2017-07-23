@@ -1,4 +1,3 @@
-
 import spatial.dsl.{Matrix => _, _ => _}
 import org.virtualized._
 import spatial.SpatialCompiler
@@ -9,30 +8,28 @@ import spatial.stdlib._
 
 trait MiniParticleFilter extends SpatialStream {
 
-  val N: scala.Int                                                    = 1
-  val initV: (scala.Double, scala.Double, scala.Double)               = (0.0, 0.0, 0.0)
-  val initP: (scala.Double, scala.Double, scala.Double)               = (0.0, 0.0, 0.0)
+  type CReal = scala.Double
+  type Real  = Double//FixPt[TRUE, _16, _16]
 
-  val initTime: scala.Double  = 0.0
-  val covAcc: scala.Double    = 0.01
-  val covGPS: scala.Double = 0.01
+  val N: scala.Int          = 10
+  val initV: (CReal, CReal) = (0.0, 0.0)
+  val initP: (CReal, CReal) = (0.0, 0.0)
 
-  type Real         = Double
-
+  val initTime: CReal = 0.0
+  val covAcc: CReal   = 0.01
+  val covGPS: CReal   = 0.01
 
   @struct case class Vec2(x: Real, y: Real)
-
 
   type Time         = Real
   type Position     = Vec2
   type Acceleration = Vec2
-  type Weight = Real
-
+  type Weight       = Real
 
   val matrix = new Matrix[Real] {
-    def sqrtT(x: Double) = sqrt(x)
-    val zero = 0.to[Real]
-    val one = 1.to[Real]
+    def sqrtT(x: Real) = sqrt(x)
+    val zero           = 0.to[Real]
+    val one            = 1.to[Real]
   }
 
   import matrix._
@@ -41,50 +38,46 @@ trait MiniParticleFilter extends SpatialStream {
     Matrix(2, 1, List(v.x, v.y))
   }
 
-  def toVec(v: Vec2): Vec= {
+  def toVec(v: Vec2): Vec = {
     Vec(v.x, v.y)
   }
 
-
   def initParticles(weights: SRAM1[Weight], states: SRAM2[Real], parFactor: Int) = {
 
-    Foreach(0::N par parFactor)(x => {
+    Foreach(0 :: N par parFactor)(x => {
 
       Pipe {
-        Pipe { states(x, 0) = initV._1 }
-        Pipe { states(x, 1) = initV._2 }
-        Pipe { states(x, 2) = initV._3 }
-        Pipe { states(x, 3) = initP._1 }
-        Pipe { states(x, 4) = initP._2 }
-        Pipe { states(x, 5) = initP._3 }
+        Pipe { states(x, 0) = initV._1.to[Real] }
+        Pipe { states(x, 1) = initV._2.to[Real] }
+        Pipe { states(x, 2) = initP._1.to[Real] }
+        Pipe { states(x, 3) = initP._2.to[Real] }
       }
-      
+
       Parallel {
         weights(x) = math.log(1.0 / N)
       }
 
     })
   }
-  
 
   @virtualize def prog() = {
 
-    val inAcc    = StreamIn[Acceleration](In1)
-    val inGPS       = StreamIn[Position](In2)
+    val inAcc     = StreamIn[Acceleration](In1)
+    val inGPS     = StreamIn[Position](In2)
     val out       = StreamOut[Position](Out1)
-    val parFactor = N (1 -> N)
+    val parFactor = 1 (1 -> N)
 
     Accel {
 
       val weights = SRAM[Weight](N)
-      val states = SRAM[Real](N, 4)
-      val dt = 0.1
+      val states  = SRAM[Real](N, 4)
+      val dt      = 0.1
 
       Sequential {
 
         initParticles(weights, states, parFactor)
 
-        Foreach(0::6)(i => {
+        Sequential.Foreach(0 :: 6)(i => {
 
           updateFromAcc(inAcc, dt, states, parFactor)
 
@@ -100,29 +93,26 @@ trait MiniParticleFilter extends SpatialStream {
     }
   }
 
-
-
-
   def updateFromAcc(acc: Acceleration, dt: Time, states: SRAM2[Real], parFactor: Int) = {
 
-    Foreach(0::N par parFactor)(i => {
+    Foreach(0 :: N par parFactor)(i => {
       val nq = sampleVel(acc, dt, covAcc)
-      val v = Matrix.fromSRAM1(4, states, i)
+      val v  = Matrix.fromSRAM1(4, states, i)
       val dv = Matrix(4, 1, List(nq(0), nq(1), v(0, 0) * dt, v(1, 0) * dt))
       val nv = v + dv
-      v.loadTo(states, i)
+//      println(v(0,0))
+      nv.loadTo(states, i)
     })
   }
 
   def updateFromGPS(pos: Position, weights: SRAM1[Real], states: SRAM2[Real], parFactor: Int) = {
     val covPos = Matrix.eye(2, covGPS)
-    Foreach(0::N par parFactor)(i => {
+    Foreach(0 :: N par parFactor)(i => {
       val state = Matrix.fromSRAM1(2, states, i, 2)
-      val lik = unnormalizedGaussianLogPdf(toMatrix(pos), state, covPos)
-      weights(i) = weights(i) * lik
+      val lik   = unnormalizedGaussianLogPdf(toMatrix(pos), state, covPos)
+      weights(i) = weights(i) + lik
     })
   }
-
 
   def sampleVel(a: Acceleration, dt: Time, covAcc: Real): Vec = {
     val withNoise  = gaussianVec(toVec(a), covAcc)
@@ -158,17 +148,16 @@ trait MiniParticleFilter extends SpatialStream {
     (y1, y2)
   }
 
-
   @virtualize def normWeights(weights: SRAM1[Weight], parFactor: Int) = {
     val totalWeight = Reg[Real](0)
-    val maxR = Reg[Real]
+    val maxR        = Reg[Real]
 
     maxR := weights(0)
 
-    Reduce(maxR)(0::N)(i => weights(i))(max(_,_))
-    Reduce(totalWeight)(0::N)(i => exp(weights(i) - maxR))(_+_)
+    Reduce(maxR)(0 :: N)(i => weights(i))(max(_, _))
+    Reduce(totalWeight)(0 :: N)(i => exp(weights(i) - maxR))(_ + _)
     totalWeight := maxR + log(totalWeight)
-    Foreach(0::N par parFactor)(i => {
+    Foreach(0 :: N par parFactor)(i => {
       weights(i) = weights(i) - totalWeight
     })
 
@@ -176,51 +165,50 @@ trait MiniParticleFilter extends SpatialStream {
 
   @virtualize def resample(weights: SRAM1[Weight], states: SRAM2[Real], parFactor: Int) = {
 
-    val cweights = SRAM[Real](N)
+    val cweights  = SRAM[Real](N)
     val outStates = SRAM[Real](N, 4)
 
     val u = random[Real](1.0)
 
-    Foreach(0::N)(i => {
+    Foreach(0 :: N)(i => {
       if (i == 0)
         cweights(i) = exp(weights(i))
       else
-        cweights(i) = cweights(i-1) + exp(weights(i))
+        cweights(i) = cweights(i - 1) + exp(weights(i))
     })
 
     val k = Reg[Int](0)
-    Foreach(0::N)(i => {
-      val b = cweights(k)*N < i.to[Real] + u
-      FSM[Boolean, Boolean](b)(x => x)(x => k := k + 1)(x => cweights(k)*N < i.to[Real]+u)
+    Foreach(0 :: N)(i => {
+      val b = cweights(k) * N < i.to[Real] + u
+      FSM[Boolean, Boolean](b)(x => x)(x => k := k + 1)(x => cweights(k) * N < i.to[Real] + u)
 
-      Foreach(0::4)(x => {
+      Foreach(0 :: 4)(x => {
         outStates(i, x) = states(k, x)
       })
 
     })
 
-    Foreach(0::N par parFactor)(i => {
+    Foreach(0 :: N par parFactor)(i => {
 
-      Foreach(0::4)(x => {
+      Foreach(0 :: 4)(x => {
         states(i, x) = outStates(i, x)
       })
 
-      weights(i) = log(1.0/N)
+      weights(i) = log(1.0 / N)
     })
 
   }
 
   def unnormalizedGaussianLogPdf(measurement: Matrix, state: Matrix, cov: Matrix): Real = {
-    val e = (measurement-state)
-    -1/2.0*((e.t*(cov.inv)*e)(0, 0))
+    val e = (measurement - state)
+    -1 / 2.0 * ((e.t * (cov.inv) * e)(0, 0))
   }
-
 
   @virtualize def averagePos(weights: SRAM1[Real], states: SRAM2[Real], parFactor: Int): Vec2 = {
     val accumP = RegFile[Real](2, List[Real](0, 0))
     Parallel {
-      Foreach(0::N par parFactor, 0::2)((i,j) => {
-        accumP(j) = accumP(j) + exp(weights(i))*states(i, j+2)
+      Foreach(0 :: N par parFactor, 0 :: 2)((i, j) => {
+        accumP(j) = accumP(j) + exp(weights(i)) * states(i, j + 2)
       })
     }
     Vec2(accumP(0), accumP(1))
@@ -233,11 +221,10 @@ object MiniParticleFilterInterpreter extends MiniParticleFilter with SpatialStre
   val outs = List(Out1)
 
   val inputs = collection.immutable.Map[Bus, List[MetaAny[_]]](
-    (In1 -> List[Real](0f, 0.1f, 0.2f, 0.3f, 0.2f).map(x => Vec2(x, x))),
-    (In2 -> List[Real](1f).map(x => Vec2(x, x)))
+    (In1 -> List[CReal](0f, 1f, 2f, 3f, 2f).map(_.to[Real]).map(x => Vec2(x, x))),
+    (In2 -> List[CReal](1f).map(_.to[Real]).map(x => Vec2(x, x)))
   )
 
 }
 
 object MiniParticleFilterCompiler extends MiniParticleFilter with SpatialStreamCompiler
-
