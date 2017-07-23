@@ -85,7 +85,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
     SQuat(q.r, -q.i, -q.j, q.j) * (1 / n)
   }
 
-  def initParticles(particles: SRAM1[Particle], states: SRAM2[SReal], covs: SRAM3[SReal], parFactor: Int) = {
+  @virtualize def initParticles(particles: SRAM1[Particle], states: SRAM2[SReal], covs: SRAM3[SReal], parFactor: Int) = {
     Foreach(0::N par parFactor)(x => {
 
       Pipe {
@@ -99,15 +99,18 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
       val initSQuat = SQuat(initQ._1, initQ._2, initQ._3, initQ._4)
       
-      Parallel {
+      Sequential {
         particles(x) = Particle(
           math.log(1.0 / N),
           initSQuat,
           SVec3(0.0, 0.0, 0.0),
           initSQuat
         )
-        Foreach(0::6)(i =>
-          covs(x, i, i) = initCov
+        Foreach(0::6, 0::6)((i,j) =>
+          if (i == j)
+            covs(x, i, i) = initCov
+          else 
+            covs(x, i, i) = 0
         )
       }
     })
@@ -154,10 +157,9 @@ trait RaoBlackParticleFilter extends SpatialStream {
               val v = fifoV.deq()
               updateFromV(v, lastSTime, lastO, particles, states, covs, parFactor)
             }
-
-            out := SVicon(lastSTime, averageSPOSE(particles, states, parFactor))
             normWeights(particles, parFactor)
-            resample(particles, states, covs, parFactor)
+            out := SVicon(lastSTime, averageSPOSE(particles, states, parFactor))
+            resample(particles, states, covs, parFactor)            
           })(x => (!fifoV.empty || !fifoSIMU.empty))
 
         }
@@ -289,13 +291,14 @@ trait RaoBlackParticleFilter extends SpatialStream {
     lq.rotateBy(q)
   }
 
-  def gaussianVec(mean: Vec, variance: SReal) = {
+  @virtualize def gaussianVec(mean: Vec, variance: SReal) = {
     val reg = RegFile[SReal](3)
-    Foreach(0::3)(i => {
+    Foreach(0::2)(i => {
       val g1 = gaussian()
       Pipe {
         Pipe { reg(i*2) = g1._1 }
-        Pipe { reg((i*2+1)%3) = g1._2 }
+        if (i != 1)
+          Pipe { reg((i*2+1)) = g1._2 }
       }
     })
     Vec(3, RegId1(reg)) * sqrt(variance) + mean
@@ -357,7 +360,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
     })
 
     val k = Reg[Int](0)
-    Foreach(0::N)(i => {
+    Sequential.Foreach(0::N)(i => {
       val b = weights(k)*N < i.to[SReal] + u
 
       FSM[Boolean, Boolean](b)(x => x)(x => k := k + 1)(x => weights(k)*N < i.to[SReal]+u)
@@ -372,7 +375,8 @@ trait RaoBlackParticleFilter extends SpatialStream {
       out(i) = particles(k)
     })
 
-    Foreach(0::N par parFactor)(i => {
+
+    Sequential.Foreach(0::N)(i => {
       val p = out(i)
       Foreach(0::6)(x => {
         states(i, x) = outStates(i, x)
@@ -387,7 +391,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   def unnormalizedGaussianLogPdf(measurement: Matrix, state: Matrix, cov: Matrix): SReal = {
     val e = (measurement-state)
-    -1/2.0*((e.t*(cov.inv)*e)(0, 0))
+    -1/2.0*((e.t*(cov.inv)*e).apply(0, 0))
   }
 
   def localAngleToQuat(v: Vec): SQuat = {

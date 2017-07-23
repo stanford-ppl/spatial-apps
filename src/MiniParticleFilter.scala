@@ -9,8 +9,28 @@ import spatial.stdlib._
 trait MiniParticleFilter extends SpatialStream {
 
   type CReal = scala.Double
-  type Real  = Double//FixPt[TRUE, _16, _16]
+//  type Real  = Double
+  type Real  = FixPt[TRUE, _16, _16]  
 
+  implicit def toReal(x: CReal) = x.to[Real]
+  //Not very precise because log and exp are for small probabilities.
+  //To remove when log and exp implemented
+
+  def sqrt(x: Real) = sqrt_approx(x)
+
+  val lutP: scala.Int = 1000
+  lazy val logLUT = {
+    Console.println(3)
+    LUT[Real](lutP)((-9:Real)::List.tabulate[Real](lutP-1)(i => math.log(i+1/lutP.toDouble)):_*)
+  }
+  lazy val expLUT = 
+    LUT[Real](lutP)(List.tabulate[Real](lutP)(i => math.exp(i/lutP.toDouble)):_*)
+  
+  def log(x: Real) = 
+    logLUT((x*(lutP.toDouble)).to[Index])
+  def exp(x: Real): Real =
+    expLUT((x*(lutP.toDouble)).to[Index])    
+  
   val N: scala.Int          = 10
   val initV: (CReal, CReal) = (0.0, 0.0)
   val initP: (CReal, CReal) = (0.0, 0.0)
@@ -28,8 +48,8 @@ trait MiniParticleFilter extends SpatialStream {
 
   val matrix = new Matrix[Real] {
     def sqrtT(x: Real) = sqrt(x)
-    val zero           = 0.to[Real]
-    val one            = 1.to[Real]
+    val zero           = 0
+    val one            = 1
   }
 
   import matrix._
@@ -47,10 +67,10 @@ trait MiniParticleFilter extends SpatialStream {
     Foreach(0 :: N par parFactor)(x => {
 
       Pipe {
-        Pipe { states(x, 0) = initV._1.to[Real] }
-        Pipe { states(x, 1) = initV._2.to[Real] }
-        Pipe { states(x, 2) = initP._1.to[Real] }
-        Pipe { states(x, 3) = initP._2.to[Real] }
+        Pipe { states(x, 0) = initV._1 }
+        Pipe { states(x, 1) = initV._2 }
+        Pipe { states(x, 2) = initP._1 }
+        Pipe { states(x, 3) = initP._2 }
       }
 
       Parallel {
@@ -68,6 +88,7 @@ trait MiniParticleFilter extends SpatialStream {
     val parFactor = 1 (1 -> N)
 
     Accel {
+      Console.println(2)
 
       val weights = SRAM[Weight](N)
       val states  = SRAM[Real](N, 4)
@@ -84,10 +105,10 @@ trait MiniParticleFilter extends SpatialStream {
           if (i == 5)
             updateFromGPS(inGPS, weights, states, parFactor)
 
-          out := averagePos(weights, states, parFactor)
-
           normWeights(weights, parFactor)
-          resample(weights, states, parFactor)
+          out := averagePos(weights, states, parFactor)          
+          resample(weights, states, parFactor)          
+
         })
       }
     }
@@ -201,7 +222,7 @@ trait MiniParticleFilter extends SpatialStream {
 
   def unnormalizedGaussianLogPdf(measurement: Matrix, state: Matrix, cov: Matrix): Real = {
     val e = (measurement - state)
-    -1 / 2.0 * ((e.t * (cov.inv) * e)(0, 0))
+    -1 / 2.0 * ((e.t * (cov.inv) * e).apply(0, 0))
   }
 
   @virtualize def averagePos(weights: SRAM1[Real], states: SRAM2[Real], parFactor: Int): Vec2 = {
@@ -221,8 +242,8 @@ object MiniParticleFilterInterpreter extends MiniParticleFilter with SpatialStre
   val outs = List(Out1)
 
   val inputs = collection.immutable.Map[Bus, List[MetaAny[_]]](
-    (In1 -> List[CReal](0f, 1f, 2f, 3f, 2f).map(_.to[Real]).map(x => Vec2(x, x))),
-    (In2 -> List[CReal](1f).map(_.to[Real]).map(x => Vec2(x, x)))
+    (In1 -> List[CReal](0f, 1f, 2f, 3f, 2f).map(x => Vec2(x, x))),
+    (In2 -> List[CReal](1f).map(x => Vec2(x, x)))
   )
 
 }
