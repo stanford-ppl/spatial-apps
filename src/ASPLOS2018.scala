@@ -453,12 +453,12 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
 
     val par_load = 8 // Wider data type
     val par_store = 8 // Wider data type
-    val loop_grid0_x = 1 (1 -> 1 -> 16)
-    val loop_grid0_y = 1 (1 -> 1 -> 16)
-    val loop_grid0_z = 1 (1 -> 1 -> 16)
+    val loop_grid0_x = 2 (1 -> 1 -> 16)
+    val loop_grid0_y = 2 (1 -> 1 -> 16)
+    val loop_grid0_z = 2 (1 -> 1 -> 16)
     val loop_grid1_x = 1 (1 -> 1 -> 16)
     val loop_grid1_y = 1 (1 -> 1 -> 16)
-    val loop_grid1_z = 2 (1 -> 1 -> 16)
+    val loop_grid1_z = 1 (1 -> 1 -> 16)
     val loop_p =       1 (1 -> 1 -> 16)
     val loop_q =       1 (1 -> 1 -> 16)
 
