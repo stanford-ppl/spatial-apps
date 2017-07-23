@@ -2,7 +2,7 @@ import spatial.dsl._
 import org.virtualized._
 import spatial.targets._
 
-object SHA extends SpatialApp { // Regression (Dense) // Args: none
+object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
   type ULong = FixPt[FALSE, _32, _0]
@@ -10,9 +10,11 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
 
   @virtualize
   def main() = {
-  	// Setup off-chip data
-  	val BLOCK_SIZE = 8192
-  	val SHA_BLOCKSIZE = 64
+    // Setup off-chip data
+    val BLOCK_SIZE = 8192
+    val SHA_BLOCKSIZE = 64
+
+    val PX = 1 
 
     val CONST1 = 0x5a827999L
     val CONST2 = 0x6ed9eba1L
@@ -33,121 +35,125 @@ object SHA extends SpatialApp { // Regression (Dense) // Args: none
     // printArray(data_text, "text as data: ")
     setMem(text_dram, data_text)
 
-  	Accel{
-  		val buffer = SRAM[Int8](BLOCK_SIZE)
-  		val sha_digest = RegFile[ULong](5)
-  		val sha_data = SRAM[ULong](16)
-  		val count_lo = Reg[Int](0)
-  		val count_hi = Reg[Int](0)
+    Accel{
+      val buffer = SRAM[Int8](BLOCK_SIZE)
+      val sha_digest = RegFile[ULong](5, List(0x67452301L.to[ULong], 0xefcdab89L.to[ULong], 
+                                              0x98badcfeL.to[ULong], 0x10325476L.to[ULong], 
+                                              0xc3d2e1f0L.to[ULong])
+                                     )
+      val sha_data = SRAM[ULong](16)
+      val count_lo = Reg[Int](0)
+      val count_hi = Reg[Int](0)
 
-  		def asLong(r: Reg[ULong]): ULong = {r.value.apply(31::0).as[ULong]}
+      def asLong(r: Reg[ULong]): ULong = {r.value.apply(31::0).as[ULong]}
 
-  		def sha_transform(): Unit = {
-	      val W = SRAM[ULong](80)
-		    val A = Reg[ULong]
-		    val B = Reg[ULong]
-		    val C = Reg[ULong]
-		    val D = Reg[ULong]
-		    val E = Reg[ULong]
+      def sha_transform(): Unit = {
+        val W = SRAM[ULong](80)
+        val A = Reg[ULong]
+        val B = Reg[ULong]
+        val C = Reg[ULong]
+        val D = Reg[ULong]
+        val E = Reg[ULong]
 
-	      Foreach(80 by 1) { i =>
-	      	W(i) = if (i < 16) {sha_data(i)} else {W(i-3) ^ W(i-8) ^ W(i-14) ^ W(i-16)}
-	      }
-
-				A := sha_digest(0)
-				B := sha_digest(1)
-				C := sha_digest(2)
-				D := sha_digest(3)
-				E := sha_digest(4)
-
-		    Sequential.Foreach(20 by 1) { i => 
-		    	val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST1 + ((B & C) | (~B & D))
-		    	E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
-		    }
-		    Sequential.Foreach(20 until 40 by 1) { i => 
-		    	val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST2 + (B ^ C ^ D)
-		    	E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
-		    }
-		    Sequential.Foreach(40 until 60 by 1) { i => 
-		    	val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST3 + ((B & C) | (B & D) | (C & D))
-		    	E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
-		    }
-		    Sequential.Foreach(60 until 80 by 1) { i => 
-		    	val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST4 + (B ^ C ^ D)
-		    	E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
-		    }
-
-				Pipe{sha_digest(0) = sha_digest(0) + A}
-				Pipe{sha_digest(1) = sha_digest(1) + B}
-				Pipe{sha_digest(2) = sha_digest(2) + C}
-				Pipe{sha_digest(3) = sha_digest(3) + D}
-				Pipe{sha_digest(4) = sha_digest(4) + E}
-  		}
-  		def sha_update(count: Index): Unit = {
-	  		if (count_lo + (count << 3) < count_lo) {count_hi :+= 1}
-				count_lo :+= count << 3
-    		count_hi :+= count >> 29
-    		Sequential.Foreach(0 until count by SHA_BLOCKSIZE) { base => 
-    			val numel = min(count - base, SHA_BLOCKSIZE.to[Index])
-    			// TODO: Can make this one writer only
-    			if (numel == SHA_BLOCKSIZE) {Pipe{
-			      Sequential.Foreach(SHA_BLOCKSIZE/4 by 1){ i => 
-			        sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
-			      }
-			      sha_transform()
-		      }} else {
-						Sequential(0 until numel by 1) { i => 
-			        sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
-						}	      	
-		      }
-				}
-
-  		}
-
-			Pipe{sha_digest(0) = 0x67452301L.to[ULong]}
-			Pipe{sha_digest(1) = 0xefcdab89L.to[ULong]}
-			Pipe{sha_digest(2) = 0x98badcfeL.to[ULong]}
-			Pipe{sha_digest(3) = 0x10325476L.to[ULong]}
-			Pipe{sha_digest(4) = 0xc3d2e1f0L.to[ULong]}
-
-  		Sequential.Foreach(len by BLOCK_SIZE) { chunk => 
-  			val count = min(BLOCK_SIZE.to[Int], (len - chunk))
-	  		buffer load text_dram(chunk::chunk+count)
-	  		sha_update(count)
-
-	  		// def byte_reverse(x: ULong): ULong = {
-	  		// 	byte_pack(x(31::24).as[Int8],x(23::16).as[Int8],x(15::8).as[Int8],x(7::0).as[Int8]).as[ULong]
-	  		// }
-
-				// Final sha
-				// TODO: This last bit is probably wrong for any input that is not size 8192
-				val lo_bit_count = count_lo.value.to[ULong]
-				val hi_bit_count = count_hi.value.to[ULong]
-    		val count_final = ((lo_bit_count.to[Int8] >> 3) & 0x3f.to[Int8]).to[Int]
-    		sha_data(count_final) = 0x80
-    		if (count_final > 56) {
-    			Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
-    			Sequential(sha_transform())
-    			sha_data(14) = 0
-    		} else {
-    			Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
+        Foreach(80 by 1 par PX) { i =>
+          W(i) = if (i < 16) {sha_data(i)} else {W(i-3) ^ W(i-8) ^ W(i-14) ^ W(i-16)}
         }
-    		Pipe{sha_data(14) = hi_bit_count}
-    		Pipe{sha_data(15) = lo_bit_count}
-    		sha_transform()
-  		}
+
+        A := sha_digest(0)
+        B := sha_digest(1)
+        C := sha_digest(2)
+        D := sha_digest(3)
+        E := sha_digest(4)
+
+        Foreach(20 by 1) { i => 
+          val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST1 + ((B & C) | (~B & D))
+          E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
+        }
+        Foreach(20 until 40 by 1) { i => 
+          val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST2 + (B ^ C ^ D)
+          E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
+        }
+        Foreach(40 until 60 by 1) { i => 
+          val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST3 + ((B & C) | (B & D) | (C & D))
+          E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
+        }
+        Foreach(60 until 80 by 1) { i => 
+          val temp = ((A << 5) | (A >> (32 - 5))) + E + W(i) + CONST4 + (B ^ C ^ D)
+          E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
+        }
+
+        Pipe{sha_digest(0) = sha_digest(0) + A}
+        // Pipe{println("sha_digest 0 is " + sha_digest(0))}
+        Pipe{sha_digest(1) = sha_digest(1) + B}
+        Pipe{sha_digest(2) = sha_digest(2) + C}
+        Pipe{sha_digest(3) = sha_digest(3) + D}
+        Pipe{sha_digest(4) = sha_digest(4) + E}
+      }
+      def sha_update(count: Index): Unit = {
+        if (count_lo + (count << 3) < count_lo) {count_hi :+= 1}
+        count_lo :+= count << 3
+        count_hi :+= count >> 29
+        Foreach(0 until count by SHA_BLOCKSIZE) { base => 
+          val numel = min(count - base, SHA_BLOCKSIZE.to[Index])
+          // TODO: Can make this one writer only
+          if (numel == SHA_BLOCKSIZE) {Pipe{
+            Foreach(SHA_BLOCKSIZE/4 by 1){ i => 
+              sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
+            }
+            sha_transform()
+          }} else {
+            Foreach(0 until numel by 1) { i => 
+              sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
+            }         
+          }
+        }
+
+      }
+
+      // Pipe{sha_digest(0) = 0x67452301L.to[ULong]}
+      // Pipe{sha_digest(1) = 0xefcdab89L.to[ULong]}
+      // Pipe{sha_digest(2) = 0x98badcfeL.to[ULong]}
+      // Pipe{sha_digest(3) = 0x10325476L.to[ULong]}
+      // Pipe{sha_digest(4) = 0xc3d2e1f0L.to[ULong]}
+
+      Sequential.Foreach(len by BLOCK_SIZE) { chunk => 
+        val count = min(BLOCK_SIZE.to[Int], (len - chunk))
+        buffer load text_dram(chunk::chunk+count)
+        sha_update(count)
+
+        // def byte_reverse(x: ULong): ULong = {
+        //  byte_pack(x(31::24).as[Int8],x(23::16).as[Int8],x(15::8).as[Int8],x(7::0).as[Int8]).as[ULong]
+        // }
+
+        // Final sha
+        // TODO: This last bit is probably wrong for any input that is not size 8192
+        val lo_bit_count = count_lo.value.to[ULong]
+        val hi_bit_count = count_hi.value.to[ULong]
+        val count_final = ((lo_bit_count.to[Int8] >> 3) & 0x3f.to[Int8]).to[Int]
+        sha_data(count_final) = 0x80
+        if (count_final > 56) {
+          Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
+          Sequential(sha_transform())
+          sha_data(14) = 0
+        } else {
+          Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
+        }
+        Pipe{sha_data(14) = hi_bit_count}
+        Pipe{sha_data(15) = lo_bit_count}
+        sha_transform()
+      }
 
 
-  		hash_dram store sha_digest
-  	}
+      hash_dram store sha_digest
+    }
 
-  	val hashed_result = getMem(hash_dram)
-  	val hashed_gold = Array[ULong](1754467640L,1633762310L,3755791939L,3062269980L,2187536409L,0,0,0,0,0,0,0,0,0,0,0)
-  	printArray(hashed_gold, "Expected: ")
-  	printArray(hashed_result, "Got: ")
+    val hashed_result = getMem(hash_dram)
+    val hashed_gold = Array[ULong](1754467640L,1633762310L,3755791939L,3062269980L,2187536409L,0,0,0,0,0,0,0,0,0,0,0)
+    printArray(hashed_gold, "Expected: ")
+    printArray(hashed_result, "Got: ")
 
-  	val cksum = hashed_gold == hashed_result
-  	println("PASS: " + cksum + " (SHA)")
+    val cksum = hashed_gold == hashed_result
+    println("PASS: " + cksum + " (SHA1)")
 
   }
 }
@@ -256,6 +262,12 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
         Pipe{scan_ptr :+= 1}
         tmp
       }
+      // def read_byte_staged(): UInt8 = {
+      //   val tmp = jpg_sram(scan_ptr)
+      //   Pipe{scan_ptr :+= 1}
+      //   tmp
+      // }
+      // val read_byte = fun[Unit, UInt8]((x:Unit) => read_byte_staged())
 
       def read_markers(): Unit = {
         val unread_marker = Reg[UInt8](0)
@@ -638,6 +650,292 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
   }
 }
 
+object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
+  override val target = AWS_F1
+  type UInt8 = FixPt[FALSE, _8, _0]
+  type UInt2 = FixPt[FALSE, _2, _0]
+  type UInt16 = FixPt[FALSE, _16, _0]
+  type UInt = FixPt[FALSE, _32, _0]
+
+  @virtualize
+  def main() = {
+
+    val NUMEL = 2048
+    val mvscale = 1
+    val MV_FIELD = 0
+    val ERROR = 255
+    val inRdBfr_data = loadCSV1D[UInt8]("/remote/regression/data/machsuite/mpeg2_inRdBfr.csv", ",")
+    val inRdBfr_dram = DRAM[UInt8](NUMEL)
+    setMem(inRdBfr_dram, inRdBfr_data)
+
+    val motion_vertical_field_select_dram = DRAM[UInt16](32)
+    val PMV_dram = DRAM[UInt16](32)
+
+    Accel{
+      val inPMV = LUT[UInt16](2,2,2)(45,  207,
+                                     70,  41,
+
+                                     4,   180,
+                                     120, 216)
+      val inmvfs = LUT[UInt16](2,2)(232, 200, 
+                                    32,  240)
+      val MVtab0 = LUT[Int](8,2)(ERROR, 0, 
+                                 3, 3, 
+                                 2, 2, 
+                                 2, 2,
+                                 1, 1, 
+                                 1, 1, 
+                                 1, 1, 
+                                 1, 1)
+
+      val MVtab1 = LUT[Int](8,2)(ERROR, 0, 
+                                 ERROR, 0, 
+                                 ERROR, 0, 
+                                 7, 6,  
+                                 6, 6, 
+                                 5, 6, 
+                                 4, 5, 
+                                 4, 5)
+
+      val MVtab2 = LUT[Int](12,2)(16, 9, 
+                                 15, 9, 
+                                 14, 9, 
+                                 13, 9, 
+                                 12, 9, 
+                                 11, 9,
+                                 10, 8, 
+                                 10, 8, 
+                                 9, 8, 
+                                 9, 8, 
+                                 8, 8, 
+                                 8, 8)
+
+      val dmvector = RegFile[Int](2)
+      val motion_vertical_field_select = RegFile[UInt16](2,2)
+      val PMV = RegFile[UInt16](2,2,2)
+
+      val ld_Rdbfr = SRAM[UInt8](2048)
+      val ld_Bfr = Reg[UInt](68157440)
+      val ld_Incnt = Reg[Int](0)
+      val ld_Rdptr = Reg[Int](2048)
+      val ld_Rdmax = Reg[Int](2047)
+      val motion_vector_count = Reg[Int](1)
+      val mv_format = Reg[Int](0)
+      val h_r_size = Reg[Int](200)
+      val v_r_size = Reg[Int](200)
+      val dmv = Reg[Boolean](false)
+      val s = Reg[Int](0)
+
+      def Fill_Buffer(): Unit = {
+
+        ld_Rdbfr load inRdBfr_dram(0::2048)
+        ld_Rdptr := 0
+        // TODO: Some padding crap if file is not aligned
+      }
+      def Flush_Buffer(n: UInt): Unit = {
+        Foreach(n.to[Int] by 1){_ => ld_Bfr := ld_Bfr << 1}
+
+        ld_Incnt := ld_Incnt - n.to[Int]
+        val Incnt = ld_Incnt
+        // Pipe{println("  in flushbuf, ldbfr " + ld_Bfr.value + " n = " + n + " branching based on " + ld_Incnt.value + " and " + ld_Rdptr.value)}
+
+        if (Incnt <= 24) {
+          if (ld_Rdptr < 2044) {
+            // println("   flushbranch1")
+            Foreach(Incnt until 25 by 8){ i => 
+              val tmp = Reg[UInt]
+              tmp := ld_Rdbfr(ld_Rdptr).to[UInt]
+              Foreach(24-i by 1){j => tmp := tmp << 1}
+              ld_Bfr := ld_Bfr | tmp.value
+            }
+          } else {
+            // println("   flushbranch2")
+            Foreach(Incnt until 25 by 8){i => 
+              if (ld_Rdptr >= 2047) {Fill_Buffer()}
+              val tmp = Reg[UInt]
+              tmp := ld_Rdbfr(ld_Rdptr).to[UInt]
+              ld_Rdptr :+= 1 
+              Foreach(24-i by 1){j => tmp := tmp << 1}
+              ld_Bfr := ld_Bfr | tmp.value
+            }
+          }
+          ld_Incnt := (8-Incnt) + 24
+        } else {}
+      }
+      def InitializeBuffer(): Unit = {
+        // Regs all set to initial value to begin with
+        Flush_Buffer(0.to[UInt])
+      }
+      def Show_Bits(n: UInt): UInt = {
+        val tmp = Reg[UInt]
+        tmp := ld_Bfr.value
+        Foreach(((32 - n)%32).to[Int] by 1){_ => tmp := tmp >> 1}
+        // Pipe{println("showed " + n+  " bits as " + tmp.value)}
+        tmp.value
+      }
+      def Get_Bits(n: UInt): UInt = {
+        val bits = Show_Bits(n)
+        Flush_Buffer(n.to[UInt])
+        bits
+      }
+      def Get_motion_code(): Int = {
+        if (Get_Bits(1) != 0.to[UInt]) {
+          0.to[Int]
+        } else {
+          val code = Reg[Int](0)
+          code := Show_Bits(9).to[Int]
+          // println("showed bits " + code.value)
+          if (code.value >= 64) {
+            code := code.value >> 6
+            // println("branch1 " + code.value)
+            Flush_Buffer(MVtab0(code.value,1).to[UInt])
+            val tmp = Get_Bits(1)
+            val read = MVtab0(code.value,0)
+            if (tmp == 1.to[UInt]) { -read } else { read }
+          } else if (code.value >= 24) {
+            code := code.value >> 3
+            // println("branch2 " + code.value)
+            Flush_Buffer(MVtab1(code.value,1).to[UInt])
+            val tmp = Get_Bits(1)
+            val read = MVtab1(code.value,0)
+            // println("mvtab1 is " + read + " tmp is " + tmp)
+            if (tmp == 1.to[UInt]) { -read } else { read }
+          } else {
+            code :-= 12
+            if (code < 0) {
+              0.to[Int]
+            } else {
+              Flush_Buffer (MVtab2(code.value,0).to[UInt])
+              // println("branch3 " + code.value)
+              val tmp = Get_Bits(1)
+              val read = MVtab2(code.value,1)
+              if (tmp == 1.to[UInt]) { -read } else { read }
+            }
+          }
+
+        }
+
+      }
+
+      def decode_motion_vector(pmv_id0: Int, pred_id: Int, motion_code: Int, motion_residual: UInt, r_size: Reg[Int], full_pel_vector: Boolean): Unit = {
+        r_size := r_size.value % 32
+        val lim = Reg[Int](16)
+        Foreach(r_size by 1) { _ => lim := lim << 1 }
+        val vec = Reg[Int](0)
+        val tmp = PMV(pmv_id0, s.value, pred_id)
+        vec := mux(full_pel_vector,  tmp >> 1, tmp).to[Int]
+        // Pipe{println("motion code " + motion_code + ", vec " + vec.value + ", lim " + lim.value)}
+        if (motion_code > 0.to[Int]) {
+          val tmp = Reg[Int](0)
+          tmp := motion_code - 1
+          Foreach(r_size by 1){_ => tmp := tmp.value << 1}
+          vec := vec + (tmp.value) + motion_residual.to[Int] + 1
+          // Pipe{println("  now vec " + vec.value + " .. + " + tmp.value + " " + motion_residual)}
+          if (vec.value >= lim.value.to[Int]) {vec :=  vec.value - (lim.value + lim.value)}
+        } else if (motion_code < 0.to[Int]) {
+          val tmp = Reg[Int](0)
+          tmp := -motion_code - 1
+          Foreach(r_size by 1){_ => tmp << 1}
+          vec := vec - tmp.value + motion_residual.to[Int] + 1;
+          if (vec.value < -(lim.value.to[Int])) {vec := vec.value + lim.value + lim.value}
+        }
+        // println("new pmv at " + pmv_id0 + "," + s.value + "," + pred_id + " = " + mux(full_pel_vector, vec.value << 1, vec.value))
+        PMV(pmv_id0, s.value, pred_id) = mux(full_pel_vector, vec.value << 1, vec.value).to[UInt16]
+      }
+
+      def Get_dmvector(): Int = {
+        if (Get_Bits(1) != 0.to[UInt]) {
+          mux(Get_Bits (1) != 0.to[UInt], -1.to[Int], 1.to[Int])
+        } else {
+          0.to[Int]
+        }
+      }
+      def motion_vector(full_pel_vector: Boolean, pmv_id0: Int): Unit = {
+        // Get horizontal
+        val h_motion_code = Get_motion_code()
+        val h_motion_residual = if (h_r_size.value != 0.to[Int] && h_motion_code != 0.to[Int]) {Get_Bits(h_r_size.value.to[UInt])} else 0.to[UInt]
+        // println(" motion code " + h_motion_code + ", residual " + h_motion_residual)
+        decode_motion_vector(pmv_id0, 0.to[Int], h_motion_code, h_motion_residual, h_r_size, full_pel_vector)        
+        if (dmv.value) { dmvector(0) = Get_dmvector () }
+
+        // Get vertical
+        val v_motion_code = Get_motion_code ();
+        val v_motion_residual = if (v_r_size.value != 0.to[Int] && v_motion_code != 0.to[Int]) {Get_Bits(v_r_size.value.to[UInt])} else 0.to[UInt]
+        if (mvscale == 1) { Pipe{ PMV(pmv_id0, s.value, 1) = PMV(pmv_id0, s.value, 1) >> 1 /* DIV 2 */}}
+        Pipe{decode_motion_vector(pmv_id0, 1.to[Int], v_motion_code, v_motion_residual, v_r_size, full_pel_vector)}
+        if (mvscale == 1) { Pipe{ PMV(pmv_id0, s.value, 1) = PMV(pmv_id0, s.value, 1) << 1 /* MUL 2 */}}
+        if (dmv) { dmvector(1) = Get_dmvector () }
+      }
+
+      def motion_vectors(): Unit = {
+        val motion_vertical_field_select = RegFile[UInt](2,2)
+        if (motion_vector_count.value == 1) {
+          if (mv_format.value == MV_FIELD && !dmv.value) {
+            val tmp = Get_Bits(1.to[UInt])
+            Foreach(2 by 1) { i => 
+              motion_vertical_field_select(i,s.value) = tmp
+            }
+            motion_vector(false, 0.to[Int])
+            /* update other motion vector predictors */
+            Pipe{PMV(1, s.value, 0) = PMV(0, s.value, 0)}
+            Pipe{PMV(1, s.value, 1) = PMV(0, s.value, 1)}
+          }
+        } else {
+          motion_vertical_field_select(0, s.value) = Get_Bits (1)
+          motion_vector (false, 0.to[Int])
+          motion_vertical_field_select(1, s.value) = Get_Bits (1)
+          motion_vector (false, 1.to[Int])
+        }
+      }
+
+      Foreach(2 by 1){i =>
+        dmvector(i) = 0
+        Foreach(2 by 1){j => 
+          motion_vertical_field_select(i,j) = inmvfs(i,j)
+          Foreach(2 by 1){k => 
+            PMV(i,j,k) = inPMV(i,j,k)
+          }
+        } 
+      }
+
+      InitializeBuffer()
+      motion_vectors()
+
+      val PMV_aligned = SRAM[UInt16](32)
+      val motion_vertical_field_select_aligned = SRAM[UInt16](32)
+
+
+      Foreach(2 by 1) { i => 
+        Foreach(2 by 1) { j => 
+          motion_vertical_field_select_aligned(i*2 + j) = motion_vertical_field_select(i,j)
+          // println("mot_vert_fs " + i + "," + j + " = " + motion_vertical_field_select(i,j))
+          Foreach(2 by 1) { k => 
+            PMV_aligned(i*2*2 + j*2 + k) = PMV(i,j,k)
+            // println("  pmv " + i + "," + j + "," + k + " = " + PMV(i,j,k))
+          }
+        }
+      }
+
+      PMV_dram store PMV_aligned
+      motion_vertical_field_select_dram store motion_vertical_field_select_aligned
+    }
+
+    val pmv_gold = Array[UInt16](1566, 206, 70, 41, 1566, 206, 120, 216)
+    val mvfs_gold = Array[UInt16](0, 200, 0, 240)
+    val mvfs_result = getMem(motion_vertical_field_select_dram)
+    val pmv_result = getMem(PMV_dram)
+
+    printArray(pmv_result, "PMV:")
+    printArray(mvfs_result, "MVFS:")
+    val pmv_cksum = Array.tabulate[Boolean](8){i => pmv_gold(i) === pmv_result(i)}.reduce{_&&_}
+    val mvfs_cksum = Array.tabulate[Boolean](4){i => pmv_gold(i) === pmv_result(i)}.reduce{_&&_}
+    val cksum = pmv_cksum && mvfs_cksum
+
+    println("PASS: " + cksum + " (MPEG2)")
+
+
+  }
+}
 
 
 

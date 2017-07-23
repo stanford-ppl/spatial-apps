@@ -2,224 +2,407 @@ import spatial.dsl._
 import org.virtualized._
 import spatial.targets._
 
-object AES extends SpatialApp { // Regression (Dense) // Args: none
+object AES extends SpatialApp { // Regression (Dense) // Args: 50
   override val target = AWS_F1
 
   /*
   TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
   
   MachSuite Concerns: 
-  	- Mix rows math seemed wrong in their implementation
-  	- Not exactly sure what was going on with their expand_key step
-	*/
+    - Mix rows math seemed wrong in their implementation
+    - Not exactly sure what was going on with their expand_key step
+  */
   type UInt8 = FixPt[FALSE,_8,_0]
   @virtualize
   def main() = {
-  	// Setup off-chip data
-	  val plaintext = Array[UInt8](0,17,34,51,68,85,102,119,136,153,170,187,204,221,238,255)
-	  val key = Array.tabulate(32){i => i.to[UInt8]}
-  	val sbox = Array[UInt8]( // 256 elements
-	    0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
-	    0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
-	    0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
-	    0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
-	    0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
-	    0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
-	    0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a,
-	    0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
-	    0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0,
-	    0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
-	    0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b,
-	    0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
-	    0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85,
-	    0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
-	    0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5,
-	    0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
-	    0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17,
-	    0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
-	    0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88,
-	    0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
-	    0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c,
-	    0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
-	    0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9,
-	    0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
-	    0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6,
-	    0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
-	    0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e,
-	    0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
-	    0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94,
-	    0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
-	    0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
-	    0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
-	  )
-  	
-  	// Create DRAMs
-  	val plaintext_dram = DRAM[UInt8](16)
-  	val key_dram = DRAM[UInt8](32)
-  	val sbox_dram = DRAM[UInt8](256)
-  	val ciphertext_dram = DRAM[UInt8](16)
+    // Setup off-chip data
+    // val text_in = "the sharkmoster"
+    // val plaintext = argon.lang.String.string2num(text_in)
+    val plaintext = Array[UInt8](0,17,34,51,68,85,102,119,136,153,170,187,204,221,238,255)
+    val key = Array.tabulate(32){i => i.to[UInt8]}
+    val sbox = Array[UInt8]( // 256 elements
+      0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
+      0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+      0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
+      0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+      0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
+      0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+      0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a,
+      0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+      0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0,
+      0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+      0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b,
+      0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+      0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85,
+      0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+      0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5,
+      0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+      0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17,
+      0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+      0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88,
+      0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+      0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c,
+      0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+      0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9,
+      0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+      0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6,
+      0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+      0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e,
+      0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+      0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94,
+      0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+      0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
+      0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+    )
+    
+    val par_load = 16
+    val par_store = 16
+    val outer_par = 1 (1 -> 1 -> 4)
 
-  	// Transfer data to DRAMs
-  	setMem(plaintext_dram, plaintext)
-  	setMem(key_dram, key)
-  	setMem(sbox_dram, sbox)
+    // Setup
+    val num_bytes = ArgIn[Int]
+    setArg(num_bytes, 16*args(0).to[Int])
 
-  	// Debugging support
+    // Create DRAMs
+    val plaintext_dram = DRAM[UInt8](16)
+    val key_dram = DRAM[UInt8](32)
+    val sbox_dram = DRAM[UInt8](256)
+    val ciphertext_dram = DRAM[Int](num_bytes)
+
+    // Transfer data to DRAMs
+    setMem(plaintext_dram, plaintext)
+    setMem(key_dram, key)
+    setMem(sbox_dram, sbox)
+
+    // Debugging support
     val niter = 15
-  	// val niter = ArgIn[Int]
-  	// setArg(niter, args(0).to[Int])
-  	// val key_debug = DRAM[UInt8](32)
+    // val niter = ArgIn[Int]
+    // setArg(niter, args(0).to[Int])
+    // val key_debug = DRAM[UInt8](32)
 
-  	Accel{
-  		// Setup data structures
-  		val plaintext_flat = SRAM[UInt8](16)
-  		val plaintext_sram = SRAM[UInt8](4,4)
-  		val sbox_sram = SRAM[UInt8](256)
-  		val key_sram = SRAM[UInt8](32)
-  		// val mix_lut = LUT[Int](4,4)(
-  		// 		2, 3, 1, 1,
-  		// 		1, 2, 3, 1,
-  		// 		1, 1, 2, 3,
-  		// 		3, 1, 1, 2
-  		// 	)
-  		val rcon = Reg[UInt8](1)
+    Accel{
+      // Setup data structures
+      val plaintext_flat = SRAM.buffer[UInt8](16)
+      val plaintext_sram = RegFile.buffer[UInt8](4,4)
+      val sbox_sram = SRAM[UInt8](256)
+      val key_sram = SRAM.buffer[UInt8](32)
+      // val mix_lut = LUT[Int](4,4)(
+      //    2, 3, 1, 1,
+      //    1, 2, 3, 1,
+      //    1, 1, 2, 3,
+      //    3, 1, 1, 2
+      //  )
+      val rcon = Reg.buffer[UInt8](1)
 
-  		// Specify methods
-		  def expand_key(): Unit = {
-		    Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
-		    Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
-		    Pipe{key_sram(2) = key_sram(2) ^ sbox_sram(key_sram(31).as[UInt16].as[Int])}
-		    Pipe{key_sram(3) = key_sram(3) ^ sbox_sram(key_sram(28).as[UInt16].as[Int])}
-		    rcon := (((rcon)<<1) ^ ((((rcon)>>7) & 1) * 0x1b))
+      // Specify methods
+      def expand_key(): Unit = {
+        val addr_lut = LUT[Int](4)(29, 30, 31, 28)
+        Foreach(4 by 1) { i => 
+          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i == 0, rcon.value, 0)
+        }
+        // Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
+        // Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
+        // Pipe{key_sram(2) = key_sram(2) ^ sbox_sram(key_sram(31).as[UInt16].as[Int])}
+        // Pipe{key_sram(3) = key_sram(3) ^ sbox_sram(key_sram(28).as[UInt16].as[Int])}
+        rcon := (((rcon)<<1) ^ ((((rcon)>>7) & 1) * 0x1b))
 
-		    Sequential.Foreach(4 until 16 by 4) {i =>
-		    	Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
-		    	Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
-		    	Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
-		    	Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
-		    }
-			
-				Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
-				Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
-				Pipe{key_sram(18) = key_sram(18) ^ sbox_sram(key_sram(14).as[UInt16].as[Int])}
-				Pipe{key_sram(19) = key_sram(19) ^ sbox_sram(key_sram(15).as[UInt16].as[Int])}
+        Sequential.Foreach(4 until 16 by 4) {i =>
+          Sequential.Foreach(4 by 1) {j => 
+            key_sram(i+j) = key_sram(i+j) ^ key_sram(i - 4 + j)
+          }
+          // Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+          // Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+          // Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+          // Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+        }
+      
+        Sequential.Foreach(16 until 20 by 1){i => 
+          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i-4).to[Int])
+        }
+        // Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
+        // Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
+        // Pipe{key_sram(18) = key_sram(18) ^ sbox_sram(key_sram(14).as[UInt16].as[Int])}
+        // Pipe{key_sram(19) = key_sram(19) ^ sbox_sram(key_sram(15).as[UInt16].as[Int])}
 
-				Sequential.Foreach(20 until 32 by 4) {i => 
-					Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
-					Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
-					Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
-					Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
-				}
-		  }
+        Sequential.Foreach(20 until 32 by 4) {i => 
+          Sequential.Foreach(4 by 1) { j => 
+            key_sram(i+j) = key_sram(i+j) ^ key_sram(i - 4 + j)
+          }
+          // Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+          // Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+          // Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+          // Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+        }
+      }
 
-		  def shift_rows(): Unit = {
-	  		Sequential.Foreach(4 by 1){ i => 
-	  			val row = RegFile[UInt8](4)
-	  			Foreach(4 by 1){ j => 
-		  			val col_addr = (j - i) % 4
-		  			row(col_addr) = plaintext_sram(i,j)
-		  		}
-		  		Foreach(4 by 1){ j => 
-		  			plaintext_sram(i,j) = row(j)
-		  		}
-	  		}
-		  }
+      def shift_rows(): Unit = {
+        Sequential.Foreach(4 by 1){ i => 
+          val row = RegFile[UInt8](4) 
+          Foreach(4 by 1){ j => 
+            val col_addr = (j - i) % 4
+            row(col_addr) = plaintext_sram(i,j)
+          }
+          Foreach(4 by 1){ j => 
+            plaintext_sram(i,j) = row(j)
+          }
+        }
+      }
 
-		  def substitute_bytes(): Unit = {
-	  		Sequential.Foreach(4 by 1, 4 by 1){(i,j) => 
-	  			val addr = plaintext_sram(i,j).as[UInt16].as[Int] // Upcast without sign-extend
-	  			val subst = sbox_sram(addr)
-	  			plaintext_sram(i,j) = subst
-	  		}
-		  }
+      def substitute_bytes(): Unit = {
+        Sequential.Foreach(4 by 1, 4 by 1){(i,j) => 
+          val addr = plaintext_sram(i,j).as[UInt16].as[Int] // Upcast without sign-extend
+          val subst = sbox_sram(addr)
+          plaintext_sram(i,j) = subst
+        }
+      }
 
-			def rj_xtime(x: UInt8): UInt8 = {
-				mux(((x & 0x80.to[UInt8]) > 0.to[UInt8]), ((x << 1) ^ 0x1b.to[UInt8]), x << 1)
-			}
+      def rj_xtime(x: UInt8): UInt8 = {
+        mux(((x & 0x80.to[UInt8]) > 0.to[UInt8]), ((x << 1) ^ 0x1b.to[UInt8]), x << 1)
+      }
 
-		  def mix_columns(): Unit = {
-	  		Sequential.Foreach(4 by 1){j => 
-		  		val col = RegFile[UInt8](4)
-		  		Sequential.Foreach(4 by 1) { i => col(i) = plaintext_sram(i,j) }
-		  		val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
-		  		// val e = col(0) ^ col(1) ^ col(2) ^ col(3)
-		  		Pipe{plaintext_sram(0,j) = col(0) ^ e ^ rj_xtime(col(0) ^ col(1))}
-		  		Pipe{plaintext_sram(1,j) = col(1) ^ e ^ rj_xtime(col(1) ^ col(2))}
-		  		Pipe{plaintext_sram(2,j) = col(2) ^ e ^ rj_xtime(col(2) ^ col(3))}
-		  		Pipe{plaintext_sram(3,j) = col(3) ^ e ^ rj_xtime(col(3) ^ col(0))}
-	  		}
-		  }
+      def mix_columns(): Unit = {
+        Sequential.Foreach(4 by 1){j => 
+          val col = RegFile[UInt8](4)
+          Foreach(4 by 1 par 4) { i => col(i) = plaintext_sram(i,j) }
+          val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
+          // val e = col(0) ^ col(1) ^ col(2) ^ col(3)
+          Foreach(4 by 1) { i => 
+            val id1 = (i+1)%4
+            plaintext_sram(i,j) = col(i) ^ e ^ rj_xtime(col(i) ^ col(id1))
+          }
+        }
+      }
 
-		  def add_round_key(round: Index): Unit = {
-	  		Foreach(4 by 1, 4 by 1) { (i,j) => 
-	  			val key = mux(round % 2 == 1, key_sram(i+j*4+16), key_sram(i+j*4))
-	  			plaintext_sram(i,j) = plaintext_sram(i,j) ^ key
-	  		}
-		  }
+      def add_round_key(round: Index): Unit = {
+        Foreach(4 by 1, 4 by 1) { (i,j) => 
+          val key = mux(round % 2 == 1, key_sram(i+j*4+16), key_sram(i+j*4))
+          plaintext_sram(i,j) = plaintext_sram(i,j) ^ key
+        }
+      }
 
-  		// Load structures
-  		Parallel {
-	  		plaintext_flat load plaintext_dram // TODO: Allow dram loads to reshape (gh issue #83)
-	  		sbox_sram load sbox_dram
-	  		key_sram load key_dram
-	  	}
+      // Load structures
+      sbox_sram load sbox_dram(0::256 par par_load)
 
-	  	// gh issue #83
-	  	Foreach(4 by 1, 4 by 1){(i,j) => 
-	  		plaintext_sram(i,j) = plaintext_flat(j*4+i) // MachSuite flattens columnwise... Why????
-	  	} 
+      Foreach(num_bytes by 16 par outer_par){block_id => 
+        plaintext_flat load plaintext_dram(0::16 par par_load) // TODO: Allow dram loads to reshape (gh issue #83)
+        key_sram load key_dram(0::32 par par_load)
+        rcon := 1
 
-	  	// Do AES
-	  	Sequential.Foreach(niter by 1) { round => 
-	  		// SubBytes
-	  		if (round > 0) {
-	  			Pipe{substitute_bytes()}
-	  		}
+        // gh issue #83
+        Sequential.Foreach(4 by 1 par 1){i => 
+          Sequential.Foreach(4 by 1 par 1){j => 
+            plaintext_sram(i,j) = plaintext_flat(j*4+i) // MachSuite flattens columnwise... Why????
+          }
+        }
 
-	  		// ShiftRows
-	  		if (round > 0) {
-	  			Pipe{shift_rows()}
-	  		}
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
 
-	  		// MixColumns
-	  		if (round > 0 && round < 14 ) {
-	  			Pipe{mix_columns()}
-	  		}
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
 
-	  		// Expand key
-	  		if (round > 0 && ((round % 2) == 0)) {
-	  			Pipe{expand_key()}
-	  		}
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
 
-	  		// AddRoundKey
-	  		add_round_key(round)
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
 
-	  	}
+        //   // AddRoundKey
+        //   add_round_key(round)
 
-	  	// Reshape plaintext_sram (gh issue # 83)
-	  	Foreach(4 by 1, 4 by 1) {(i,j) => 
-	  		plaintext_flat(j*4+i) = plaintext_sram(i,j)
-	  	}
+        // }
 
-	  	ciphertext_dram store plaintext_flat
+        /* Partially pipelined version */
+        // Round 0
+        add_round_key(0)
 
-	  	// // Debugging
-	  	// key_debug store key_sram
+        // Rounds 1 - 7
+        Sequential.Foreach(1 until 8 by 1) { round => 
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          if ((round % 2) == 0) {
+            Pipe{expand_key()}
+          }
+          add_round_key(round)
+        }
+        // Rounds 8 - 14
+        Sequential.Foreach(8 until 14 by 1) { round => 
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          if ((round % 2) == 0) {
+            Pipe{expand_key()}
+          }
+          add_round_key(round)
+        }
+        // Round 14
+        Pipe {
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{expand_key()}
+          add_round_key(14)
+        }
 
-  	}
 
-  	val ciphertext = getMem(ciphertext_dram)
-  	val ciphertext_gold = Array[UInt8](142,162,183,202,81,103,69,191,234,252,73,144,75,73,96,137)
+        // /* Totally pipelined version */
+        // // Round 0
+        // add_round_key(0)
+        
+        // // Round 1
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(1)
+        // }
 
-  	printArray(ciphertext_gold, "Expected: ")
-  	printArray(ciphertext, "Got: ")
+        // // Round 2
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(2)
+        // }
 
-  	// // Debugging
-  	// val key_dbg = getMem(key_debug)
-  	// printArray(key_dbg, "Key: ")
+        // // Round 3
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(3)
+        // }
 
-  	val cksum = ciphertext_gold.zip(ciphertext){_ == _}.reduce{_&&_}
-  	println("PASS: " + cksum + " (AES) * For retiming, need to fix ^ reduction if not parallelized")
+        // // Round 4
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(4)
+        // }
+
+        // // Round 5
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(5)
+        // }
+
+        // // Round 6
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(6)
+        // }
+
+        // // Round 7
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(7)
+        // }
+
+        // // Round 8
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(8)
+        // }
+
+        // // Round 9
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(9)
+        // }
+
+        // // Round 10
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(10)
+        // }
+
+        // // Round 11
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(11)
+        // }
+
+        // // Round 12
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   Pipe{expand_key()}
+        //   add_round_key(12)
+        // }
+
+        // // Round 13
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   add_round_key(13)
+        // }
+
+        // // Round 14
+        // Pipe{
+        //   Pipe{substitute_bytes()}
+        //   Pipe{shift_rows()}
+        //   Pipe{expand_key()}
+        //   add_round_key(14)
+        // }
+
+        // Reshape plaintext_sram (gh issue # 83)
+        val ciphertext_flat = SRAM[Int](16)
+        Sequential.Foreach(4 by 1, 4 by 1) {(i,j) => 
+          ciphertext_flat(j*4+i) = plaintext_sram(i,j).as[Int]
+        }
+
+        ciphertext_dram(block_id::block_id+16 par par_store) store ciphertext_flat
+      }
+
+      // // Debugging
+      // key_debug store key_sram
+
+    }
+
+    val ciphertext = getMem(ciphertext_dram)
+    val ciphertext_gold = Array.fill(args(0).to[Int])(Array[Int](142,162,183,202,81,103,69,191,234,252,73,144,75,73,96,137)).flatten
+
+    printArray(ciphertext_gold, "Expected: ")
+    printArray(ciphertext, "Got: ")
+
+    // // Debugging
+    // val key_dbg = getMem(key_debug)
+    // printArray(key_dbg, "Key: ")
+
+    val cksum = ciphertext_gold.zip(ciphertext){_ == _}.reduce{_&&_}
+    println("PASS: " + cksum + " (AES) * For retiming, need to fix ^ reduction if not parallelized")
 
   }
 }
@@ -679,14 +862,16 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
 
       // Build score matrix
       Foreach(length+1 by 1){ r =>
-        Foreach(length+1 by 1) { c => // Bug #151
+        Sequential.Foreach(length+1 by 1) { c => // Bug #151, should be able to remove previous_result reg when fixed
+          val previous_result = Reg[nw_tuple]
           val update = if (r == 0) (nw_tuple(-c.as[Int16], 0)) else if (c == 0) (nw_tuple(-r.as[Int16], 1)) else {
             val match_score = mux(seqa_sram_raw(c-1) == seqb_sram_raw(r-1), MATCH_SCORE.to[Int16], MISMATCH_SCORE.to[Int16])
             val from_top = score_matrix(r-1, c).score + GAP_SCORE
-            val from_left = score_matrix(r, c-1).score + GAP_SCORE
+            val from_left = previous_result.score + GAP_SCORE
             val from_diag = score_matrix(r-1, c-1).score + match_score
             mux(from_left >= from_top && from_left >= from_diag, nw_tuple(from_left, SKIPB), mux(from_top >= from_diag, nw_tuple(from_top,SKIPA), nw_tuple(from_diag, ALIGN)))
           }
+          previous_result := update
           score_matrix(r,c) = update
         }
       }
@@ -1000,7 +1185,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
         val b1z_start = max(0.to[Int],b0z-1.to[Int])
         val b1z_end = min(BLOCK_SIDE.to[Int], b0z+2.to[Int])
         MemReduce(b0_cube_forces)(b1x_start until b1x_end by 1, b1y_start until b1y_end by 1, b1z_start until b1z_end by 1) { (b1x, b1y, b1z) => 
-          val b1_cube_contributions = SRAM[XYZ](density)
+          val b1_cube_contributions = SRAM.buffer[XYZ](density)
           // Iterate over points in b0
           val p_range = npoints_sram(b0x, b0y, b0z)
           val q_range = npoints_sram(b1x, b1y, b1z)
@@ -1068,7 +1253,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
   }
 }      
 
-object KMP extends SpatialApp { // Regression (Dense) // Args: none
+object KMP extends SpatialApp { // Regression (Dense) // Args: the
   override val target = AWS_F1
 
 
@@ -1077,16 +1262,20 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: none
   Knuth-Morris-Pratt
 
   Used https://www.browserling.com/tools/text-to-hex to convert string to hex, and then converted hex to dec                                                               
-                                                                                             
+                           
+  Machsuite, and therefore this implementation, will hang infinitely if the first char of the pattern appears later on
+   in the pattern and it also gets the same WRONG answer for pattern "these" ... -____-                                                                  
                                                                                                            
  */
 
   @virtualize
   def main() = {
     val raw_string_data = loadCSV1D[MString]("/remote/regression/data/machsuite/kmp_string.csv", "\n")
-    val raw_string_pattern = "bull"//Array[Int](98,117,108,108)
+    val raw_string_pattern = args(0).to[MString]//"bull"//Array[Int](98,117,108,108)
     val raw_string = argon.lang.String.string2num(raw_string_data(0))
     val raw_pattern = argon.lang.String.string2num(raw_string_pattern)
+    val par_load = 16
+    val outer_par = 4 (1 -> 1 -> 16)
     val STRING_SIZE_NUM = raw_string.length.to[Int]
     val PATTERN_SIZE_NUM = raw_pattern.length.to[Int]
     val STRING_SIZE = ArgIn[Int]
@@ -1101,13 +1290,10 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: none
     setMem(pattern_dram, raw_pattern)
 
     Accel{
-      val string_sram = SRAM[Int8](32411) // Conveniently sized
       val pattern_sram = SRAM[Int8](4) // Conveniently sized
       val kmp_next = SRAM[Int](4) // Conveniently sized
-      val num_matches = Reg[Int](0)
 
-      string_sram load string_dram
-      pattern_sram load pattern_dram
+      pattern_sram load pattern_dram(0::PATTERN_SIZE) // too tiny for par
 
       // Init kmp_next
       val k = Reg[Int](0)
@@ -1122,28 +1308,41 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: none
         kmp_next(q) = k
       }
 
-      // Scan string
-      val q = Reg[Int](0)
-      Sequential.Foreach(0 until STRING_SIZE) { i => 
-        // val whileCond = Reg[Bit](false)
-        FSM[Int](state => state != 1) { state => 
-          // whileCond := (q > 0) && (pattern_sram(i) != pattern_sram(q))
-          if ((q > 0) && (string_sram(i) != pattern_sram(q))) q := kmp_next(q)
-        }{state => mux((q > 0) && (string_sram(i) != pattern_sram(q)), 0, 1)}
-        if (pattern_sram(q) == string_sram(i)) { q :+= 1 }
-        if (q >= PATTERN_SIZE) {
-          Pipe{
-            num_matches :+= 1
-            val bump = kmp_next(q - 1)
-            q := bump
+      // Scan string portions
+      val global_matches = Sequential.Reduce(Reg[Int](0))(STRING_SIZE by (STRING_SIZE/outer_par) by STRING_SIZE/outer_par par outer_par) {chunk => 
+        val num_matches = Reg[Int](0)
+        num_matches.reset
+        val string_sram = SRAM[Int8](32411) // Conveniently sized
+        string_sram load string_dram(chunk::chunk + (STRING_SIZE/outer_par) + (PATTERN_SIZE-1) par par_load)
+        val q = Reg[Int](0)
+        Sequential.Foreach(0 until STRING_SIZE/outer_par + PATTERN_SIZE-1 by 1) { i => 
+          // val whileCond = Reg[Bit](false)
+          FSM[Int](state => state != 1) { state => 
+            // whileCond := (q > 0) && (pattern_sram(i) != pattern_sram(q))
+            if ((q > 0) && (string_sram(i) != pattern_sram(q))) q := kmp_next(q)
+          }{state => mux((q > 0) && (string_sram(i) != pattern_sram(q)), 0, 1)}
+          if (pattern_sram(q) == string_sram(i)) { q :+= 1 }
+          if (q >= PATTERN_SIZE) {
+            Pipe{
+              num_matches :+= 1
+              val bump = kmp_next(q - 1)
+              q := bump
+            }
           }
         }
-      }
+        num_matches
+      }{_+_}
 
-      nmatches := num_matches
+      nmatches := global_matches
     }
 
-    val gold_nmatches = 12
+    var gold_nmatches = 0
+    val pattern_length = raw_string_pattern.length
+    val string_length = raw_string_data.apply(0).length
+    for (i <- 0 until string_length) {
+      val substr = raw_string_data.apply(0).apply(i,i+pattern_length)
+      if (substr == raw_string_pattern) gold_nmatches = gold_nmatches + 1
+    }
     val computed_nmatches = getArg(nmatches)
 
     println("Expected " + gold_nmatches + " matches")
@@ -1315,6 +1514,9 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
     val levels = STOP-START //ArgIn[Int]
     // setArg(levels, args(0).to[Int])
 
+    val par_load = 16
+    val par_store = 16
+
     val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/sort_data.csv", "\n")
 
     val data_dram = DRAM[Int](numel)
@@ -1327,7 +1529,7 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
       val lower_fifo = FIFO[Int](numel/2)
       val upper_fifo = FIFO[Int](numel/2)
 
-      data_sram load data_dram
+      data_sram load data_dram(0::numel par par_load)
 
 
       FSM[Int,Int](1){m => m < levels} { m =>
@@ -1337,28 +1539,20 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
           val to = min(i+m+m-1, STOP.to[Int])
           val lower_tmp = Reg[Int](0)
           val upper_tmp = Reg[Int](0)
-          Foreach(from until mid+1 by 1){ i => if (i == from) {lower_tmp := data_sram(i)} else {lower_fifo.enq(data_sram(i))} }
-          Foreach(mid+1 until to+1 by 1){ j => if (j == mid+1) {upper_tmp := data_sram(j)} else {upper_fifo.enq(data_sram(j))} }
+          Foreach(from until mid+1 by 1){ i => lower_fifo.enq(data_sram(i)) }
+          Foreach(mid+1 until to+1 by 1){ j => upper_fifo.enq(data_sram(j)) }
           Sequential.Foreach(from until to+1 by 1) { k => 
-            if (lower_tmp < upper_tmp) {
-              Pipe{
-                data_sram(k) = lower_tmp
-                val next_lower = if (lower_fifo.empty) {0x7FFFFFFF.to[Int]} else {lower_fifo.deq()}
-                lower_tmp := next_lower
-              }
-            } else {
-              Pipe {
-                data_sram(k) = upper_tmp
-                val next_upper = if (upper_fifo.empty) {0x7FFFFFFF.to[Int]} else {upper_fifo.deq()}
-                upper_tmp := next_upper
-              }
-            }
+            data_sram(k) = 
+              if (lower_fifo.empty) { upper_fifo.deq() }
+              else if (upper_fifo.empty) { lower_fifo.deq() }
+              else if (lower_fifo.peek < upper_fifo.peek) { lower_fifo.deq() }
+              else { upper_fifo.deq() }
           }
         }{ i => i + m + m }
       }{ m => m + m}
 
       // sorted_dram store data_sram
-      data_dram store data_sram
+      data_dram(0::numel par par_store) store data_sram
     }
 
     val sorted_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/sort_gold.csv", "\n")
@@ -1369,11 +1563,11 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
 
     val cksum = sorted_gold.zip(sorted_result){_==_}.reduce{_&&_}
     // // Use the real way to check if list is sorted instead of using machsuite gold
-    // // This way says I've done goofed, issue #
     // val cksum = Array.tabulate(STOP-1){ i => pack(sorted_result(i), sorted_result(i+1)) }.map{a => a._1 <= a._2}.reduce{_&&_}
     println("PASS: " + cksum + " (Sort_Merge)")
   }
 }
+
 
 object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
@@ -1714,7 +1908,8 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: none
     val training_sets =   163
     val sets_to_do = ArgIn[Int]
     // setArg(sets_to_do, args(0).to[Int])
-    setArg(sets_to_do, training_sets)
+    // setArg(sets_to_do, training_sets)
+    setArg(sets_to_do, 20)
     val nodes_per_layer =  64
     val layers =            2
     val learning_rate =  0.01.to[T]
@@ -2064,7 +2259,7 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: none
     println("Results: W1 " + cksumW1 + ", W2 " + cksumW2 + ", W3 " + cksumW3 + ", B1 " + cksumB1 + ", B2 " + cksumB2 + ", B3 " + cksumB3)
 
     val cksum = /*cksumW1 &&*/ cksumW2 && cksumW3 /*&& cksumB1*/ && cksumB2 && cksumB3
-    println("PASS: " + cksum + " (Backprop) * seems like this may be saturating, need to revisit when floats are implemented")
+    println("PASS: " + cksum + " (Backprop) * seems like this may be saturating, need to revisit when floats are implemented, and add full 163 training points")
 
   }
 }
