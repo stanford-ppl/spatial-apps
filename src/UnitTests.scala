@@ -635,7 +635,7 @@ object MemTest2D extends SpatialApp { // Regression (Unit) // Args: 7
 
 object FifoLoad extends SpatialApp { // Regression (Unit) // Args: 192
 
-  @virtualize
+
   def fifoLoad[T:Type:Num](srcHost: Array[T], N: Int) = {
     val tileSize = 16 (64 -> 64)
 
@@ -651,9 +651,8 @@ object FifoLoad extends SpatialApp { // Regression (Unit) // Args: 192
       Sequential.Foreach(size by tileSize) { i =>
         f1 load srcFPGA(i::i + tileSize par 16)
         val b1 = SRAM[T](tileSize)
-        Sequential.Foreach(tileSize by 1) { i =>
-          Pipe{b1(i) = f1.peek()}
-          Pipe{f1.deq()}
+        Foreach(tileSize by 1) { i =>
+          b1(i) = f1.deq()
         }
         dstFPGA(i::i + tileSize par 16) store b1
       }
@@ -1735,8 +1734,6 @@ object FifoPushPop extends SpatialApp { // Regression (Unit) // Args: 384
 
 
 object StreamTest extends SpatialApp {
-
-
    override val target = targets.DE1
 
    @virtualize
@@ -1994,12 +1991,8 @@ object FifoStackFSM extends SpatialApp { // Regression (Unit) // Args: none
         if (state == init || state == fill) {
           stack_almost.push(stack_almost.numel)
         } else {
-          Pipe{
-            Pipe{ 
-              val x = stack_almost.peek
-              stack_accum_almost := stack_accum_almost + x
-            }
-            Pipe{stack_almost.pop()}
+          Pipe{            
+            stack_accum_almost := stack_accum_almost + stack_almost.pop()
           }
         }
       } { state => mux(state == 0, fill, mux(stack_almost.almostFull() && state == fill, drain, mux(stack_almost.almostEmpty() && state == drain, done, state))) }
@@ -2048,41 +2041,6 @@ object FifoStackFSM extends SpatialApp { // Regression (Unit) // Args: none
     val cksum6 = stack_sum_almost_gold == stack_sum_almost_res
     val cksum = cksum1 && cksum2 && cksum3 && cksum4 && cksum5 && cksum6
     println("PASS: " + cksum + " (FifoStackFSM)")
-  }
-}
-
-
-object LaneMaskPar extends SpatialApp { // Regression (Unit) // Args: 13
-/* 
-  This app is for testing the valids that get passed to each child of a metapipe,
-  and before this bug was caught in MD_Grid, the enable for all stages was computed
-  based on the current counter value for stage 0
-*/
-
-  @virtualize
-  def main() {
-
-    val x = ArgIn[Int] // Should NOT be multiple of 4
-    val y = ArgOut[Int]
-    setArg(x, args(0).to[Int])
-
-    Accel {
-      y := Reduce(Reg[Int](0))(x by 1 par 4) {i => 
-        val dummy = Reg.buffer[Int]
-        Pipe{dummy := i}
-        Foreach(4 by 1){j => dummy := j}
-        Pipe{dummy := i}
-        dummy.value
-      }{_+_}
-      
-    }
-
-    val gold = Array.tabulate(x){i => i}.reduce{_+_}
-    println("Wanted " + gold)
-    println("Got " + getArg(y))
-
-    val cksum = gold == getArg(y)
-    println("PASS: " + cksum + " (LaneMaskPar)")
   }
 }
 
