@@ -916,7 +916,7 @@ x_par=4  |  --->            X                XX    |
 
     val par_load = 16
     val par_store = 16
-    val x_par = 1 (1 -> 1 -> 16)
+    val x_par = 4 (1 -> 1 -> 16)
 
     // Square
     val bias_matrix = (0::ROWS, 0::COLS){(i,j) => if (i > ROWS/4 && i < 3*ROWS/4 && j > COLS/4 && j < 3*COLS/4) -1.to[Int] else 1.to[Int]}
@@ -983,30 +983,36 @@ x_par=4  |  --->            X                XX    |
     Accel{
       val exp_sram = SRAM[T](lut_size)
       val grid_sram = SRAM[Int](ROWS,COLS)
-      val bias_sram = SRAM[Int](ROWS,COLS)
       exp_sram load exp_lut
       grid_sram load grid_dram(0::ROWS, 0::COLS par par_load)
-      bias_sram load bias_dram(0::ROWS, 0::COLS par par_load)
+      // Issue #187
+      // val bias_sram = SRAM[Int](ROWS,COLS)
+      // bias_sram load bias_dram(0::ROWS, 0::COLS par par_load)
+
 
       Foreach(iters by 1) { iter =>
         Foreach(ROWS by 1 par x_par) { i => 
+          val bias_sram = SRAM[Int](ROWS,COLS)
+          if (iters == 0 && i < x_par) {
+            bias_sram load bias_dram(0::ROWS, 0::COLS par par_load)
+          }
           // Update each point in active row
           val this_body = i % x_par
-          Sequential.Foreach(-x_par until COLS+x_par by 1) { j => 
-            val col = j - this_body
-            if (col >= 0 && col < COLS) {
-              val N = grid_sram((i+1)%ROWS, col)
-              val E = grid_sram(i, (col+1)%COLS)
-              val S = grid_sram((i-1)%ROWS, col)
-              val W = grid_sram(i, (col-1)%COLS)
-              val self = grid_sram(i,col)
-              val sum = (N+E+S+W)*self
-              val p_flip = exp_sram(-sum+lut_size/2)
-              val pi_x = exp_sram(sum+4) * mux((bias_sram(i,col) * self) < 0, exp_posbias, exp_negbias)
-              val threshold = min(1.to[T], pi_x)
-              val rng = unif[_16]()
-              val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(31::16).as[PROB], 1.to[T], 0.to[T]))
-              grid_sram(i,col) = mux(flip == 1.to[T], -self, self)
+          Sequential.Foreach(-this_body until COLS by 1) { j => 
+            // val col = j - this_body
+            val N = grid_sram((i+1)%ROWS, j)
+            val E = grid_sram(i, (j+1)%COLS)
+            val S = grid_sram((i-1)%ROWS, j)
+            val W = grid_sram(i, (j-1)%COLS)
+            val self = grid_sram(i,j)
+            val sum = (N+E+S+W)*self
+            val p_flip = exp_sram(-sum+lut_size/2)
+            val pi_x = exp_sram(sum+4) * mux((bias_sram(i,j) * self) < 0, exp_posbias, exp_negbias)
+            val threshold = min(1.to[T], pi_x)
+            val rng = unif[_16]()
+            val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(31::16).as[PROB], 1.to[T], 0.to[T]))
+            if (j >= 0 && j < COLS) {
+              grid_sram(i,j) = mux(flip == 1.to[T], -self, self)
             }
           }
         }
