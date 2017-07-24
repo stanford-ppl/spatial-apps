@@ -993,7 +993,7 @@ x_par=4  |  --->            X                XX    |
       Foreach(iters by 1) { iter =>
         Foreach(ROWS by 1 par x_par) { i => 
           val bias_sram = SRAM[Int](ROWS,COLS)
-          if (iters == 0 && i < x_par) {
+          if (iters == 0.to[Int] && i < x_par) {
             bias_sram load bias_dram(0::ROWS, 0::COLS par par_load)
           }
           // Update each point in active row
@@ -1247,6 +1247,11 @@ object BFS_Queue extends SpatialApp { // Regression (Sparse) // Args: none
     val N_LEVELS = 10
     val unvisited = -1
     val start_id = 38
+
+    val par_load = 16
+    val par_store = 16
+    val nodes_par = 16 (1 -> 16 -> 32)
+    val 
 
     val nodes_raw = loadCSV1D[Int]("/remote/regression/data/machsuite/bfs_nodes.csv", "\n")
     val edges_data = loadCSV1D[Int]("/remote/regression/data/machsuite/bfs_edges.csv", "\n")
