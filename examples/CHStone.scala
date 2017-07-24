@@ -630,7 +630,7 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
 
       jpeg_init_decompress()
 
-      // decode_start()
+      decode_start()
 
 
     }
