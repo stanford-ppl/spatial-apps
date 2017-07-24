@@ -31,11 +31,18 @@ trait RaoBlackParticleFilter extends SpatialStream {
   
   @virtualize
   def acos(x: SReal) = {
-    val r = acosLUT((x*(lutP.toDouble)).to[Index])
-    if (x >= 0)
-      r
-    else
-      PI - r
+    val ind = (x*(lutP.toDouble)).to[Index]
+    if (ind <= 0)
+      0
+    else if (ind >= lutAcos)
+      PI
+    else {
+      val r = acosLUT(ind)
+      if (x >= 0)
+        r
+      else
+        PI - r
+    }
   }
 
   @virtualize
@@ -50,7 +57,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
       expLUT((((x+10)/10.0)*(lutP.toDouble)).to[Index])
   }
   
-  val N: scala.Int                                                    = 1
+  val N: scala.Int                                  = 10
   val initV: (SCReal, SCReal, SCReal)               = (0.0, 0.0, 0.0)
   val initP: (SCReal, SCReal, SCReal)               = (0.0, 0.0, 0.0)
   val initQ: (SCReal, SCReal, SCReal, SCReal) = (1.0, 0.0, 0.0, 0.0)
@@ -58,8 +65,8 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
 
   val initTime: SCReal  = 0.0
-  val covGyro: SCReal   = 0.01
-  val covAcc: SCReal    = 0.01
+  val covGyro: SCReal   = 1.0
+  val covAcc: SCReal    = 0.1
   val covViconP: SCReal = 0.01
   val covViconQ: SCReal = 0.01
 
@@ -83,6 +90,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
 
   val matrix = new Matrix[SReal] {
+    val IN_PLACE = false
     def sqrtT(x: SReal) = sqrt(x)
     val zero = 0.to[SReal]
     val one = 1.to[SReal]
@@ -154,7 +162,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
           if (i == j)
             covs(x, i, i) = initCov
           else 
-            covs(x, i, i) = 0
+            covs(x, i, j) = 0
         )
       }
     })
@@ -166,7 +174,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
     val inSIMU     = StreamIn[SIMU](In1)
     val inV       = StreamIn[SVicon](In2)
     val out       = StreamOut[SVicon](Out1)
-    val parFactor = N (1 -> N)
+    val parFactor = 1 (1 -> N)
 
     Accel {
 
@@ -195,42 +203,43 @@ trait RaoBlackParticleFilter extends SpatialStream {
           val choice = Reg[Int]
           val dt = Reg[SReal]          
           FSM[Boolean, Boolean](true)(x => x)(x => {
-            
-            if ((fifoV.empty && !fifoSIMU.empty) || (!fifoSIMU.empty && !fifoV.empty && fifoSIMU.peek.t < fifoV.peek.t)) {
-              choice := 0
-              val imu = fifoSIMU.peek
-              val t = imu.t
-              lastO := imu.g
-              dt := t - lastSTime
-              lastSTime := t              
-            }
-            else if (!fifoV.empty) {
-              choice := 1
-              val t = fifoV.peek.t
-              dt := t - lastSTime
-              lastSTime := t
-            }
-            else
+            Sequential {
+              if ((fifoV.empty && !fifoSIMU.empty) || (!fifoSIMU.empty && !fifoV.empty && fifoSIMU.peek.t < fifoV.peek.t)) {
+                choice := 0
+                val imu = fifoSIMU.peek
+                val t = imu.t
+                lastO := imu.g
+                dt := t - lastSTime
+                lastSTime := t
+              }
+              else if (!fifoV.empty) {
+                choice := 1
+                val t = fifoV.peek.t
+                dt := t - lastSTime
+                lastSTime := t
+              }
+              else
                 choice := -1
 
-            if (choice.value != -1) {
-              updateAtt(dt, lastO, particles, parFactor)
-            }
-            if (choice.value == 0) {
-              val imu = fifoSIMU.deq()
-              imuUpdate(imu.a, particles, parFactor)
-            }
-            if (choice.value != -1) {
-              kalmanPredictParticle(dt, particles, states, covs, parFactor)
-            }
-            if (choice.value == 1) {
-              val v = fifoV.deq()
-              viconUpdate(v.pose, dt, particles, states, covs, parFactor)
-            }
-            if (choice.value != -1) {
-              normWeights(particles, parFactor)
-              out := SVicon(lastSTime, averageSPOSE(particles, states, parFactor))
-              resample(particles, states, covs, parFactor)
+              if (choice.value != -1) {
+                updateAtt(dt, lastO, particles, parFactor)
+              }
+              if (choice.value == 0) {
+                val imu = fifoSIMU.deq()
+                imuUpdate(imu.a, particles, parFactor)
+              }
+              if (choice.value != -1) {
+                kalmanPredictParticle(dt, particles, states, covs, parFactor)
+              }
+              if (choice.value == 1) {
+                val v = fifoV.deq()
+                viconUpdate(v.pose, dt, particles, states, covs, parFactor)
+              }
+              if (choice.value != -1) {
+                normWeights(particles, parFactor)
+                out := SVicon(lastSTime, averageSPOSE(particles, states, parFactor))
+                resample(particles, states, covs, parFactor)
+              }
             }
           })(x => (!fifoV.empty || !fifoSIMU.empty))
 
@@ -253,7 +262,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
     particles: SRAM1[Particle],
     parFactor: Int
   ) = {
-    Sequential.Foreach(0::N par parFactor)(i => {
+    Foreach(0::N par parFactor)(i => {
       val pp = particles(i)
       val nq = 
         if (dt > 0.00001)
@@ -272,7 +281,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
     covs: SRAM3[SReal],
     parFactor: Int
   ) = {
-    Sequential.Foreach(0::N par parFactor)(i => {
+    Foreach(0::N par parFactor)(i => {
 
       val pp = particles(i)
 
@@ -322,7 +331,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   @virtualize
   def imuUpdate(acc: SAcceleration, particles: SRAM1[Particle], parFactor: Int) = {
-    Sequential.Foreach(0::N par parFactor)(i => {
+    Foreach(0::N par parFactor)(i => {
       val pp = particles(i)
       val na = pp.q.rotate(acc)
       particles(i) = Particle(pp.w, pp.q, na, pp.q)
@@ -338,7 +347,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
     covs: SRAM3[SReal],
     parFactor: Int) = {
 
-    Sequential.Foreach(0::N par parFactor)(i => {
+    Foreach(0::N par parFactor)(i => {
       
       val pp = particles(i)
 
@@ -477,8 +486,9 @@ trait RaoBlackParticleFilter extends SpatialStream {
       })
       particles(i) = Particle(log(1.0/N), p.q, p.lastA, p.lastQ)
     })
-
   }
+
+
 
   def unnormalizedGaussianLogPdf(measurement: Matrix, state: Matrix, cov: Matrix): SReal = {
     val e = (measurement :- state)
@@ -543,11 +553,26 @@ object RaoBlackParticleFilterInterpreter extends RaoBlackParticleFilter with Spa
   val outs = List(Out1)
 
   val inputs = collection.immutable.Map[Bus, List[MetaAny[_]]](
-    (In1 -> List[SReal](3f, 4f, 2f, 6f).map(x => SIMU(x / 10, SVec3(x, x, x), SVec3(x / 100, x / 100, x / 100)))),
-    (In2 -> List[SReal](3.5f, 5f).map(x => SVicon(x / 10, SPOSE(SVec3(x, x, x), SQuat(1, 0, 0, 0)))))
-  )
+    (In1 -> List[SIMU](
+      SIMU(0.0, SVec3(0.25592961314469886, 0.07098284446822825, 0.21456271801876464), SVec3(-1.5064973528139753, -0.616587623133762, -1.2282747703297874)),
+      SIMU(0.005, SVec3(0.25592961314469886, 0.07098284446822825, 0.21456271801876464), SVec3(-1.5064973528139753, -0.616587623133762, -1.2282747703297874)),
+      SIMU(0.01, SVec3(-0.028161957507305768, 0.5264671724413507, -0.08577696872942979), SVec3(-8.614952996266531, -3.699394514006443, -1.2972430998591449)),
+      SIMU(0.015, SVec3(0.5872729169473, 1.3887486685548156, 0.05238849400043921),SVec3(-7.587044288799566, -4.571689569385891, 1.3110956660901323)),
+      SIMU(0.02, SVec3(-1.2583237251856354, 1.4047261203145096, 1.066904859524985),SVec3(-6.119550697150657, -1.7511569969392748, -0.7289420270309247))
+    )),
+    (In2 -> List[SVicon](SVicon(0.025, SPOSE(SVec3(0.0747780945262634, 0.10808064129411422, -0.10529076833659502), SQuat(0.9962501245604087, -0.04308471266603672, -0.01947353436952111, -0.07245811415579231))))
+  ))
 
 }
 
 object RaoBlackParticleFilterCompiler extends RaoBlackParticleFilter with SpatialStreamCompiler
 
+
+/* DATA
+[toPoints]: TF[0.00] TrajectoryPoint(DenseVector(0.0, 0.0, 0.0),DenseVector(0.0, 0.0, 0.0),DenseVector(0.0, 0.0, 0.0),DenseVector(-37.00014407662634, 86.84166419242068, 10.523938717792923),DenseVector(0.0, 0.0, 1.0),(1.0 + 0.0i + 0.0j + 0.0k),9.81,DenseVector(0.0, 0.0, 0.0))
+[toPoints]: TF[0.01] TrajectoryPoint(DenseVector(-7.645964651320439E-7, 1.7963549928932355E-6, 2.1837004810941414E-7),DenseVector(-4.575124958068485E-4, 0.001075248724922495, 1.3084649880258688E-4),DenseVector(-0.18084536701814624, 0.425311731034842, 0.07405368621675425),DenseVector(-35.80581966497862, 84.38236328814914, 10.35552824406629),DenseVector(-0.018434797861176987, 0.04335491651731315, 0.9988896382692106),(0.9997223710283797 + -0.02168347822041606i + -0.009219958658229159j + 0.0k),9.87316103763771,DenseVector(-8.528830507218192, -3.62049527991325, 1.3057038059774835E-4))
+[toPoints]: TF[0.01] TrajectoryPoint(DenseVector(-6.0670600176474915E-6, 1.4268469033661097E-5, 1.7399473812538917E-6),DenseVector(-0.0018101963901097265, 0.0042601065128119835, 5.205832534320919E-4),DenseVector(-0.3528332025733467, 0.8315013374973425, 0.18752229855317967),DenseVector(-34.62393055168155, 81.94705315024433, 10.188101638464804),DenseVector(-0.03596668731634523, 0.08476058486211442, 0.995751997566322),(0.9989374348692519 + -0.04242537215216511i + -0.01800247245767339j + 0.0k),9.955849394678799,DenseVector(-8.148301826046563, -3.4440965481316588, 5.73110384850643E-4))
+[toPoints]: TF[0.02] TrajectoryPoint(DenseVector(-2.03092500460876E-5, 4.781193064970317E-5, 5.848708867091625E-6),DenseVector(-0.004028504455076206, 0.009493690610220843, 0.0011650245987484776),DenseVector(-0.5153587990907468, 1.2170700968958759, 0.33520587112180383),DenseVector(-33.45447673673513, 79.5357337787062, 10.021658900988463),DenseVector(-0.052534026410881424, 0.12406423006074165, 0.9908825575659793),(0.9977180357109867 + -0.062173993864073976i + -0.026327090686220283j + 0.0k),10.05576376084406,DenseVector(-7.753707879951792, -3.262368095199566, 0.0013010856075564362))
+[toPoints]: TF[0.02] TrajectoryPoint(DenseVector(-4.774606700597842E-5, 1.1251941402407888E-4, 1.3807764539338446E-5),DenseVector(-0.00708320034533263, 0.01671571803286062, 0.0020600094663148355),DenseVector(-0.6680817013561959, 1.581129095901126, 0.5120103995746261),DenseVector(-32.29745822013937, 77.1484051735348, 9.856200031637268),DenseVector(-0.0681021102299894, 0.161175239133652, 0.9845733313839211),(0.9961358670843855 + -0.08090022880382762i + -0.03418314332427319j + 0.0k),10.170674780450891,DenseVector(-7.352552831116772, -3.078562026781905, 0.0022858276136445165))
+[toPoints]: TF[0.03] TrajectoryPoint(DenseVector(-9.248700683212461E-5, 2.181836778413033E-4, 2.6859480581283463E-5),DenseVector(-0.010945358597964102, 0.02586650556560204, 0.0032014013843973863),DenseVector(-0.8108896433987998, 1.9233196281930298, 0.7130805012581392),DenseVector(-31.152875001894255, 74.7850673347301, 9.69172503041122),DenseVector(-0.08265949473993882, 0.19605704670673085, 0.9771023704637979),(0.9942591137283574 + -0.09859454341411035i + -0.04156838675080141j + 0.0k),10.298454755507995,DenseVector(-6.951231178340113, -2.8954286157512206, 0.0034980857699019635))
+*/

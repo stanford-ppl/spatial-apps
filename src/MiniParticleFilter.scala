@@ -9,8 +9,6 @@ import spatial.stdlib._
 trait MiniParticleFilter extends SpatialStream {
 
   type CReal = scala.Double
-//  type Real  = Double
-
   type Real  = FixPt[TRUE, _16, _16]
 
   implicit def toReal(x: CReal) = x.to[Real]
@@ -28,12 +26,13 @@ trait MiniParticleFilter extends SpatialStream {
     logLUT(((x/20.0)*(lutP.toDouble)).to[Index])
 
   @virtualize
-  def exp(x: Real): Real = {
+  def exp(x: Real): Real = 
     if (x >= 0.0)
       1
     else
       expLUT((((x+10)/10.0)*(lutP.toDouble)).to[Index])
-  }
+
+
   val N: scala.Int          = 10
   val initV: (CReal, CReal) = (0.0, 0.0)
   val initP: (CReal, CReal) = (0.0, 0.0)
@@ -50,6 +49,7 @@ trait MiniParticleFilter extends SpatialStream {
   type Weight       = Real
 
   val matrix = new Matrix[Real] {
+    val IN_PLACE = false    
     def sqrtT(x: Real) = sqrt(x)
     val zero           = 0
     val one            = 1
@@ -78,9 +78,7 @@ trait MiniParticleFilter extends SpatialStream {
         Pipe { states(x, 3) = initP._2 }
       }
 
-      Parallel {
-        weights(x) = math.log(1.0 / N)
-      }
+      weights(x) = math.log(1.0 / N)
 
     })
   }
