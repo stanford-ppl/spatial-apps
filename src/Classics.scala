@@ -958,15 +958,34 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
 }
 
-/*
+
+object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3 2
+  /*
   Implementation based on http://cs.stanford.edu/people/karpathy/visml/ising_example.html
    pi(x) = exp(J* 𝚺x_j*x_i + J_b * 𝚺b_i*x_i)        
    let x' = x with one entry flipped
    Prob(accept x') ~ min(1, pi(x')/pi(x)) = exp(-2*J*𝚺x_j*x_i)*exp(-2*J_b*𝚺b_i*x_i)
   Use args 100 0.4 0 to get a nice looking lava lamp pattern, or 0.8 for scala
-*/
 
-object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3 2
+                           
+          _________________________________________
+         |                                         |
+         |   --->                                  |
+x_par=4  |  --->            X                XX    |
+         | --->                            XXXX    |
+         |--->          .------------.X   X XXX    |
+         |          X   .BIAS REGION .  XX   X     |
+         |            XX.            .     XX      |
+         |              .     X XX   .             |
+         |X             .      XXXXX .             |
+         |              .      XXXX  .             |
+         |      X XXX   .------------.             |
+         |     X XXX        XX         X           |
+         |                                         |
+         |                                  X      |
+         |_________________________________________|
+
+  */
   type T = FixPt[TRUE,_32,_32]
   type PROB = FixPt[FALSE, _0, _16]
   @virtualize
@@ -1006,6 +1025,10 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
     val grid_init = (0::ROWS, 0::COLS){(i,j) => if ((i+j)%2 == 0) -1.to[Int] else 1.to[Int]}
     // // Square
     // val grid_init = (0::ROWS, 0::COLS){(i,j) => if (i > ROWS/4 && i < 3*ROWS/4 && j > COLS/4 && j < 3*COLS/4) -1.to[Int] else 1.to[Int]}
+
+    val par_load = 16
+    val par_store = 16
+    val x_par = 4 (1 -> 1 -> 16)
 
     // Square
     val bias_matrix = (0::ROWS, 0::COLS){(i,j) => if (i > ROWS/4 && i < 3*ROWS/4 && j > COLS/4 && j < 3*COLS/4) -1.to[Int] else 1.to[Int]}
@@ -1072,15 +1095,19 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
     Accel{
       val exp_sram = SRAM[T](lut_size)
       val grid_sram = SRAM[Int](ROWS,COLS)
-      val bias_sram = SRAM[Int](ROWS,COLS)
       exp_sram load exp_lut
-      grid_sram load grid_dram
-      bias_sram load bias_dram
+      grid_sram load grid_dram(0::ROWS, 0::COLS par par_load)
+      // Issue #187
+      val bias_sram = SRAM[Int](ROWS,COLS)
+      bias_sram load bias_dram(0::ROWS, 0::COLS par par_load)
+
 
       Foreach(iters by 1) { iter =>
-        Sequential.Foreach(ROWS by 1) { i => 
+        Foreach(ROWS by 1 par x_par) { i => 
           // Update each point in active row
-          Sequential.Foreach(0 until COLS by 1) { j => 
+          val this_body = i % x_par
+          Sequential.Foreach(-this_body until COLS by 1) { j => 
+            // val col = j - this_body
             val N = grid_sram((i+1)%ROWS, j)
             val E = grid_sram(i, (j+1)%COLS)
             val S = grid_sram((i-1)%ROWS, j)
@@ -1092,11 +1119,13 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
             val threshold = min(1.to[T], pi_x)
             val rng = unif[_16]()
             val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(31::16).as[PROB], 1.to[T], 0.to[T]))
-            grid_sram(i,j) = mux(flip == 1.to[T], -self, self)
+            if (j >= 0 && j < COLS) {
+              grid_sram(i,j) = mux(flip == 1.to[T], -self, self)
+            }
           }
         }
       }
-      grid_dram store grid_sram
+      grid_dram(0::ROWS, 0::COLS par par_store) store grid_sram
     }
 
     val result = getMatrix(grid_dram)
@@ -1131,7 +1160,7 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
     }.reduce{_+_}
     println("Found " + blips_inside + " blips inside the bias region and " + blips_outside + " blips outside the bias region")
     val cksum = (blips_inside + blips_outside) < (ROWS*COLS/8)
-    println("PASS: " + cksum + " (Gibbs_Ising2D) * Scala and Chisel selection of J seem to not agree")
+    println("PASS: " + cksum + " (Gibbs_Ising2D)")
 
   }
 }
