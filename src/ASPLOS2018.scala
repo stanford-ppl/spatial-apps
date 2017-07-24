@@ -394,7 +394,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 
-// rework
+// good
 object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -454,13 +454,13 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val par_load = 8 // Wider data type
     val par_store = 8 // Wider data type
     val loop_grid0_x = 2 (1 -> 1 -> 16)
-    val loop_grid0_y = 2 (1 -> 1 -> 16)
+    val loop_grid0_y = 1 (1 -> 1 -> 16)
     val loop_grid0_z = 2 (1 -> 1 -> 16)
     val loop_grid1_x = 1 (1 -> 1 -> 16)
     val loop_grid1_y = 1 (1 -> 1 -> 16)
     val loop_grid1_z = 2 (1 -> 1 -> 16)
-    val loop_p =       2 (1 -> 1 -> 16)
-    val loop_q =       2 (1 -> 1 -> 16)
+    val loop_p =       1 (1 -> 1 -> 16)
+    val loop_q =       1 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
@@ -848,6 +848,32 @@ object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
 
 // Rework
 object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3 2
+  /*
+  Implementation based on http://cs.stanford.edu/people/karpathy/visml/ising_example.html
+   pi(x) = exp(J* 𝚺x_j*x_i + J_b * 𝚺b_i*x_i)        
+   let x' = x with one entry flipped
+   Prob(accept x') ~ min(1, pi(x')/pi(x)) = exp(-2*J*𝚺x_j*x_i)*exp(-2*J_b*𝚺b_i*x_i)
+  Use args 100 0.4 0 to get a nice looking lava lamp pattern, or 0.8 for scala
+
+                           y_par=2
+          _________________________________________
+         |                    .                    |
+         |                    .                    |
+         |                  X .              XX    |
+         |                    .            XXXX    |
+         |              ,-------------X   X XXX    |
+         |          X   ,BIAS REGION ,  XX   X     |
+ x_par=2 |            XX,     .      ,     XX      |
+         |..............,............,.............|
+         |X             ,     .      ,             |
+         |              ,     .      ,             |
+         |      X XXX   ,------------,             |
+         |     X XXX        XX.        X           |
+         |                    .                    |
+         |                    .             X      |
+         |____________________.____________________|
+
+  */
   type T = FixPt[TRUE,_32,_32]
   type PROB = FixPt[FALSE, _0, _16]
   @virtualize
@@ -890,6 +916,8 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
 
     val par_load = 16
     val par_store = 16
+    val x_par = 2 (1 -> 1 -> 16)
+    val y_par = 2 (1 -> 1 -> 16)
 
     // Square
     val bias_matrix = (0::ROWS, 0::COLS){(i,j) => if (i > ROWS/4 && i < 3*ROWS/4 && j > COLS/4 && j < 3*COLS/4) -1.to[Int] else 1.to[Int]}
@@ -962,6 +990,8 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
       bias_sram load bias_dram(0::ROWS, 0::COLS par par_load)
 
       Foreach(iters by 1) { iter =>
+        // Foreach(ROWS by ROWS/x_par par x_par) {tile_x => 
+        //   Foreach(COLS by COLS/y_par par y _par) {tile_y => 
         Sequential.Foreach(ROWS by 1) { i => 
           // Update each point in active row
           Sequential.Foreach(0 until COLS by 1) { j => 
