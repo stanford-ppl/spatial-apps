@@ -5,9 +5,9 @@ object BlackScholes extends SpatialApp {
 
 
   val margin = 0.5f // Validates true if within +/- margin
-  val innerPar = 6
+  val innerPar = 4
   val outerPar = 1
-  val tileSize = 9600
+  val tileSize = 18144
 
   final val inv_sqrt_2xPI = 0.39894228040143270286f
 
