@@ -9,20 +9,59 @@ import spatial.stdlib._
 
 trait RaoBlackParticleFilter extends SpatialStream {
 
+  type SCReal = scala.Double
+  type SReal  = FixPt[TRUE, _16, _16]
+
+  implicit def toReal(x: SCReal) = x.to[SReal]
+
+  def sqrt(x: SReal) = sqrt_approx(x)
+  def sin(x: SReal) = sin_taylor(x)
+  def cos(x: SReal) = cos_taylor(x)  
+
+  val lutP: scala.Int = 10000
+  val lutAcos: scala.Int = 1000 
+  lazy val logLUT = 
+    LUT[SReal](lutP)(((-9:SReal)::List.tabulate[SReal](lutP-1)(i => math.log(((i+1)/lutP.toDouble)*20))):_*)
+
+  lazy val expLUT = 
+    LUT[SReal](lutP)(List.tabulate[SReal](lutP)(i => math.exp(i/lutP.toDouble*10-10)):_*)
+
+  lazy val acosLUT = 
+    LUT[SReal](lutAcos)(List.tabulate[SReal](lutAcos)(i => math.acos(i/lutAcos.toDouble)):_*)
+  
+  @virtualize
+  def acos(x: SReal) = {
+    val r = acosLUT((x*(lutP.toDouble)).to[Index])
+    if (x >= 0)
+      r
+    else
+      PI - r
+  }
+
+  @virtualize
+  def log(x: SReal) = 
+    logLUT(((x/20.0)*(lutP.toDouble)).to[Index])
+  
+  @virtualize
+  def exp(x: SReal): SReal = {
+    if (x >= 0.0)
+      1
+    else
+      expLUT((((x+10)/10.0)*(lutP.toDouble)).to[Index])
+  }
+  
   val N: scala.Int                                                    = 1
-  val initV: (scala.Double, scala.Double, scala.Double)               = (0.0, 0.0, 0.0)
-  val initP: (scala.Double, scala.Double, scala.Double)               = (0.0, 0.0, 0.0)
-  val initQ: (scala.Double, scala.Double, scala.Double, scala.Double) = (1.0, 0.0, 0.0, 0.0)
+  val initV: (SCReal, SCReal, SCReal)               = (0.0, 0.0, 0.0)
+  val initP: (SCReal, SCReal, SCReal)               = (0.0, 0.0, 0.0)
+  val initQ: (SCReal, SCReal, SCReal, SCReal) = (1.0, 0.0, 0.0, 0.0)
   val initCov = 0.00001
 
-  val initTime: scala.Double  = 0.0
-  val covGyro: scala.Double   = 0.01
-  val covAcc: scala.Double    = 0.01
-  val covViconP: scala.Double = 0.01
-  val covViconQ: scala.Double = 0.01
 
-  type SReal         = Double
-
+  val initTime: SCReal  = 0.0
+  val covGyro: SCReal   = 0.01
+  val covAcc: SCReal    = 0.01
+  val covViconP: SCReal = 0.01
+  val covViconQ: SCReal = 0.01
 
   @struct case class SVec3(x: SReal, y: SReal, z: SReal)
 
@@ -44,7 +83,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
 
   val matrix = new Matrix[SReal] {
-    def sqrtT(x: Double) = sqrt(x)
+    def sqrtT(x: SReal) = sqrt(x)
     val zero = 0.to[SReal]
     val one = 1.to[SReal]
   }
@@ -86,8 +125,13 @@ trait RaoBlackParticleFilter extends SpatialStream {
   }
 
   @virtualize def initParticles(particles: SRAM1[Particle], states: SRAM2[SReal], covs: SRAM3[SReal], parFactor: Int) = {
-    Foreach(0::N par parFactor)(x => {
 
+    acosLUT
+    logLUT
+    expLUT
+
+    Foreach(0::N par parFactor)(x => {
+      
       Pipe {
         Pipe { states(x, 0) = initV._1 }
         Pipe { states(x, 1) = initV._2 }
@@ -148,18 +192,46 @@ trait RaoBlackParticleFilter extends SpatialStream {
             fifoSIMU.enq(inSIMU)
           })
 
+          val choice = Reg[Int]
+          val dt = Reg[SReal]          
           FSM[Boolean, Boolean](true)(x => x)(x => {
+            
             if ((fifoV.empty && !fifoSIMU.empty) || (!fifoSIMU.empty && !fifoV.empty && fifoSIMU.peek.t < fifoV.peek.t)) {
-              val imu = fifoSIMU.deq()
-              updateFromSIMU(imu, lastSTime, lastO, particles, states, covs, parFactor)
+              choice := 0
+              val imu = fifoSIMU.peek
+              val t = imu.t
+              lastO := imu.g
+              dt := t - lastSTime
+              lastSTime := t              
             }
             else if (!fifoV.empty) {
-              val v = fifoV.deq()
-              updateFromV(v, lastSTime, lastO, particles, states, covs, parFactor)
+              choice := 1
+              val t = fifoV.peek.t
+              dt := t - lastSTime
+              lastSTime := t
             }
-            normWeights(particles, parFactor)
-            out := SVicon(lastSTime, averageSPOSE(particles, states, parFactor))
-            resample(particles, states, covs, parFactor)            
+            else
+                choice := -1
+
+            if (choice.value != -1) {
+              updateAtt(dt, lastO, particles, parFactor)
+            }
+            if (choice.value == 0) {
+              val imu = fifoSIMU.deq()
+              imuUpdate(imu.a, particles, parFactor)
+            }
+            if (choice.value != -1) {
+              kalmanPredictParticle(dt, particles, states, covs, parFactor)
+            }
+            if (choice.value == 1) {
+              val v = fifoV.deq()
+              viconUpdate(v.pose, dt, particles, states, covs, parFactor)
+            }
+            if (choice.value != -1) {
+              normWeights(particles, parFactor)
+              out := SVicon(lastSTime, averageSPOSE(particles, states, parFactor))
+              resample(particles, states, covs, parFactor)
+            }
           })(x => (!fifoV.empty || !fifoSIMU.empty))
 
         }
@@ -175,23 +247,34 @@ trait RaoBlackParticleFilter extends SpatialStream {
     ))
 
   @virtualize
-  def update(accO: Option[SAcceleration],
-    vicon: Option[SPOSE],
-    dt: STime,
-    lastO: Reg[SOmega],
+  def updateAtt(
+    dt: SReal,
+    lastO: SOmega,
     particles: SRAM1[Particle],
-    states: SRAM2[SReal],
-    covs: SRAM3[SReal],
-    parFactor: Int) = {
-
-    Foreach(0::N par parFactor)(i => {
-
+    parFactor: Int
+  ) = {
+    Sequential.Foreach(0::N par parFactor)(i => {
       val pp = particles(i)
-      val nq =
+      val nq = 
         if (dt > 0.00001)
           sampleAtt(pp.q, lastO, dt)
         else
           pp.q
+      particles(i) = Particle(pp.w, nq, pp.lastA, pp.lastQ)
+    })
+  }
+
+  @virtualize
+  def kalmanPredictParticle(
+    dt: STime,
+    particles: SRAM1[Particle],
+    states: SRAM2[SReal],
+    covs: SRAM3[SReal],
+    parFactor: Int
+  ) = {
+    Sequential.Foreach(0::N par parFactor)(i => {
+
+      val pp = particles(i)
 
       val X: Option[SReal] = None
       val Sdt: Option[SReal] = Some(dt)
@@ -227,52 +310,62 @@ trait RaoBlackParticleFilter extends SpatialStream {
       ))
 
       val state = Matrix.fromSRAM1(6, states, i)
-      val cov = Matrix.fromSRAM2(6, 6, covs, i)
-      
-      val nla        = accO.map(x => nq.rotate(x)).getOrElse(pp.lastA)
-      val nlq        = accO.map(x => nq).getOrElse(pp.lastQ)
+      val cov = Matrix.fromSRAM2(6, 6, covs, i)    
 
       val (nx, nsig) = kalmanPredict(state, cov, F, U, Q)
+      nx.loadTo(states, i)
+      nsig.loadTo(covs, i)      
 
-      if (vicon.isDefined) {
 
-        val x = vicon.get
-
-        val h = Matrix.sparse(3, 6,
-          IndexedSeq[Option[SReal]](
-            X, X, X, S1, X, X,
-            X, X, X, X, S1, X,
-            X, X, X, X, X, S1
-          ))
-        val r = Matrix.eye(3, covViconP)
-
-        val (nx2, nsig2, lik) = kalmanUpdate(nx, nsig, toMatrix(x.p), h, r)
-        val nw                = pp.w + likelihoodSPOSE(x, lik._1, nq, lik._2)
-
-        nx2.loadTo(states, i)
-        nsig2.loadTo(covs, i)        
-        particles(i) = Particle(nw, nq, nla, nlq)
-      }
-      else {
-        nx.loadTo(states, i)
-        nsig.loadTo(covs, i)                        
-        particles(i) = Particle(pp.w, nq, nla, nlq)
-      }
     })
   }
 
-  def updateFromSIMU(x: SIMU, lastSTime: Reg[STime], lastO: Reg[SOmega], particles: SRAM1[Particle], states: SRAM2[SReal], covs: SRAM3[SReal], parFactor: Int) = {
-    val dt = x.t - lastSTime
-    lastSTime := x.t
-    lastO := x.g
-    update(Some(x.a), None, dt, lastO, particles, states, covs, parFactor)
+  @virtualize
+  def imuUpdate(acc: SAcceleration, particles: SRAM1[Particle], parFactor: Int) = {
+    Sequential.Foreach(0::N par parFactor)(i => {
+      val pp = particles(i)
+      val na = pp.q.rotate(acc)
+      particles(i) = Particle(pp.w, pp.q, na, pp.q)
+    })
   }
 
-  def updateFromV(x: SVicon, lastSTime: Reg[STime], lastO: Reg[SOmega], particles: SRAM1[Particle], states: SRAM2[SReal], covs: SRAM3[SReal],  parFactor: Int) = {
-    val dt = x.t - lastSTime
-    lastSTime := x.t
-    update(None, Some(x.pose), dt, lastO, particles, states, covs, parFactor)
+  @virtualize
+  def viconUpdate(
+    vicon: SPOSE,
+    dt: STime,
+    particles: SRAM1[Particle],
+    states: SRAM2[SReal],
+    covs: SRAM3[SReal],
+    parFactor: Int) = {
+
+    Sequential.Foreach(0::N par parFactor)(i => {
+      
+      val pp = particles(i)
+
+      val X: Option[SReal] = None
+      val S1: Option[SReal] = Some(1)
+
+      val h = Matrix.sparse(3, 6,
+        IndexedSeq[Option[SReal]](
+          X, X, X, S1, X, X,
+          X, X, X, X, S1, X,
+          X, X, X, X, X, S1
+        ))
+
+      val r = Matrix.eye(3, covViconP)
+
+      val state = Matrix.fromSRAM1(6, states, i)
+      val cov = Matrix.fromSRAM2(6, 6, covs, i)    
+      
+      val (nx2, nsig2, lik) = kalmanUpdate(state, cov, toMatrix(vicon.p), h, r)
+      val nw                = pp.w + likelihoodSPOSE(vicon, lik._1, pp.q, lik._2)
+
+      nx2.loadTo(states, i)
+      nsig2.loadTo(covs, i)
+      particles(i) = Particle(nw, pp.q, pp.lastA, pp.lastQ)
+    })
   }
+
 
   @virtualize def likelihoodSPOSE(measurement: SPOSE, expectedPosMeasure: Matrix, quatState: SQuat, covPos: Matrix) = {
     val wPos                = unnormalizedGaussianLogPdf(toMatrix(measurement.p), expectedPosMeasure, covPos)
@@ -293,15 +386,13 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   @virtualize def gaussianVec(mean: Vec, variance: SReal) = {
     val reg = RegFile[SReal](3)
-    Foreach(0::2)(i => {
+    Sequential.Foreach(0::2)(i => {
       val g1 = gaussian()
-      Pipe {
-        Pipe { reg(i*2) = g1._1 }
+        reg(i*2) = g1._1 
         if (i != 1)
-          Pipe { reg((i*2+1)) = g1._2 }
-      }
+          reg((i*2+1)) = g1._2
     })
-    Vec(3, RegId1(reg)) * sqrt(variance) + mean
+    (Vec(3, RegId1(reg)) :* sqrt(variance)) :+ mean
   }
 
   //Box-Muller
@@ -390,7 +481,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
   }
 
   def unnormalizedGaussianLogPdf(measurement: Matrix, state: Matrix, cov: Matrix): SReal = {
-    val e = (measurement-state)
+    val e = (measurement :- state)
     -1/2.0*((e.t*(cov.inv)*e).apply(0, 0))
   }
 
@@ -398,7 +489,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
     val n    = v.norm
     val l    = n / 2
     val sl   = sin(l)
-    val nrot = v * (sl / n)
+    val nrot = v :* (sl / n)
     SQuat(cos(l), nrot(0), nrot(1), nrot(2))
   }
 
@@ -406,22 +497,22 @@ trait RaoBlackParticleFilter extends SpatialStream {
     val r: SReal = min(q.r, 1.0)
     val n = acos(r) * 2
     val s = n / sin(n / 2)
-    Matrix(3, 1, List(q.i, q.j, q.k)) * s
+    Matrix(3, 1, List(q.i, q.j, q.k)) :* s
   }
 
   def kalmanPredict(xp: Matrix, sigp: Matrix, f: Matrix, u: Matrix, q: Matrix) = {
-    val xm   = f * xp + u
-    val sigm = (f * sigp * f.t) + q
+    val xm   = f * xp :+ u
+    val sigm = (f * sigp * f.t) :+ q
     (xm, sigm)
   }
 
 
   def kalmanUpdate(xm: Matrix, sigm: Matrix, z: Matrix, h: Matrix, r: Matrix) = {
-    val s   = (h * sigm * h.t) + r
+    val s   = (h * sigm * h.t) :+ r
     val za = h * xm
     val k = sigm * h.t * s.inv
-    val sig = sigm - (k * s * k.t)
-    val x = xm + (k * (z - za))
+    val sig = sigm :- (k * s * k.t)
+    val x = xm :+ (k * (z :- za))
     (x, sig, (za, s))
   }
 

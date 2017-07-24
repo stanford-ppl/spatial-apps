@@ -10,27 +10,30 @@ trait MiniParticleFilter extends SpatialStream {
 
   type CReal = scala.Double
 //  type Real  = Double
-  type Real  = FixPt[TRUE, _16, _16]  
+
+  type Real  = FixPt[TRUE, _16, _16]
 
   implicit def toReal(x: CReal) = x.to[Real]
-  //Not very precise because log and exp are for small probabilities.
-  //To remove when log and exp implemented
-
   def sqrt(x: Real) = sqrt_approx(x)
 
-  val lutP: scala.Int = 1000
-  lazy val logLUT = {
-    Console.println(3)
-    LUT[Real](lutP)((-9:Real)::List.tabulate[Real](lutP-1)(i => math.log(i+1/lutP.toDouble)):_*)
-  }
+  val lutP: scala.Int = 10000
+  lazy val logLUT = 
+    LUT[Real](lutP)(((-9:Real)::List.tabulate[Real](lutP-1)(i => math.log(((i+1)/lutP.toDouble)*20))):_*)
+
   lazy val expLUT = 
-    LUT[Real](lutP)(List.tabulate[Real](lutP)(i => math.exp(i/lutP.toDouble)):_*)
+    LUT[Real](lutP)(List.tabulate[Real](lutP)(i => math.exp(i/lutP.toDouble*10-10)):_*)
   
+  @virtualize
   def log(x: Real) = 
-    logLUT((x*(lutP.toDouble)).to[Index])
-  def exp(x: Real): Real =
-    expLUT((x*(lutP.toDouble)).to[Index])    
-  
+    logLUT(((x/20.0)*(lutP.toDouble)).to[Index])
+
+  @virtualize
+  def exp(x: Real): Real = {
+    if (x >= 0.0)
+      1
+    else
+      expLUT((((x+10)/10.0)*(lutP.toDouble)).to[Index])
+  }
   val N: scala.Int          = 10
   val initV: (CReal, CReal) = (0.0, 0.0)
   val initP: (CReal, CReal) = (0.0, 0.0)
@@ -64,6 +67,8 @@ trait MiniParticleFilter extends SpatialStream {
 
   def initParticles(weights: SRAM1[Weight], states: SRAM2[Real], parFactor: Int) = {
 
+    expLUT
+    logLUT
     Foreach(0 :: N par parFactor)(x => {
 
       Pipe {
@@ -88,7 +93,6 @@ trait MiniParticleFilter extends SpatialStream {
     val parFactor = 1 (1 -> N)
 
     Accel {
-      Console.println(2)
 
       val weights = SRAM[Weight](N)
       val states  = SRAM[Real](N, 4)
