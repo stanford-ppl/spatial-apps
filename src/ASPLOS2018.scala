@@ -993,7 +993,7 @@ x_par=4  |  --->            X                XX    |
       Foreach(iters by 1) { iter =>
         Foreach(ROWS by 1 par x_par) { i => 
           val bias_sram = SRAM[Int](ROWS,COLS)
-          if (iters == 0 && i < x_par) {
+          if (iters == 0.to[Int] && i < x_par) {
             bias_sram load bias_dram(0::ROWS, 0::COLS par par_load)
           }
           // Update each point in active row
