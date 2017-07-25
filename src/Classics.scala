@@ -2057,6 +2057,7 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
             val j = 4*i
             m(i) = (data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])
           } else {
+            println(" m(" + i + ") = " + SIG1(m(i-2)) + " " + m(i-7) + " " + SIG0(m(i-15)) + " " + m(i-16))
             m(i) = SIG1(m(i-2)) + m(i-7) + SIG0(m(i-15)) + m(i-16)
           } 
         }
@@ -2106,7 +2107,7 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
 
       // Final
       val pad_stop = if (datalen.value < 56) 56 else 64
-      Foreach(datalen until pad_stop by 1){i => data(i) = 0x80.to[UInt8]}
+      Foreach(datalen until pad_stop by 1){i => data(i) = if (i == datalen) 0x80.to[UInt8] else 0.to[UInt8]}
       if (datalen.value >= 56) {
         sha_transform()
       }
