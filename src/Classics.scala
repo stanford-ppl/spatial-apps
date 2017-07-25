@@ -2022,12 +2022,12 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
 
       def SIG0(x:ULong): ULong = {
         // (ROTRIGHT(x,7) ^ ROTRIGHT(x,18) ^ ((x) >> 3))
-        ( x >> 7 | x << (32-7) ) ^ ( x >> 18 | x << (32-18) ) | x >> 3
+        ( x >> 7 | x << (32-7) ) ^ ( x >> 18 | x << (32-18) ) ^ x >> 3
       }
 
       def SIG1(x:ULong): ULong = {
         // (ROTRIGHT(x,17) ^ ROTRIGHT(x,19) ^ ((x) >> 10))
-        ( x >> 17 | x << (32-17) ) ^ ( x >> 19 | x << (32-19) ) | x >> 10
+        ( x >> 17 | x << (32-17) ) ^ ( x >> 19 | x << (32-19) ) ^ x >> 10
       }
 
       def CH(x:ULong, y:ULong, z:ULong): ULong = {
@@ -2057,7 +2057,7 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
             val j = 4*i
             m(i) = (data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])
           } else {
-            println(" m(" + i + ") = " + SIG1(m(i-2)) + " " + m(i-7) + " " + SIG0(m(i-15)) + " " + m(i-16))
+            // println(" m(" + i + ") = " + SIG1(m(i-2)) + " " + m(i-7) + " " + SIG0(m(i-15)) + " " + m(i-16))
             m(i) = SIG1(m(i-2)) + m(i-7) + SIG0(m(i-15)) + m(i-16)
           } 
         }
@@ -2082,15 +2082,15 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
         Foreach(64 by 1){ i => 
           val tmp1 = H + EP1(E) + CH(E,F,G) + K_LUT(i) + m(i)
           val tmp2 = EP0(A) + MAJ(A,B,C)
-          println(" " + i + " : " + A.value + " " + B.value + " " + 
-            C.value + " " + D.value + " " + E.value + " " + F.value + " " + G.value + " " + H.value)
-          println("    " + H.value + " " + EP1(E) + " " + CH(E,F,G) + " " + K_LUT(i) + " " + m(i))
+          // println(" " + i + " : " + A.value + " " + B.value + " " + 
+          //   C.value + " " + D.value + " " + E.value + " " + F.value + " " + G.value + " " + H.value)
+          // println("    " + H.value + " " + EP1(E) + " " + CH(E,F,G) + " " + K_LUT(i) + " " + m(i))
           H := G; G := F; F := E; E := D + tmp1; D := C; C := B; B := A; A := tmp1 + tmp2
         }
 
         Foreach(8 by 1 par 8){i => 
           state(i) = state(i) + mux(i == 0, A, mux(i == 1, B, mux(i == 2, C, mux(i == 3, D, 
-            mux(i == 4, E, mux(i == 5, D, mux(i == 6, E, F)))))))
+            mux(i == 4, E, mux(i == 5, F, mux(i == 6, G, H)))))))
         }
 
       }
@@ -2122,6 +2122,8 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
       Pipe{data(57) = (bitlen(1) >> 16).to[UInt8]}
       Pipe{data(56) = (bitlen(1) >> 24).to[UInt8]}
       sha_transform()
+
+      // Foreach(8 by 1){i => println(" " + state(i))}
 
       Sequential.Foreach(4 by 1){ i => 
         hash(i)    = (SHFR(state(0), (24-i*8))).apply(7::0).as[UInt8]
