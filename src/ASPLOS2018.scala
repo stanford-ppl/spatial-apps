@@ -1558,6 +1558,7 @@ object BlackScholes extends SpatialApp {
     val xPowerTerm = (volatility ** 2) * 0.5f.to[T]
     val xNum = (rate + xPowerTerm) * time + xLogTerm
     val xDen = volatility * sqrt_approx(time)
+    println("  " + xDen)
 
     val xDiv = xNum / (xDen ** 2)
     val nofXd1 = CNDF(xDiv)
@@ -1582,11 +1583,11 @@ object BlackScholes extends SpatialApp {
     svolatility: Array[T],
     stimes:      Array[T]
   ): Array[T] = {
-    val B  = 2048 (96 -> 96 -> 19200)
+    val B  = 32 (32 -> 96 -> 19200)
     val OP = 1 (1 -> 2)
-    val IP = 16 (1 -> 96)
-    val par_load = 16
-    val par_store = 16
+    val IP = 1 (1 -> 96)
+    val par_load = 1
+    val par_store = 1
 
     val size = stypes.length; bound(size) = 9995328
 
