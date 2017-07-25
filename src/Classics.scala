@@ -1961,7 +1961,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   }
 }
 
-object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
+object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7e569e8bcd9317e2fe99f2de44d49ab2b8851ba4a308000000000000e320b6c2fffc8d750423db8b1eb942ae710e951ed797f7affc8892b0f1fc122bc7f5d74df2b9441a42a14695
   /*
     According to https://en.bitcoin.it/wiki/Block_hashing_algorithm
     Proof of Work = SHA256(SHA256(HEADER))
@@ -1977,9 +1977,9 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
     val raw_text = args(0).to[MString]// loadCSV1D[String]("/remote/regression/data/machsuite/sha_txt.csv", "\n").apply(0)
     val data_text_int = argon.lang.String.string2num(raw_text)
     val data_text = Array.tabulate(data_text_int.length){i => data_text_int(i).to[UInt8]}
-    val len = ArgIn[Int]
+    val len = HostIO[Int]
     setArg(len, data_text.length)
-    val text_dram = DRAM[UInt8](len)
+    val text_dram = DRAM[UInt8](1024)
     val hash_dram = DRAM[UInt8](32)//(5)
 
     println("Hashing: " + raw_text + " (len: " + data_text.length + ")")
@@ -2055,6 +2055,7 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
         Foreach(0 until 64 by 1){i => 
           if ( i < 16 ) {
             val j = 4*i
+            // println(" m(" + i + ") = " + {(data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])})
             m(i) = (data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])
           } else {
             // println(" m(" + i + ") = " + SIG1(m(i-2)) + " " + m(i-7) + " " + SIG0(m(i-15)) + " " + m(i-16))
@@ -2095,57 +2096,77 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
 
       }
 
-      // def SHA256(): Unit = {}
-      // Update
-      Foreach(len by 64) { i => 
-        datalen := min(len - i, 64)
-        data load text_dram(i::i+datalen.value)
-        if (datalen.value == 64.to[Int]) {
-          //transform
+      def SHA256(): Unit = {
+        // Init 
+        Pipe{
+          bitlen.reset
+          state.reset
+        }
+
+        // Update
+        Sequential.Foreach(0 until len.value by 64 par 1) { i => 
+          datalen := min(len.value - i, 64)
+          // println(" datalen " + datalen.value + " and i " + i + " and len " + len.value)
+          data load text_dram(i::i+datalen.value)
+          if (datalen.value == 64.to[Int]) {
+            // println("doing this " + datalen.value)
+            sha_transform()
+            DBL_INT_ADD(512); 
+          }
+        }
+
+        // Final
+        val pad_stop = if (datalen.value < 56) 56 else 64
+        Foreach(datalen until pad_stop by 1){i => data(i) = if (i == datalen) 0x80.to[UInt8] else 0.to[UInt8]}
+        if (datalen.value >= 56) {
+          sha_transform()
+          Foreach(56 by 1){i => data(i) = 0}
+        }
+
+        DBL_INT_ADD(datalen.value.to[ULong] * 8.to[ULong])
+        Pipe{data(63) = (bitlen(0)).to[UInt8]}
+        Pipe{data(62) = (bitlen(0) >> 8).to[UInt8]}
+        Pipe{data(61) = (bitlen(0) >> 16).to[UInt8]}
+        Pipe{data(60) = (bitlen(0) >> 24).to[UInt8]}
+        Pipe{data(59) = (bitlen(1)).to[UInt8]}
+        Pipe{data(58) = (bitlen(1) >> 8).to[UInt8]}
+        Pipe{data(57) = (bitlen(1) >> 16).to[UInt8]}
+        Pipe{data(56) = (bitlen(1) >> 24).to[UInt8]}
+        sha_transform()
+
+        // Foreach(8 by 1){i => println(" " + state(i))}
+
+        Sequential.Foreach(4 by 1){ i => 
+          hash(i)    = (SHFR(state(0), (24-i*8))).apply(7::0).as[UInt8]
+          hash(i+4)  = (SHFR(state(1), (24-i*8))).apply(7::0).as[UInt8]
+          hash(i+8)  = (SHFR(state(2), (24-i*8))).apply(7::0).as[UInt8]
+          hash(i+12) = (SHFR(state(3), (24-i*8))).apply(7::0).as[UInt8]
+          hash(i+16) = (SHFR(state(4), (24-i*8))).apply(7::0).as[UInt8]
+          hash(i+20) = (SHFR(state(5), (24-i*8))).apply(7::0).as[UInt8]
+          hash(i+24) = (SHFR(state(6), (24-i*8))).apply(7::0).as[UInt8]
+          hash(i+28) = (SHFR(state(7), (24-i*8))).apply(7::0).as[UInt8]
+        }
+
+      }
+
+      Foreach(2 by 1){i => 
+        Pipe{SHA256()}
+        if (i == 0) {
+          text_dram(0::32) store hash
+          len := 32
         }
       }
-
-      // Final
-      val pad_stop = if (datalen.value < 56) 56 else 64
-      Foreach(datalen until pad_stop by 1){i => data(i) = if (i == datalen) 0x80.to[UInt8] else 0.to[UInt8]}
-      if (datalen.value >= 56) {
-        sha_transform()
-      }
-      // memset(ctx->data,0,56); 
-      DBL_INT_ADD(datalen.value.to[ULong] * 8.to[ULong])
-      Pipe{data(63) = (bitlen(0)).to[UInt8]}
-      Pipe{data(62) = (bitlen(0) >> 8).to[UInt8]}
-      Pipe{data(61) = (bitlen(0) >> 16).to[UInt8]}
-      Pipe{data(60) = (bitlen(0) >> 24).to[UInt8]}
-      Pipe{data(59) = (bitlen(1)).to[UInt8]}
-      Pipe{data(58) = (bitlen(1) >> 8).to[UInt8]}
-      Pipe{data(57) = (bitlen(1) >> 16).to[UInt8]}
-      Pipe{data(56) = (bitlen(1) >> 24).to[UInt8]}
-      sha_transform()
-
-      // Foreach(8 by 1){i => println(" " + state(i))}
-
-      Sequential.Foreach(4 by 1){ i => 
-        hash(i)    = (SHFR(state(0), (24-i*8))).apply(7::0).as[UInt8]
-        hash(i+4)  = (SHFR(state(1), (24-i*8))).apply(7::0).as[UInt8]
-        hash(i+8)  = (SHFR(state(2), (24-i*8))).apply(7::0).as[UInt8]
-        hash(i+12) = (SHFR(state(3), (24-i*8))).apply(7::0).as[UInt8]
-        hash(i+16) = (SHFR(state(4), (24-i*8))).apply(7::0).as[UInt8]
-        hash(i+20) = (SHFR(state(5), (24-i*8))).apply(7::0).as[UInt8]
-        hash(i+24) = (SHFR(state(6), (24-i*8))).apply(7::0).as[UInt8]
-        hash(i+28) = (SHFR(state(7), (24-i*8))).apply(7::0).as[UInt8]
-      }
-
+      
       hash_dram store hash
     }  
 
     val hashed_result = getMem(hash_dram)
-    val hashed_gold = Array[UInt8](186.to[UInt8],120.to[UInt8],22.to[UInt8],191.to[UInt8],143.to[UInt8],1.to[UInt8],207.to[UInt8],234.to[UInt8],65.to[UInt8],65.to[UInt8],64.to[UInt8],222.to[UInt8],93.to[UInt8],174.to[UInt8],34.to[UInt8],35.to[UInt8],176.to[UInt8],3.to[UInt8],97.to[UInt8],163.to[UInt8],150.to[UInt8],23.to[UInt8],122.to[UInt8],156.to[UInt8],180.to[UInt8],16.to[UInt8],255.to[UInt8],97.to[UInt8],242.to[UInt8],0.to[UInt8],21.to[UInt8],173.to[UInt8])
+    val hashed_gold = Array[UInt8](101.to[UInt8],0.to[UInt8],241.to[UInt8],59.to[UInt8],194.to[UInt8],84.to[UInt8],197.to[UInt8],158.to[UInt8],159.to[UInt8],61.to[UInt8],119.to[UInt8],189.to[UInt8],11.to[UInt8],25.to[UInt8],153.to[UInt8],230.to[UInt8],134.to[UInt8],250.to[UInt8],223.to[UInt8],119.to[UInt8],101.to[UInt8],174.to[UInt8],43.to[UInt8],89.to[UInt8],38.to[UInt8],109.to[UInt8],29.to[UInt8],131.to[UInt8],91.to[UInt8],134.to[UInt8],144.to[UInt8],131.to[UInt8])
     printArray(hashed_gold, "Expected: ")
     printArray(hashed_result, "Got: ")
 
     val cksum = hashed_gold.zip(hashed_result){_==_}.reduce{_&&_}
-    println("PASS: " + cksum + " (SHA1)")
+    println("PASS: " + cksum + " (BTC)")
 
   }
 }
