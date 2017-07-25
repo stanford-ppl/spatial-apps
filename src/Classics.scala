@@ -1969,17 +1969,18 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
   */
 
   type ULong = FixPt[FALSE, _32, _0]
-
+  type UInt8 = FixPt[FALSE, _8, _0]
   @virtualize
   def main() = {
     // Setup off-chip data
 
     val raw_text = args(0).to[MString]// loadCSV1D[String]("/remote/regression/data/machsuite/sha_txt.csv", "\n").apply(0)
-    val data_text = argon.lang.String.string2num(raw_text)
+    val data_text_int = argon.lang.String.string2num(raw_text)
+    val data_text = Array.tabulate(data_text_int.length){i => data_text_int(i).to[UInt8]}
     val len = ArgIn[Int]
     setArg(len, data_text.length)
-    val text_dram = DRAM[Int8](len)
-    val hash_dram = DRAM[Int8](32)//(5)
+    val text_dram = DRAM[UInt8](len)
+    val hash_dram = DRAM[UInt8](32)//(5)
 
     println("Hashing: " + raw_text + " (len: " + data_text.length + ")")
     setMem(text_dram, data_text)
@@ -1992,7 +1993,7 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
       val state = RegFile[ULong](8, List(0x6a09e667L.to[ULong],0xbb67ae85L.to[ULong],0x3c6ef372L.to[ULong],0xa54ff53aL.to[ULong],
                                        0x510e527fL.to[ULong],0x9b05688cL.to[ULong],0x1f83d9abL.to[ULong],0x5be0cd19L.to[ULong])
                               )
-      val hash = SRAM[Int8](32)
+      val hash = SRAM[UInt8](32)
       val K_LUT = LUT[ULong](64)(
             0x428a2f98L.to[ULong],0x71374491L.to[ULong],0xb5c0fbcfL.to[ULong],0xe9b5dba5L.to[ULong],0x3956c25bL.to[ULong],0x59f111f1L.to[ULong],0x923f82a4L.to[ULong],0xab1c5ed5L.to[ULong],
             0xd807aa98L.to[ULong],0x12835b01L.to[ULong],0x243185beL.to[ULong],0x550c7dc3L.to[ULong],0x72be5d74L.to[ULong],0x80deb1feL.to[ULong],0x9bdc06a7L.to[ULong],0xc19bf174L.to[ULong],
@@ -2004,7 +2005,7 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
             0x748f82eeL.to[ULong],0x78a5636fL.to[ULong],0x84c87814L.to[ULong],0x8cc70208L.to[ULong],0x90befffaL.to[ULong],0xa4506cebL.to[ULong],0xbef9a3f7L.to[ULong],0xc67178f2L.to[ULong]
           )
 
-      val data = SRAM[Int8](64)
+      val data = SRAM[UInt8](64)
       
       def SHFR(x: ULong, y: Int): ULong = {
         val tmp = Reg[ULong](0)
@@ -2041,12 +2042,12 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
 
       def EP0(x: ULong): ULong = {
         // (ROTRIGHT(x,2) ^ ROTRIGHT(x,13) ^ ROTRIGHT(x,22))
-        ( x >> 2 | x << (32-2) ) ^ ( x >> 13 | x << (32-13) ) | ( x >> 22 | x << (32-22) )
+        ( x >> 2 | x << (32-2) ) ^ ( x >> 13 | x << (32-13) ) ^ ( x >> 22 | x << (32-22) )
       }
 
       def EP1(x: ULong): ULong = {
         // (ROTRIGHT(x,6) ^ ROTRIGHT(x,11) ^ ROTRIGHT(x,25))
-        ( x >> 6 | x << (36-2) ) ^ ( x >> 11 | x << (32-11) ) | ( x >> 25 | x << (32-25) )
+        ( x >> 6 | x << (32-6) ) ^ ( x >> 11 | x << (32-11) ) ^ ( x >> 25 | x << (32-25) )
       }
 
       def sha_transform(): Unit = {
@@ -2080,6 +2081,9 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
         Foreach(64 by 1){ i => 
           val tmp1 = H + EP1(E) + CH(E,F,G) + K_LUT(i) + m(i)
           val tmp2 = EP0(A) + MAJ(A,B,C)
+          println(" " + i + " : " + A.value + " " + B.value + " " + 
+            C.value + " " + D.value + " " + E.value + " " + F.value + " " + G.value + " " + H.value)
+          println("    " + H.value + " " + EP1(E) + " " + CH(E,F,G) + " " + K_LUT(i) + " " + m(i))
           H := G; G := F; F := E; E := D + tmp1; D := C; C := B; B := A; A := tmp1 + tmp2
         }
 
@@ -2102,38 +2106,38 @@ object BTC extends SpatialApp { // DISABLED Regression (Dense) // Args: abc
 
       // Final
       val pad_stop = if (datalen.value < 56) 56 else 64
-      Foreach(datalen until pad_stop by 1){i => data(i) = 0x80.to[Int8]}
+      Foreach(datalen until pad_stop by 1){i => data(i) = 0x80.to[UInt8]}
       if (datalen.value >= 56) {
         sha_transform()
       }
       // memset(ctx->data,0,56); 
       DBL_INT_ADD(datalen.value.to[ULong] * 8.to[ULong])
-      Pipe{data(63) = (bitlen(0)).to[Int8]}
-      Pipe{data(62) = (bitlen(0) >> 8).to[Int8]}
-      Pipe{data(61) = (bitlen(0) >> 16).to[Int8]}
-      Pipe{data(60) = (bitlen(0) >> 24).to[Int8]}
-      Pipe{data(59) = (bitlen(1)).to[Int8]}
-      Pipe{data(58) = (bitlen(1) >> 8).to[Int8]}
-      Pipe{data(57) = (bitlen(1) >> 16).to[Int8]}
-      Pipe{data(56) = (bitlen(1) >> 24).to[Int8]}
+      Pipe{data(63) = (bitlen(0)).to[UInt8]}
+      Pipe{data(62) = (bitlen(0) >> 8).to[UInt8]}
+      Pipe{data(61) = (bitlen(0) >> 16).to[UInt8]}
+      Pipe{data(60) = (bitlen(0) >> 24).to[UInt8]}
+      Pipe{data(59) = (bitlen(1)).to[UInt8]}
+      Pipe{data(58) = (bitlen(1) >> 8).to[UInt8]}
+      Pipe{data(57) = (bitlen(1) >> 16).to[UInt8]}
+      Pipe{data(56) = (bitlen(1) >> 24).to[UInt8]}
       sha_transform()
 
       Sequential.Foreach(4 by 1){ i => 
-        hash(i)    = (SHFR(state(0), (24-i*8))).apply(7::0).as[Int8]
-        hash(i+4)  = (SHFR(state(1), (24-i*8))).apply(7::0).as[Int8]
-        hash(i+8)  = (SHFR(state(2), (24-i*8))).apply(7::0).as[Int8]
-        hash(i+12) = (SHFR(state(3), (24-i*8))).apply(7::0).as[Int8]
-        hash(i+16) = (SHFR(state(4), (24-i*8))).apply(7::0).as[Int8]
-        hash(i+20) = (SHFR(state(5), (24-i*8))).apply(7::0).as[Int8]
-        hash(i+24) = (SHFR(state(6), (24-i*8))).apply(7::0).as[Int8]
-        hash(i+28) = (SHFR(state(7), (24-i*8))).apply(7::0).as[Int8]
+        hash(i)    = (SHFR(state(0), (24-i*8))).apply(7::0).as[UInt8]
+        hash(i+4)  = (SHFR(state(1), (24-i*8))).apply(7::0).as[UInt8]
+        hash(i+8)  = (SHFR(state(2), (24-i*8))).apply(7::0).as[UInt8]
+        hash(i+12) = (SHFR(state(3), (24-i*8))).apply(7::0).as[UInt8]
+        hash(i+16) = (SHFR(state(4), (24-i*8))).apply(7::0).as[UInt8]
+        hash(i+20) = (SHFR(state(5), (24-i*8))).apply(7::0).as[UInt8]
+        hash(i+24) = (SHFR(state(6), (24-i*8))).apply(7::0).as[UInt8]
+        hash(i+28) = (SHFR(state(7), (24-i*8))).apply(7::0).as[UInt8]
       }
 
       hash_dram store hash
     }  
 
     val hashed_result = getMem(hash_dram)
-    val hashed_gold = Array[Int8](186.to[Int8],120.to[Int8],22.to[Int8],191.to[Int8],143.to[Int8],1.to[Int8],207.to[Int8],234.to[Int8],65.to[Int8],65.to[Int8],64.to[Int8],222.to[Int8],93.to[Int8],174.to[Int8],34.to[Int8],35.to[Int8],176.to[Int8],3.to[Int8],97.to[Int8],163.to[Int8],150.to[Int8],23.to[Int8],122.to[Int8],156.to[Int8],180.to[Int8],16.to[Int8],255.to[Int8],97.to[Int8],242.to[Int8],0.to[Int8],21.to[Int8],173.to[Int8])
+    val hashed_gold = Array[UInt8](186.to[UInt8],120.to[UInt8],22.to[UInt8],191.to[UInt8],143.to[UInt8],1.to[UInt8],207.to[UInt8],234.to[UInt8],65.to[UInt8],65.to[UInt8],64.to[UInt8],222.to[UInt8],93.to[UInt8],174.to[UInt8],34.to[UInt8],35.to[UInt8],176.to[UInt8],3.to[UInt8],97.to[UInt8],163.to[UInt8],150.to[UInt8],23.to[UInt8],122.to[UInt8],156.to[UInt8],180.to[UInt8],16.to[UInt8],255.to[UInt8],97.to[UInt8],242.to[UInt8],0.to[UInt8],21.to[UInt8],173.to[UInt8])
     printArray(hashed_gold, "Expected: ")
     printArray(hashed_result, "Got: ")
 
