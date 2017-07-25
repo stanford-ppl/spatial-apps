@@ -272,7 +272,7 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
       Pipe { y2 := 999 }
       Pipe { y1 := x1.value + 6 }
       Pipe { y2 := x2.value + 8 }
-      val reg = Reg[Int](0) // Nbuffered reg with multi writes, note that it does not do what you think!
+      val reg = Reg.buffer[Int](0) // Nbuffered reg with multi writes, note that it does not do what you think!
       Foreach(3 by 1) {i => 
         Pipe{reg :+= 1}
         Pipe{y4 := reg}
@@ -1733,8 +1733,6 @@ object FifoPushPop extends SpatialApp { // Regression (Unit) // Args: 384
 
 
 object StreamTest extends SpatialApp {
-
-
    override val target = targets.DE1
 
    @virtualize
@@ -2405,7 +2403,7 @@ object MultiWriteBuffer extends SpatialApp { // Regression (Unit) // Args: none
     Accel {
       val accum = SRAM[Int](R, C)
       MemReduce(accum)(1 until (R+1)) { row =>
-        val sram_seq = SRAM[Int](R, C)
+        val sram_seq = SRAM.buffer[Int](R, C) // Metapipelined buffer is ok here
          Foreach(0 until R, 0 until C) { (r, c) =>
             sram_seq(r,c) = 0
          }

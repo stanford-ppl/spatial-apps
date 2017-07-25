@@ -22,6 +22,11 @@ object ArgInOut extends SpatialApp {
 }
 
 
+
+
+
+
+
 object TextTest extends SpatialApp {
   def test(x: String): String = x
 
