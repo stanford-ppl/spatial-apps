@@ -1074,6 +1074,14 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     val dim = 64
     val tileSize = 8
 
+    val par_load = 16
+    val par_store = 16
+    val loop_jj = 1 (1 -> 1 -> 8)
+    val loop_kk = 1 (1 -> 1 -> 8)
+    val loop_i =  1 (1 -> 1 -> 8)
+    val loop_k =  1 (1 -> 1 -> 8)
+    val loop_j =  1 (1 -> 1 -> 8)
+
     val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
     val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
     val c_init = (0::dim, 0::dim){(i,j) => 0.to[T]}
@@ -1089,23 +1097,23 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
       val a_sram = SRAM[T](tileSize)
       val b_sram = SRAM[T](tileSize,tileSize)
       val c_sram = SRAM[T](dim,dim) // No tiling along rows dim in machsuite??
-      c_sram load c_dram
+      c_sram load c_dram(0::dim, 0::dim par par_load)
 
-      Foreach(dim by tileSize) { jj => 
-        Foreach(dim by tileSize) { kk =>
-          b_sram load b_dram(kk::kk+tileSize, jj::jj+tileSize)
-          Foreach(dim by 1) { i => 
+      Foreach(dim by tileSize par loop_jj) { jj => 
+        Foreach(dim by tileSize par loop_kk) { kk =>
+          b_sram load b_dram(kk::kk+tileSize, jj::jj+tileSize par par_load)
+          Foreach(dim by 1 par loop_i) { i => 
             a_sram load a_dram(i, kk::kk+tileSize)
-            Foreach(tileSize by 1) { k => 
+            Foreach(tileSize by 1 par loop_k) { k => 
               val temp_a = a_sram(k)
-              Foreach(tileSize by 1) { j => 
+              Foreach(tileSize by 1 par loop_j) { j => 
                 c_sram(i,j+jj) = c_sram(i,j+jj) + b_sram(k, j) * temp_a
               }
             }
           } 
         }
       }
-      c_dram store c_sram
+      c_dram(0::dim, 0::dim par par_store) store c_sram
     }
 
     val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
@@ -1250,8 +1258,7 @@ object BFS_Queue extends SpatialApp { // Regression (Sparse) // Args: none
 
     val par_load = 16
     val par_store = 16
-    val nodes_par = 16 (1 -> 16 -> 32)
-    val 
+    val init_par = 16 (1 -> 16 -> 32)
 
     val nodes_raw = loadCSV1D[Int]("/remote/regression/data/machsuite/bfs_nodes.csv", "\n")
     val edges_data = loadCSV1D[Int]("/remote/regression/data/machsuite/bfs_edges.csv", "\n")
@@ -1268,30 +1275,33 @@ object BFS_Queue extends SpatialApp { // Regression (Sparse) // Args: none
     setMem(edges_dram, edges_data)
 
     Accel{
-      val node_starts_sram = SRAM[Int](N_NODES)
-      val node_ends_sram = SRAM[Int](N_NODES)
       val levels_sram = SRAM[Int](N_NODES)
-      val edges_sram = SRAM[Int](N_NODES) // bigger than necessary
       val Q = FIFO[Int](N_NODES)
       val widths_sram = SRAM[Int](16)
 
-      node_starts_sram load node_starts_dram
-      node_ends_sram load node_ends_dram
 
-      Foreach(N_NODES by 1){ i => levels_sram(i) = unvisited }
+      Foreach(N_NODES by 1 par init_par){ i => levels_sram(i) = unvisited }
       Pipe{levels_sram(start_id) = 0}
-      Foreach(16 by 1) {i => widths_sram(i) = if ( i == 0) 1 else 0}
+      Foreach(16 by 1 par init_par) {i => widths_sram(i) = if ( i == 0) 1 else 0}
       Q.enq(start_id)
 
       FSM[Int,Int](0)( horizon => horizon < N_LEVELS ) { horizon => 
         val level_size = Q.numel
         Sequential.Foreach(level_size by 1) { i => 
+          val edges_sram = SRAM[Int](N_NODES) // bigger than necessary
+          val node_starts_sram = SRAM[Int](N_NODES)
+          val node_ends_sram = SRAM[Int](N_NODES)
+          if (i < 2 && horizon == 0) {
+            node_starts_sram load node_starts_dram
+            node_ends_sram load node_ends_dram
+          }
+
           val n = Q.deq()
           val start = node_starts_sram(n)
           val end = node_ends_sram(n)
           val length = end - start
-          edges_sram load edges_dram(start::end)
-          Sequential.Foreach(length by 1) { e =>
+          edges_sram load edges_dram(start::end par par_load)
+          Foreach(length by 1) { e =>
             val tmp_dst = edges_sram(e)
             val dst_level = levels_sram(tmp_dst)
             if (dst_level == unvisited) { Q.enq(tmp_dst) }
@@ -1510,28 +1520,28 @@ object PageRank extends SpatialApp { // DISABLED Regression (Sparse) // Args: 1 
 
 object BlackScholes extends SpatialApp {
 
-
+  type T = FixPt[TRUE,_32,_32]
   val margin = 0.5f // Validates true if within +/- margin
 
-  final val inv_sqrt_2xPI = 0.39894228040143270286f
+  final val inv_sqrt_2xPI = 0.39894228040143270286f.to[T]
 
   @virtualize
-  def CNDF(x: Float) = {
+  def CNDF(x: T) = {
     val ax = abs(x)
 
-    val xNPrimeofX = exp((ax ** 2) * -0.05f) * inv_sqrt_2xPI
-    val xK2 = 1.to[Float] / ((ax * 0.2316419f) + 1.0f)
+    val xNPrimeofX = exp_taylor((ax ** 2) * -0.05f.to[T]) * inv_sqrt_2xPI
+    val xK2 = 1.to[T] / ((ax * 0.2316419f.to[T]) + 1.0f.to[T])
 
     val xK2_2 = xK2 ** 2
     val xK2_3 = xK2_2 * xK2
     val xK2_4 = xK2_3 * xK2
     val xK2_5 = xK2_4 * xK2
 
-    val xLocal_10 = xK2 * 0.319381530f
-    val xLocal_20 = xK2_2 * -0.356563782f
-    val xLocal_30 = xK2_3 * 1.781477937f
-    val xLocal_31 = xK2_4 * -1.821255978f
-    val xLocal_32 = xK2_5 * 1.330274429f
+    val xLocal_10 = xK2 * 0.319381530f.to[T]
+    val xLocal_20 = xK2_2 * -0.356563782f.to[T]
+    val xLocal_30 = xK2_3 * 1.781477937f.to[T]
+    val xLocal_31 = xK2_4 * -1.821255978f.to[T]
+    val xLocal_32 = xK2_5 * 1.330274429f.to[T]
 
     val xLocal_21 = xLocal_20 + xLocal_30
     val xLocal_22 = xLocal_21 + xLocal_31
@@ -1539,28 +1549,28 @@ object BlackScholes extends SpatialApp {
     val xLocal_1 = xLocal_23 + xLocal_10
 
     val xLocal0 = xLocal_1 * xNPrimeofX
-    val xLocal  = -xLocal0 + 1.0f
+    val xLocal  = -xLocal0 + 1.0f.to[T]
 
-    mux(x < 0.0f, xLocal0, xLocal)
+    mux(x < 0.0f.to[T], xLocal0, xLocal)
   }
 
   @virtualize
-  def BlkSchlsEqEuroNoDiv(sptprice: Float, strike: Float, rate: Float,
-    volatility: Float, time: Float, otype: Int) = {
+  def BlkSchlsEqEuroNoDiv(sptprice: T, strike: T, rate: T,
+    volatility: T, time: T, otype: Int) = {
 
-    val xLogTerm = log( sptprice / strike )
-    val xPowerTerm = (volatility ** 2) * 0.5f
+    val xLogTerm = log_taylor( sptprice / strike )
+    val xPowerTerm = (volatility ** 2) * 0.5f.to[T]
     val xNum = (rate + xPowerTerm) * time + xLogTerm
-    val xDen = volatility * sqrt(time)
+    val xDen = volatility * sqrt_approx(time)
 
     val xDiv = xNum / (xDen ** 2)
     val nofXd1 = CNDF(xDiv)
     val nofXd2 = CNDF(xDiv - xDen)
 
-    val futureValueX = strike * exp(-rate * time)
+    val futureValueX = strike * exp_taylor(-rate * time)
 
-    val negNofXd1 = -nofXd1 + 1.0f
-    val negNofXd2 = -nofXd2 + 1.0f
+    val negNofXd1 = -nofXd1 + 1.0f.to[T]
+    val negNofXd2 = -nofXd2 + 1.0f.to[T]
 
     val optionPrice1 = (sptprice * nofXd1) - (futureValueX * nofXd2)
     val optionPrice2 = (futureValueX * negNofXd2) - (sptprice * negNofXd1)
@@ -1570,12 +1580,12 @@ object BlackScholes extends SpatialApp {
   @virtualize
   def blackscholes(
     stypes:      Array[Int],
-    sprices:     Array[Float],
-    sstrike:     Array[Float],
-    srate:       Array[Float],
-    svolatility: Array[Float],
-    stimes:      Array[Float]
-  ): Array[Float] = {
+    sprices:     Array[T],
+    sstrike:     Array[T],
+    srate:       Array[T],
+    svolatility: Array[T],
+    stimes:      Array[T]
+  ): Array[T] = {
     val B  = 2048 (96 -> 96 -> 19200)
     val OP = 1 (1 -> 2)
     val IP = 16 (1 -> 96)
@@ -1588,12 +1598,12 @@ object BlackScholes extends SpatialApp {
     setArg(N, size)
 
     val types    = DRAM[Int](N)
-    val prices   = DRAM[Float](N)
-    val strike   = DRAM[Float](N)
-    val rate     = DRAM[Float](N)
-    val vol      = DRAM[Float](N)
-    val times    = DRAM[Float](N)
-    val optprice = DRAM[Float](N)
+    val prices   = DRAM[T](N)
+    val strike   = DRAM[T](N)
+    val rate     = DRAM[T](N)
+    val vol      = DRAM[T](N)
+    val times    = DRAM[T](N)
+    val optprice = DRAM[T](N)
     setMem(types, stypes)
     setMem(prices, sprices)
     setMem(strike, sstrike)
@@ -1604,12 +1614,12 @@ object BlackScholes extends SpatialApp {
     Accel {
       Foreach(N by B par OP) { i =>
         val typeBlk   = SRAM[Int](B)
-        val priceBlk  = SRAM[Float](B)
-        val strikeBlk = SRAM[Float](B)
-        val rateBlk   = SRAM[Float](B)
-        val volBlk    = SRAM[Float](B)
-        val timeBlk   = SRAM[Float](B)
-        val optpriceBlk = SRAM[Float](B)
+        val priceBlk  = SRAM[T](B)
+        val strikeBlk = SRAM[T](B)
+        val rateBlk   = SRAM[T](B)
+        val volBlk    = SRAM[T](B)
+        val timeBlk   = SRAM[T](B)
+        val optpriceBlk = SRAM[T](B)
 
         Parallel {
           typeBlk   load types(i::i+B par par_load)
@@ -1635,18 +1645,22 @@ object BlackScholes extends SpatialApp {
     val N = args(0).to[Int]
 
     val types  = Array.fill(N)(random[Int](2))
-    val prices = Array.fill(N)(random[Float])
-    val strike = Array.fill(N)(random[Float])
-    val rate   = Array.fill(N)(random[Float])
-    val vol    = Array.fill(N)(random[Float])
-    val time   = Array.fill(N)(random[Float])
+    val prices = Array.fill(N)(random[T])
+    val strike = Array.fill(N)(random[T])
+    val rate   = Array.fill(N)(random[T])
+    val vol    = Array.fill(N)(random[T])
+    val time   = Array.fill(N)(random[T])
 
     val out = blackscholes(types, prices, strike, rate, vol, time)
 
+    val gold = Array.tabulate(N){i => 
+      BlkSchlsEqEuroNoDiv(prices(i), strike(i), rate(i), vol(i), time(i), types(i))
+    }
     printArray(out, "result: ")
+    printArray(gold, "gold: ")
 
-    //val cksum = out.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
-    //println("PASS: " + cksum + " (BlackSholes)")
+    val cksum = out.zip(gold){ case (o, g) => (g < (o + margin.to[T])) && g > (o - margin.to[T])}.reduce{_&&_}
+    println("PASS: " + cksum + " (BlackSholes)")
 
 
   }
