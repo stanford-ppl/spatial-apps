@@ -1339,7 +1339,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
     var gold_nmatches = 0
     val pattern_length = raw_string_pattern.length
     val string_length = raw_string_data.apply(0).length
-    for (i <- 0 until string_length) {
+    for (i <- 0 until string_length-pattern_length) {
       val substr = raw_string_data.apply(0).apply(i,i+pattern_length)
       if (substr == raw_string_pattern) gold_nmatches = gold_nmatches + 1
     }
