@@ -2149,7 +2149,7 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
 
       }
 
-      Foreach(2 by 1){i => 
+      Sequential.Foreach(2 by 1){i => 
         Pipe{SHA256()}
         if (i == 0) {
           text_dram(0::32) store hash
