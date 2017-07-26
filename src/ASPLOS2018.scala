@@ -1323,7 +1323,7 @@ object BFS_Queue extends SpatialApp { // Regression (Sparse) // Args: none
   }
 }
 
-object PageRank extends SpatialApp { // DISABLED Regression (Sparse) // Args: 1 768 0.125
+object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
@@ -1332,30 +1332,38 @@ object PageRank extends SpatialApp { // DISABLED Regression (Sparse) // Args: 1 
     Currently testing with DIMACS10 Chesapeake dataset from UF Sparse Matrix collection
 
   */
-  val margin = 1
+  val margin = 0.3f
 
   @virtualize
   def main() {
     val tileSize = 16
     val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
     val rows = sparse_data(0,0)
-    val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)}
-    val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)}
+    val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
+    val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
     // Preprocess to get frontier sizes.  We can do this on chip also if we wanted
-    val edgeLens = Array.tabulate(rows){i => Array.tabulate(rows){j => 
+    println("Matrix has " + rows + " rows")
+    val edgeLens = Array.tabulate(rows){i => Array.tabulate(node1_list.length){j => 
       if (node1_list(j) == i) 1 else 0
     }.reduce{_+_}}
     val edgeIds = Array.tabulate(rows){i => 
       var id = -1
-      Array.tabulate(rows){j => 
+      Array.tabulate(node1_list.length){j => 
         if (id == -1 && node1_list(j) == i) {
           id = j
           j
         } else { 0 }
     }.reduce{_+_}}
 
+    // printArray(node1_list, "node1_list:")
+    // printArray(node2_list, "node2_list:")
+    printArray(edgeLens, "edgeLens: ")
+    printArray(edgeIds, "edgeIds: ")
+
     val par_load = 16
     val par_store = 16
+    val tile_par = 2 (1 -> 1 -> 12)
+    val page_par = 2 (1 -> 1 -> tileSize)
 
     // Arguments
     val itersIN = args(0).to[Int]
@@ -1384,27 +1392,27 @@ object PageRank extends SpatialApp { // DISABLED Regression (Sparse) // Args: 1 
 
     Accel {
       Sequential.Foreach(iters by 1){iter => 
-        val local_pages = SRAM[X](tileSize)
-        val local_edgeIds = SRAM[Int](tileSize)
-        val local_edgeLens = SRAM[Int](tileSize)
         // Step through each tile
-        Sequential.Foreach(NP by tileSize){page => 
+        Foreach(NP by tileSize par tile_par){page => 
+          val local_pages = SRAM.buffer[X](tileSize)
+          val local_edgeIds = SRAM[Int](tileSize)
+          val local_edgeLens = SRAM[Int](tileSize)
           val pages_left = min(tileSize.to[Int], NP-page)
           local_pages load OCpages(page::page+pages_left par par_load)
           local_edgeLens load OCedgeLens(page::page+pages_left par par_load)
           local_edgeIds load OCedgeIds(page::page+pages_left par par_load)
           // Process each page in local tile
-          Sequential.Foreach(pages_left by 1){local_page => 
+          Sequential.Foreach(pages_left by 1 par page_par){local_page => 
             // Fetch edge list for this page
             val edgeList = FIFO[Int](128)
             val id = local_edgeIds(local_page)
             val len = local_edgeLens(local_page)
-            edgeList load OCedges(id::id+len par par_load)
+            edgeList load OCedges(id::id+len)
             // Triage between edges that exist in local tiles and off chip
             val nearPages = FIFO[Int](128)
             val farPages1 = FIFO[Int](128)
             val farPages2 = FIFO[Int](128)
-            Sequential.Foreach(edgeList.numel by 1){i => 
+            Foreach(edgeList.numel by 1){i => 
               val tmp = edgeList.deq()
               if (tmp >= page && tmp < page+pages_left) {
                 nearPages.enq(tmp - page)
@@ -1422,9 +1430,11 @@ object PageRank extends SpatialApp { // DISABLED Regression (Sparse) // Args: 1 
             // Do math to find new rank
             val pagerank = Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
+                println("page: " + page + ", local_page: " + local_page + " deq from far")
                 local_farPages.deq() / local_farEdgeLens.deq().to[X]
               } else {
                 val addr = nearPages.deq()
+                println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
                 local_pages(addr) / local_edgeLens(addr).to[X]
               }
             }{_+_}
@@ -1432,7 +1442,7 @@ object PageRank extends SpatialApp { // DISABLED Regression (Sparse) // Args: 1 
             // Write new rank
             local_pages(local_page) = pagerank * damp + (1.to[X] - damp)
           }
-          OCpages(page::page+pages_left par par_load) store local_pages
+          OCpages(page::page+pages_left par par_store) store local_pages
         }
       }
     }
@@ -1447,12 +1457,14 @@ object PageRank extends SpatialApp { // DISABLED Regression (Sparse) // Args: 1 
 
     // Really bad imperative version
     for (ep <- 0 until iters) {
+      // println("Iter " + ep)
       for (i <- 0 until NP) {
         val numEdges = edgeLens(i)
         val startId = edgeIds(i)
         val iterator = Array.tabulate(numEdges){kk => startId + kk}
-        val these_pages = iterator.map{j => gold(j)}
-        val these_counts = iterator.map{j => edgeLens(j)}
+        val these_edges = iterator.map{j => node2_list(j)}
+        val these_pages = these_edges.map{j => gold(j)}
+        val these_counts = these_edges.map{j => edgeLens(j)}
         val pr = these_pages.zip(these_counts){ (p,c) =>
           // println("page " + i + " doing " + p + " / " + c)
           p/c.to[X]
@@ -1462,9 +1474,10 @@ object PageRank extends SpatialApp { // DISABLED Regression (Sparse) // Args: 1 
       }
     }
 
+    println("PageRank on DIMACS10 Chesapeake dataset downloaded from UF Sparse Matrix collection")
     printArray(gold, "gold: ")
     printArray(result, "result: ")
-    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin.to[X])) && g > (o - margin.to[X])}.reduce{_&&_}
     println("PASS: " + cksum + " (PageRank)")
 
   }
