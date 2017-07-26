@@ -1076,7 +1076,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     val loop_kk = 1 (1 -> 1 -> 8)
     val loop_i =  1 (1 -> 1 -> 8)
     val loop_k =  1 (1 -> 1 -> 8)
-    val loop_j =  1 (1 -> 1 -> 8)
+    val loop_j =  2 (1 -> 1 -> 8)
 
     val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
     val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
@@ -1516,13 +1516,13 @@ object PageRank extends SpatialApp { // DISABLED Regression (Sparse) // Args: 1 
 
 object BlackScholes extends SpatialApp {
 
-  type T = FixPt[TRUE,_32,_32]
-  val margin = 0.5f // Validates true if within +/- margin
+  type T = Float//FixPt[TRUE,_32,_32]
+  val margin = 0.2f // Validates true if within +/- margin
 
   final val inv_sqrt_2xPI = 0.39894228040143270286f.to[T]
 
   @virtualize
-  def CNDF(x: T) = {
+  def CNDF(x: T): T = {
     val ax = abs(x)
 
     val xNPrimeofX = exp_taylor((ax ** 2) * -0.05f.to[T]) * inv_sqrt_2xPI
@@ -1552,26 +1552,26 @@ object BlackScholes extends SpatialApp {
 
   @virtualize
   def BlkSchlsEqEuroNoDiv(sptprice: T, strike: T, rate: T,
-    volatility: T, time: T, otype: Int) = {
+    volatility: T, time: T, otype: Int): T = {
 
     val xLogTerm = log_taylor( sptprice / strike )
-    val xPowerTerm = (volatility ** 2) * 0.5f.to[T]
-    val xNum = (rate + xPowerTerm) * time + xLogTerm
-    val xDen = volatility * sqrt_approx(time)
-    println("  " + xDen)
+    sptprice*strike
+    // val xPowerTerm = (volatility ** 2) * 0.5f.to[T]
+    // val xNum = (rate + xPowerTerm) * time + xLogTerm
+    // val xDen = volatility * sqrt_approx(time)
 
-    val xDiv = xNum / (xDen ** 2)
-    val nofXd1 = CNDF(xDiv)
-    val nofXd2 = CNDF(xDiv - xDen)
+    // val xDiv = xNum / (xDen ** 2)
+    // val nofXd1 = CNDF(xDiv)
+    // val nofXd2 = CNDF(xDiv - xDen)
 
-    val futureValueX = strike * exp_taylor(-rate * time)
+    // val futureValueX = strike * exp_taylor(-rate * time)
 
-    val negNofXd1 = -nofXd1 + 1.0f.to[T]
-    val negNofXd2 = -nofXd2 + 1.0f.to[T]
+    // val negNofXd1 = -nofXd1 + 1.0f.to[T]
+    // val negNofXd2 = -nofXd2 + 1.0f.to[T]
 
-    val optionPrice1 = (sptprice * nofXd1) - (futureValueX * nofXd2)
-    val optionPrice2 = (futureValueX * negNofXd2) - (sptprice * negNofXd1)
-    mux(otype == 0, optionPrice2, optionPrice1)
+    // val optionPrice1 = (sptprice * nofXd1) - (futureValueX * nofXd2)
+    // val optionPrice2 = (futureValueX * negNofXd2) - (sptprice * negNofXd1)
+    // mux(otype == 0, optionPrice2, optionPrice1)
   }
 
   @virtualize
@@ -1586,8 +1586,8 @@ object BlackScholes extends SpatialApp {
     val B  = 32 (32 -> 96 -> 19200)
     val OP = 1 (1 -> 2)
     val IP = 1 (1 -> 96)
-    val par_load = 1
-    val par_store = 1
+    val par_load = 8
+    val par_store = 8
 
     val size = stypes.length; bound(size) = 9995328
 
@@ -1641,12 +1641,12 @@ object BlackScholes extends SpatialApp {
   def main(): Unit = {
     val N = args(0).to[Int]
 
-    val types  = Array.fill(N)(random[Int](2))
-    val prices = Array.fill(N)(random[T])
-    val strike = Array.fill(N)(random[T])
-    val rate   = Array.fill(N)(random[T])
-    val vol    = Array.fill(N)(random[T])
-    val time   = Array.fill(N)(random[T])
+    val types  = Array.fill(N)(1 + random[Int](2))
+    val prices = Array.fill(N)(1 + random[T])
+    val strike = Array.fill(N)(1 + random[T])
+    val rate   = Array.fill(N)(1 + random[T])
+    val vol    = Array.fill(N)(1 + random[T])
+    val time   = Array.fill(N)(1 + random[T])
 
     val out = blackscholes(types, prices, strike, rate, vol, time)
 

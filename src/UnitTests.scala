@@ -57,6 +57,7 @@ object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -28
 
     val in1 = ArgIn[T]
     val in2 = ArgIn[T]
+    val ffnegate_out = ArgOut[T]
     val ffadd_out = ArgOut[T]
     val ffmul_out = ArgOut[T]
     val ffdiv_out = ArgOut[T]
@@ -66,16 +67,18 @@ object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -28
     val ffgt_out = ArgOut[Boolean]
     val ffeq_out = ArgOut[Boolean]
 
-    // val dram1 = DRAM[T](16)
-    // val dram2 = DRAM[T](16)
+    val dram1 = DRAM[T](16)
+    val dram2 = DRAM[T](16)
 
-    // val array1 = Array.tabulate[T](16){i => i.to[T]}
+    val array1 = Array.tabulate[T](16){i => i.to[T] / 2.to[T]}
 
-    // setMem(dram1, array1)
+    setMem(dram1, array1)
     setArg(in1, args(0).to[T])
     setArg(in2, args(1).to[T])
     Accel{
-      // val sram1 = SRAM[T](16)
+      val sram1 = SRAM[T](16)
+      val sram2 = SRAM[T](16)
+      ffnegate_out := -in1
       ffadd_out := in1 + in2
       ffmul_out := in1 * in2
       ffdiv_out := in1 / in2
@@ -84,17 +87,23 @@ object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -28
       fflt_out := in1 < in2
       ffgt_out := in1 > in2
       ffeq_out := in1.value == in2.value
+      sram1 load dram1
+      Foreach(16 by 1) { i => sram2(i) = sram1(i) / 0.5f.to[T]}
+      dram2 store sram2
     }
 
-    val ffadd_result = getArg(ffadd_out)
-    val ffmul_result = getArg(ffmul_out)
-    val ffsub_result = getArg(ffsub_out)
-    val ffdiv_result = getArg(ffdiv_out)
-    val ffsqrt_result = getArg(ffsqrt_out)
-    val fflt_result = getArg(fflt_out)
-    val ffgt_result = getArg(ffgt_out)
-    val ffeq_result = getArg(ffeq_out)
+    val ffnegate_result  = getArg(ffnegate_out)
+    val ffadd_result     = getArg(ffadd_out)
+    val ffmul_result     = getArg(ffmul_out)
+    val ffsub_result     = getArg(ffsub_out)
+    val ffdiv_result     = getArg(ffdiv_out)
+    val ffsqrt_result    = getArg(ffsqrt_out)
+    val fflt_result      = getArg(fflt_out)
+    val ffgt_result      = getArg(ffgt_out)
+    val ffeq_result      = getArg(ffeq_out)
+    val dram_result      = getMem(dram2)
 
+    val ffnegate_gold = -args(0).to[T]
     val ffadd_gold = args(0).to[T] + args(1).to[T]
     val ffmul_gold = args(0).to[T] * args(1).to[T]
     val ffsub_gold = args(0).to[T] - args(1).to[T]
@@ -104,6 +113,9 @@ object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -28
     val fflt_gold = args(0).to[T] < args(1).to[T]
     val ffeq_gold = args(0).to[T] == args(1).to[T]
 
+    printArray(dram_result, "Dram result: ")
+    printArray(array1, "Dram expected: ")
+    println("negate: " + ffnegate_result + " == " + ffnegate_gold)
     println("sum: " + ffadd_result + " == " + ffadd_gold)
     println("prod: " + ffmul_result + " == " + ffmul_gold)
     println("sub: " + ffsub_result + " == " + ffsub_gold)
@@ -112,8 +124,8 @@ object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -28
     println("gt: " + ffgt_result + " == " + ffgt_gold)
     println("lt: " + fflt_result + " == " + fflt_gold)
     println("eq: " + ffeq_result + " == " + ffeq_gold)
-    val cksum = /*ffsqrt_result == ffsqrt_gold && ffdiv_result == ffdiv_gold && */ffadd_result == ffadd_gold && ffmul_result == ffmul_gold && ffsub_result == ffsub_gold && fflt_result == fflt_gold && ffgt_result == ffgt_gold && ffeq_result == ffeq_gold
-    println("PASS: " + cksum + " (FloatBasics) * Fix sqrt and div")
+    val cksum = /*ffsqrt_result == ffsqrt_gold && ffdiv_result == ffdiv_gold && */ffadd_result == ffadd_gold && ffmul_result == ffmul_gold && ffsub_result == ffsub_gold && fflt_result == fflt_gold && ffgt_result == ffgt_gold && ffeq_result == ffeq_gold && ffnegate_result == ffnegate_gold && dram_result.zip(array1){(a,b) => abs(a-(b/0.5f.to[T])) < 0.1f.to[T]}.reduce{_&&_}
+    println("PASS: " + cksum + " (FloatBasics) * Fix sqrt.  Div should only work with retime on")
   }
 }
 
