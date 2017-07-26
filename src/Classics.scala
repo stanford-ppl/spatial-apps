@@ -1295,195 +1295,165 @@ object LogReg extends SpatialApp {
 
 }
 
-object PageRank extends SpatialApp { // DISABLED Regression (Sparse) // Args: 1 768 0.125
+object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
 
   /*
-                                          0
-         _________________________________|__________________________________________________________
-        |                   |                 |                  |                 |                 |
-        1                   3                 5                  7                 9                 11
-     ___|______        _____|____         ____|__          ______|______           |        _________|____________
-    |     |    |      |     |    |       |       |        |      |      |          |       |       |        |     |
-    2     50   55     4     92   49      150     6        8      10     12        42      110     210      310   311
-   _|_    _|_   |    _|_    |   _|_      |     __|_       |      |      |         |        |       |      _|_     |
-  |   |  |   |  |   |   |   |  |   |     |    |    |      |      |      |         |        |       |     |   |    |
-  57 100 58 101 140 60 102  99 120 115   13  103  104    105    106    108        43      111     211   300  301  290
-                    |
-              ______|________
-             |   |   |   |   |
-             80 131 132 181 235
-
-
+    Currently testing with DIMACS10 Chesapeake dataset from UF Sparse Matrix collection
 
   */
-  val edges_per_page = 6 // Will make this random later
-  val margin = 1
-
-  @virtualize
-  def pagerank[T:Type:Num](
-    pagesIN:  Array[T],
-    edgesIN:  Array[Int],
-    countsIN: Array[Int],
-    edgeIdIN: Array[Int],
-    edgeLenIN: Array[Int],
-    itersIN: Int,
-    dampIN: T,
-    np: Int
-  ) = {
-
-    val NE = 9216
-    val tileSize = 16 // For now
-    val iters = ArgIn[Int]
-    val NP    = ArgIn[Int]
-    val damp  = ArgIn[T]
-    setArg(iters, itersIN)
-    setArg(NP, np)
-    setArg(damp, dampIN)
-
-    val OCpages    = DRAM[T](NP)
-    val OCedges    = DRAM[Int](NE)    // srcs of edges
-    val OCcounts   = DRAM[Int](NE)    // counts for each edge
-    val OCedgeId   = DRAM[Int](NP) // Start index of edges
-    val OCedgeLen  = DRAM[Int](NP) // Number of edges for each page
-    // val OCresult   = DRAM[T](np)
-
-    setMem(OCpages, pagesIN)
-    setMem(OCedges, edgesIN)
-    setMem(OCcounts, countsIN)
-    setMem(OCedgeId, edgeIdIN)
-    setMem(OCedgeLen, edgeLenIN)
-
-    Accel {
-      val frontierOff = SRAM[Int](tileSize)
-      val currentPR = SRAM[T](tileSize)
-      // Flush frontierOff so we don't cause gather segfault. Flush currentPR because mux isn't do what I thought it would
-      Foreach(tileSize by 1) { i => frontierOff(i) = 0.to[Int]}
-
-      Sequential.Foreach(iters by 1){ iter =>
-        // val oldPrIdx = iter % 2.as[SInt]
-        // val newPrIdx = mux(oldPrIdx == 1, 0.as[SInt], 1.as[SInt])
-        Sequential.Foreach(NP by tileSize) { tid =>
-          val edgesId = SRAM[Int](tileSize)
-          val edgesLen = SRAM[Int](tileSize)
-          Parallel {
-            currentPR load OCpages(tid::tid+tileSize)
-            edgesId load OCedgeId(tid :: tid+tileSize)
-            edgesLen load OCedgeLen(tid :: tid+tileSize)
-          }
-
-          Sequential.Foreach(tileSize by 1) { pid =>
-            val startId = edgesId(pid)
-            val numEdges = Reg[Int](0)
-            Pipe{ numEdges := edgesLen(pid) }
-
-
-            // Gather edges indices and counts
-            val edges = SRAM[Int](tileSize)
-            val counts = SRAM[Int](tileSize)
-            Parallel {
-              edges load OCedges(startId :: startId + numEdges.value)
-              counts load OCcounts(startId :: startId + numEdges.value)
-            }
-
-            // Triage edges based on if they are in current tile or offchip
-            val offLoc = SRAM[Int](tileSize)
-            val onChipMask = SRAM[Int](tileSize) // Really bitmask
-            val offAddr = Reg[Int](-1)
-            Sequential.Foreach(numEdges.value by 1){ i =>
-              val addr = edges(i) // Write addr to both tiles, but only inc one addr
-              val onchip = addr >= tid && addr < tid+tileSize
-              offAddr := offAddr.value + mux(onchip, 0, 1)
-              offLoc(i) = mux(onchip, offAddr.value, (tileSize-1).to[Int]) // Probably no need to mux here
-              onChipMask(i) = mux(onchip, 1.to[Int], 0.to[Int])
-            }
-
-            // Set up gather addresses
-            Sequential.Foreach(numEdges.value by 1){i =>
-              frontierOff(offLoc(i)) = edges(i)
-            }
-
-            // Gather offchip ranks
-            val gatheredPR = SRAM[T](tileSize)
-            val num2gather = max(offAddr.value + 1.to[Int], 0.to[Int]) // Probably no need for mux
-            gatheredPR gather OCpages(frontierOff, num2gather)
-
-            // Compute new PR
-            val pr = Reduce(Reg[T])(numEdges.value by 1){ i =>
-              val addr = edges(i)
-              val off  = offLoc(i)
-              val mask = onChipMask(i)
-              val onchipRank = currentPR(addr - tid)
-
-              val offchipRank = gatheredPR(off)
-
-              val rank = mux(mask == 1.to[Int], onchipRank, offchipRank)
-
-              rank / (counts(i).to[T])
-            }{_+_}
-            //val pr = Reduce(numEdges.value by 1)(0.as[T]){ i => frontier(i) / counts(i).to[T] }{_+_}
-
-            // Update PR
-            currentPR(pid) = pr.value * damp + (1.to[T] - damp)
-
-            // Reset counts (Plasticine: assume this is done by CUs)
-            Pipe{offAddr := -1}
-
-          }
-          OCpages(tid::tid+tileSize) store currentPR
-        }
-      }
-    }
-    getMem(OCpages)
-  }
+  val margin = 0.3f
 
   @virtualize
   def main() {
-    val iters = args(0).to[Int]
-    val NP = args(1).to[Int]
-    val damp = args(2).to[X]
-    val NE = 18432
+    val tileSize = 16
+    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val rows = sparse_data(0,0)
+    val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
+    val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
+    // Preprocess to get frontier sizes.  We can do this on chip also if we wanted
+    println("Matrix has " + rows + " rows")
+    val edgeLens = Array.tabulate(rows){i => Array.tabulate(node1_list.length){j => 
+      if (node1_list(j) == i) 1 else 0
+    }.reduce{_+_}}
+    val edgeIds = Array.tabulate(rows){i => 
+      var id = -1
+      Array.tabulate(node1_list.length){j => 
+        if (id == -1 && node1_list(j) == i) {
+          id = j
+          j
+        } else { 0 }
+    }.reduce{_+_}}
 
-    val pages = Array.tabulate(NP){i => 4.to[X]}
-    val edges = Array.tabulate(NP){i => Array.tabulate(edges_per_page) {j => if (i < edges_per_page) j else i - j}}.flatten
-    val counts = Array.tabulate(NP){i => Array.tabulate(edges_per_page) { j => edges_per_page.to[Int] }}.flatten
-    val edgeId = Array.tabulate(NP){i => i*edges_per_page }
-    val edgeLen = Array.tabulate(NP){i => edges_per_page.to[Int] }
+    // printArray(node1_list, "node1_list:")
+    // printArray(node2_list, "node2_list:")
+    printArray(edgeLens, "edgeLens: ")
+    printArray(edgeIds, "edgeIds: ")
 
-    val result = pagerank(pages, edges, counts, edgeId, edgeLen, iters, damp, NP)
+    val par_load = 16
+    val par_store = 16
+    val tile_par = 2 (1 -> 1 -> 12)
+    val page_par = 2 (1 -> 1 -> tileSize)
 
+    // Arguments
+    val itersIN = args(0).to[Int]
+    val dampIN = args(1).to[X]
+
+    val iters = ArgIn[Int]
+    val NP    = ArgIn[Int]
+    val damp  = ArgIn[X]
+    val NE    = ArgIn[Int]
+    setArg(iters, itersIN)
+    setArg(NP, rows)
+    setArg(damp, dampIN)
+    setArg(NE, node2_list.length)
+
+    val OCpages    = DRAM[X](NP)
+    val OCedges    = DRAM[Int](NE)    // srcs of edges
+    val OCedgeLens   = DRAM[Int](NP)    // counts for each edge
+    val OCedgeIds   = DRAM[Int](NP) // Start index of edges
+
+    val pagesInit = Array.tabulate(NP){i => 4.to[X]}
+
+    setMem(OCpages, pagesInit)
+    setMem(OCedges, node2_list)
+    setMem(OCedgeLens, edgeLens)
+    setMem(OCedgeIds, edgeIds)
+
+    Accel {
+      Sequential.Foreach(iters by 1){iter => 
+        // Step through each tile
+        Foreach(NP by tileSize par tile_par){page => 
+          val local_pages = SRAM.buffer[X](tileSize)
+          val local_edgeIds = SRAM[Int](tileSize)
+          val local_edgeLens = SRAM[Int](tileSize)
+          val pages_left = min(tileSize.to[Int], NP-page)
+          local_pages load OCpages(page::page+pages_left par par_load)
+          local_edgeLens load OCedgeLens(page::page+pages_left par par_load)
+          local_edgeIds load OCedgeIds(page::page+pages_left par par_load)
+          // Process each page in local tile
+          Sequential.Foreach(pages_left by 1 par page_par){local_page => 
+            // Fetch edge list for this page
+            val edgeList = FIFO[Int](128)
+            val id = local_edgeIds(local_page)
+            val len = local_edgeLens(local_page)
+            edgeList load OCedges(id::id+len)
+            // Triage between edges that exist in local tiles and off chip
+            val nearPages = FIFO[Int](128)
+            val farPages1 = FIFO[Int](128)
+            val farPages2 = FIFO[Int](128)
+            Foreach(edgeList.numel by 1){i => 
+              val tmp = edgeList.deq()
+              if (tmp >= page && tmp < page+pages_left) {
+                nearPages.enq(tmp - page)
+              } else {
+                farPages1.enq(tmp)
+                farPages2.enq(tmp)
+              }
+            }
+            // Fetch off chip info
+            val local_farPages = FIFO[X](128)
+            val local_farEdgeLens = FIFO[Int](128)
+            local_farPages gather OCpages(farPages1) // Need fifos 1 and 2 because fifo is consumed during gather
+            local_farEdgeLens gather OCedgeLens(farPages2)
+
+            // Do math to find new rank
+            val pagerank = Reduce(Reg[X](0))(len by 1){i => 
+              if (nearPages.empty) {
+                println("page: " + page + ", local_page: " + local_page + " deq from far")
+                local_farPages.deq() / local_farEdgeLens.deq().to[X]
+              } else {
+                val addr = nearPages.deq()
+                println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                local_pages(addr) / local_edgeLens(addr).to[X]
+              }
+            }{_+_}
+
+            // Write new rank
+            local_pages(local_page) = pagerank * damp + (1.to[X] - damp)
+          }
+          OCpages(page::page+pages_left par par_store) store local_pages
+        }
+      }
+    }
+
+    val result = getMem(OCpages)
 
     val gold = Array.empty[X](NP)
     // Init
     for (i <- 0 until NP) {
-      gold(i) = pages(i)
+      gold(i) = pagesInit(i)
     }
 
     // Really bad imperative version
     for (ep <- 0 until iters) {
+      // println("Iter " + ep)
       for (i <- 0 until NP) {
-        val numEdges = edgeLen(i)
-        val startId = edgeId(i)
+        val numEdges = edgeLens(i)
+        val startId = edgeIds(i)
         val iterator = Array.tabulate(numEdges){kk => startId + kk}
-        val these_edges = iterator.map{j => edges(j)}
+        val these_edges = iterator.map{j => node2_list(j)}
         val these_pages = these_edges.map{j => gold(j)}
-        val these_counts = these_edges.map{j => counts(j)}
+        val these_counts = these_edges.map{j => edgeLens(j)}
         val pr = these_pages.zip(these_counts){ (p,c) =>
           // println("page " + i + " doing " + p + " / " + c)
           p/c.to[X]
         }.reduce{_+_}
         // println("new pr for " + i + " is " + pr)
-        gold(i) = pr*damp + (1.to[X]-damp)
+        gold(i) = pr*dampIN + (1.to[X]-dampIN)
       }
     }
 
+    println("PageRank on DIMACS10 Chesapeake dataset downloaded from UF Sparse Matrix collection")
     printArray(gold, "gold: ")
     printArray(result, "result: ")
-    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin.to[X])) && g > (o - margin.to[X])}.reduce{_&&_}
     println("PASS: " + cksum + " (PageRank)")
+
   }
+
 }
 
 
