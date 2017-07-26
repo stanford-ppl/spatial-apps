@@ -1177,7 +1177,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
       // Iterate over each block
       Foreach(BLOCK_SIDE by 1, BLOCK_SIDE by 1, BLOCK_SIDE by 1) { (b0x, b0y, b0z) => 
         // Iterate over each point in this block, considering boundaries
-        val b0_cube_forces = SRAM[XYZ](density)
+        val b0_cube_forces = SRAM.buffer[XYZ](density)
         val b1x_start = max(0.to[Int],b0x-1.to[Int])
         val b1x_end = min(BLOCK_SIDE.to[Int], b0x+2.to[Int])
         val b1y_start = max(0.to[Int],b0y-1.to[Int])
