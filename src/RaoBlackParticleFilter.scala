@@ -14,20 +14,85 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   implicit def toReal(x: SCReal) = x.to[SReal]
 
-  def sqrt(x: SReal) = sqrt_approx(x)
-  def sin(x: SReal) = sin_taylor(x)
-  def cos(x: SReal) = cos_taylor(x)  
+  val N: scala.Int                                  = 2
+  val initV: (SCReal, SCReal, SCReal)               = (0.0, 0.0, 0.0)
+  val initP: (SCReal, SCReal, SCReal)               = (0.0, 0.0, 0.0)
+  val initQ: (SCReal, SCReal, SCReal, SCReal) = (1.0, 0.0, 0.0, 0.0)
+  val initCov = 0.00001
+
+
+  val initTime: SCReal  = 0.0
+  val covGyro: SCReal   = 1.0
+  val covAcc: SCReal    = 0.1
+  val covViconP: SCReal = 0.01
+  val covViconQ: SCReal = 0.01
+
+  @struct case class SVec3(x: SReal, y: SReal, z: SReal)
+
+
+  type STime         = Double
+  type SPosition     = SVec3
+  type SVelocity     = SVec3
+  type SAcceleration = SVec3
+  type SOmega        = SVec3
+  type SAttitude     = SQuat
+
+
+  @struct case class SQuat(r: SReal, i: SReal, j: SReal, k: SReal)
+  @struct case class SIMU(a: SAcceleration, g: SOmega)  
+  @struct case class TSA(t: STime, v: SIMU)
+  @struct case class SPOSE(p: SVec3, q: SAttitude)
+  @struct case class TSB(t: STime, v: SPOSE)
+  @struct case class TSR(t: STime, pose: SPOSE)  
+  @struct case class Particle(w: SReal, q: SQuat, lastA: SAcceleration, lastQ: SQuat)
+  
 
   val lutP: scala.Int = 10000
-  val lutAcos: scala.Int = 1000 
-  lazy val logLUT = 
-    LUT[SReal](lutP)(((-9:SReal)::List.tabulate[SReal](lutP-1)(i => math.log(((i+1)/lutP.toDouble)*20))):_*)
-
-  lazy val expLUT = 
-    LUT[SReal](lutP)(List.tabulate[SReal](lutP)(i => math.exp(i/lutP.toDouble*10-10)):_*)
+  val lutAcos: scala.Int = 1000
 
   lazy val acosLUT = 
     LUT[SReal](lutAcos)(List.tabulate[SReal](lutAcos)(i => math.acos(i/lutAcos.toDouble)):_*)
+
+  lazy val sqrtLUT = 
+    LUT[SReal](lutP)(List.tabulate[SReal](lutP)(i => math.sqrt(((i/lutP.toDouble)*5))):_*)
+    
+  lazy val logLUTSmall = 
+    LUT[SReal](lutP)(((-9:SReal)::List.tabulate[SReal](lutP-1)(i => math.log(((i+1)/lutP.toDouble)*1))):_*)
+
+  lazy val logLUTBig = 
+    LUT[SReal](lutP)(((-9:SReal)::List.tabulate[SReal](lutP-1)(i => math.log(((i+1)/lutP.toDouble)*200))):_*)
+  
+  lazy val expLUT = 
+    LUT[SReal](lutP)(List.tabulate[SReal](lutP)(i => math.exp(i/lutP.toDouble*20-10)):_*)
+
+  def sin(x: SReal) = sin_taylor(x)
+  def cos(x: SReal) = cos_taylor(x)  
+
+  @virtualize
+  def log(x: SReal) = {
+    if (x < 1.0)
+      logLUTSmall(((x/1.0)*(lutP.toDouble)).to[Index])
+    else
+      logLUTBig(((x/200.0)*(lutP.toDouble)).to[Index])      
+  }
+
+  @virtualize
+  def sqrt(x: SReal) = {
+    if (x < 5)
+      sqrtLUT(((x/5.0)*(lutP.toDouble)).to[Index])
+    else
+      sqrt_approx(x)
+  }
+
+  @virtualize
+  def exp(x: SReal): SReal =  {
+    if (x <= -10)
+      4.5399929762484854E-5
+    else
+      expLUT((((x+10)/20.0)*(lutP.toDouble)).to[Index])      
+
+  }
+  
   
   @virtualize
   def acos(x: SReal) = {
@@ -45,48 +110,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
     }
   }
 
-  @virtualize
-  def log(x: SReal) = 
-    logLUT(((x/20.0)*(lutP.toDouble)).to[Index])
   
-  @virtualize
-  def exp(x: SReal): SReal = {
-    if (x >= 0.0)
-      1
-    else
-      expLUT((((x+10)/10.0)*(lutP.toDouble)).to[Index])
-  }
-  
-  val N: scala.Int                                  = 10
-  val initV: (SCReal, SCReal, SCReal)               = (0.0, 0.0, 0.0)
-  val initP: (SCReal, SCReal, SCReal)               = (0.0, 0.0, 0.0)
-  val initQ: (SCReal, SCReal, SCReal, SCReal) = (1.0, 0.0, 0.0, 0.0)
-  val initCov = 0.00001
-
-
-  val initTime: SCReal  = 0.0
-  val covGyro: SCReal   = 1.0
-  val covAcc: SCReal    = 0.1
-  val covViconP: SCReal = 0.01
-  val covViconQ: SCReal = 0.01
-
-  @struct case class SVec3(x: SReal, y: SReal, z: SReal)
-
-
-  type STime         = SReal
-  type SPosition     = SVec3
-  type SVelocity     = SVec3
-  type SAcceleration = SVec3
-  type SOmega        = SVec3
-  type SAttitude     = SQuat
-
-
-  @struct case class SQuat(r: SReal, i: SReal, j: SReal, k: SReal)
-  @struct case class SIMU(t: STime, a: SAcceleration, g: SOmega)
-  @struct case class SPOSE(p: SVec3, q: SAttitude)
-  @struct case class SVicon(t: STime, pose: SPOSE)
-  //x(v1, v2, v3, p1, p2, p3)
-  @struct case class Particle(w: SReal, q: SQuat, lastA: SAcceleration, lastQ: SQuat)
 
 
   val matrix = new Matrix[SReal] {
@@ -135,10 +159,12 @@ trait RaoBlackParticleFilter extends SpatialStream {
   @virtualize def initParticles(particles: SRAM1[Particle], states: SRAM2[SReal], covs: SRAM3[SReal], parFactor: Int) = {
 
     acosLUT
-    logLUT
+    logLUTSmall
+    logLUTBig
+    sqrtLUT
     expLUT
 
-    Foreach(0::N par parFactor)(x => {
+    Sequential.Foreach(0::N par parFactor)(x => {
       
       Pipe {
         Pipe { states(x, 0) = initV._1 }
@@ -169,11 +195,11 @@ trait RaoBlackParticleFilter extends SpatialStream {
   }
   
 
-  @virtualize def prog() = {
+  @virtualize def spatial() = {
 
-    val inSIMU     = StreamIn[SIMU](In1)
-    val inV       = StreamIn[SVicon](In2)
-    val out       = StreamOut[SVicon](Out1)
+    val inSIMU     = StreamIn[TSA](In1)
+    val inV       = StreamIn[TSB](In2)
+    val out       = StreamOut[TSR](Out1)
     val parFactor = 1 (1 -> N)
 
     Accel {
@@ -181,8 +207,8 @@ trait RaoBlackParticleFilter extends SpatialStream {
       val particles = SRAM[Particle](N)
       val states = SRAM[SReal](N, 6)
       val covs = SRAM[SReal](N, 6, 6)
-      val fifoSIMU   = FIFO[SIMU](100)
-      val fifoV     = FIFO[SVicon](100)
+      val fifoSIMU   = FIFO[TSA](100)
+      val fifoV     = FIFO[TSB](100)
 
       val lastSTime = Reg[STime](initTime)
       val lastO    = Reg[SOmega](SVec3(0.0, 0.0, 0.0))
@@ -208,14 +234,14 @@ trait RaoBlackParticleFilter extends SpatialStream {
                 choice := 0
                 val imu = fifoSIMU.peek
                 val t = imu.t
-                lastO := imu.g
-                dt := t - lastSTime
+                lastO := imu.v.g
+                dt := (t - lastSTime).to[SReal]
                 lastSTime := t
               }
               else if (!fifoV.empty) {
                 choice := 1
                 val t = fifoV.peek.t
-                dt := t - lastSTime
+                dt := (t - lastSTime).to[SReal]                
                 lastSTime := t
               }
               else
@@ -226,18 +252,18 @@ trait RaoBlackParticleFilter extends SpatialStream {
               }
               if (choice.value == 0) {
                 val imu = fifoSIMU.deq()
-                imuUpdate(imu.a, particles, parFactor)
+                imuUpdate(imu.v.a, particles, parFactor)
               }
               if (choice.value != -1) {
                 kalmanPredictParticle(dt, particles, states, covs, parFactor)
               }
               if (choice.value == 1) {
                 val v = fifoV.deq()
-                viconUpdate(v.pose, dt, particles, states, covs, parFactor)
+                viconUpdate(v.v, dt, particles, states, covs, parFactor)
               }
               if (choice.value != -1) {
                 normWeights(particles, parFactor)
-                out := SVicon(lastSTime, averageSPOSE(particles, states, parFactor))
+                out := TSR(lastSTime, averageSPOSE(particles, states, parFactor))
                 resample(particles, states, covs, parFactor)
               }
             }
@@ -275,7 +301,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   @virtualize
   def kalmanPredictParticle(
-    dt: STime,
+    dt: SReal,
     particles: SRAM1[Particle],
     states: SRAM2[SReal],
     covs: SRAM3[SReal],
@@ -341,52 +367,59 @@ trait RaoBlackParticleFilter extends SpatialStream {
   @virtualize
   def viconUpdate(
     vicon: SPOSE,
-    dt: STime,
+    dt: SReal,
     particles: SRAM1[Particle],
     states: SRAM2[SReal],
     covs: SRAM3[SReal],
     parFactor: Int) = {
 
+    val X: Option[SReal] = None
+    val S1: Option[SReal] = Some(1)
+   
+    val h = Matrix.sparse(3, 6,
+      IndexedSeq[Option[SReal]](
+        X, X, X, S1, X, X,
+        X, X, X, X, S1, X,
+        X, X, X, X, X, S1
+      ))
+    
+    val r = Matrix.eye(3, covViconP)
+
+    val viconP = toMatrix(vicon.p)
+
+    covViconQMat
+    zeroVec
+
     Foreach(0::N par parFactor)(i => {
       
       val pp = particles(i)
 
-      val X: Option[SReal] = None
-      val S1: Option[SReal] = Some(1)
-
-      val h = Matrix.sparse(3, 6,
-        IndexedSeq[Option[SReal]](
-          X, X, X, S1, X, X,
-          X, X, X, X, S1, X,
-          X, X, X, X, X, S1
-        ))
-
-      val r = Matrix.eye(3, covViconP)
-
       val state = Matrix.fromSRAM1(6, states, i)
       val cov = Matrix.fromSRAM2(6, 6, covs, i)    
       
-      val (nx2, nsig2, lik) = kalmanUpdate(state, cov, toMatrix(vicon.p), h, r)
-      val nw                = pp.w + likelihoodSPOSE(vicon, lik._1, pp.q, lik._2)
-
+      val (nx2, nsig2, lik) = kalmanUpdate(state, cov, viconP, h, r)
       nx2.loadTo(states, i)
-      nsig2.loadTo(covs, i)
+      nsig2.loadTo(covs, i)      
+      val nw                = pp.w  + likelihoodSPOSE(vicon, lik._1, pp.q, lik._2)
+
       particles(i) = Particle(nw, pp.q, pp.lastA, pp.lastQ)
     })
   }
 
 
+  lazy val covViconQMat = Matrix.eye(3, covViconQ)
+  lazy val zeroVec = Matrix(3, 1, List[SReal](0, 0, 0))
   @virtualize def likelihoodSPOSE(measurement: SPOSE, expectedPosMeasure: Matrix, quatState: SQuat, covPos: Matrix) = {
     val wPos                = unnormalizedGaussianLogPdf(toMatrix(measurement.p), expectedPosMeasure, covPos)
-    val covViconQMat = Matrix.eye(3, covViconQ)
     val error               = quatToLocalAngle(measurement.q.rotateBy(quatState.inverse))
-    val wSQuat               = unnormalizedGaussianLogPdf(error, Matrix(3, 1, List[SReal](0, 0, 0)), covViconQMat)
+    val wSQuat               = unnormalizedGaussianLogPdf(error, zeroVec, covViconQMat)
     //    println("wPos: " + wPos)
     //    println("wSQuat: " + wSQuat)
     wPos + wSQuat
   }
 
-  def sampleAtt(q: SQuat, om: SOmega, dt: STime): SQuat = {
+
+  def sampleAtt(q: SQuat, om: SOmega, dt: SReal): SQuat = {
     val withNoise  = gaussianVec(toVec(om), covGyro)
     val integrated = withNoise * dt
     val lq         = localAngleToQuat(integrated)
@@ -395,6 +428,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   @virtualize def gaussianVec(mean: Vec, variance: SReal) = {
     val reg = RegFile[SReal](3)
+    //Real sequential
     Sequential.Foreach(0::2)(i => {
       val g1 = gaussian()
         reg(i*2) = g1._1 
@@ -461,9 +495,8 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
     val k = Reg[Int](0)
     Sequential.Foreach(0::N)(i => {
-      val b = weights(k)*N < i.to[SReal] + u
-
-      FSM[Boolean, Boolean](b)(x => x)(x => k := k + 1)(x => weights(k)*N < i.to[SReal]+u)
+      def notDone = (weights(k) * N < i.to[SReal] + u) && k < N
+      FSM[Boolean, Boolean](notDone)(x => x)(x => k := k + 1)(x => notDone)
 
       Foreach(0::6)(x => {
         outStates(i, x) = states(k, x)
@@ -476,7 +509,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
     })
 
 
-    Sequential.Foreach(0::N)(i => {
+    Foreach(0::N)(i => {
       val p = out(i)
       Foreach(0::6)(x => {
         states(i, x) = outStates(i, x)
@@ -519,9 +552,9 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   def kalmanUpdate(xm: Matrix, sigm: Matrix, z: Matrix, h: Matrix, r: Matrix) = {
     val s   = (h * sigm * h.t) :+ r
-    val za = h * xm
     val k = sigm * h.t * s.inv
     val sig = sigm :- (k * s * k.t)
+    val za = h * xm    
     val x = xm :+ (k * (z :- za))
     (x, sig, (za, s))
   }
@@ -529,7 +562,9 @@ trait RaoBlackParticleFilter extends SpatialStream {
   @virtualize def averageSPOSE(particles: SRAM1[Particle], states: SRAM2[SReal], parFactor: Int): SPOSE = {
     val firstQ = particles(0).q
     val accumP = RegFile[SReal](3, List[SReal](0, 0, 0))
-    val accumQ = Reg[SQuat](SQuat(0, 0, 0, 0))
+    val accumQ = Reg[SQuat](SQuat(1, 0, 0, 0))
+    accumP.reset
+    accumQ.reset
     Parallel {
       Foreach(0::N par parFactor, 0::3)((i,j) => {
         accumP(j) = accumP(j) + exp(particles(i).w) * states(i, j+3)
@@ -553,14 +588,14 @@ object RaoBlackParticleFilterInterpreter extends RaoBlackParticleFilter with Spa
   val outs = List(Out1)
 
   val inputs = collection.immutable.Map[Bus, List[MetaAny[_]]](
-    (In1 -> List[SIMU](
-      SIMU(0.0, SVec3(0.25592961314469886, 0.07098284446822825, 0.21456271801876464), SVec3(-1.5064973528139753, -0.616587623133762, -1.2282747703297874)),
-      SIMU(0.005, SVec3(0.25592961314469886, 0.07098284446822825, 0.21456271801876464), SVec3(-1.5064973528139753, -0.616587623133762, -1.2282747703297874)),
-      SIMU(0.01, SVec3(-0.028161957507305768, 0.5264671724413507, -0.08577696872942979), SVec3(-8.614952996266531, -3.699394514006443, -1.2972430998591449)),
-      SIMU(0.015, SVec3(0.5872729169473, 1.3887486685548156, 0.05238849400043921),SVec3(-7.587044288799566, -4.571689569385891, 1.3110956660901323)),
-      SIMU(0.02, SVec3(-1.2583237251856354, 1.4047261203145096, 1.066904859524985),SVec3(-6.119550697150657, -1.7511569969392748, -0.7289420270309247))
+    (In1 -> List[TSA](
+      TSA(0.0, SIMU(SVec3(0.25592961314469886, 0.07098284446822825, 0.21456271801876464), SVec3(-1.5064973528139753, -0.616587623133762, -1.2282747703297874))),
+      TSA(0.005, SIMU(SVec3(0.25592961314469886, 0.07098284446822825, 0.21456271801876464), SVec3(-1.5064973528139753, -0.616587623133762, -1.2282747703297874))),
+      TSA(0.01, SIMU(SVec3(-0.028161957507305768, 0.5264671724413507, -0.08577696872942979), SVec3(-8.614952996266531, -3.699394514006443, -1.2972430998591449))),
+      TSA(0.015, SIMU(SVec3(0.5872729169473, 1.3887486685548156, 0.05238849400043921),SVec3(-7.587044288799566, -4.571689569385891, 1.3110956660901323))),
+      TSA(0.02, SIMU(SVec3(-1.2583237251856354, 1.4047261203145096, 1.066904859524985),SVec3(-6.119550697150657, -1.7511569969392748, -0.7289420270309247)))
     )),
-    (In2 -> List[SVicon](SVicon(0.025, SPOSE(SVec3(0.0747780945262634, 0.10808064129411422, -0.10529076833659502), SQuat(0.9962501245604087, -0.04308471266603672, -0.01947353436952111, -0.07245811415579231))))
+    (In2 -> List[TSB](TSB(0.025, SPOSE(SVec3(0.0747780945262634, 0.10808064129411422, -0.10529076833659502), SQuat(0.9962501245604087, -0.04308471266603672, -0.01947353436952111, -0.07245811415579231))))
   ))
 
 }
