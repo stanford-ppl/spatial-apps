@@ -12,41 +12,64 @@ trait MiniParticleFilter extends SpatialStream {
   type SReal  = FixPt[TRUE, _16, _16]
 
   implicit def toSReal(x: CReal) = x.to[SReal]
-  def sqrt(x: SReal) = sqrt_approx(x)
-
-  val lutP: scala.Int = 10000
-  lazy val logLUT = 
-    LUT[SReal](lutP)(((-9:SReal)::List.tabulate[SReal](lutP-1)(i => math.log(((i+1)/lutP.toDouble)*20))):_*)
-
-  lazy val expLUT = 
-    LUT[SReal](lutP)(List.tabulate[SReal](lutP)(i => math.exp(i/lutP.toDouble*10-10)):_*)
-  
-  @virtualize
-  def log(x: SReal) = 
-    logLUT(((x/20.0)*(lutP.toDouble)).to[Index])
-
-  @virtualize
-  def exp(x: SReal): SReal = 
-    if (x >= 0.0)
-      1
-    else
-      expLUT((((x+10)/10.0)*(lutP.toDouble)).to[Index])
-
-
-  val N: scala.Int          = 10
-  val initV: (CReal, CReal) = (0.0, 0.0)
-  val initP: (CReal, CReal) = (0.0, 0.0)
-
-  val initSTime: CReal = 0.0
-  val covAcc: CReal   = 0.01
-  val covGPS: CReal   = 0.01
-
-  @struct case class SVec2(x: SReal, y: SReal)
 
   type STime         = SReal
   type SPosition2D     = SVec2
   type SAcceleration2D = SVec2
   type SWeight       = SReal
+
+  @struct case class SVec2(x: SReal, y: SReal)
+  @struct case class TSA(t: Double, v: SAcceleration2D)
+  @struct case class TSB(t: Double, v: SPosition2D)
+  @struct case class TSR(t: Double, v: SPosition2D)    
+
+  val N: scala.Int = 10
+  val covAcc: scala.Double = 0.01
+  val covGPS: scala.Double = 0.01
+  val dt: scala.Double = 0.1
+
+  val lutP: scala.Int = 10000
+
+  lazy val sqrtLUT = 
+    LUT[SReal](lutP)(List.tabulate[SReal](lutP)(i => math.sqrt(((i/lutP.toDouble)*5))):_*)
+    
+  lazy val logLUTSmall = 
+    LUT[SReal](lutP)(((-9:SReal)::List.tabulate[SReal](lutP-1)(i => math.log(((i+1)/lutP.toDouble)*1))):_*)
+
+  lazy val logLUTBig = 
+    LUT[SReal](lutP)(((-9:SReal)::List.tabulate[SReal](lutP-1)(i => math.log(((i+1)/lutP.toDouble)*200))):_*)
+  
+  lazy val expLUT = 
+    LUT[SReal](lutP)(List.tabulate[SReal](lutP)(i => math.exp(i/lutP.toDouble*20-10)):_*)
+
+  @virtualize
+  def log(x: SReal) = {
+    if (x < 1.0)
+      logLUTSmall(((x/1.0)*(lutP.toDouble)).to[Index])
+    else
+      logLUTBig(((x/200.0)*(lutP.toDouble)).to[Index])      
+  }
+
+  @virtualize
+  def sqrt(x: SReal) = {
+    if (x < 5)
+      sqrtLUT(((x/5.0)*(lutP.toDouble)).to[Index])
+    else
+      sqrt_approx(x)
+  }
+
+  @virtualize
+  def exp(x: SReal): SReal =  {
+    if (x <= -10)
+      4.5399929762484854E-5
+    else
+      expLUT((((x+10)/20.0)*(lutP.toDouble)).to[Index])      
+
+  }
+
+
+  val initV: (CReal, CReal) = (0.0, 0.0)
+  val initP: (CReal, CReal) = (0.0, 0.0)
 
   val matrix = new Matrix[SReal] {
     val IN_PLACE = false    
@@ -67,8 +90,10 @@ trait MiniParticleFilter extends SpatialStream {
 
   def initParticles(weights: SRAM1[SWeight], states: SRAM2[SReal], parFactor: Int) = {
 
+    sqrtLUT
     expLUT
-    logLUT
+    logLUTSmall
+    logLUTBig    
     Foreach(0 :: N par parFactor)(x => {
 
       Pipe {
@@ -83,49 +108,56 @@ trait MiniParticleFilter extends SpatialStream {
     })
   }
 
-  @virtualize def prog() = {
+  @virtualize def spatial() = {
 
-    val inAcc     = StreamIn[SAcceleration2D](In1)
-    val inGPS     = StreamIn[SPosition2D](In2)
-    val out       = StreamOut[SPosition2D](Out1)
+    val inAcc     = StreamIn[TSA](In1)
+    val inGPS     = StreamIn[TSB](In2)
+    val out       = StreamOut[TSR](Out1)
     val parFactor = 1 (1 -> N)
 
     Accel {
 
       val weights = SRAM[SWeight](N)
       val states  = SRAM[SReal](N, 4)
-      val dt      = 0.1
 
       Sequential {
 
         initParticles(weights, states, parFactor)
+        
+        Sequential.Foreach(1 :: 101)(i => {
 
-        Sequential.Foreach(0 :: 6)(i => {
+          updateFromAcc(inAcc.v, dt, states, parFactor)
 
-          updateFromAcc(inAcc, dt, states, parFactor)
+          if (i%5 == 0) {
+            updateFromGPS(inGPS.v, weights, states, parFactor)
+            normSWeights(weights, parFactor)
+          }
 
-          if (i == 5)
-            updateFromGPS(inGPS, weights, states, parFactor)
+          out := TSR(i.to[Double]*dt.to[Double], averagePos(weights, states, parFactor))
 
-          normSWeights(weights, parFactor)
-          out := averagePos(weights, states, parFactor)          
-          resample(weights, states, parFactor)          
+          if (i%5 == 0 && tooLowEffective(weights))
+            resample(weights, states, parFactor)
 
         })
       }
     }
   }
 
-  def updateFromAcc(acc: SAcceleration2D, dt: STime, states: SRAM2[SReal], parFactor: Int) = {
+  @virtualize def updateFromAcc(acc: SAcceleration2D, dt: STime, states: SRAM2[SReal], parFactor: Int) = {
 
     Foreach(0 :: N par parFactor)(i => {
-      val nq = sampleVel(acc, dt, covAcc)
-      val v  = Matrix.fromSRAM1(4, states, i)
-      val dv = Matrix(4, 1, List(nq(0), nq(1), v(0, 0) * dt, v(1, 0) * dt))
-      val nv = v + dv
-//      println(v(0,0))
-      nv.loadTo(states, i)
+      val dv = sampleVel(acc, dt, covAcc)
+      val s  = Matrix.fromSRAM1(4, states, i)
+      val ds = Matrix(4, 1, List(dv(0), dv(1), s(0, 0)*dt, s(1, 0)*dt))      
+      val ns = s + ds
+      ns.loadTo(states, i)
     })
+  }
+
+  @virtualize def tooLowEffective(weights: SRAM1[SReal]): Boolean = {
+    val thresh = log(1.0/N)
+    val c = Reduce(0)(0::N)(i => if (weights(i) > thresh) 1 else 0)(_+_)
+    c < N/10
   }
 
   def updateFromGPS(pos: SPosition2D, weights: SRAM1[SReal], states: SRAM2[SReal], parFactor: Int) = {
@@ -137,7 +169,7 @@ trait MiniParticleFilter extends SpatialStream {
     })
   }
 
-  def sampleVel(a: SAcceleration2D, dt: STime, covAcc: SReal): Vec = {
+  @virtualize def sampleVel(a: SAcceleration2D, dt: STime, covAcc: SReal): Vec = {
     val withNoise  = gaussianVec(toVec(a), covAcc)
     val integrated = withNoise * dt
     integrated
@@ -145,7 +177,7 @@ trait MiniParticleFilter extends SpatialStream {
 
   def gaussianVec(mean: Vec, variance: SReal) = {
     val g1 = gaussian()
-    Vec(g1._1, g1._2) * sqrt(variance) + mean
+    (Vec(g1._1, g1._2) * sqrt(variance)) + mean
   }
 
   //Box-Muller
@@ -173,10 +205,9 @@ trait MiniParticleFilter extends SpatialStream {
 
   @virtualize def normSWeights(weights: SRAM1[SWeight], parFactor: Int) = {
     val totalSWeight = Reg[SReal](0)
-    val maxR        = Reg[SReal]
-
-    maxR := weights(0)
-
+    val maxR        = Reg[SReal](-100)
+    maxR.reset
+    totalSWeight.reset
     Reduce(maxR)(0 :: N)(i => weights(i))(max(_, _))
     Reduce(totalSWeight)(0 :: N)(i => exp(weights(i) - maxR))(_ + _)
     totalSWeight := maxR + log(totalSWeight)
@@ -202,8 +233,8 @@ trait MiniParticleFilter extends SpatialStream {
 
     val k = Reg[Int](0)
     Foreach(0 :: N)(i => {
-      val b = cweights(k) * N < i.to[SReal] + u
-      FSM[Boolean, Boolean](b)(x => x)(x => k := k + 1)(x => cweights(k) * N < i.to[SReal] + u)
+      def notDone = (cweights(k) * N < i.to[SReal] + u) && k < N
+      FSM[Boolean, Boolean](notDone)(x => x)(x => k := k + 1)(x => notDone)
 
       Foreach(0 :: 4)(x => {
         outStates(i, x) = states(k, x)
@@ -216,7 +247,7 @@ trait MiniParticleFilter extends SpatialStream {
       Foreach(0 :: 4)(x => {
         states(i, x) = outStates(i, x)
       })
-
+      
       weights(i) = log(1.0 / N)
     })
 
@@ -229,13 +260,14 @@ trait MiniParticleFilter extends SpatialStream {
 
   @virtualize def averagePos(weights: SRAM1[SReal], states: SRAM2[SReal], parFactor: Int): SVec2 = {
     val accumP = RegFile[SReal](2, List[SReal](0, 0))
-    Parallel {
-      Foreach(0 :: N par parFactor, 0 :: 2)((i, j) => {
-        accumP(j) = accumP(j) + exp(weights(i)) * states(i, j + 2)
-      })
-    }
+    accumP.reset
+    Foreach(0 :: N par parFactor, 0 :: 2)((i, j) => {
+      accumP(j) = accumP(j) + exp(weights(i)) * states(i, j + 2)
+    })
+
     SVec2(accumP(0), accumP(1))
   }
+  
 
 }
 
@@ -244,8 +276,8 @@ object MiniParticleFilterInterpreter extends MiniParticleFilter with SpatialStre
   val outs = List(Out1)
 
   val inputs = collection.immutable.Map[Bus, List[MetaAny[_]]](
-    (In1 -> List[CReal](0f, 1f, 2f, 3f, 2f).map(x => SVec2(x, x))),
-    (In2 -> List[CReal](1f).map(x => SVec2(x, x)))
+    (In1 -> List[CReal](0f, 1f, 2f, 3f, 2f).map(x => TSA(x, SVec2(x, x)))),
+    (In2 -> List[CReal](1f).map(x => TSB(x, SVec2(x, x))))
   )
 
 }

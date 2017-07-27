@@ -4,7 +4,7 @@ import spatial.interpreter._
 
 trait StreamInOutAdd extends SpatialStream {
 
-  @virtualize def prog() = {
+  @virtualize def spatial() = {
     val in  = StreamIn[Int](In1)
     val out = StreamOut[Int](Out1)    
     Accel(*) {
