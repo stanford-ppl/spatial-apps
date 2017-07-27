@@ -4,15 +4,15 @@ import spatial.targets._
 
 // rework
 object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Plasticine
 
 
  /*
                                                                                                                              
- H   ↗        ___________________                  ___________________                                                                  
-  E         /                   /|               /000000000000000000/ |                                                                
+ H   ↗        ___________________                  ___________________                                                             
+  E         /                   /|               /000000000000000000/ |                                                            
    I       / ←    ROW      →   / |              /0  x  x  x  x    0/ 0|                        
- ↙  G     /__________________ /  |             /0________________0/  0|                                                                 
+ ↙  G     /__________________ /  |             /0________________0/  0|                                                            
      H   |                   |   |            |0  X  X  X  X  X  0| x0|      
       T  |     ___           |   |            |0                 0|  0|      
          |    /__/|          |   |            |0   VALID DATA    0|  0|    *This app frames all borders with original value  
@@ -98,11 +98,8 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
           }
           local_slice
         }{_+_}
-
         Foreach(COLS by 1, ROWS by 1){(i,j) => result_sram(p, i, j) = temp_slice(i,j)}
-
       }
-
       result_dram(0::HEIGHT, 0::COLS, 0::ROWS par par_store) store result_sram
 
 
@@ -125,7 +122,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
 
 // No opportunities for par
 object NW extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Plasticine
 
 
  /*
@@ -396,7 +393,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
 
 // good
 object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Plasticine
 
 
  /*
@@ -580,7 +577,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
 
 // seems like this implementation has no room for par
 object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Plasticine
 
 
  /*                                                                                                  
@@ -684,7 +681,7 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
 }
 // No opportunities for par
 object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Plasticine
 
 
   /*
@@ -1058,7 +1055,7 @@ x_par=4  |  --->            X                XX    |
 }
 
 object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Plasticine
 
 
  /*
@@ -1121,7 +1118,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
-  override val target = AWS_F1
+  override val target = Plasticine
 
 
  /*                                                                                                  
@@ -1211,7 +1208,7 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
 }
 
 object BFS_Queue extends SpatialApp { // Regression (Sparse) // Args: none
-  override val target = AWS_F1
+  override val target = Plasticine
 
 
  /*                                                                                                  
@@ -1649,7 +1646,7 @@ object BlackScholes extends SpatialApp {
 
 // good, can parallelize/pipeline stages with diminishing returns probably
 object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Plasticine
 
 
  /*                                                                                                  
@@ -1745,7 +1742,7 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
 
 // good
 object KMP extends SpatialApp { // Regression (Dense) // Args: the
-  override val target = AWS_F1
+  override val target = Plasticine
 
 
  /*
@@ -1954,7 +1951,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
 
 // good, but pipelining vs area
 object AES extends SpatialApp { // Regression (Dense) // Args: 50
-  override val target = AWS_F1
+  override val target = Plasticine
 
   /*
   TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
@@ -2360,7 +2357,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
 // Waiting on issue #182
 object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Plasticine
 
   type ULong = FixPt[FALSE, _32, _0]
   @struct case class byte_pack(a: Int8, b: Int8, c: Int8, d: Int8)
