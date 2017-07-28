@@ -14,7 +14,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   implicit def toReal(x: SCReal) = x.to[SReal]
 
-  val N: scala.Int                                  = 2
+  val N: scala.Int                                  = 10
   val initV: (SCReal, SCReal, SCReal)               = (0.0, 0.0, 0.0)
   val initP: (SCReal, SCReal, SCReal)               = (0.0, 0.0, 0.0)
   val initQ: (SCReal, SCReal, SCReal, SCReal) = (1.0, 0.0, 0.0, 0.0)
@@ -65,6 +65,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
   lazy val expLUT = 
     LUT[SReal](lutP)(List.tabulate[SReal](lutP)(i => math.exp(i/lutP.toDouble*20-10)):_*)
 
+  
   def sin(x: SReal) = sin_taylor(x)
   def cos(x: SReal) = cos_taylor(x)  
 
@@ -267,7 +268,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
                 resample(particles, states, covs, parFactor)
               }
             }
-          })(x => (!fifoV.empty || !fifoSIMU.empty))
+          })(x => true)//(x => (!fifoV.empty || !fifoSIMU.empty))
 
         }
       }
@@ -309,7 +310,6 @@ trait RaoBlackParticleFilter extends SpatialStream {
   ) = {
     Foreach(0::N par parFactor)(i => {
 
-      val pp = particles(i)
 
       val X: Option[SReal] = None
       val Sdt: Option[SReal] = Some(dt)
@@ -324,6 +324,8 @@ trait RaoBlackParticleFilter extends SpatialStream {
           X, Sdt, X, X, S1, X,
           X, X, Sdt, X, X, S1
         ))
+
+      val pp = particles(i)
 
       val U = Matrix.sparse(6, 1, IndexedSeq[Option[SReal]](
         Some(pp.lastA.x * dt),
@@ -391,18 +393,18 @@ trait RaoBlackParticleFilter extends SpatialStream {
     zeroVec
 
     Foreach(0::N par parFactor)(i => {
-      
-      val pp = particles(i)
+     
 
-      val state = Matrix.fromSRAM1(6, states, i)
-      val cov = Matrix.fromSRAM2(6, 6, covs, i)    
+      val state = Matrix.fromSRAM1(6, states, i, true)
+      val cov = Matrix.fromSRAM2(6, 6, covs, i, true)    
       
       val (nx2, nsig2, lik) = kalmanUpdate(state, cov, viconP, h, r)
       nx2.loadTo(states, i)
-      nsig2.loadTo(covs, i)      
-      val nw                = pp.w  + likelihoodSPOSE(vicon, lik._1, pp.q, lik._2)
+      nsig2.loadTo(covs, i)
 
-      particles(i) = Particle(nw, pp.q, pp.lastA, pp.lastQ)
+      val pp = particles(i)
+      val nw                = likelihoodSPOSE(vicon, lik._1, pp.q, lik._2)
+      particles(i) = Particle(pp.w + nw, pp.q, pp.lastA, pp.lastQ)
     })
   }
 
@@ -529,9 +531,10 @@ trait RaoBlackParticleFilter extends SpatialStream {
   }
 
   def localAngleToQuat(v: Vec): SQuat = {
-    val n    = v.norm
-    val l    = n / 2
+    val n    = (v*256).norm/256
+    val l    = n / 2.0
     val sl   = sin(l)
+    println(v(0) + " " + v(1) + " " + v(2) + "" + n + " " + sl)
     val nrot = v :* (sl / n)
     SQuat(cos(l), nrot(0), nrot(1), nrot(2))
   }
