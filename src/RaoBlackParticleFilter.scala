@@ -20,7 +20,6 @@ trait RaoBlackParticleFilter extends SpatialStream {
   val initQ: (SCReal, SCReal, SCReal, SCReal) = (1.0, 0.0, 0.0, 0.0)
   val initCov = 0.00001
 
-
   val initTime: SCReal  = 0.0
   val covGyro: SCReal   = 1.0
   val covAcc: SCReal    = 0.1
@@ -111,9 +110,6 @@ trait RaoBlackParticleFilter extends SpatialStream {
     }
   }
 
-  
-
-
   val matrix = new Matrix[SReal] {
     val IN_PLACE = false
     def sqrtT(x: SReal) = sqrt(x)
@@ -198,12 +194,18 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
   @virtualize def spatial() = {
 
-    val inSIMU     = StreamIn[TSA](In1)
-    val inV       = StreamIn[TSB](In2)
-    val out       = StreamOut[TSR](Out1)
+//    val inSIMU     = StreamIn[TSA](In1)
+//    val inV       = StreamIn[TSB](In2)
+//    val out       = StreamOut[TSR](Out1)
+    val out        = DRAM[TSR](11)
+    val outI  = Reg[Index](0)
+
+    
     val parFactor = 1 (1 -> N)
 
     Accel {
+
+      val sramBUFFER = SRAM[TSR](10)
 
       val particles = SRAM[Particle](N)
       val states = SRAM[SReal](N, 6)
@@ -217,8 +219,24 @@ trait RaoBlackParticleFilter extends SpatialStream {
       Sequential {
 
         initParticles(particles, states, covs, parFactor)
+        val tsas = List(
+          TSA(0.0, SIMU(SVec3(0.25592961314469886, 0.07098284446822825, 0.21456271801876464), SVec3(-1.5064973528139753, -0.616587623133762, -1.2282747703297874))),
+          TSA(0.005, SIMU(SVec3(0.25592961314469886, 0.07098284446822825, 0.21456271801876464), SVec3(-1.5064973528139753, -0.616587623133762, -1.2282747703297874))),
+          TSA(0.01, SIMU(SVec3(-0.028161957507305768, 0.5264671724413507, -0.08577696872942979), SVec3(-8.614952996266531, -3.699394514006443, -1.2972430998591449))),
+          TSA(0.015, SIMU(SVec3(0.5872729169473, 1.3887486685548156, 0.05238849400043921),SVec3(-7.587044288799566, -4.571689569385891, 1.3110956660901323))),
+          TSA(0.02, SIMU(SVec3(-1.2583237251856354, 1.4047261203145096, 1.066904859524985),SVec3(-6.119550697150657, -1.7511569969392748, -0.7289420270309247)))
+        )
+        val tsbs = List(
+          TSB(0.025, SPOSE(SVec3(0.0747780945262634, 0.10808064129411422, -0.10529076833659502), SQuat(0.9962501245604087, -0.04308471266603672, -0.01947353436952111, -0.07245811415579231)))
+        )
+
+
+        tsas.foreach(x => Pipe {fifoSIMU.enq(x) } )
+        tsbs.foreach(x => Pipe {fifoV.enq(x) } )         
+        
         Parallel {
 
+          /*
           Stream(*)(x => {
             fifoV.enq(inV)
           })
@@ -226,6 +244,8 @@ trait RaoBlackParticleFilter extends SpatialStream {
           Stream(*)(x => {
             fifoSIMU.enq(inSIMU)
           })
+           */
+
 
           val choice = Reg[Int]
           val dt = Reg[SReal]          
@@ -264,15 +284,25 @@ trait RaoBlackParticleFilter extends SpatialStream {
               }
               if (choice.value != -1) {
                 normWeights(particles, parFactor)
-                out := TSR(lastSTime, averageSPOSE(particles, states, parFactor))
+
+                sramBUFFER(outI) = TSR(lastSTime, averageSPOSE(particles, states, parFactor))
+
+                outI := outI + 1
+
+              //  out := TSR(lastSTime, averageSPOSE(particles, states, parFactor))
                 resample(particles, states, covs, parFactor)
               }
             }
-          })(x => true)//(x => (!fifoV.empty || !fifoSIMU.empty))
+          })(x => (!fifoV.empty || !fifoSIMU.empty))            
+//          })(x => true)
 
         }
+
+        out(0::10) store sramBUFFER
       }
     }
+
+    getMem(out).foreach(x => println(x))
   }
 
   def rotationMatrix(q: SQuat) =
@@ -599,4 +629,6 @@ object RaoBlackParticleFilterInterpreter extends RaoBlackParticleFilter with Spa
 }
 
 object RaoBlackParticleFilterCompiler extends RaoBlackParticleFilter with SpatialStreamCompiler
+
+object RaoBlackParticleFilterDRAM extends RaoBlackParticleFilter with SpatialStreamCompiler
 
