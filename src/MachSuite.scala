@@ -679,26 +679,30 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
   @virtualize
   def main() = {
 
-   	// Problem properties
-   	val ROWS = 16 // Leading dim
-   	val COLS = 32
+    // Problem properties
+    val ROWS = 16 // Leading dim
+    val COLS = 32
     val HEIGHT = 32
+    val par_load = 16
+    val par_store = 16
+    val loop_height = 2 (1 -> 1 -> 8)
+    val PX = 1
     // val num_slices = ArgIn[Int]
     // setArg(num_slices, args(0).to[Int])
     val num_slices = HEIGHT
-   	val filter_size = 3*3*3
+    val filter_size = 3*3*3
 
-   	// Setup data
-   	val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_data.csv", "\n")
-   	val data = raw_data.reshape(HEIGHT, COLS, ROWS)
+    // Setup data
+    val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_data.csv", "\n")
+    val data = raw_data.reshape(HEIGHT, COLS, ROWS)
 
-   	// Setup DRAMs
-   	val data_dram = DRAM[Int](HEIGHT, COLS, ROWS)
-   	val result_dram = DRAM[Int](HEIGHT, COLS, ROWS)
+    // Setup DRAMs
+    val data_dram = DRAM[Int](HEIGHT, COLS, ROWS)
+    val result_dram = DRAM[Int](HEIGHT, COLS, ROWS)
 
-   	setMem(data_dram, data)
+    setMem(data_dram, data)
 
-   	Accel {
+    Accel {
       val filter = LUT[Int](3,3,3)(   0,  0,  0,
                                       0, -1,  0,
                                       0,  0,  0,
@@ -712,27 +716,27 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
                                       0,  0,  0)
 
       val result_sram = SRAM[Int](HEIGHT,COLS,ROWS)
-      val temp_slice = SRAM[Int](COLS,ROWS)
 
-      Foreach(num_slices by 1) { p => 
+      Foreach(num_slices by 1 par loop_height) { p => 
+        val temp_slice = SRAM[Int](COLS,ROWS)
         MemReduce(temp_slice)(-1 until 2 by 1) { slice => 
           val local_slice = SRAM[Int](COLS,ROWS)
-          val lb = LineBuffer[Int](3,ROWS)
-          val sr = RegFile[Int](3,3)
-          Foreach(COLS+1 by 1){ i => 
+          Foreach(COLS+1 by 1 par PX){ i => 
+            val lb = LineBuffer[Int](3,ROWS)
             lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS)
-            Foreach(ROWS+1 by 1) {j => 
+            Foreach(ROWS+1 by 1 par PX) {j => 
+              val sr = RegFile[Int](3,3)
               Foreach(3 by 1 par 3) {k => sr(k,*) <<= lb(k,j%ROWS)}
               val temp = Reduce(Reg[Int](0))(3 by 1, 3 by 1){(r,c) => sr(r,c) * filter(slice+1,r,c)}{_+_}
               // For final version, make wr_value a Mux1H instead of a unique writer per val
               if (i == 0 || j == 0) {Pipe{}/*do nothing*/}
               else if (i == 1 || i == COLS || j == 1 || j == ROWS) {
                 Pipe{
-                  if (slice == 0) {local_slice(i-1, j-1) = sr(1,1)} // If on boundary of page, use meat only
+                  if (slice == 0) {local_slice(i-1, j-1) = sr(1,1); println("1 local_slice(" + {i-1} + "," + {j-1} + ") = " + sr(1,1))} // If on boundary of page, use meat only
                   else {local_slice(i-1, j-1) = 0} // If on boundary of page, ignore bread
                 }
               }
-              else if (slice == 0 && (p == 0 || p == HEIGHT-1)) {local_slice(i-1,j-1) = sr(1,1)} // First and last page, use meat only
+              else if (slice == 0 && (p == 0 || p == HEIGHT-1)) {local_slice(i-1,j-1) = sr(1,1); println("2 local_slice(" + {i-1} + "," + {j-1} + ") = " + sr(1,1))} // First and last page, use meat only
               else if ((p == 0 || p == HEIGHT-1)) {local_slice(i-1,j-1) = 0} // First and last page, ignore bread
               else {local_slice(i-1, j-1) = temp} // Otherwise write convolution result
             }       
@@ -744,22 +748,22 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
 
       }
 
-      result_dram store result_sram
+      result_dram(0::HEIGHT, 0::COLS, 0::ROWS par par_store) store result_sram
 
 
-   	}
+    }
 
-   	// Get results
-   	val result_data = getTensor3(result_dram)
-   	val raw_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_gold.csv", "\n")
-   	val gold = raw_gold.reshape(HEIGHT,COLS,ROWS)
+    // Get results
+    val result_data = getTensor3(result_dram)
+    val raw_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_gold.csv", "\n")
+    val gold = raw_gold.reshape(HEIGHT,COLS,ROWS)
 
-   	// Printers
-   	printTensor3(gold, "gold") // Least significant dimension is horizontal, second-least is vertical, third least is ---- separated blocks
-   	printTensor3(result_data, "results")
+    // Printers
+    printTensor3(gold, "gold") // Least significant dimension is horizontal, second-least is vertical, third least is ---- separated blocks
+    printTensor3(result_data, "results")
 
-   	val cksum = gold.zip(result_data){_==_}.reduce{_&&_}
-   	println("PASS: " + cksum + " (Stencil3D)")
+    val cksum = gold.zip(result_data){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (Stencil3D)")
 
  }
 }
