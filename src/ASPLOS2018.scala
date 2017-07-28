@@ -2,7 +2,7 @@ import spatial.dsl._
 import org.virtualized._
 import spatial.targets._
 
-// rework
+// need to do coarse tiling for par to work, awaiting affine though
 object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
@@ -39,9 +39,8 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
     val HEIGHT = 32
     val par_load = 16
     val par_store = 16
-    val loop_height = 2 (1 -> 1 -> 8)
-    val loop_row = 1 (1 -> 1 -> 8)
-    val loop_col = 2 (1 -> 1 -> 8)
+    val loop_height = 1 (1 -> 1 -> 8)
+    val PX = 1
     // val num_slices = ArgIn[Int]
     // setArg(num_slices, args(0).to[Int])
     val num_slices = HEIGHT
@@ -76,10 +75,10 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
         val temp_slice = SRAM[Int](COLS,ROWS)
         MemReduce(temp_slice)(-1 until 2 by 1) { slice => 
           val local_slice = SRAM[Int](COLS,ROWS)
-          Foreach(COLS+1 by 1 par loop_col){ i => 
+          Foreach(COLS+1 by 1 par PX){ i => 
             val lb = LineBuffer[Int](3,ROWS)
             lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS)
-            Foreach(ROWS+1 by 1 par loop_row) {j => 
+            Foreach(ROWS+1 by 1 par PX) {j => 
               val sr = RegFile[Int](3,3)
               Foreach(3 by 1 par 3) {k => sr(k,*) <<= lb(k,j%ROWS)}
               val temp = Reduce(Reg[Int](0))(3 by 1, 3 by 1){(r,c) => sr(r,c) * filter(slice+1,r,c)}{_+_}
@@ -87,11 +86,11 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
               if (i == 0 || j == 0) {Pipe{}/*do nothing*/}
               else if (i == 1 || i == COLS || j == 1 || j == ROWS) {
                 Pipe{
-                  if (slice == 0) {local_slice(i-1, j-1) = sr(1,1)} // If on boundary of page, use meat only
+                  if (slice == 0) {local_slice(i-1, j-1) = sr(1,1); println("1 local_slice(" + {i-1} + "," + {j-1} + ") = " + sr(1,1))} // If on boundary of page, use meat only
                   else {local_slice(i-1, j-1) = 0} // If on boundary of page, ignore bread
                 }
               }
-              else if (slice == 0 && (p == 0 || p == HEIGHT-1)) {local_slice(i-1,j-1) = sr(1,1)} // First and last page, use meat only
+              else if (slice == 0 && (p == 0 || p == HEIGHT-1)) {local_slice(i-1,j-1) = sr(1,1); println("2 local_slice(" + {i-1} + "," + {j-1} + ") = " + sr(1,1))} // First and last page, use meat only
               else if ((p == 0 || p == HEIGHT-1)) {local_slice(i-1,j-1) = 0} // First and last page, ignore bread
               else {local_slice(i-1, j-1) = temp} // Otherwise write convolution result
             }       
