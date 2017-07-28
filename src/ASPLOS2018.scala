@@ -448,11 +448,12 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val DOMAIN_EDGE = 20
     val BLOCK_SIDE = 4
     val density = 10
+    val density_aligned = density + (8 - (density % 8))
     val lj1 = 1.5.to[T]
     val lj2 = 2.to[T]
 
-    val par_load = 8 // Wider data type
-    val par_store = 8 // Wider data type
+    val par_load = 1 // Wider data type
+    val par_store = 1 // Wider data type
     val loop_grid0_x = 1 (1 -> 1 -> 16)
     val loop_grid0_y = 1 (1 -> 1 -> 16)
     val loop_grid0_z = 1 (1 -> 1 -> 16)
@@ -475,9 +476,9 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val dvec_x_dram = DRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
     val dvec_y_dram = DRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
     val dvec_z_dram = DRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
-    val force_x_dram = DRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
-    val force_y_dram = DRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
-    val force_z_dram = DRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
+    val force_x_dram = DRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density_aligned)
+    val force_y_dram = DRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density_aligned)
+    val force_z_dram = DRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density_aligned)
     val npoints_dram = DRAM[Int](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE)
 
     setMem(dvec_x_dram, dvec_x_data)
@@ -490,9 +491,9 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
       val dvec_y_sram = SRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
       val dvec_z_sram = SRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
       val npoints_sram = SRAM[Int](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE)
-      val force_x_sram = SRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
-      val force_y_sram = SRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
-      val force_z_sram = SRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density)
+      val force_x_sram = SRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density_aligned)
+      val force_y_sram = SRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density_aligned)
+      val force_z_sram = SRAM[T](BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE,density_aligned)
 
       dvec_x_sram load dvec_x_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load)
       dvec_y_sram load dvec_y_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load)
@@ -534,9 +535,9 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
               } else {
                 XYZ(0.to[T], 0.to[T], 0.to[T])
               }
-              println(" " + b1x + "," + b1y + "," + b1z + " " + b0x + "," + b0y + "," + b0z + " = " + tmp )
               tmp
             }{(a,b) => XYZ(a.x + b.x, a.y + b.y, a.z + b.z)}
+            // println(" " + b1x + "," + b1y + "," + b1z + " " + b0x + "," + b0y + "," + b0z + " = " + q_sum )
             b1_cube_contributions(p_idx) = q_sum
           }
           Foreach(p_range until density) { i => b1_cube_contributions(i) = XYZ(0.to[T], 0.to[T], 0.to[T]) } // Zero out untouched interactions          
@@ -549,15 +550,19 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
           force_z_sram(b0x,b0y,b0z,i) = b0_cube_forces(i).z
         }
       }}}
-      force_x_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load) store force_x_sram
-      force_y_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load) store force_y_sram
-      force_z_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density par par_load) store force_z_sram
+      force_x_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density_aligned par par_load) store force_x_sram
+      force_y_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density_aligned par par_load) store force_y_sram
+      force_z_dram(0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density_aligned par par_load) store force_z_sram
 
     }
 
-    val force_x_received = getTensor4(force_x_dram)
-    val force_y_received = getTensor4(force_y_dram)
-    val force_z_received = getTensor4(force_z_dram)
+    // No need to align after bug #195 fixed
+    val force_x_received_aligned = getTensor4(force_x_dram)
+    val force_y_received_aligned = getTensor4(force_y_dram)
+    val force_z_received_aligned = getTensor4(force_z_dram)
+    val force_x_received = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => force_x_received_aligned(i,j,k,l)}
+    val force_y_received = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => force_y_received_aligned(i,j,k,l)}
+    val force_z_received = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => force_z_received_aligned(i,j,k,l)}
     val raw_force_gold = loadCSV1D[T]("/remote/regression/data/machsuite/grid_gold.csv", "\n")
     val force_x_gold = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => raw_force_gold(i*BLOCK_SIDE*BLOCK_SIDE*density*3 + j*BLOCK_SIDE*density*3 + k*density*3 + 3*l)}
     val force_y_gold = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => raw_force_gold(i*BLOCK_SIDE*BLOCK_SIDE*density*3 + j*BLOCK_SIDE*density*3 + k*density*3 + 3*l+1)}
@@ -575,6 +580,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val cksumx = force_x_gold.zip(force_x_received){case (a,b) => abs(a - b) < margin}.reduce{_&&_}
     val cksumy = force_y_gold.zip(force_y_received){case (a,b) => abs(a - b) < margin}.reduce{_&&_}
     val cksumz = force_z_gold.zip(force_z_received){case (a,b) => abs(a - b) < margin}.reduce{_&&_}
+    println("X: " + cksumx + ", Y:" + cksumy + ", Z: " + cksumz)
     val cksum = cksumx && cksumy && cksumz
     println("PASS: " + cksum + " (MD_Grid)")
   }
