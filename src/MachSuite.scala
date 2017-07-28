@@ -1783,34 +1783,43 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
     val vec_dram = DRAM[T](N) 
     val result_dram = DRAM[T](N)
 
+    val par_load = 16
+    val par_store = 16
+    val tile_par = 2 (1 -> 1 -> 16)
+    val pt_par = 2 (1 -> 1 -> 16)
+    val red_par = 2 (1 -> 1 -> 16)
+
     setMem(values_dram, raw_values)
     setMem(cols_dram, raw_cols)
     setMem(rowid_dram, raw_rowid)
     setMem(vec_dram, raw_vec)
 
     Accel {
-      val rowid_sram = SRAM[Int](tileSize+1)
-      val cols_sram = SRAM[Int](tileSize)
-      val values_sram = SRAM[T](tileSize)
-      val vec_sram = SRAM[T](tileSize)
-      val result_sram = SRAM[T](tileSize)
+      Foreach(N/tileSize by 1 par tile_par) { tile =>
+        val rowid_sram = SRAM[Int](tileSize+1)
+        val result_sram = SRAM[T](tileSize)
 
-      Foreach(N/tileSize by 1) { tile =>
-        rowid_sram load rowid_dram(tile*(tileSize+1) :: (tile+1)*(tileSize+1))
-        Foreach(tileSize by 1) { i => 
+        rowid_sram load rowid_dram(tile*(tileSize+1) :: (tile+1)*(tileSize+1) par par_load)
+        Foreach(tileSize by 1 par pt_par) { i => 
+          val cols_sram = SRAM[Int](tileSize)
+          val values_sram = SRAM[T](tileSize)
+          val vec_sram = SRAM[T](tileSize)
+
           val start_id = rowid_sram(i)
           val stop_id = rowid_sram(i+1)
           Parallel{
-            cols_sram load cols_dram(start_id :: stop_id)
-            values_sram load values_dram(start_id :: stop_id)
+            cols_sram load cols_dram(start_id :: stop_id par par_load)
+            values_sram load values_dram(start_id :: stop_id par par_load)
           }
           vec_sram gather vec_dram(cols_sram, stop_id - start_id)
-          val element = Reduce(Reg[T](0))(stop_id - start_id by 1) { j => 
+          println("row " + {i + tile})
+          val element = Reduce(Reg[T](0))(stop_id - start_id by 1 par red_par) { j => 
+            // println(" partial from " + j + " = " + {values_sram(j) * vec_sram(j)})
             values_sram(j) * vec_sram(j)
           }{_+_}
           result_sram(i) = element
         }
-        result_dram(tile*tileSize :: (tile+1)*tileSize) store result_sram
+        result_dram(tile*tileSize :: (tile+1)*tileSize par par_store) store result_sram
       }
     }
 
