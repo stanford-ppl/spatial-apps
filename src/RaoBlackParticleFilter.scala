@@ -30,7 +30,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
   @struct case class SVec3(x: SReal, y: SReal, z: SReal)
 
 
-  type STime         = Double
+  type STime         = SReal//Double
   type SPosition     = SVec3
   type SVelocity     = SVec3
   type SAcceleration = SVec3
@@ -465,17 +465,12 @@ trait RaoBlackParticleFilter extends SpatialStream {
 
 
   @virtualize def normWeights(particles: SRAM1[Particle], parFactor: Int) = {
-    val totalWeight = Reg[SReal](0)
-    val maxR = Reg[SReal]
-
-    maxR := particles(0).w
-
-    Reduce(maxR)(0::N)(i => particles(i).w)(max(_,_))
-    Reduce(totalWeight)(0::N)(i => exp(particles(i).w - maxR))(_+_)
-    totalWeight := maxR + log(totalWeight)
+    val maxR = Reduce(Reg[SReal])(0::N)(i => particles(i).w)(max(_,_))
+    val totalWeight = Reduce(Reg[SReal])(0::N)(i => exp(particles(i).w - maxR))(_+_)
+    val norm = maxR + log(totalWeight)
     Foreach(0::N par parFactor)(i => {
       val p = particles(i)
-      particles(i) = Particle(p.w - totalWeight, p.q, p.lastA, p.lastQ)
+      particles(i) = Particle(p.w - norm, p.q, p.lastA, p.lastQ)
     })
   }
 
