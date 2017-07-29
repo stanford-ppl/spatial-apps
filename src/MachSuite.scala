@@ -1731,6 +1731,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
     printArray(sorted_result, "Sorted Result: ")
 
     val cksum = sorted_gold.zip(sorted_result){_==_}.reduce{_&&_}
+    printArray(sorted_gold.zip(sorted_result){_==_}, "Matchup: ")
     // // Use the real way to check if list is sorted instead of using machsuite gold
     // // This way says I've done goofed, issue #
     // val cksum = Array.tabulate(STOP-1){ i => pack(sorted_result(i), sorted_result(i+1)) }.map{a => a._1 <= a._2}.reduce{_&&_}
