@@ -2503,6 +2503,31 @@ object MultiWriteBuffer extends SpatialApp { // Regression (Unit) // Args: none
   }
 }
 
+object SingleIf extends SpatialApp {
+
+  @virtualize
+  def singleIfTest(x: Int) = {
+    val in = ArgIn[Int]
+    val out = ArgOut[Int]
+    setArg(in, x)
+    Accel {
+      val sram = SRAM[Int](3)
+      if (in >= 42.to[Int]) {     // if (43 >= 42)
+        sram(in - 41.to[Int]) = 10.to[Int] // sram(2) = 10
+      } else {
+        sram(in) = 20.to[Int]
+      }
+      out := sram(2)
+    }
+    getArg(out)
+  }
+  @virtualize
+  def main() {
+    val result = singleIfTest(43)
+    println("result:   " + result)
+  }
+}
+
 object NestedIfs extends SpatialApp {
 
   @virtualize

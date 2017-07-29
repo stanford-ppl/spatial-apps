@@ -920,12 +920,13 @@ x_par=4  |  --->            X                XX    |
 
     val par_load = 16
     val par_store = 16
-    val x_par = 4 (1 -> 1 -> 16)
+    val x_par = 1 (1 -> 1 -> 16)
 
     // Square
     val bias_matrix = (0::ROWS, 0::COLS){(i,j) => if (i > ROWS/4 && i < 3*ROWS/4 && j > COLS/4 && j < 3*COLS/4) -1.to[Int] else 1.to[Int]}
 
-    val exp_lut = DRAM[T](lut_size)
+    //val exp_lut = DRAM[T](lut_size)
+    val exp_lut = DRAM[T](16)
     val grid_dram = DRAM[Int](ROWS,COLS)
     val bias_dram = DRAM[Int](ROWS,COLS)
 
@@ -985,7 +986,8 @@ x_par=4  |  --->            X                XX    |
     // }
 
     Accel{
-      val exp_sram = SRAM[T](lut_size)
+      //val exp_sram = SRAM[T](lut_size)
+      val exp_sram = SRAM[T](16)
       val grid_sram = SRAM[Int](ROWS,COLS)
       exp_sram load exp_lut
       grid_sram load grid_dram(0::ROWS, 0::COLS par par_load)
@@ -1009,11 +1011,12 @@ x_par=4  |  --->            X                XX    |
             val p_flip = exp_sram(-sum+lut_size/2)
             val pi_x = exp_sram(sum+4) * mux((bias_sram(i,j) * self) < 0, exp_posbias, exp_negbias)
             val threshold = min(1.to[T], pi_x)
-            val rng = unif[_16]()
-            val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(31::16).as[PROB], 1.to[T], 0.to[T]))
-            if (j >= 0 && j < COLS) {
+            //val rng = unif[_16]()
+            val rng = 0//unif[_16]()
+            val flip = mux(pi_x > 1, 1.to[T], mux(rng < 31, 1.to[T], 0.to[T]))
+            //if (j >= 0 && j < COLS) {
               grid_sram(i,j) = mux(flip == 1.to[T], -self, self)
-            }
+            //}
           }
         }
       }
@@ -1373,8 +1376,8 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 
     val par_load = 16
     val par_store = 16
-    val tile_par = 2 (1 -> 1 -> 12)
-    val page_par = 2 (1 -> 1 -> tileSize)
+    val tile_par = 1 (1 -> 1 -> 12)
+    val page_par = 1 (1 -> 1 -> tileSize)
 
     // Arguments
     val itersIN = args(0).to[Int]
