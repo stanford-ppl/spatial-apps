@@ -2741,7 +2741,7 @@ object SSV1D extends SpatialApp { // Regression (Unit) // Args: none
       result := Reduce(Reg[T](0.to[T]))(memsize.value by tilesize) { r =>
         fpgamem load srcmem(r :: r + tilesize)
         Reduce(Reg[T](0.to[T]))(-tilesize until 0 by 1) { i =>
-          fpgamem(i)
+          fpgamem(i+tilesize)
         }{_+_}
       }{_+_}
     }
