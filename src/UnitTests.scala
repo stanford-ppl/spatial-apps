@@ -1430,10 +1430,10 @@ object BlockReduce2D extends SpatialApp { // Regression (Unit) // Args: 192 384
       val accum = SRAM[T](tileSize,tileSize)
       MemReduce(accum)(rowsIn by tileSize, colsIn by tileSize par 2){ (i,j)  =>
         val tile = SRAM[T](tileSize,tileSize)
-        tile load srcFPGA(i::i+tileSize, j::j+tileSize  par 16)
+        tile load srcFPGA(i::i+tileSize, j::j+tileSize  par 1)
         tile
       }{_+_}
-      dstFPGA(0::tileSize, 0::tileSize par 16) store accum
+      dstFPGA(0::tileSize, 0::tileSize par 1) store accum
     }
     getMem(dstFPGA)
   }
@@ -1871,6 +1871,7 @@ object BasicFSM extends SpatialApp { // Regression (Unit) // Args: none
   @virtualize
   def main() {
     val dram = DRAM[Int](32)
+    val out = ArgOut[Int]
     Accel {
       val bram = SRAM[Int](32)
 
@@ -1878,14 +1879,22 @@ object BasicFSM extends SpatialApp { // Regression (Unit) // Args: none
         bram(state) = state
       }{state => state + 1}
 
+      val y = Reg[Int](0)
+      FSM[Boolean,Boolean](true)(x => x){x => 
+        y :+= 1
+      }{x => mux(y < 5, true, false)}
+
+      out := y
       dram(0::32 par 16) store bram
     }
     val gold = Array.tabulate(32){i => i}
 
     val result = getMem(dram)
+    val argresult = getArg(out)
     printArray(result, "Result")
     printArray(gold, "Gold")
-    val cksum = gold.zip(result){_ == _}.reduce{_&&_}
+    println("Arg is " + argresult + " =?= 5")
+    val cksum = gold.zip(result){_ == _}.reduce{_&&_} && argresult == 5
     // for(i <- 0 until 32) { assert(result(i) == i, "Incorrect at index " + i) }
     println("PASS: " + cksum + " (BasicFSM)")
   }
