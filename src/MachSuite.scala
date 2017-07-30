@@ -1633,7 +1633,8 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
       def hist(exp: Index, s: SRAM1[Int]): Unit = {
         Foreach(NUM_BLOCKS by 1) { blockID => 
           Sequential.Foreach(4 by 1) {i => 
-            val a_indx = blockID * EL_PER_BLOCK + i
+            val a_indx = Reg[Int](0)
+            a_indx := blockID * EL_PER_BLOCK + i
             val shifted = Reg[Int](0)
             shifted := s(a_indx) // TODO: Allow just s(a_indx) >> exp syntax
             // Reduce(shifted)(exp by 1) { k => shifted >> 1}{(a,b) => b}

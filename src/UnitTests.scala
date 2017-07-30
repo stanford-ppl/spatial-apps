@@ -1119,9 +1119,11 @@ object SimpleMemReduce extends SpatialApp { // Regression (Unit) // Args: none
 
   val N = 16.to[Int]
 
-  def simpleReduce() = {
+  @virtualize
+  def main() {
 
     val out = DRAM[Int](16)
+    val out2 = DRAM[Int](16)
 
     Accel {
       val a = SRAM[Int](16)
@@ -1130,21 +1132,22 @@ object SimpleMemReduce extends SpatialApp { // Regression (Unit) // Args: none
         Foreach(16 by 1) { j => tmp(j) = 1}
         tmp
       }{_+_}
+      val b = SRAM[Int](16)
+      Foreach(15 until -1 by -1){i => b(i) = 2}
       out store a
+      out2 store b
     }
-    getMem(out)
-  }
-
-  @virtualize
-  def main() {
-
-    val result = simpleReduce()
+    val result = getMem(out)
+    val result2 = getMem(out2)
 
     val gold = Array.tabulate(16){i => 5.to[Int]}
+    val gold2 = Array.tabulate(16){i => 2.to[Int]}
     printArray(gold, "expected: ")
     printArray(result, "result:   ")
+    printArray(gold2, "expected: ")
+    printArray(result2, "result:   ")
 
-    val cksum = gold == result
+    val cksum = gold.zip(result){_==_}.reduce{_&&_} && gold2.zip(result2){_==_}.reduce{_&&_}
     println("PASS: " + cksum + " (SimpleMemReduce)")
   }
 }
