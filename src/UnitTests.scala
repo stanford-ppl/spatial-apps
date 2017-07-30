@@ -371,6 +371,7 @@ object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: n
   val I = 5
   val N = 192
 
+  @virtualize
   def multiplexedwrtest[W:Type:Num](w: Array[W], i: Array[W]): Array[W] = {
     val T = param(tileSize)
     val P = param(4)
@@ -1091,7 +1092,7 @@ object SimpleReduce extends SpatialApp { // Regression (Unit) // Args: 7
     setArg(x, xin)
 
     Accel {
-      out := Reduce(Reg[T](0.to[T]))(N by 1){ ii =>
+      out := Reduce(Reg[T](0.to[T]))(-N until 0 by 1){ ii =>
         x.value * ii.to[T]
       }{_+_}
     }
@@ -1104,7 +1105,7 @@ object SimpleReduce extends SpatialApp { // Regression (Unit) // Args: 7
 
     val result = simpleReduce(x)
 
-    val gold = Array.tabulate(N){i => x * i}.reduce{_+_}
+    val gold = Array.tabulate(N){i => x * (i-N)}.reduce{_+_}
     println("expected: " + gold)
     println("result:   " + result)
 
@@ -1113,6 +1114,40 @@ object SimpleReduce extends SpatialApp { // Regression (Unit) // Args: 7
   }
 }
 
+object SimpleMemReduce extends SpatialApp { // Regression (Unit) // Args: none
+
+
+  val N = 16.to[Int]
+
+  def simpleReduce() = {
+
+    val out = DRAM[Int](16)
+
+    Accel {
+      val a = SRAM[Int](16)
+      MemReduce(a)(-5 until 0 by 1){i =>
+        val tmp = SRAM[Int](16)
+        Foreach(16 by 1) { j => tmp(j) = 1}
+        tmp
+      }{_+_}
+      out store a
+    }
+    getMem(out)
+  }
+
+  @virtualize
+  def main() {
+
+    val result = simpleReduce()
+
+    val gold = Array.tabulate(16){i => 5.to[Int]}
+    printArray(gold, "expected: ")
+    printArray(result, "result:   ")
+
+    val cksum = gold == result
+    println("PASS: " + cksum + " (SimpleMemReduce)")
+  }
+}
 
 
 
@@ -2702,7 +2737,7 @@ object SSV1D extends SpatialApp { // Regression (Unit) // Args: none
       val fpgamem = SRAM[T](tilesize)
       result := Reduce(Reg[T](0.to[T]))(memsize.value by tilesize) { r =>
         fpgamem load srcmem(r :: r + tilesize)
-        Reduce(Reg[T](0.to[T]))(tilesize by 1) { i =>
+        Reduce(Reg[T](0.to[T]))(-tilesize until 0 by 1) { i =>
           fpgamem(i)
         }{_+_}
       }{_+_}
