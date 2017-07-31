@@ -1633,13 +1633,14 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
       def hist(exp: Index, s: SRAM1[Int]): Unit = {
         Foreach(NUM_BLOCKS by 1) { blockID => 
           Sequential.Foreach(4 by 1) {i => 
-            val a_indx = Reg[Int](0)
-            a_indx := blockID * EL_PER_BLOCK + i
+            val a_indx = blockID.to[Index] * EL_PER_BLOCK + i
+            // val a_indx = Reg[Int](0)
+            // a_indx := blockID * EL_PER_BLOCK + i
             val shifted = Reg[Int](0)
             shifted := s(a_indx) // TODO: Allow just s(a_indx) >> exp syntax
             // Reduce(shifted)(exp by 1) { k => shifted >> 1}{(a,b) => b}
             Foreach(exp by 1) { k => shifted := shifted.value >> 1}
-            val bucket_indx = (shifted.value & 0x3.to[Int])*NUM_BLOCKS.to[Int] + blockID + 1.to[Int]
+            val bucket_indx = (shifted.value & 0x3.to[Int])*NUM_BLOCKS.to[Int] + blockID.to[Index] + 1.to[Int]
             bucket_sram(bucket_indx) = bucket_sram(bucket_indx) + 1
           }
         }
@@ -1648,7 +1649,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
       def local_scan(): Unit = {
         Foreach(SCAN_RADIX by 1) { radixID => 
           Sequential.Foreach(1 until SCAN_BLOCK by 1) { i => // Loop carry dependency
-            val bucket_indx = radixID*SCAN_BLOCK.to[Int] + i
+            val bucket_indx = radixID.to[Index]*SCAN_BLOCK.to[Int] + i.to[Index]
             val prev_val = Reg[Int](0)
             Pipe{ prev_val := bucket_sram(bucket_indx - 1) }
             Pipe{ bucket_sram(bucket_indx) = bucket_sram(bucket_indx) + prev_val }
@@ -1659,7 +1660,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
       def sum_scan(): Unit = {
         sum_sram(0) = 0
         Foreach(1 until SCAN_RADIX by 1) { radixID =>  // Bug #151
-          val bucket_indx = radixID*SCAN_BLOCK - 1
+          val bucket_indx = radixID.to[Index]*SCAN_BLOCK - 1
           sum_sram(radixID) = sum_sram(radixID-1) + bucket_sram(bucket_indx)
         }
       }
@@ -1667,7 +1668,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
       def last_step_scan(): Unit = {
         Foreach(SCAN_RADIX by 1) { radixID => 
           Foreach(SCAN_BLOCK by 1) { i => 
-            val bucket_indx = radixID * SCAN_BLOCK + i
+            val bucket_indx = radixID.to[Index] * SCAN_BLOCK + i.to[Index]
             bucket_sram(bucket_indx) = bucket_sram(bucket_indx) + sum_sram(radixID)
           }
         }
@@ -1678,11 +1679,11 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
         Foreach(NUM_BLOCKS by 1) { blockID => 
           Sequential.Foreach(4 by 1) { i => 
             val shifted = Reg[Int](0)
-            shifted := s1(blockID*EL_PER_BLOCK + i) // TODO: Allow just s(a_indx) >> exp syntax
+            shifted := s1(blockID.to[Index]*EL_PER_BLOCK + i.to[Index]) // TODO: Allow just s(a_indx) >> exp syntax
             // Reduce(shifted)(exp by 1) { k => shifted >> 1}{(a,b) => b}
             Foreach(exp by 1) { k => shifted := shifted >> 1}
-            val bucket_indx = (shifted & 0x3.to[Int])*NUM_BLOCKS + blockID
-            val a_indx = blockID * EL_PER_BLOCK + i
+            val bucket_indx = (shifted & 0x3.to[Int])*NUM_BLOCKS + blockID.to[Index]
+            val a_indx = blockID * EL_PER_BLOCK + i.to[Index]
             s2(bucket_sram(bucket_indx)) = s1(a_indx)
             bucket_sram(bucket_indx) = bucket_sram(bucket_indx) + 1
           }
@@ -1694,9 +1695,9 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
         Foreach(BUCKET_SIZE by 1) { i => bucket_sram(i) = 0 }
   
         if (valid_buffer == a) {
-          Pipe{hist(exp, a_sram)}
+          Pipe{hist(exp.to[Index], a_sram)}
         } else {
-          Pipe{hist(exp, b_sram)}
+          Pipe{hist(exp.to[Index], b_sram)}
         }
 
         local_scan()
@@ -1705,12 +1706,12 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
 
         if (valid_buffer == a) {
           Pipe{
-            update(exp, a_sram, b_sram)
+            update(exp.to[Index], a_sram, b_sram)
             valid_buffer := b
           }
         } else {
           Pipe{
-            update(exp, b_sram, a_sram)
+            update(exp.to[Index], b_sram, a_sram)
             valid_buffer := a
           }
         }
