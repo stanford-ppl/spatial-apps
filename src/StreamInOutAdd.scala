@@ -9,6 +9,7 @@ trait StreamInOutAdd extends SpatialStream {
     val out = StreamOut[Int](Out1)    
     Accel(*) {
       out := in + 4
+      breakpoint
     }
   }
 }
