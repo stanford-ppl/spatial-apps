@@ -10,7 +10,7 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
   val pts_per_ld = 1 // ???
 
   val ip = 16
-  val op = 1
+  val op = 2
 
   val element_max = 10
   val margin = (element_max * 0.2).to[X]
@@ -60,7 +60,7 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
 
       // Initialize newCents
       // FPGA:
-      Foreach(K by 1, D by 1) {(i,j) => newCents(i,j) = cts(i,j)} 
+      // Foreach(K by 1, D by 1) {(i,j) => newCents(i,j) = cts(i,j)} 
 
       val DM1 = D - 1
 
@@ -128,7 +128,7 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
 
       val flatCts = SRAM[T](MAXK * MAXD)
       Foreach(K by 1, D by 1) {(i,j) =>
-        flatCts(i*D+j) = cts(i,j)
+        flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
       }
       // Store the centroids out
       centroids(0::K*D par 16) store flatCts
@@ -2023,8 +2023,8 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
       def sha_transform(): Unit = {
         val m = SRAM[ULong](64)
         Foreach(0 until 64 by 1){i => 
-          if ( i < 16 ) {
-            val j = 4*i
+          if ( i.to[Index] < 16 ) {
+            val j = 4*i.to[Index]
             // println(" m(" + i + ") = " + {(data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])})
             m(i) = (data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])
           } else {
@@ -2060,8 +2060,8 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
         }
 
         Foreach(8 by 1 par 8){i => 
-          state(i) = state(i) + mux(i == 0, A, mux(i == 1, B, mux(i == 2, C, mux(i == 3, D, 
-            mux(i == 4, E, mux(i == 5, F, mux(i == 6, G, H)))))))
+          state(i) = state(i) + mux(i.to[Index] == 0, A, mux(i.to[Index] == 1, B, mux(i.to[Index] == 2, C, mux(i.to[Index] == 3, D, 
+            mux(i.to[Index] == 4, E, mux(i.to[Index] == 5, F, mux(i.to[Index] == 6, G, H)))))))
         }
 
       }
@@ -2087,7 +2087,7 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
 
         // Final
         val pad_stop = if (datalen.value < 56) 56 else 64
-        Foreach(datalen until pad_stop by 1){i => data(i) = if (i == datalen) 0x80.to[UInt8] else 0.to[UInt8]}
+        Foreach(datalen until pad_stop by 1){i => data(i) = if (i.to[Index] == datalen) 0x80.to[UInt8] else 0.to[UInt8]}
         if (datalen.value >= 56) {
           sha_transform()
           Foreach(56 by 1){i => data(i) = 0}
@@ -2107,21 +2107,21 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
         // Foreach(8 by 1){i => println(" " + state(i))}
 
         Sequential.Foreach(4 by 1){ i => 
-          hash(i)    = (SHFR(state(0), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+4)  = (SHFR(state(1), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+8)  = (SHFR(state(2), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+12) = (SHFR(state(3), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+16) = (SHFR(state(4), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+20) = (SHFR(state(5), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+24) = (SHFR(state(6), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+28) = (SHFR(state(7), (24-i*8))).apply(7::0).as[UInt8]
+          hash(i)    = (SHFR(state(0), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+4)  = (SHFR(state(1), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+8)  = (SHFR(state(2), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+12) = (SHFR(state(3), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+16) = (SHFR(state(4), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+20) = (SHFR(state(5), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+24) = (SHFR(state(6), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+28) = (SHFR(state(7), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
         }
 
       }
 
       Sequential.Foreach(2 by 1){i => 
         Pipe{SHA256()}
-        if (i == 0) {
+        if (i.to[Index] == 0) {
           text_dram(0::32) store hash
           len := 32
         }

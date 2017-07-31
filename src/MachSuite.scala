@@ -98,7 +98,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
       def expand_key(): Unit = {
         val addr_lut = LUT[Int](4)(29, 30, 31, 28)
         Foreach(4 by 1) { i => 
-          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i == 0, rcon.value, 0)
+          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i.to[Index] == 0, rcon.value, 0)
         }
         // Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
         // Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
@@ -108,7 +108,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
         Sequential.Foreach(4 until 16 by 4) {i =>
           Sequential.Foreach(4 by 1) {j => 
-            key_sram(i+j) = key_sram(i+j) ^ key_sram(i - 4 + j)
+            key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
           }
           // Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
           // Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
@@ -117,7 +117,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
         }
       
         Sequential.Foreach(16 until 20 by 1){i => 
-          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i-4).to[Int])
+          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i.to[Index]-4).to[Int])
         }
         // Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
         // Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
@@ -126,7 +126,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
         Sequential.Foreach(20 until 32 by 4) {i => 
           Sequential.Foreach(4 by 1) { j => 
-            key_sram(i+j) = key_sram(i+j) ^ key_sram(i - 4 + j)
+            key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
           }
           // Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
           // Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
@@ -139,7 +139,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
         Sequential.Foreach(4 by 1){ i => 
           val row = RegFile[UInt8](4) 
           Foreach(4 by 1){ j => 
-            val col_addr = (j - i) % 4
+            val col_addr = (j.to[Index] - i.to[Index]) % 4
             row(col_addr) = plaintext_sram(i,j)
           }
           Foreach(4 by 1){ j => 
@@ -167,7 +167,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
           val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
           // val e = col(0) ^ col(1) ^ col(2) ^ col(3)
           Foreach(4 by 1) { i => 
-            val id1 = (i+1)%4
+            val id1 = (i.to[Index]+1)%4
             plaintext_sram(i,j) = col(i) ^ e ^ rj_xtime(col(i) ^ col(id1))
           }
         }
@@ -175,7 +175,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
       def add_round_key(round: Index): Unit = {
         Foreach(4 by 1, 4 by 1) { (i,j) => 
-          val key = mux(round % 2 == 1, key_sram(i+j*4+16), key_sram(i+j*4))
+          val key = mux(round % 2 == 1, key_sram(i.to[Index]+j.to[Index]*4+16), key_sram(i.to[Index]+j.to[Index]*4))
           plaintext_sram(i,j) = plaintext_sram(i,j) ^ key
         }
       }
@@ -191,7 +191,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
         // gh issue #83
         Sequential.Foreach(4 by 1 par 1){i => 
           Sequential.Foreach(4 by 1 par 1){j => 
-            plaintext_sram(i,j) = plaintext_flat(j*4+i) // MachSuite flattens columnwise... Why????
+            plaintext_sram(i,j) = plaintext_flat(j.to[Index]*4+i.to[Index]) // MachSuite flattens columnwise... Why????
           }
         }
 
@@ -380,7 +380,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
         // Reshape plaintext_sram (gh issue # 83)
         val ciphertext_flat = SRAM[Int](16)
         Sequential.Foreach(4 by 1, 4 by 1) {(i,j) => 
-          ciphertext_flat(j*4+i) = plaintext_sram(i,j).as[Int]
+          ciphertext_flat(j.to[Index]*4+i.to[Index]) = plaintext_sram(i,j).as[Int]
         }
 
         ciphertext_dram(block_id::block_id+16 par par_store) store ciphertext_flat
@@ -1633,7 +1633,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
       def hist(exp: Index, s: SRAM1[Int]): Unit = {
         Foreach(NUM_BLOCKS by 1) { blockID => 
           Sequential.Foreach(4 by 1) {i => 
-            val a_indx = blockID.to[Index] * EL_PER_BLOCK + i
+            val a_indx = blockID.to[Index] * EL_PER_BLOCK + i.to[Index]
             // val a_indx = Reg[Int](0)
             // a_indx := blockID * EL_PER_BLOCK + i
             val shifted = Reg[Int](0)
@@ -1651,7 +1651,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
           Sequential.Foreach(1 until SCAN_BLOCK by 1) { i => // Loop carry dependency
             val bucket_indx = radixID.to[Index]*SCAN_BLOCK.to[Int] + i.to[Index]
             val prev_val = Reg[Int](0)
-            Pipe{ prev_val := bucket_sram(bucket_indx - 1) }
+            Pipe{ prev_val := bucket_sram(bucket_indx.to[Index] - 1) }
             Pipe{ bucket_sram(bucket_indx) = bucket_sram(bucket_indx) + prev_val }
           }
         }
@@ -1661,7 +1661,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
         sum_sram(0) = 0
         Foreach(1 until SCAN_RADIX by 1) { radixID =>  // Bug #151
           val bucket_indx = radixID.to[Index]*SCAN_BLOCK - 1
-          sum_sram(radixID) = sum_sram(radixID-1) + bucket_sram(bucket_indx)
+          sum_sram(radixID) = sum_sram(radixID.to[Index]-1) + bucket_sram(bucket_indx)
         }
       }
 
@@ -1683,8 +1683,10 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
             // Reduce(shifted)(exp by 1) { k => shifted >> 1}{(a,b) => b}
             Foreach(exp by 1) { k => shifted := shifted >> 1}
             val bucket_indx = (shifted & 0x3.to[Int])*NUM_BLOCKS + blockID.to[Index]
-            val a_indx = blockID * EL_PER_BLOCK + i.to[Index]
+            val a_indx = blockID.to[Index] * EL_PER_BLOCK + i.to[Index]
+            println("s2(" + bucket_sram(bucket_indx) + ") = " + s1(a_indx) + " (addr " + a_indx + ")")
             s2(bucket_sram(bucket_indx)) = s1(a_indx)
+            // println("bucket " + bucket_indx + " = " + {bucket_sram(bucket_indx) + 1})
             bucket_sram(bucket_indx) = bucket_sram(bucket_indx) + 1
           }
         }
@@ -1705,22 +1707,26 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
         last_step_scan()
 
         if (valid_buffer == a) {
-          Pipe{
-            update(exp.to[Index], a_sram, b_sram)
-            valid_buffer := b
+          println("s1 = a, s2 = b")
+          Sequential{
+            Pipe{update(exp.to[Index], a_sram, b_sram)}
+            Pipe{valid_buffer := b}
           }
         } else {
-          Pipe{
-            update(exp.to[Index], b_sram, a_sram)
-            valid_buffer := a
+          println("s1 = b, s2 = a")
+          Sequential{
+            Pipe{update(exp.to[Index], b_sram, a_sram)}
+            Pipe{valid_buffer := a}
           }
         }
 
       }
 
       if (valid_buffer == a) {
+        println("dumping buf a")
         data_dram store a_sram
       } else {
+        println("dumping buf b")
         data_dram store b_sram
       }
 
@@ -2521,31 +2527,31 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
       def FFT4(tid: Index, base: Int):Unit = {
         val exp_LUT = LUT[T](2)(0, -1)
         Sequential.Foreach(0 until 2 by 1) { j => 
-          Pipe{FFT2(tid, base+j, 2+base+j)}
+          Pipe{FFT2(tid, base+j.to[Index], 2+base+j.to[Index])}
         }
         val temp_x = work_x_sram(base+3,tid)
         Pipe{work_x_sram(base+3,tid) = temp_x * exp_LUT(0) - work_y_sram(base+3,tid)*exp_LUT(1)}
         Pipe{work_y_sram(base+3,tid) = temp_x * exp_LUT(1) - work_y_sram(base+3,tid)*exp_LUT(0)}
         Sequential.Foreach(0 until 2 by 1) { j => 
-          Pipe{FFT2(tid, base+2*j, 1+base+2*j)}
+          Pipe{FFT2(tid, base+2*j.to[Index], 1+base+2*j.to[Index])}
         }
       }
 
       def FFT8(tid: Index):Unit = {
         Sequential.Foreach(0 until 4 by 1) { i => 
-          Pipe{FFT2(tid, i, 4+i)}
+          Pipe{FFT2(tid, i, 4+i.to[Index])}
         }
         Sequential.Foreach(0 until 3 by 1) { i => 
           val exp_LUT = LUT[T](2,3)( 1,  0, -1,
                                       -1, -1, -1)
-          val temp_x = work_x_sram(5+i, tid)
-          val mul_factor = mux(i == 1, 1.to[T], M_SQRT1_2)
-          Pipe{work_x_sram(5+i, tid) = (temp_x * exp_LUT(0,i) - work_y_sram(5+i,tid) * exp_LUT(1,i))*mul_factor}
-          Pipe{work_y_sram(5+i, tid) = (temp_x * exp_LUT(1,i) + work_y_sram(5+i,tid) * exp_LUT(0,i))*mul_factor}
+          val temp_x = work_x_sram(5+i.to[Index], tid)
+          val mul_factor = mux(i.to[Index] == 1, 1.to[T], M_SQRT1_2)
+          Pipe{work_x_sram(5+i.to[Index], tid) = (temp_x * exp_LUT(0,i) - work_y_sram(5+i.to[Index],tid) * exp_LUT(1,i))*mul_factor}
+          Pipe{work_y_sram(5+i.to[Index], tid) = (temp_x * exp_LUT(1,i) + work_y_sram(5+i.to[Index],tid) * exp_LUT(0,i))*mul_factor}
         }
         // FFT4
         Sequential.Foreach(0 until 2 by 1) { ii =>
-          val base = 4*ii
+          val base = 4*ii.to[Index]
           FFT4(tid, base)
         }
 
@@ -2563,8 +2569,8 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
       // Loop 2
       Sequential.Foreach(THREADS by 1) { tid => 
         val sx = 66
-        val hi = tid >> 3
-        val lo = tid & 7
+        val hi = tid.to[Index] >> 3
+        val lo = tid.to[Index] & 7
         val offset = hi*8+lo // * here but >> above????
         Sequential.Foreach(8 by 1) { i => 
           val lhs_factor = shuffle_lhs_LUT(i)
@@ -2576,8 +2582,8 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
       // Loop 3
       Sequential.Foreach(THREADS by 1) { tid => 
         val sx = 8
-        val hi = tid >> 3
-        val lo = tid & 7
+        val hi = tid.to[Index] >> 3
+        val lo = tid.to[Index] & 7
         val offset = lo*66 + hi
         Sequential.Foreach(8 by 1) { i => 
           val lhs_factor = shuffle_lhs_LUT(i)
@@ -2589,8 +2595,8 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
       // Loop 4
       Sequential.Foreach(THREADS by 1) { tid => 
         val sx = 66
-        val hi = tid >> 3
-        val lo = tid & 7
+        val hi = tid.to[Index] >> 3
+        val lo = tid.to[Index] & 7
         val offset = hi*8+lo // * here but >> above????
         Sequential.Foreach(8 by 1) { i => 
           val lhs_factor = shuffle_lhs_LUT(i)
@@ -2602,26 +2608,26 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
       // Loop 5
       Sequential.Foreach(THREADS by 1) { tid => 
         val sx = 8
-        val hi = tid >> 3;
-        val lo = tid & 7;
+        val hi = tid.to[Index] >> 3;
+        val lo = tid.to[Index] & 7;
         val offset = lo*66+hi
         Sequential.Foreach(8 by 1) { i => 
-          work_y_sram(i, tid) = smem(i*sx+offset) 
+          work_y_sram(i, tid) = smem(i.to[Index]*sx+offset) 
         }
       }
 
       // Loop 6 
       Sequential.Foreach(THREADS by 1) { tid => 
         FFT8(tid)
-        val hi = tid >> 3
+        val hi = tid.to[Index] >> 3
         twiddles8(tid, hi, 64)
       }
 
       // Loop 7
       Sequential.Foreach(THREADS by 1) { tid => 
         val sx = 72
-        val hi = tid >> 3
-        val lo = tid & 7
+        val hi = tid.to[Index] >> 3
+        val lo = tid.to[Index] & 7
         val offset = hi*8 + lo
         Sequential.Foreach(8 by 1) { i => 
           val lhs_factor = shuffle_lhs_LUT(i)
@@ -2633,8 +2639,8 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
       // Loop 8
       Sequential.Foreach(THREADS by 1) { tid => 
         val sx = 8
-        val hi = tid >> 3
-        val lo = tid & 7
+        val hi = tid.to[Index] >> 3
+        val lo = tid.to[Index] & 7
         val offset = hi*72 + lo
         Sequential.Foreach(8 by 1) { i => 
           val lhs_factor = shuffle_lhs_LUT(i)
@@ -2646,8 +2652,8 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
       // Loop 9
       Sequential.Foreach(THREADS by 1) { tid => 
         val sx = 72
-        val hi = tid >> 3
-        val lo = tid & 7
+        val hi = tid.to[Index] >> 3
+        val lo = tid.to[Index] & 7
         val offset = hi*8 + lo
         Sequential.Foreach(8 by 1) { i => 
           val lhs_factor = shuffle_lhs_LUT(i)
@@ -2659,11 +2665,11 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
       // Loop 10
       Sequential.Foreach(THREADS by 1) { tid => 
         val sx = 8
-        val hi = tid >> 3
-        val lo = tid & 7
+        val hi = tid.to[Index] >> 3
+        val lo = tid.to[Index] & 7
         val offset = hi*72 + lo
         Sequential.Foreach(8 by 1) { i => 
-          work_y_sram(i, tid) = smem(i * sx + offset)
+          work_y_sram(i, tid) = smem(i.to[Index] * sx + offset)
         }
       }
 

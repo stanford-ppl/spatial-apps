@@ -680,7 +680,7 @@ object MemTest2D extends SpatialApp { // Regression (Unit) // Args: 7
     Accel {
       val mem = SRAM[Int](64, 128)
       Sequential.Foreach(64 by 1, 128 by 1) { (i,j) =>
-        mem(i,j) = x + (i*128+j).to[Int]
+        mem(i,j) = x + (i.to[Index]*128+j.to[Index]).to[Int]
       }
       Pipe { y := mem(63,127) }
     }

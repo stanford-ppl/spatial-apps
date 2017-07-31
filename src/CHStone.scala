@@ -98,12 +98,12 @@ object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
           // TODO: Can make this one writer only
           if (numel == SHA_BLOCKSIZE) {Pipe{
             Foreach(SHA_BLOCKSIZE/4 by 1){ i => 
-              sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
+              sha_data(i) = (buffer(base + i.to[Index]*4).as[ULong]) | (buffer(base + i.to[Index]*4+1).as[ULong] << 8) | (buffer(base + i.to[Index]*4 + 2).as[ULong] << 16) | (buffer(base + i.to[Index]*4+3).as[ULong] << 24)
             }
             sha_transform()
           }} else {
             Foreach(0 until numel by 1) { i => 
-              sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
+              sha_data(i) = (buffer(base + i.to[Index]*4).as[ULong]) | (buffer(base + i.to[Index]*4+1).as[ULong] << 8) | (buffer(base + i.to[Index]*4 + 2).as[ULong] << 16) | (buffer(base + i.to[Index]*4+3).as[ULong] << 24)
             }         
           }
         }
