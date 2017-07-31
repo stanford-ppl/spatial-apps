@@ -46,9 +46,10 @@ trait RaoBlackParticleFilter extends SpatialStream {
   @struct case class Particle(w: SReal, q: SQuat, lastA: SAcceleration, lastQ: SQuat)
   
 
-  val lutP: scala.Int = 10000
-  val lutAcos: scala.Int = 1000
+  val lutP: scala.Int = 100//10000
+  val lutAcos: scala.Int = 10//1000
 
+  // LUTs are way too big.  They don't compile because the scala to create them exceeds JVM code size limits for apply.  Either shrink or make them drams
   lazy val acosLUT = 
     LUT[SReal](lutAcos)(List.tabulate[SReal](lutAcos)(i => math.acos(i/lutAcos.toDouble)):_*)
 
@@ -198,12 +199,12 @@ trait RaoBlackParticleFilter extends SpatialStream {
 //    val inV       = StreamIn[TSB](In2)
 //    val out       = StreamOut[TSR](Out1)
     val out        = DRAM[TSR](11)
-    val outI  = Reg[Index](0)
 
     
     val parFactor = 1 (1 -> N)
 
     Accel {
+      val outI  = Reg[Index](0)
 
       val sramBUFFER = SRAM[TSR](10)
 
@@ -480,8 +481,8 @@ trait RaoBlackParticleFilter extends SpatialStream {
     val w2 = Reg[SReal]
 
     FSM[Boolean, Boolean](true)(x => x)(x => {
-      x1 := 2.0 * random[SReal](1.0) - 1.0
-      x2 := 2.0 * random[SReal](1.0) - 1.0
+      x1 := 2.0 * unif[_16].to[SReal] - 1.0
+      x2 := 2.0 * unif[_16].to[SReal] - 1.0
       w := (x1 * x1 + x2 * x2)
     })(x => w.value >= 1.0)
 
@@ -511,7 +512,7 @@ trait RaoBlackParticleFilter extends SpatialStream {
     val outStates = SRAM[SReal](N, 6)
     val outCovs = SRAM[SReal](N, 6, 6)    
 
-    val u = random[SReal](1.0)
+    val u = unif[_16].to[SReal]
 
     Foreach(0::N)(i => {
       if (i == 0)
