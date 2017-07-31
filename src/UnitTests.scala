@@ -46,6 +46,20 @@ object StreamInOut extends SpatialApp {
   }
 }
 
+// Example of user syntax for explicitly setting II of a pipeline
+object ExplicitIITest extends SpatialApp {
+  @virtualize def main(): Unit = {
+    val y = ArgIn[Int]
+
+    Accel {
+      val x = SRAM[Int](32)
+      Pipe(ii=1).Foreach(0 until 32) { i =>
+        x(i) = (x(i) * 32) / y.value
+      }
+    }
+  }
+}
+
 
 
 object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -283.70
