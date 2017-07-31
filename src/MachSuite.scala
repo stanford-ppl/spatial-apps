@@ -1641,7 +1641,8 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
             // Reduce(shifted)(exp by 1) { k => shifted >> 1}{(a,b) => b}
             Foreach(exp by 1) { k => shifted := shifted.value >> 1}
             val bucket_indx = (shifted.value & 0x3.to[Int])*NUM_BLOCKS.to[Int] + blockID.to[Index] + 1.to[Int]
-            bucket_sram(bucket_indx) = bucket_sram(bucket_indx) + 1
+            // println(" hist bucket(" + bucket_indx + ") = " + bucket_sram(bucket_indx) + " + 1")
+            if (bucket_indx < 2048) {bucket_sram(bucket_indx) = bucket_sram(bucket_indx) + 1}
           }
         }
       }
@@ -1684,7 +1685,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
             Foreach(exp by 1) { k => shifted := shifted >> 1}
             val bucket_indx = (shifted & 0x3.to[Int])*NUM_BLOCKS + blockID.to[Index]
             val a_indx = blockID.to[Index] * EL_PER_BLOCK + i.to[Index]
-            println("s2(" + bucket_sram(bucket_indx) + ") = " + s1(a_indx) + " (addr " + a_indx + ")")
+            // println("s2(" + bucket_sram(bucket_indx) + ") = " + s1(a_indx) + " (addr " + a_indx + ")")
             s2(bucket_sram(bucket_indx)) = s1(a_indx)
             // println("bucket " + bucket_indx + " = " + {bucket_sram(bucket_indx) + 1})
             bucket_sram(bucket_indx) = bucket_sram(bucket_indx) + 1
@@ -1707,13 +1708,13 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
         last_step_scan()
 
         if (valid_buffer == a) {
-          println("s1 = a, s2 = b")
+          // println("s1 = a, s2 = b")
           Sequential{
             Pipe{update(exp.to[Index], a_sram, b_sram)}
             Pipe{valid_buffer := b}
           }
         } else {
-          println("s1 = b, s2 = a")
+          // println("s1 = b, s2 = a")
           Sequential{
             Pipe{update(exp.to[Index], b_sram, a_sram)}
             Pipe{valid_buffer := a}
@@ -1723,10 +1724,10 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
       }
 
       if (valid_buffer == a) {
-        println("dumping buf a")
+        // println("dumping buf a")
         data_dram store a_sram
       } else {
-        println("dumping buf b")
+        // println("dumping buf b")
         data_dram store b_sram
       }
 
