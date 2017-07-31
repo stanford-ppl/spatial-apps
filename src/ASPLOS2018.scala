@@ -1008,15 +1008,15 @@ x_par=4  |  --->            X                XX    |
             val W = grid_sram(i, (j-1)%COLS)
             val self = grid_sram(i,j)
             val sum = (N+E+S+W)*self
-            val p_flip = exp_sram(-sum+lut_size/2)
+            //val p_flip = exp_sram(-sum+lut_size/2) //value not used?
             val pi_x = exp_sram(sum+4) * mux((bias_sram(i,j) * self) < 0, exp_posbias, exp_negbias)
             val threshold = min(1.to[T], pi_x)
-            //val rng = unif[_16]()
             val rng = 0//unif[_16]()
             val flip = mux(pi_x > 1, 1.to[T], mux(rng < 31, 1.to[T], 0.to[T]))
             //if (j >= 0 && j < COLS) {
-              grid_sram(i,j) = mux(flip == 1.to[T], -self, self)
+              //grid_sram(i,j) = mux(flip == 1.to[T], -self, self)
             //}
+            grid_sram(i,j) = mux((j>0) && (j<COLS) && (flip == 1.to[T]), -self, self)
           }
         }
       }
