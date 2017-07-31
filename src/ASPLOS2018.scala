@@ -925,8 +925,7 @@ x_par=4  |  --->            X                XX    |
     // Square
     val bias_matrix = (0::ROWS, 0::COLS){(i,j) => if (i > ROWS/4 && i < 3*ROWS/4 && j > COLS/4 && j < 3*COLS/4) -1.to[Int] else 1.to[Int]}
 
-    //val exp_lut = DRAM[T](lut_size)
-    val exp_lut = DRAM[T](16)
+    val exp_lut = DRAM[T](lut_size)
     val grid_dram = DRAM[Int](ROWS,COLS)
     val bias_dram = DRAM[Int](ROWS,COLS)
 
@@ -986,8 +985,7 @@ x_par=4  |  --->            X                XX    |
     // }
 
     Accel{
-      //val exp_sram = SRAM[T](lut_size)
-      val exp_sram = SRAM[T](16)
+      val exp_sram = SRAM[T](lut_size)
       val grid_sram = SRAM[Int](ROWS,COLS)
       exp_sram load exp_lut
       grid_sram load grid_dram(0::ROWS, 0::COLS par par_load)
