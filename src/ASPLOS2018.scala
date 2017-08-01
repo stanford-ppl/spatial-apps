@@ -920,7 +920,7 @@ x_par=4  |  --->            X                XX    |
 
     val par_load = 16
     val par_store = 16
-    val x_par = 1 (1 -> 1 -> 16)
+    val x_par = 4 (1 -> 1 -> 16)
 
     // Square
     val bias_matrix = (0::ROWS, 0::COLS){(i,j) => if (i > ROWS/4 && i < 3*ROWS/4 && j > COLS/4 && j < 3*COLS/4) -1.to[Int] else 1.to[Int]}
@@ -2691,14 +2691,14 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
 }
 
 object Backprop extends SpatialApp { // Regression (Dense) // Args: 20
-  override val target = AWS_F1
+  override val target = Plasticine 
 
  /*                                                                                                  
     Concerns: 
         Their implementation and way of writing this app really sucks...
  */
 
-  type T = FixPt[TRUE,_32,_32]
+  type T = FixPt[TRUE,_16,_16]
   // type T = Float
   @virtualize
   def main() = {
@@ -2717,39 +2717,41 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: 20
     val test_sets =        15
     val norm_param =    0.005
 
-    val par_load = 8
-    val par_store = 8
-    val fw_layer1_pt    = 2 (1 -> 1 -> 16)
-    val fw_layer1_red   = 2 (1 -> 1 -> 16)
-    val fw_layer1_relu  = 2 (1 -> 1 -> 16)
-    val fw_layer2_pt    = 2 (1 -> 1 -> 16)
-    val fw_layer2_red   = 2 (1 -> 1 -> 16)
-    val fw_layer2_relu  = 2 (1 -> 1 -> 16)
-    val fw_layer3_pt    = 2 (1 -> 1 -> 16)
-    val fw_layer3_red   = 2 (1 -> 1 -> 16)
-    val fw_layer3_relu  = 2 (1 -> 1 -> 16)
-    val softmax_red     = 2 (1 -> 1 -> 16)
-    val softmax_nmlz    = 2 (1 -> 1 -> 16)
-    val err_par         = 2 (1 -> 1 -> 16)
-    val bw_act2_red     = 2 (1 -> 1 -> 16)
-    val bw_act2_pt      = 2 (1 -> 1 -> 16)
-    val bw_act1_red     = 2 (1 -> 1 -> 16)
-    val bw_act1_pt      = 2 (1 -> 1 -> 16)
-    val bw_layer3       = 2 (1 -> 1 -> 16)
-    val bw_layer2       = 2 (1 -> 1 -> 16)
-    val bw_layer1       = 2 (1 -> 1 -> 16)
-    val ud_weight1      = 2 (1 -> 1 -> 16)
-    val ud_bias1        = 2 (1 -> 1 -> 16)
-    val ud_weight1_norm = 2 (1 -> 1 -> 16)
-    val ud_bias1_norm   = 2 (1 -> 1 -> 16)
-    val ud_weight2      = 2 (1 -> 1 -> 16)
-    val ud_bias2        = 2 (1 -> 1 -> 16)
-    val ud_weight2_norm = 2 (1 -> 1 -> 16)
-    val ud_bias2_norm   = 2 (1 -> 1 -> 16)
-    val ud_weight3      = 2 (1 -> 1 -> 16)
-    val ud_bias3        = 2 (1 -> 1 -> 16)
-    val ud_weight3_norm = 2 (1 -> 1 -> 16)
-    val ud_bias3_norm   = 2 (1 -> 1 -> 16)
+    val inner_par = 16
+    val outer_par = 1
+    val par_load = 16
+    val par_store = 16
+    val fw_layer1_pt    = outer_par (1 -> 1 -> 16)
+    val fw_layer1_red   = inner_par (1 -> 1 -> 16)
+    val fw_layer1_relu  = inner_par (1 -> 1 -> 16)
+    val fw_layer2_pt    = outer_par (1 -> 1 -> 16)
+    val fw_layer2_red   = inner_par (1 -> 1 -> 16)
+    val fw_layer2_relu  = inner_par (1 -> 1 -> 16)
+    val fw_layer3_pt    = outer_par (1 -> 1 -> 16)
+    val fw_layer3_red   = inner_par (1 -> 1 -> 16)
+    val fw_layer3_relu  = inner_par (1 -> 1 -> 16)
+    val softmax_red     = inner_par (1 -> 1 -> 16)
+    val softmax_nmlz    = inner_par (1 -> 1 -> 16)
+    val err_par         = inner_par (1 -> 1 -> 16)
+    val bw_act2_red     = inner_par (1 -> 1 -> 16)
+    val bw_act2_pt      = outer_par (1 -> 1 -> 16)
+    val bw_act1_red     = inner_par (1 -> 1 -> 16)
+    val bw_act1_pt      = outer_par (1 -> 1 -> 16)
+    val bw_layer3       = inner_par (1 -> 1 -> 16)
+    val bw_layer2       = inner_par (1 -> 1 -> 16)
+    val bw_layer1       = inner_par (1 -> 1 -> 16)
+    val ud_weight1      = inner_par (1 -> 1 -> 16)
+    val ud_bias1        = inner_par (1 -> 1 -> 16)
+    val ud_weight1_norm = inner_par (1 -> 1 -> 16)
+    val ud_bias1_norm   = inner_par (1 -> 1 -> 16)
+    val ud_weight2      = inner_par (1 -> 1 -> 16)
+    val ud_bias2        = inner_par (1 -> 1 -> 16)
+    val ud_weight2_norm = inner_par (1 -> 1 -> 16)
+    val ud_bias2_norm   = inner_par (1 -> 1 -> 16)
+    val ud_weight3      = inner_par (1 -> 1 -> 16)
+    val ud_bias3        = inner_par (1 -> 1 -> 16)
+    val ud_weight3_norm = inner_par (1 -> 1 -> 16)
+    val ud_bias3_norm   = inner_par (1 -> 1 -> 16)
 
     val weights1_data = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_weights1.csv").reshape(input_dimension, nodes_per_layer)
     val weights2_data = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_weights2.csv").reshape(nodes_per_layer, nodes_per_layer)
@@ -2899,8 +2901,8 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: 20
 
           // Relu
           Sequential.Foreach(nodes_per_layer by 1 par fw_layer1_relu) { i => 
-            Pipe{dactivations1(i) = activations1(i)*(1.0.to[T]-activations1(i))}
-            Pipe{activations1(i) = RELU(activations1(i))}
+            dactivations1(i) = activations1(i)*(1.0.to[T]-activations1(i))
+            activations1(i) = RELU(activations1(i))
           }
           // print_dactivations1()
           // print_activations1()
@@ -2913,8 +2915,8 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: 20
           
           // Relu
           Sequential.Foreach(nodes_per_layer by 1 par fw_layer2_relu) { i => 
-            Pipe{dactivations2(i) = activations2(i)*(1.0.to[T]-activations2(i))}
-            Pipe{activations2(i) = RELU(activations2(i))}
+            dactivations2(i) = activations2(i)*(1.0.to[T]-activations2(i))
+            activations2(i) = RELU(activations2(i))
           }
           // print_dactivations2()
           // print_activations2()
@@ -2929,8 +2931,8 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: 20
 
           // Relu
           Sequential.Foreach(possible_outputs by 1 par fw_layer3_relu) { i => 
-            Pipe{dactivations3(i) = activations3(i)*(1.0.to[T]-activations3(i))}
-            Pipe{activations3(i) = RELU(activations3(i))}
+            dactivations3(i) = activations3(i)*(1.0.to[T]-activations3(i))
+            activations3(i) = RELU(activations3(i))
           }
 
           // print_dactivations3()
@@ -2971,13 +2973,13 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: 20
         def update_weights(): Unit = {
           // Update input layer weights
           val norm_temp1 = Sequential.Reduce(Reg[T](0))(input_dimension by 1, nodes_per_layer by 1 par ud_weight1_norm){ (i,j) => 
-            Pipe{weights1_sram(i,j) = weights1_sram(i,j) - delta_weights1(i,j) * learning_rate}
+            weights1_sram(i,j) = weights1_sram(i,j) - delta_weights1(i,j) * learning_rate
             weights1_sram(i,j) * weights1_sram(i,j)
           }{_+_}
           // print_weights1()
           // print_bias1()
           val bias_norm_temp1 = Sequential.Reduce(Reg[T](0))(nodes_per_layer by 1 par ud_bias1_norm) { i => 
-            Pipe{biases1_sram(i) = biases1_sram(i) - (oracle_activations1(i)*learning_rate)}
+            biases1_sram(i) = biases1_sram(i) - (oracle_activations1(i)*learning_rate)
             biases1_sram(i) * biases1_sram(i)
           }{_+_}
           // print_bias1()
@@ -2994,11 +2996,11 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: 20
 
           // Update middle layer weights
           val norm_temp2 = Sequential.Reduce(Reg[T](0))(nodes_per_layer by 1, nodes_per_layer by 1 par ud_weight2_norm){ (i,j) => 
-            Pipe{weights2_sram(i,j) = weights2_sram(i,j) - delta_weights2(i,j) * learning_rate}
+            weights2_sram(i,j) = weights2_sram(i,j) - delta_weights2(i,j) * learning_rate
             weights2_sram(i,j) * weights2_sram(i,j)
           }{_+_}
           val bias_norm_temp2 = Sequential.Reduce(Reg[T](0))(nodes_per_layer by 1 par ud_bias2_norm) { i => 
-            Pipe{biases2_sram(i) = biases2_sram(i) - (oracle_activations2(i)*learning_rate)}
+            biases2_sram(i) = biases2_sram(i) - (oracle_activations2(i)*learning_rate)
             biases2_sram(i) * biases2_sram(i)
           }{_+_}
           // print_bias2()
@@ -3014,11 +3016,11 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: 20
 
           // Update last layer weights
           val norm_temp3 = Sequential.Reduce(Reg[T](0))(nodes_per_layer by 1, possible_outputs by 1 par ud_weight3_norm){ (i,j) => 
-            Pipe{weights3_sram(i,j) = weights3_sram(i,j) - delta_weights3(i,j) * learning_rate}
+            weights3_sram(i,j) = weights3_sram(i,j) - delta_weights3(i,j) * learning_rate
             weights3_sram(i,j) * weights3_sram(i,j)
           }{_+_}
           val bias_norm_temp3 = Sequential.Reduce(Reg[T](0))(possible_outputs by 1 par ud_bias3_norm) { i => 
-            Pipe{biases3_sram(i) = biases3_sram(i) - (delta_outputs(i)*learning_rate)}
+            biases3_sram(i) = biases3_sram(i) - (delta_outputs(i)*learning_rate)
             biases3_sram(i) * biases3_sram(i)
           }{_+_}
 
