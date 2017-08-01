@@ -33,30 +33,30 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
   @virtualize
   def main() = {
 
-   	// Problem properties
-   	val ROWS = 16 // Leading dim
-   	val COLS = 32
+    // Problem properties
+    val ROWS = 16 // Leading dim
+    val COLS = 32
     val HEIGHT = 32
     val par_load = 16
     val par_store = 16
-    val loop_height = 1 (1 -> 1 -> 8)
+    val loop_height = 2 (1 -> 1 -> 8)
     val PX = 1
     // val num_slices = ArgIn[Int]
     // setArg(num_slices, args(0).to[Int])
     val num_slices = HEIGHT
-   	val filter_size = 3*3*3
+    val filter_size = 3*3*3
 
-   	// Setup data
-   	val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_data.csv", "\n")
-   	val data = raw_data.reshape(HEIGHT, COLS, ROWS)
+    // Setup data
+    val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_data.csv", "\n")
+    val data = raw_data.reshape(HEIGHT, COLS, ROWS)
 
-   	// Setup DRAMs
-   	val data_dram = DRAM[Int](HEIGHT, COLS, ROWS)
-   	val result_dram = DRAM[Int](HEIGHT, COLS, ROWS)
+    // Setup DRAMs
+    val data_dram = DRAM[Int](HEIGHT, COLS, ROWS)
+    val result_dram = DRAM[Int](HEIGHT, COLS, ROWS)
 
-   	setMem(data_dram, data)
+    setMem(data_dram, data)
 
-   	Accel {
+    Accel {
       val filter = LUT[Int](3,3,3)(   0,  0,  0,
                                       0, -1,  0,
                                       0,  0,  0,
@@ -105,19 +105,19 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
       result_dram(0::HEIGHT, 0::COLS, 0::ROWS par par_store) store result_sram
 
 
-   	}
+    }
 
-   	// Get results
-   	val result_data = getTensor3(result_dram)
-   	val raw_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_gold.csv", "\n")
-   	val gold = raw_gold.reshape(HEIGHT,COLS,ROWS)
+    // Get results
+    val result_data = getTensor3(result_dram)
+    val raw_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_gold.csv", "\n")
+    val gold = raw_gold.reshape(HEIGHT,COLS,ROWS)
 
-   	// Printers
-   	printTensor3(gold, "gold") // Least significant dimension is horizontal, second-least is vertical, third least is ---- separated blocks
-   	printTensor3(result_data, "results")
+    // Printers
+    printTensor3(gold, "gold") // Least significant dimension is horizontal, second-least is vertical, third least is ---- separated blocks
+    printTensor3(result_data, "results")
 
-   	val cksum = gold.zip(result_data){_==_}.reduce{_&&_}
-   	println("PASS: " + cksum + " (Stencil3D)")
+    val cksum = gold.zip(result_data){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (Stencil3D)")
 
  }
 }
@@ -171,9 +171,6 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
 
     val SKIPB = 0
     val SKIPA = 1
-    val PX = 1 // Parallelized in MachSuite even though it is WRONG
-    val par_load = 16
-    val par_store = 16
     val ALIGN = 2
     val MATCH_SCORE = 1
     val MISMATCH_SCORE = -1
@@ -216,14 +213,14 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
       val seqa_fifo_aligned = FIFO[Int8](length*2)
       val seqb_fifo_aligned = FIFO[Int8](length*2)
 
-      seqa_sram_raw load seqa_dram_raw(0::length par par_load)
-      seqb_sram_raw load seqb_dram_raw(0::length par par_load)
+      seqa_sram_raw load seqa_dram_raw
+      seqb_sram_raw load seqb_dram_raw
 
       val score_matrix = SRAM[nw_tuple](length+1,length+1)
 
       // Build score matrix
-      Foreach(length+1 by 1 par PX){ r =>
-        Sequential.Foreach(length+1 by 1 par PX) { c => // Bug #151, should be able to remove previous_result reg when fixed
+      Foreach(length+1 by 1){ r =>
+        Sequential.Foreach(length+1 by 1) { c => // Bug #151, should be able to remove previous_result reg when fixed
           val previous_result = Reg[nw_tuple]
           val update = if (r == 0) (nw_tuple(-c.as[Int16], 0)) else if (c == 0) (nw_tuple(-r.as[Int16], 1)) else {
             val match_score = mux(seqa_sram_raw(c-1) == seqb_sram_raw(r-1), MATCH_SCORE.to[Int16], MISMATCH_SCORE.to[Int16])
@@ -241,7 +238,6 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
       val b_addr = Reg[Int](length)
       val a_addr = Reg[Int](length)
       val done_backtrack = Reg[Bit](false)
-      // par PX
       FSM[Int](state => state != doneState) { state =>
         if (state == traverseState) {
           if (score_matrix(b_addr,a_addr).ptr == ALIGN.to[Int16]) {
@@ -271,8 +267,8 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
       }
 
       Parallel{
-        seqa_dram_aligned(0::2*length par par_store) store seqa_fifo_aligned
-        seqb_dram_aligned(0::2*length par par_store) store seqb_fifo_aligned
+        seqa_dram_aligned store seqa_fifo_aligned
+        seqb_dram_aligned store seqb_fifo_aligned
       }
 
     }
@@ -338,7 +334,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
     val par_store = 16
     val row_par = 2 (1 -> 1 -> 8)
     val tile_par = 2 (1 -> 1 -> 4)
-    val mean_par = window/2 (1 -> 1 -> window/2)
+    val mean_par = (window/2) (1 -> 1 -> window/2)
     val data = loadCSV2D[T]("/remote/regression/data/slacsample2d.csv", ",", "\n")
     val memrows = ArgIn[Int]
     val memcols = ArgIn[Int]
@@ -798,14 +794,14 @@ object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
       val path_sram = SRAM[Int](N_OBS)
 
       Parallel{
-        obs_sram load obs_dram(0::N_OBS par par_load)
-        init_sram load init_dram(0::N_STATES par par_load)
-        transitions_sram load transitions_dram(0::N_STATES, 0::N_STATES par par_load)
-        emissions_sram load emissions_dram(0::N_STATES, 0::N_TOKENS par par_load)
+        obs_sram load obs_dram
+        init_sram load init_dram
+        transitions_sram load transitions_dram
+        emissions_sram load emissions_dram
       }
 
       // from --> to
-      Foreach(0 until steps_to_take par PX) { step => 
+      Sequential.Foreach(0 until steps_to_take) { step => 
         val obs = obs_sram(step)
         Sequential.Foreach(0 until N_STATES) { to => 
           val emission = emissions_sram(to, obs)
@@ -1204,7 +1200,9 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
             values_sram load values_dram(start_id :: stop_id par par_load)
           }
           vec_sram gather vec_dram(cols_sram, stop_id - start_id)
+          println("row " + {i + tile})
           val element = Reduce(Reg[T](0))(stop_id - start_id by 1 par red_par) { j => 
+            // println(" partial from " + j + " = " + {values_sram(j) * vec_sram(j)})
             values_sram(j) * vec_sram(j)
           }{_+_}
           result_sram(i) = element
@@ -2049,7 +2047,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
       def expand_key(): Unit = {
         val addr_lut = LUT[Int](4)(29, 30, 31, 28)
         Foreach(4 by 1) { i => 
-          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i == 0, rcon.value, 0)
+          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i.to[Index] == 0, rcon.value, 0)
         }
         // Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
         // Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
@@ -2059,7 +2057,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
         Sequential.Foreach(4 until 16 by 4) {i =>
           Sequential.Foreach(4 by 1) {j => 
-            key_sram(i+j) = key_sram(i+j) ^ key_sram(i - 4 + j)
+            key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
           }
           // Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
           // Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
@@ -2068,7 +2066,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
         }
       
         Sequential.Foreach(16 until 20 by 1){i => 
-          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i-4).to[Int])
+          key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i.to[Index]-4).to[Int])
         }
         // Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
         // Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
@@ -2077,7 +2075,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
         Sequential.Foreach(20 until 32 by 4) {i => 
           Sequential.Foreach(4 by 1) { j => 
-            key_sram(i+j) = key_sram(i+j) ^ key_sram(i - 4 + j)
+            key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
           }
           // Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
           // Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
@@ -2090,7 +2088,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
         Sequential.Foreach(4 by 1){ i => 
           val row = RegFile[UInt8](4) 
           Foreach(4 by 1){ j => 
-            val col_addr = (j - i) % 4
+            val col_addr = (j.to[Index] - i.to[Index]) % 4
             row(col_addr) = plaintext_sram(i,j)
           }
           Foreach(4 by 1){ j => 
@@ -2118,7 +2116,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
           val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
           // val e = col(0) ^ col(1) ^ col(2) ^ col(3)
           Foreach(4 by 1) { i => 
-            val id1 = (i+1)%4
+            val id1 = (i.to[Index]+1)%4
             plaintext_sram(i,j) = col(i) ^ e ^ rj_xtime(col(i) ^ col(id1))
           }
         }
@@ -2126,7 +2124,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
       def add_round_key(round: Index): Unit = {
         Foreach(4 by 1, 4 by 1) { (i,j) => 
-          val key = mux(round % 2 == 1, key_sram(i+j*4+16), key_sram(i+j*4))
+          val key = mux(round % 2 == 1, key_sram(i.to[Index]+j.to[Index]*4+16), key_sram(i.to[Index]+j.to[Index]*4))
           plaintext_sram(i,j) = plaintext_sram(i,j) ^ key
         }
       }
@@ -2142,7 +2140,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
         // gh issue #83
         Sequential.Foreach(4 by 1 par 1){i => 
           Sequential.Foreach(4 by 1 par 1){j => 
-            plaintext_sram(i,j) = plaintext_flat(j*4+i) // MachSuite flattens columnwise... Why????
+            plaintext_sram(i,j) = plaintext_flat(j.to[Index]*4+i.to[Index]) // MachSuite flattens columnwise... Why????
           }
         }
 
@@ -2331,7 +2329,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
         // Reshape plaintext_sram (gh issue # 83)
         val ciphertext_flat = SRAM[Int](16)
         Sequential.Foreach(4 by 1, 4 by 1) {(i,j) => 
-          ciphertext_flat(j*4+i) = plaintext_sram(i,j).as[Int]
+          ciphertext_flat(j.to[Index]*4+i.to[Index]) = plaintext_sram(i,j).as[Int]
         }
 
         ciphertext_dram(block_id::block_id+16 par par_store) store ciphertext_flat
@@ -2418,14 +2416,6 @@ object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
           W(i) = if (i < 16) {sha_data(i)} else {W(i-3) ^ W(i-8) ^ W(i-14) ^ W(i-16)}
         }
 
-        // Foreach(5 by 1 par 5){i => 
-        //   val tmp = sha_digest(i)
-        //   if (i == 0) A := tmp 
-        //   else if (i == 1) B := tmp
-        //   else if (i == 2) C := tmp
-        //   else if (i == 3) D := tmp
-        //   else E := tmp
-        // }
         A := sha_digest(0)
         B := sha_digest(1)
         C := sha_digest(2)
@@ -2449,9 +2439,12 @@ object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
           E := D; D := C; C := ((B << 30) | (B >> (32 - 30))); B := A; A := temp
         }
 
-        Foreach(5 by 1 par 5){i => 
-          sha_digest(i) = sha_digest(i) + mux(i == 0, A, mux(i == 1, B, mux(i == 2, C, mux(i == 3, D, E))))
-        }
+        Pipe{sha_digest(0) = sha_digest(0) + A}
+        // Pipe{println("sha_digest 0 is " + sha_digest(0))}
+        Pipe{sha_digest(1) = sha_digest(1) + B}
+        Pipe{sha_digest(2) = sha_digest(2) + C}
+        Pipe{sha_digest(3) = sha_digest(3) + D}
+        Pipe{sha_digest(4) = sha_digest(4) + E}
       }
       def sha_update(count: Index): Unit = {
         if (count_lo + (count << 3) < count_lo) {count_hi :+= 1}
@@ -2462,21 +2455,27 @@ object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
           // TODO: Can make this one writer only
           if (numel == SHA_BLOCKSIZE) {Pipe{
             Foreach(SHA_BLOCKSIZE/4 by 1){ i => 
-              sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
+              sha_data(i) = (buffer(base + i.to[Index]*4).as[ULong]) | (buffer(base + i.to[Index]*4+1).as[ULong] << 8) | (buffer(base + i.to[Index]*4 + 2).as[ULong] << 16) | (buffer(base + i.to[Index]*4+3).as[ULong] << 24)
             }
             sha_transform()
           }} else {
             Foreach(0 until numel by 1) { i => 
-              sha_data(i) = (buffer(base + i*4).as[ULong]) | (buffer(base + i*4+1).as[ULong] << 8) | (buffer(base + i*4 + 2).as[ULong] << 16) | (buffer(base + i*4+3).as[ULong] << 24)
+              sha_data(i) = (buffer(base + i.to[Index]*4).as[ULong]) | (buffer(base + i.to[Index]*4+1).as[ULong] << 8) | (buffer(base + i.to[Index]*4 + 2).as[ULong] << 16) | (buffer(base + i.to[Index]*4+3).as[ULong] << 24)
             }         
           }
         }
 
       }
 
+      // Pipe{sha_digest(0) = 0x67452301L.to[ULong]}
+      // Pipe{sha_digest(1) = 0xefcdab89L.to[ULong]}
+      // Pipe{sha_digest(2) = 0x98badcfeL.to[ULong]}
+      // Pipe{sha_digest(3) = 0x10325476L.to[ULong]}
+      // Pipe{sha_digest(4) = 0xc3d2e1f0L.to[ULong]}
+
       Sequential.Foreach(len by BLOCK_SIZE) { chunk => 
         val count = min(BLOCK_SIZE.to[Int], (len - chunk))
-        buffer load text_dram(chunk::chunk+count par par_load)
+        buffer load text_dram(chunk::chunk+count)
         sha_update(count)
 
         // def byte_reverse(x: ULong): ULong = {
@@ -2491,18 +2490,18 @@ object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
         sha_data(count_final) = 0x80
         if (count_final > 56) {
           Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
-          sha_transform()
+          Sequential(sha_transform())
           sha_data(14) = 0
         } else {
           Foreach(count_final+1 until 16 by 1) { i => sha_data(i) = 0 }
         }
-        Foreach(14 until 16 by 1){i => 
-          sha_data(i) = if (i == 14) hi_bit_count else lo_bit_count
-        }
+        Pipe{sha_data(14) = hi_bit_count}
+        Pipe{sha_data(15) = lo_bit_count}
         sha_transform()
       }
 
-      hash_dram(0::16 par par_store) store sha_digest
+
+      hash_dram store sha_digest
     }
 
     val hashed_result = getMem(hash_dram)
@@ -2624,7 +2623,7 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
 
       val flatCts = SRAM[T](MAXK * MAXD)
       Foreach(K by 1, D by 1 par PX) {(i,j) => // Parallelize when issue #159 is fixed
-        flatCts(i*D+j) = cts(i,j)
+        flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
       }
       // Store the centroids out
       centroids(0::K*D par par_store) store flatCts
