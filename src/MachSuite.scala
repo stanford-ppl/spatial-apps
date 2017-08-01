@@ -1564,7 +1564,7 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
           val upper_tmp = Reg[Int](0)
           Foreach(from until mid+1 by 1){ i => lower_fifo.enq(data_sram(i)) }
           Foreach(mid+1 until to+1 by 1){ j => upper_fifo.enq(data_sram(j)) }
-          Sequential.Foreach(from until to+1 by 1) { k => 
+          Pipe(ii=6).Foreach(from until to+1 by 1) { k =>  // Bug # 202
             data_sram(k) = 
               if (lower_fifo.empty) { upper_fifo.deq() }
               else if (upper_fifo.empty) { lower_fifo.deq() }
