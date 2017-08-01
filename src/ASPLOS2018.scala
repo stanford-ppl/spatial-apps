@@ -1440,7 +1440,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
             local_farEdgeLens gather OCedgeLens(farPages2)
 
             // Do math to find new rank
-            val pagerank = Reduce(Reg[X](0))(len by 1){i => 
+            val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
                 println("page: " + page + ", local_page: " + local_page + " deq from far")
                 local_farPages.deq() / local_farEdgeLens.deq().to[X]
@@ -1714,7 +1714,7 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
           val upper_tmp = Reg[Int](0)
           Foreach(from until mid+1 by 1){ i => lower_fifo.enq(data_sram(i)) }
           Foreach(mid+1 until to+1 by 1){ j => upper_fifo.enq(data_sram(j)) }
-          Sequential.Foreach(from until to+1 by 1) { k => 
+          Pipe(ii=6).Foreach(from until to+1 by 1) { k => 
             data_sram(k) = 
               if (lower_fifo.empty) { upper_fifo.deq() }
               else if (upper_fifo.empty) { lower_fifo.deq() }
