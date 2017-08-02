@@ -2,8 +2,6 @@ import spatial.dsl._
 import org.virtualized._
 
 object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
-
-
   @virtualize
   def main() {
     // Declare SW-HW interface vals
@@ -60,6 +58,30 @@ object ExplicitIITest extends SpatialApp {
   }
 }
 
+object SRAMChar extends SpatialApp {
+  val N = 16
+  val len = 8192
+  val depth = 2
+  val p = 2
+  type T = Int
+
+  @virtualize def main(): Unit = {
+    val outs = List.fill(N){ ArgOut[T] }
+
+    Accel {
+      val rfs = List.fill(N){ SRAM.buffer[T](len) }
+
+      Foreach(0 until 1000) { _ =>
+        List.tabulate(depth) { d =>
+          Foreach(0 until 100 par p) { i =>
+            rfs.zip(outs).foreach{case (rf,out) => if (d > 0) rf.update(i, i.to[T]) else out := rf(i) }
+          }
+        }
+        ()
+      }
+    }
+  }
+}
 
 
 object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -283.70
