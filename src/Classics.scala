@@ -590,6 +590,7 @@ object Convolution_FPGA extends SpatialApp { // Regression (Dense) // Args: none
     val C = ArgIn[Int]
     setArg(R, image.rows)
     setArg(C, image.cols)
+    val lb_par = 8
 
     val img = DRAM[T](R, C)
     val imgOut = DRAM[T](R, C)
@@ -610,7 +611,7 @@ object Convolution_FPGA extends SpatialApp { // Regression (Dense) // Args: none
       val lineOut = SRAM[T](Cmax)
 
       Foreach(0 until R) { r =>
-        lb load img(r, 0::C)
+        lb load img(r, 0::C par lb_par)
 
         /*println("Row " + r)
         Foreach(0 until Kh) { i =>

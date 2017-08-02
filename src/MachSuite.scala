@@ -599,6 +599,7 @@ object Stencil2D extends SpatialApp { // Regression (Dense) // Args: none
   	val ROWS = 128
   	val COLS = 64
   	val filter_size = 9
+    val par_lb_load = 4
 
   	// Setup data
   	val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil2d_data.csv", "\n")
@@ -620,7 +621,7 @@ object Stencil2D extends SpatialApp { // Regression (Dense) // Args: none
 	  	val result_sram = SRAM[Int](ROWS,COLS)
 	  	Foreach(ROWS by 1){ i => 
 				val wr_row = (i-2)%ROWS
-	  		lb load data_dram(i, 0::COLS)
+	  		lb load data_dram(i, 0::COLS par par_lb_load)
 				Foreach(COLS by 1) {j => 
 					Foreach(3 by 1 par 3) {k => sr(k,*) <<= lb(k,j)}
 					val temp = Reduce(Reg[Int](0))(3 by 1, 3 by 1){(r,c) => sr(r,c) * filter(r,c)}{_+_}
@@ -686,6 +687,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
     val par_load = 16
     val par_store = 16
     val loop_height = 2 (1 -> 1 -> 8)
+    val par_lb_load = 4 (1 -> 1 -> 16)
     val PX = 1
     // val num_slices = ArgIn[Int]
     // setArg(num_slices, args(0).to[Int])
@@ -723,7 +725,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
           val local_slice = SRAM[Int](COLS,ROWS)
           Foreach(COLS+1 by 1 par PX){ i => 
             val lb = LineBuffer[Int](3,ROWS)
-            lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS)
+            lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS par par_lb_load)
             Foreach(ROWS+1 by 1 par PX) {j => 
               val sr = RegFile[Int](3,3)
               Foreach(3 by 1 par 3) {k => sr(k,*) <<= lb(k,j%ROWS)}
