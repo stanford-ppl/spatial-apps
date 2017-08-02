@@ -163,7 +163,7 @@ trait MiniParticleFilter extends SpatialStream {
   def updateFromGPS(pos: SPosition2D, weights: SRAM1[SReal], states: SRAM2[SReal], parFactor: Int) = {
     val covPos = Matrix.eye(2, covGPS)
     Foreach(0 :: N par parFactor)(i => {
-      val state = Matrix.fromSRAM1(2, states, i, 2)
+      val state = Matrix.fromSRAM1(2, states, i, ofs=2)
       val lik   = unnormalizedGaussianLogPdf(toMatrix(pos), state, covPos)
       weights(i) = weights(i) + lik
     })
