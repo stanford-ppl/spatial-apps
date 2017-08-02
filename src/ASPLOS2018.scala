@@ -39,6 +39,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
     val HEIGHT = 32
     val par_load = 16
     val par_store = 16
+    val par_lb_load = 8 (1 -> 1 -> 16)
     val loop_height = 2 (1 -> 1 -> 8)
     val PX = 1
     // val num_slices = ArgIn[Int]
@@ -77,7 +78,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
           val local_slice = SRAM[Int](COLS,ROWS)
           Foreach(COLS+1 by 1 par PX){ i => 
             val lb = LineBuffer[Int](3,ROWS)
-            lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS)
+            lb load data_dram((p+slice)%HEIGHT, i, 0::ROWS par par_lb_load)
             Foreach(ROWS+1 by 1 par PX) {j => 
               val sr = RegFile[Int](3,3)
               Foreach(3 by 1 par 3) {k => sr(k,*) <<= lb(k,j%ROWS)}
