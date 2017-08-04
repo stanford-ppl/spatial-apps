@@ -175,14 +175,14 @@ object BandwidthTests extends SpatialCompiler {
   def createPrograms(): Seq[Program[_]] = {
     import spatial.dsl._
 
-    val ranks = List(1, 2)
-    val pars  = List(1, 2, 4, 8, 16).reverse
+    val ranks = List(1, 2).reverse
+    val pars  = List(1, 2, 4, 8, 16)
 
     ranks.flatMap { r =>
       pars.map { p =>
         Program[Int](p = p, rank = r)
       }
-    }
+    }.headOption.toSeq
   }
 
   override val stagingArgs = Array("--synth")
@@ -208,8 +208,6 @@ object BandwidthTests extends SpatialCompiler {
       Config.name = name
       Config.genDir = s"${Config.cwd}/gen/$name"
       Config.logDir = s"${Config.cwd}/logs/$name"
-      Config.verbosity = -2
-      Config.showWarn = false
       resetState()
 
       //println(s"Compiling #$i: " + name + "...")
@@ -217,8 +215,9 @@ object BandwidthTests extends SpatialCompiler {
         compileProgram { program.go() }
         workQueue.put(name)
       }
-      catch {case _: Throwable =>
+      catch {case e: Throwable =>
         println(s"$name: FAIL (Compilation)")
+        e.printStackTrace()
       }
     }
 
