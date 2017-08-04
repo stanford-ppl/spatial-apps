@@ -1660,10 +1660,10 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
         MemReduce(c_col par reduce_col)(dim by tileSize par loop_kk) { kk => 
           val c_col_partial = SRAM[T](dim,tileSize)
           val b_sram = SRAM[T](tileSize,tileSize)
-          b_sram load b_dram(kk::kk+tileSize, jj::jj+tileSize par par_load)
+          b_sram load b_dram(kk::kk.to[Index]+tileSize, jj::jj.to[Index]+tileSize par par_load)
           Foreach(dim by 1 par loop_i) { i => 
             val a_sram = SRAM[T](tileSize)
-            a_sram load a_dram(i, kk::kk+tileSize)
+            a_sram load a_dram(i, kk::kk.to[Index]+tileSize)
             val c_tmp = SRAM[T](tileSize)
             MemReduce(c_tmp par reduce_tmp)(tileSize by 1 par loop_k) { k => 
               val c_tmp_partial = SRAM[T](tileSize)
@@ -1677,7 +1677,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
           }
         c_col_partial
         }{_+_}
-        c_dram(0::dim, jj::jj+tileSize par par_store) store c_col
+        c_dram(0::dim, jj::jj.to[Index]+tileSize par par_store) store c_col
       }
     }
 
