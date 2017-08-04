@@ -182,7 +182,7 @@ object BandwidthTests extends SpatialCompiler {
       pars.map { p =>
         Program[Int](p = p, rank = r)
       }
-    }.headOption.toSeq
+    }
   }
 
   override val stagingArgs = Array("--synth")
