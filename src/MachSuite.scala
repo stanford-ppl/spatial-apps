@@ -1634,13 +1634,13 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
 
     val par_load = 8
     val par_store = 8
-    val loop_jj    = 1 (1 -> 1 -> 8) // WARNING, THIS ONE DOES NOT WORK NOW
-    val loop_kk    = 2 (1 -> 1 -> 8)
-    val loop_i     = 2 (1 -> 1 -> 8)
-    val loop_k     = 2 (1 -> 1 -> 8)
-    val loop_j     = 2 (1 -> 1 -> 8)
-    val reduce_col = 2 (1 -> 1 -> 8)
-    val reduce_tmp = 2 (1 -> 1 -> 8)
+    val loop_jj    = 1 (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
+    val loop_kk    = 2 (1 -> 1 -> dim/tileSize)
+    val loop_i     = 2 (1 -> 1 -> dim)
+    val loop_k     = 2 (1 -> 1 -> tileSize)
+    val loop_j     = 2 (1 -> 1 -> tileSize)
+    val reduce_col = 2 (1 -> 1 -> tileSize)
+    val reduce_tmp = 2 (1 -> 1 -> tileSize)
 
     val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
     val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
