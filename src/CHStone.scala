@@ -56,7 +56,7 @@ object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
         val E = Reg[ULong]
 
         Foreach(80 by 1 par PX) { i =>
-          W(i) = if (i < 16) {sha_data(i)} else {W(i-3) ^ W(i-8) ^ W(i-14) ^ W(i-16)}
+          W(i) = if (i < 16) {sha_data(i)} else {W(i.as[Index]-3) ^ W(i.as[Index]-8) ^ W(i.as[Index]-14) ^ W(i.as[Index]-16)}
         }
 
         A := sha_digest(0)

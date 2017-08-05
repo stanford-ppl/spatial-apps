@@ -2023,7 +2023,7 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
 
       def sha_transform(): Unit = {
         val m = SRAM[ULong](64)
-        Foreach(0 until 64 by 1){i => 
+        Pipe(ii=5).Foreach(0 until 64 by 1){i =>  // Waiting for bug #207 to remove this manual II
           if ( i.to[Index] < 16 ) {
             val j = 4*i.to[Index]
             // println(" m(" + i + ") = " + {(data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])})
@@ -2032,6 +2032,9 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
             // println(" m(" + i + ") = " + SIG1(m(i-2)) + " " + m(i-7) + " " + SIG0(m(i-15)) + " " + m(i-16))
             m(i) = SIG1(m(i-2)) + m(i-7) + SIG0(m(i-15)) + m(i-16)
           } 
+          // val j = 4*i.to[Index]
+          // m(i) = if (i.to[Index] < 16) {(data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])}
+          //        else {SIG1(m(i-2)) + m(i-7) + SIG0(m(i-15)) + m(i-16)}
         }
         val A = Reg[ULong] 
         val B = Reg[ULong] 
