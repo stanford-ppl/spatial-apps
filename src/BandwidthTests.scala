@@ -21,39 +21,36 @@ object BandwidthTests extends SpatialCompiler {
     sys.exit()
   })
 
+  def synthesize(name: String): Unit = {
+    try {
+      val output = Seq("python", s"$SPATIAL_HOME/bin/scrape.py", s"${Config.cwd}/gen/$name").!!
+
+      if (output.contains("failed") || output.contains("error") || output.contains("aborting")) {
+        println(s"$name: FAIL (Synthesis)")
+      }
+      else println(s"$name: DONE")
+    }
+    catch { case e: Throwable =>
+      println(s"$name: FAIL (Synthesis)")
+    }
+  }
+
   class Synthesis(id: Int, queue: BlockingQueue[String]) extends Runnable {
     var isAlive = true
 
     def run(): Unit = {
-      Console.println(s"[T$id] Started")
+      println(s"[T$id] Started")
 
       while(isAlive) {
         val name = queue.take()
-
-        try {
-          if (!name.isEmpty) {
-            //Console.println(s"[T$id] Synthesizing ${Config.cwd}/gen/$name...")
-
-            val output = Seq("python", s"$SPATIAL_HOME/bin/scrape.py", s"${Config.cwd}/gen/$name").!!
-
-            //println(output)
-
-            if (output.contains("failed") || output.contains("error") || output.contains("aborting")) {
-              Console.println(s"$name: FAIL (Synthesis)")
-            }
-            else Console.println(s"$name: DONE")
-          }
-          else {
-            println(s"[T$id] Received kill signal")
-            isAlive = false
-          }
-        }
-        catch { case e: Throwable =>
-          Console.println(s"$name: FAIL (Synthesis)")
+        if (!name.isEmpty) synthesize(name)
+        else {
+          isAlive = false
+          println(s"[T#$id] Received kill signal")
         }
       }
 
-      Console.println(s"[T$id] Ended")
+      println(s"[T$id] Ended")
     }
   }
 
@@ -191,11 +188,11 @@ object BandwidthTests extends SpatialCompiler {
     println(s"Number of programs: ${programs.length}")
     println(s"SPATIAL_HOME: $SPATIAL_HOME")
 
-    val pool = Executors.newFixedThreadPool(threads)
-    val workQueue = new LinkedBlockingQueue[String](programs.length)
+    //val pool = Executors.newFixedThreadPool(threads)
+    //val workQueue = new LinkedBlockingQueue[String](programs.length)
 
-    val workers = List.tabulate(threads){id => new Synthesis(id, workQueue) }
-    workers.foreach{worker => pool.submit(worker) }
+    //val workers = List.tabulate(threads){id => new Synthesis(id, workQueue) }
+    //workers.foreach{worker => pool.submit(worker) }
 
     programs.zipWithIndex.foreach{case (program,i) =>
       val name = program.name
@@ -209,7 +206,8 @@ object BandwidthTests extends SpatialCompiler {
       //println(s"Compiling #$i: " + name + "...")
       try {
         compileProgram { program.go() }
-        workQueue.put(name)
+        synthesize(program.name)
+        //workQueue.put(name)
       }
       catch {case e: Throwable =>
         println(s"$name: FAIL (Compilation)")
@@ -217,10 +215,10 @@ object BandwidthTests extends SpatialCompiler {
       }
     }
 
-    (0 until threads).foreach{_ => workQueue.put("") }
+    //(0 until threads).foreach{_ => workQueue.put("") }
 
-    pool.shutdown()
-    pool.awaitTermination(14L, TimeUnit.DAYS)
+    //pool.shutdown()
+    //pool.awaitTermination(14L, TimeUnit.DAYS)
     println("COMPLETED")
   }
 }
