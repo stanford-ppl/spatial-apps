@@ -63,30 +63,30 @@ object BandwidthTests extends SpatialCompiler {
     val N_MAX = 16
 
     val drams = List.fill(N_MAX){ DRAM[T](1000000) }
-    val N     = ArgIn[Int]
-    val align = ArgIn[Bit]
-    val store = ArgIn[Int]
-    val width = ArgIn[Int]
+    val N      = ArgIn[Int]
+    val offset = ArgIn[Int]
+    val store  = ArgIn[Int]
+    val width  = ArgIn[Int]
 
     if (args.length < 4) {
-      println("Args: #Txs Align Store #Words")
-      println("  Align: true = aligned load, false = unaligned load")
-      println("  Store: 0 = loads, 1 = stores, 2 = mixed")
+      println("Args: #Txs isAlign isStore #Words")
+      println("  isAlign: false = unaligned, true = aligned ")
+      println("  isStore: 0 = loads, 1 = stores, 2 = mixed")
     }
 
+    val ofs = if (args(1).to[Bit]) { 0.to[Int] } else { random[Int](16) + 5 }
+
     setArg(N, args(0).to[Int])
-    setArg(align, args(1).to[Bit])
+    setArg(offset, ofs)
     setArg(store, args(2).to[Int])
     setArg(width, args(3).to[Int])
 
     Accel {
       val n: Int = N.value
       val tx: Int = store.value
-      val al: Bit = align.value
+      val ofs: Int = offset.value
       val cmdWidth: Int = width.value
       val srams = List.fill(N_MAX){ SRAM[T](96) }  // Won't actually get all the writes but that's ok
-
-      val offset = mux(al, 0.to[Int], 17.to[Int])
 
       Foreach(100000 by 1){ i =>
         Parallel {
@@ -94,12 +94,10 @@ object BandwidthTests extends SpatialCompiler {
             Pipe {
               if (j.to[Int] < n) {
                 if (tx == 0.to[Int] || (tx == 2.to[Int] && j % 2 == 0)) {
-                  if (al) sram loadAligned dram(offset :: cmdWidth+offset par p)
-                  else    sram load dram(offset :: cmdWidth+offset par p)
+                  sram load dram(ofs :: cmdWidth+ofs par p)
                 }
                 if (tx == 1.to[Int] || (tx == 2.to[Int] && j % 2 == 1)) {
-                  if (al) dram(offset :: cmdWidth+offset par p) storeAligned sram
-                  else    dram(offset :: cmdWidth+offset par p) store sram
+                  dram(ofs :: cmdWidth+ofs par p) store sram
                 }
               }
             }
@@ -115,20 +113,22 @@ object BandwidthTests extends SpatialCompiler {
     val N_MAX = 16
 
     val drams = List.fill(N_MAX){ DRAM[T](100,1000000) }
-    val N     = ArgIn[Int]
-    val align = ArgIn[Bit]
-    val store = ArgIn[Int]
-    val rows  = ArgIn[Int]
-    val cols  = ArgIn[Int]
+    val N      = ArgIn[Int]
+    val offset = ArgIn[Int]
+    val store  = ArgIn[Int]
+    val rows   = ArgIn[Int]
+    val cols   = ArgIn[Int]
 
     if (args.length < 5) {
-      println("Args: #Txs Align Store #Rows #Cols")
-      println("  Align: true = aligned load, false = unaligned load")
-      println("  Store: 0 = loads, 1 = stores, 2 = mixed")
+      println("Args: #Txs isAlign isStore #Rows #Cols")
+      println("  isAlign: false = unaligned, true = aligned")
+      println("  isStore: 0 = loads, 1 = stores, 2 = mixed")
     }
 
+    val ofs = if (args(1).to[Bit]) { 0.to[Int] } else { random[Int](16) + 5 }
+
     setArg(N, args(0).to[Int])
-    setArg(align, args(1).to[Bit])
+    setArg(offset, ofs)
     setArg(store, args(2).to[Int])
     setArg(rows, args(3).to[Int])
     setArg(cols, args(4).to[Int])
@@ -136,12 +136,10 @@ object BandwidthTests extends SpatialCompiler {
     Accel {
       val n: Int = N.value
       val tx: Int = store.value
-      val al: Bit = align.value
+      val ofs: Int = offset.value
       val numCmds: Int = rows.value
       val cmdWidth: Int = cols.value
-      val srams = List.fill(N_MAX){ SRAM[T](96,96) }  // Won't actually get all the writes but that's ok
-
-      val offset = mux(al, 0.to[Int], 17.to[Int])
+      val srams = List.fill(N_MAX){ SRAM[T](4,96) }  // Won't actually get all the writes but that's ok
 
       Foreach(100000 by 1){ i =>
         Parallel {
@@ -149,12 +147,10 @@ object BandwidthTests extends SpatialCompiler {
             Pipe {
               if (j.to[Int] < n) {
                 if (tx == 0.to[Int] || (tx == 2.to[Int] && j % 2 == 0)) {
-                  if (al) sram loadAligned dram(0 :: rows, offset :: cmdWidth+offset par p)
-                  else    sram load dram(0 :: rows, offset :: cmdWidth+offset par p)
+                  sram load dram(0 :: rows, ofs :: cmdWidth+ofs par p)
                 }
                 if (tx == 1.to[Int] || (tx == 2.to[Int] && j % 2 == 1)) {
-                  if (al) dram(0 :: rows, offset :: cmdWidth+offset par p) storeAligned sram
-                  else    dram(0 :: rows, offset :: cmdWidth+offset par p) store sram
+                  dram(0 :: rows, ofs :: cmdWidth+ofs par p) store sram
                 }
               }
             }
