@@ -1254,15 +1254,15 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     val innerPar = 16
     val tileSize = innerPar
 
-    val par_load = 8
-    val par_store = 8
-    val loop_jj    = 1 (1 -> 1 -> 8)
-    val loop_kk    = 2 (1 -> 1 -> 8)
-    val loop_i     = 2 (1 -> 1 -> 8)
-    val loop_k     = 2 (1 -> 1 -> 8)
-    val loop_j     = 2 (1 -> 1 -> 8)
-    val reduce_col = 2 (1 -> 1 -> 8)
-    val reduce_tmp = 2 (1 -> 1 -> 8)
+    val par_load = tileSize
+    val par_store = tileSize
+    val loop_jj    = 1 (1 -> 1 -> dim/tileSize)
+    val loop_kk    = 1 (1 -> 1 -> dim/tileSize)
+    val loop_i     = 2 (1 -> 1 -> dim)
+    val loop_k     = 2 (1 -> 1 -> tileSize)
+    val loop_j     = innerPar (1 -> 1 -> tileSize)
+    val reduce_col = innerPar (1 -> 1 -> tileSize)
+    val reduce_tmp = innerPar (1 -> 1 -> tileSize)
 
     val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
     val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
@@ -1295,9 +1295,9 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
               }
               c_tmp_partial
             }{_+_}
-          Foreach(tileSize by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
+            Foreach(tileSize by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
           }
-        c_col_partial
+          c_col_partial
         }{_+_}
         c_dram(0::dim, jj::jj+tileSize par par_store) store c_col
       }
