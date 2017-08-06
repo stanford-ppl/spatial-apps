@@ -960,7 +960,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 }
 
 
-object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3 2
+object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 25 0.3 2
   /*
   Implementation based on http://cs.stanford.edu/people/karpathy/visml/ising_example.html
    pi(x) = exp(J* 𝚺x_j*x_i + J_b * 𝚺b_i*x_i)        
@@ -970,11 +970,11 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
 
                            
           _________________________________________
-         |                                         |
-         |   --->                                  |
-x_par=4  |  --->            X                XX    |
-         | --->                            XXXX    |
-         |--->          .------------.X   X XXX    |
+         |updates                                  |
+         |        --->                             |
+x_par=4  |       --->       X                XX    |
+         |      --->                       XXXX    |
+         |     --->     .------------.X   X XXX    |
          |          X   .BIAS REGION .  XX   X     |
          |            XX.            .     XX      |
          |              .     X XX   .             |
