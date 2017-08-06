@@ -195,64 +195,64 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
           }
         }
 
-        // /* Loopy version */
-        // Sequential.Foreach(niter by 1) { round => 
-        //   // SubBytes
-        //   if (round > 0) {
-        //     Pipe{substitute_bytes()}
-        //   }
+        /* Loopy version */
+        Sequential.Foreach(niter by 1) { round => 
+          // SubBytes
+          if (round > 0) {
+            Pipe{substitute_bytes()}
+          }
 
-        //   // ShiftRows
-        //   if (round > 0) {
-        //     Pipe{shift_rows()}
-        //   }
+          // ShiftRows
+          if (round > 0) {
+            Pipe{shift_rows()}
+          }
 
-        //   // MixColumns
-        //   if (round > 0 && round < 14 ) {
-        //     Pipe{mix_columns()}
-        //   }
+          // MixColumns
+          if (round > 0 && round < 14 ) {
+            Pipe{mix_columns()}
+          }
 
-        //   // Expand key
-        //   if (round > 0 && ((round % 2) == 0)) {
+          // Expand key
+          if (round > 0 && ((round % 2) == 0)) {
+            Pipe{expand_key()}
+          }
+
+          // AddRoundKey
+          add_round_key(round)
+
+        }
+
+        // /* Partially pipelined version */
+        // // Round 0
+        // add_round_key(0)
+
+        // // Rounds 1 - 7
+        // Sequential.Foreach(1 until 8 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
         //     Pipe{expand_key()}
         //   }
-
-        //   // AddRoundKey
         //   add_round_key(round)
-
         // }
-
-        /* Partially pipelined version */
-        // Round 0
-        add_round_key(0)
-
-        // Rounds 1 - 7
-        Sequential.Foreach(1 until 8 by 1) { round => 
-          substitute_bytes()
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          if ((round % 2) == 0) {
-            Pipe{expand_key()}
-          }
-          add_round_key(round)
-        }
-        // Rounds 8 - 14
-        Sequential.Foreach(8 until 14 by 1) { round => 
-          substitute_bytes()
-          Pipe{shift_rows()}
-          Pipe{mix_columns()}
-          if ((round % 2) == 0) {
-            Pipe{expand_key()}
-          }
-          add_round_key(round)
-        }
-        // Round 14
-        Pipe {
-          substitute_bytes()
-          Pipe{shift_rows()}
-          Pipe{expand_key()}
-          add_round_key(14)
-        }
+        // // Rounds 8 - 14
+        // Sequential.Foreach(8 until 14 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Round 14
+        // Pipe {
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{expand_key()}
+        //   add_round_key(14)
+        // }
 
 
         // /* Totally pipelined version */
