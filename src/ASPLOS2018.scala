@@ -322,6 +322,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
 
 // good
 object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
+  override val target = AWS_F1
 
   type T = FixPt[TRUE,_16,_16]
 
@@ -852,6 +853,7 @@ object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
 
 // Rework
 object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3 2
+  override val target = AWS_F1
   /*
   Implementation based on http://cs.stanford.edu/people/karpathy/visml/ising_example.html
    pi(x) = exp(J* 𝚺x_j*x_i + J_b * 𝚺b_i*x_i)        
@@ -1524,6 +1526,7 @@ object BFS_Queue extends SpatialApp { // Regression (Sparse) // Args: none
 }
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
+  override val target = AWS_F1
 
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
@@ -1685,6 +1688,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 }
 
 object BlackScholes extends SpatialApp {
+  override val target = AWS_F1
 
   type T = Float//FixPt[TRUE,_32,_32]
   val margin = 0.2f // Validates true if within +/- margin
@@ -2032,6 +2036,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
 
 // good
 object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
+  override val target = AWS_F1
 /*
 
 
@@ -2705,6 +2710,7 @@ object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
 
 // good
 object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
+  override val target = AWS_F1
 
   type X = Int
 
