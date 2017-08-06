@@ -1,8 +1,8 @@
 import spatial.dsl._
 import org.virtualized._
+import spatial.targets._
 
 object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
-
 
   @virtualize
   def main() {
@@ -2222,6 +2222,7 @@ object LaneMaskPar extends SpatialApp { // Regression (Unit) // Args: 13
 }
 
 object FixPtInOutArg extends SpatialApp {  // Regression (Unit) // Args: -1.5
+  override val target = AWS_F1
 
   type T = FixPt[TRUE,_28,_4]
   
