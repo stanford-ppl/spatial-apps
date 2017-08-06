@@ -170,6 +170,9 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
     val dash = argon.lang.String.char2num("-")
     val underscore = argon.lang.String.char2num("_")
 
+    val par_load = 16
+    val par_store = 16
+
     val SKIPB = 0
     val SKIPA = 1
     val ALIGN = 2
@@ -214,8 +217,8 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
       val seqa_fifo_aligned = FIFO[Int8](length*2)
       val seqb_fifo_aligned = FIFO[Int8](length*2)
 
-      seqa_sram_raw load seqa_dram_raw
-      seqb_sram_raw load seqb_dram_raw
+      seqa_sram_raw load seqa_dram_raw(0::length par par_load)
+      seqb_sram_raw load seqb_dram_raw(0::length par par_load)
 
       val score_matrix = SRAM[nw_tuple](length+1,length+1)
 
@@ -268,8 +271,8 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
       }
 
       Parallel{
-        seqa_dram_aligned store seqa_fifo_aligned
-        seqb_dram_aligned store seqb_fifo_aligned
+        seqa_dram_aligned(0::length*2 par par_store) store seqa_fifo_aligned
+        seqb_dram_aligned(0::length*2 par par_store) store seqb_fifo_aligned
       }
 
     }
