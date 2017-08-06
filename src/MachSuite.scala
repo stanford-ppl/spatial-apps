@@ -1865,7 +1865,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
 
       def last_step_scan(): Unit = {
         Foreach(SCAN_RADIX by 1) { radixID => 
-          Pipe(ii=3).Foreach(SCAN_BLOCK by 1) { i => // Remove manual II when bug #207 is fixed
+          Foreach(SCAN_BLOCK by 1) { i => 
             val bucket_indx = radixID.to[Index] * SCAN_BLOCK + i.to[Index]
             bucket_sram(bucket_indx) = bucket_sram(bucket_indx) + sum_sram(radixID)
           }

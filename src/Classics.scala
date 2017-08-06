@@ -970,8 +970,8 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 25 0.3 
 
                            
           _________________________________________
-         |updates                                  |
-         |        --->                             |
+         |                                         |
+         | update --->                             |
 x_par=4  |       --->       X                XX    |
          |      --->                       XXXX    |
          |     --->     .------------.X   X XXX    |
@@ -2023,7 +2023,7 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
 
       def sha_transform(): Unit = {
         val m = SRAM[ULong](64)
-        Pipe(ii=5).Foreach(0 until 64 by 1){i =>  // Waiting for bug #207 to remove this manual II
+        Foreach(0 until 64 by 1){i => 
           if ( i.to[Index] < 16 ) {
             val j = 4*i.to[Index]
             // println(" m(" + i + ") = " + {(data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])})
