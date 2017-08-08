@@ -2658,7 +2658,7 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
   }
 }
 
-object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
+object FFT_Transpose extends SpatialApp { // Regression (Fixme) // Args: none
   override val target = AWS_F1
 
 
