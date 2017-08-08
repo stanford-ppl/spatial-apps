@@ -67,11 +67,11 @@ object BandwidthTests extends SpatialCompiler {
 
     if (args.length < 4) {
       println("Args: #Txs isAlign isStore #Words")
-      println("  isAlign: false = unaligned, true = aligned ")
+      println("  isAlign: 0 = unaligned, 1 = aligned ")
       println("  isStore: 0 = loads, 1 = stores, 2 = mixed")
     }
 
-    val ofs = if (args(1).to[Bit]) { 0.to[Int] } else { random[Int](16) + 5 }
+    val ofs = if (args(1).to[Int] == 1.to[Int]) { 0.to[Int] } else { random[Int](16) + 5 }
 
     setArg(N, args(0).to[Int])
     setArg(offset, ofs)
@@ -188,11 +188,10 @@ object BandwidthTests extends SpatialCompiler {
     println(s"Number of programs: ${programs.length}")
     println(s"SPATIAL_HOME: $SPATIAL_HOME")
 
-    //val pool = Executors.newFixedThreadPool(threads)
-    //val workQueue = new LinkedBlockingQueue[String](programs.length)
-
-    //val workers = List.tabulate(threads){id => new Synthesis(id, workQueue) }
-    //workers.foreach{worker => pool.submit(worker) }
+    val pool = Executors.newFixedThreadPool(threads)
+    val workQueue = new LinkedBlockingQueue[String](programs.length)
+    val workers = List.tabulate(threads){id => new Synthesis(id, workQueue) }
+    workers.foreach{worker => pool.submit(worker) }
 
     programs.zipWithIndex.foreach{case (program,i) =>
       val name = program.name
@@ -206,8 +205,8 @@ object BandwidthTests extends SpatialCompiler {
       //println(s"Compiling #$i: " + name + "...")
       try {
         compileProgram { program.go() }
-        synthesize(program.name)
-        //workQueue.put(name)
+        //synthesize(program.name)
+        workQueue.put(name)
       }
       catch {case e: Throwable =>
         println(s"$name: FAIL (Compilation)")
@@ -215,10 +214,10 @@ object BandwidthTests extends SpatialCompiler {
       }
     }
 
-    //(0 until threads).foreach{_ => workQueue.put("") }
+    (0 until threads).foreach{_ => workQueue.put("") }
 
-    //pool.shutdown()
-    //pool.awaitTermination(14L, TimeUnit.DAYS)
+    pool.shutdown()
+    pool.awaitTermination(14L, TimeUnit.DAYS)
     println("COMPLETED")
   }
 }
