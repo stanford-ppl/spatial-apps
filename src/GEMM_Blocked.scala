@@ -203,10 +203,10 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
 
     val par_load = tileSize
     val par_store = tileSize
-    val loop_jj    = 3 (1 -> 1 -> dim/tileSize)
+    val loop_jj    = 2 (1 -> 1 -> dim/tileSize)
     val loop_kk    = 2 (1 -> 1 -> dim/tileSize)
     val loop_i     = 2 (1 -> 1 -> dim)
-    val loop_k     = 2 (1 -> 1 -> tileSize)
+    val loop_k     = 1 (1 -> 1 -> tileSize)
     val loop_j     = innerPar (1 -> 1 -> tileSize)
     val reduce_col = innerPar (1 -> 1 -> tileSize)
     val reduce_tmp = innerPar (1 -> 1 -> tileSize)
