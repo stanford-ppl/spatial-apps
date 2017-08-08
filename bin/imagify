@@ -1,0 +1,99 @@
+<<<<<<< HEAD
+#!/usr/bin/env python3
+=======
+#!/usr/bin/env python
+
+>>>>>>> origin/develop
+from argparse import ArgumentParser
+from matplotlib import pyplot
+import numpy
+import sys
+import os
+
+def main():
+    parser = ArgumentParser()
+    parser.add_argument('type', type=str, help='VGA or CAM')
+    parser.add_argument('file', type=str, help='name of file to load')
+    parser.add_argument('rows', type=int, help='Number of image rows')
+    parser.add_argument('cols', type=int, help='Number of image columns')
+
+    opts = parser.parse_args()
+    outName = opts.file.split('.')[0] + '.png'
+
+    data = []
+    grayscale = False
+    max = 255.0
+    maxValue = 0
+    mult = 1
+    if opts.type == 'VGA':
+        max = 64.0
+        mult = 2
+
+    with open(opts.file) as f:
+        content = f.readlines()
+
+        for line in content:
+            line = line.strip()
+
+            if ';' in line:
+                elems = line.split(';')
+                try:
+                    b = float(elems[2].strip())
+                except:
+                    b = 0
+                try:
+                    g = float(elems[1].strip())
+                except:
+                    g = 0
+                try:
+                    r = float(elems[0].strip())
+                except:
+                    r = 0
+                elems = [r, g, b]
+                data.append([elems[2]*mult/max, elems[1]/max, elems[0]*mult/max])
+
+                if elems[2]*mult > maxValue: maxValue = elems[2]*mult
+                if elems[1] > maxValue: maxValue = elems[1]
+                if elems[0]*mult > maxValue: maxValue = elems[0]*mult
+
+            else:
+                grayscale = True
+                try:
+                    elem = float(line)
+                except:
+                    elem = 0
+                if elem > maxValue: maxValue = elem
+                data.append(elem)
+
+    if maxValue < 0.1*max:
+        print('Largest pixel value was ' + str(maxValue) + ', < 10% of max (' + str(max) + ') - maybe you made a mistake with bit slicing?')
+    elif maxValue > max:
+        print('Largest pixel value was ' + str(maxValue) + ', > max (' + str(max) + ') - maybe you made a mistake with bit slicing?')
+
+
+    length = len(data)
+    h = int(opts.rows)
+    w = int(opts.cols)
+    p = 1
+    #if not grayscale: p = 3
+    if h*w*p != length:
+        print("Cannot display " + str(length) + " pixels as " + str(h) + " x " + str(w))
+        exit(-1)
+
+    if grayscale:
+        img = numpy.array(data).reshape((h,w))
+        pyplot.imshow(img, cmap='gray')
+        #pyplot.show()
+        pyplot.savefig(outName)
+
+    else:
+        img = numpy.array(data).reshape((h,w,3))
+        #print(img)
+        pyplot.imshow(img, interpolation='nearest')
+        pyplot.savefig(outName)
+
+    os.system("display " + outName)
+    #os.system("rm out.png")
+
+if __name__ == "__main__":
+    main()
