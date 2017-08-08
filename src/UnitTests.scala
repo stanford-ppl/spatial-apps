@@ -1070,6 +1070,7 @@ object StackLoadStore extends SpatialApp { // Regression (Unit) // Args: none
 
   val N = 32
 
+  @virtualize
   def stackLoadStore[T:Type:Bits](srcHost: Array[T]) = {
     val tileSize = N
 
