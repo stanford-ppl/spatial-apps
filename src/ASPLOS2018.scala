@@ -591,7 +591,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     CONCERNS: We need to figure out how HLS is actually managing the srams, or make our management better  
               We cannot do unaligned stores yet, so tilesize of 8 won't work unless we keep ts 16 of c_sram onchip                                                                                          
  */
-  type T = FixPt[TRUE,_32,_32] // Fatter type so that tileSize is burst aligned
+  type T = FixPt[TRUE,_16,_16] // Fatter type so that tileSize is burst aligned
 
   @virtualize
   def main() = {
