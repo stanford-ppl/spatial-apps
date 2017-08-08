@@ -771,7 +771,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 
-object NW extends SpatialApp { // Regression (Dense) // Args: none
+object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
   override val target = AWS_F1
 
 
@@ -817,6 +817,9 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
     val dash = argon.lang.String.char2num("-")
     val underscore = argon.lang.String.char2num("_")
 
+    val par_load = 16
+    val par_store = 16
+
     val SKIPB = 0
     val SKIPA = 1
     val ALIGN = 2
@@ -825,9 +828,15 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
     val GAP_SCORE = -1 
     // val seqa_string = "tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc".toText
     // val seqb_string = "ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat".toText
-    val seqa_string = "tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc"
-    val seqb_string = "ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"
-    val length = 128
+    val seqa_string = args(0).to[MString] //"tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc"
+    val seqb_string = args(1).to[MString] //"ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"
+    val measured_length = seqa_string.length
+    val length = ArgIn[Int]
+    val lengthx2 = ArgIn[Int]
+    setArg(length, measured_length)
+    setArg(lengthx2, 2*measured_length)
+    val max_length = 512
+    assert(max_length >= length, "Cannot have string longer than 512 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
     // Array.tabulate[Int](seqa_string.length){i => 
@@ -850,21 +859,21 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
 
     val seqa_dram_raw = DRAM[Int8](length)
     val seqb_dram_raw = DRAM[Int8](length)
-    val seqa_dram_aligned = DRAM[Int8](length*2)
-    val seqb_dram_aligned = DRAM[Int8](length*2)
+    val seqa_dram_aligned = DRAM[Int8](lengthx2)
+    val seqb_dram_aligned = DRAM[Int8](lengthx2)
     setMem(seqa_dram_raw, seqa_bin)
     setMem(seqb_dram_raw, seqb_bin)
 
     Accel{
-      val seqa_sram_raw = SRAM[Int8](length)
-      val seqb_sram_raw = SRAM[Int8](length)
-      val seqa_fifo_aligned = FIFO[Int8](length*2)
-      val seqb_fifo_aligned = FIFO[Int8](length*2)
+      val seqa_sram_raw = SRAM[Int8](max_length)
+      val seqb_sram_raw = SRAM[Int8](max_length)
+      val seqa_fifo_aligned = FIFO[Int8](max_length*2)
+      val seqb_fifo_aligned = FIFO[Int8](max_length*2)
 
-      seqa_sram_raw load seqa_dram_raw
-      seqb_sram_raw load seqb_dram_raw
+      seqa_sram_raw load seqa_dram_raw(0::length par par_load)
+      seqb_sram_raw load seqb_dram_raw(0::length par par_load)
 
-      val score_matrix = SRAM[nw_tuple](length+1,length+1)
+      val score_matrix = SRAM[nw_tuple](max_length+1,max_length+1)
 
       // Build score matrix
       Foreach(length+1 by 1){ r =>
@@ -883,8 +892,9 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
       }
 
       // Read score matrix
-      val b_addr = Reg[Int](length)
-      val a_addr = Reg[Int](length)
+      val b_addr = Reg[Int](0)
+      val a_addr = Reg[Int](0)
+      Parallel{b_addr := length; a_addr := length}
       val done_backtrack = Reg[Bit](false)
       FSM[Int](state => state != doneState) { state =>
         if (state == traverseState) {
@@ -915,8 +925,8 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
       }
 
       Parallel{
-        seqa_dram_aligned store seqa_fifo_aligned
-        seqb_dram_aligned store seqb_fifo_aligned
+        seqa_dram_aligned(0::length*2 par par_store) store seqa_fifo_aligned
+        seqb_dram_aligned(0::length*2 par par_store) store seqb_fifo_aligned
       }
 
     }
@@ -965,7 +975,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: none
 
 
   }
-}      
+}
 
 
 object MD_KNN extends SpatialApp { // Regression (Dense) // Args: none
