@@ -4,7 +4,7 @@ import spatial.targets._
 
 // No opportunities for par
 object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -67,7 +67,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 512
+    val max_length = 256
     assert(max_length >= length, "Cannot have string longer than 512 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -212,7 +212,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 
 // good
 object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -403,7 +403,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
 }      
 
 object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
                                                                                                   
                                                                                                   
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
@@ -605,12 +605,12 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     val par_store = 16
     val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
     val loop_ii    = 1 // not sure if this one works
-    val loop_kk    = 2 (1 -> 1 -> 8)
-    val loop_i     = 2 (1 -> 1 -> 32)
-    val loop_k     = 2 (1 -> 1 -> 16)
-    val loop_j     = 4 (1 -> 1 -> 16)
-    val reduce_col = 8 (1 -> 1 -> 16)
-    val reduce_tmp = 8 (1 -> 1 -> 16)
+    val loop_kk    = 1 (1 -> 1 -> 8)
+    val loop_i     = 1 (1 -> 1 -> 32)
+    val loop_k     = 1 (1 -> 1 -> 16)
+    val loop_j     = 2 (1 -> 1 -> 16)
+    val reduce_col = 4 (1 -> 1 -> 16)
+    val reduce_tmp = 4 (1 -> 1 -> 16)
 
     // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
     // val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
@@ -671,7 +671,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*                                                                                                  
@@ -778,7 +778,7 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
 
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
-  override val target = AWS_F1
+  override val target = Zynq
 
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
@@ -940,7 +940,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 }
 
 object BlackScholes extends SpatialApp {
-  override val target = AWS_F1
+  override val target = Zynq
 
   type T = Float//FixPt[TRUE,_32,_32]
   val margin = 0.2f // Validates true if within +/- margin
@@ -1091,7 +1091,7 @@ object BlackScholes extends SpatialApp {
 
 // good
 object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
-  override val target = AWS_F1
+  override val target = Zynq
 /*
 
 
@@ -1196,7 +1196,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
 
 // good, but pipelining vs area
 object AES extends SpatialApp { // Regression (Dense) // Args: 50
-  override val target = AWS_F1
+  override val target = Zynq
 
   /*
   TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
@@ -1603,7 +1603,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
 // good
 object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
-  override val target = AWS_F1
+  override val target = Zynq
 
   type X = Int
 
