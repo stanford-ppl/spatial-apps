@@ -4,7 +4,7 @@ import spatial.targets._
 
 // No opportunities for par
 object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -53,7 +53,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 
     val par_load = 16
     val par_store = 16
-    val row_par = 4 (1 -> 1 -> 8)
+    val row_par = 2 (1 -> 1 -> 8)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -286,7 +286,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val loop_grid1_y = 2 (1 -> 1 -> 16)
     val loop_grid1_z = 2 (1 -> 1 -> 16)
     val loop_p =       2 (1 -> 1 -> 16)
-    val loop_q =       16 (1 -> 1 -> 16)
+    val loop_q =       2 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
