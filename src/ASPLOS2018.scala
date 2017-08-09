@@ -616,7 +616,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     val loop_ii    = 1 // not sure if this one works
     val loop_kk    = 1 (1 -> 1 -> 8)
     val loop_i     = 1 (1 -> 1 -> 32)
-    val loop_k     = 1 (1 -> 1 -> 16)
+    val loop_k     = 2 (1 -> 1 -> 16)
     val loop_j     = 2 (1 -> 1 -> 16)
     val reduce_col = 4 (1 -> 1 -> 16)
     val reduce_tmp = 4 (1 -> 1 -> 16)
@@ -733,8 +733,8 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
     val par_store = 16
     val tileSize = 494
     val tile_par = 2 (1 -> 1 -> 16)
-    val pt_par = 2 (1 -> 1 -> 16)
-    val red_par = 2 (1 -> 1 -> 16)
+    val pt_par = 4 (1 -> 1 -> 16)
+    val red_par = 8 (1 -> 1 -> 16)
 
     setMem(values_dram, raw_values)
     setMem(cols_dram, raw_cols)
@@ -1398,64 +1398,64 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
           }
         }
 
-        /* Loopy version */
-        Sequential.Foreach(niter by 1) { round => 
-          // SubBytes
-          if (round > 0) {
-            Pipe{substitute_bytes()}
-          }
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
 
-          // ShiftRows
-          if (round > 0) {
-            Pipe{shift_rows()}
-          }
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
 
-          // MixColumns
-          if (round > 0 && round < 14 ) {
-            Pipe{mix_columns()}
-          }
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
 
-          // Expand key
-          if (round > 0 && ((round % 2) == 0)) {
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
+
+        //   // AddRoundKey
+        //   add_round_key(round)
+
+        // }
+
+        /* Partially pipelined version */
+        // Round 0
+        add_round_key(0)
+
+        // Rounds 1 - 7
+        Sequential.Foreach(1 until 8 by 1) { round => 
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          if ((round % 2) == 0) {
             Pipe{expand_key()}
           }
-
-          // AddRoundKey
           add_round_key(round)
-
         }
-
-        // /* Partially pipelined version */
-        // // Round 0
-        // add_round_key(0)
-
-        // // Rounds 1 - 7
-        // Sequential.Foreach(1 until 8 by 1) { round => 
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{mix_columns()}
-        //   if ((round % 2) == 0) {
-        //     Pipe{expand_key()}
-        //   }
-        //   add_round_key(round)
-        // }
-        // // Rounds 8 - 14
-        // Sequential.Foreach(8 until 14 by 1) { round => 
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{mix_columns()}
-        //   if ((round % 2) == 0) {
-        //     Pipe{expand_key()}
-        //   }
-        //   add_round_key(round)
-        // }
-        // // Round 14
-        // Pipe {
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{expand_key()}
-        //   add_round_key(14)
-        // }
+        // Rounds 8 - 14
+        Sequential.Foreach(8 until 14 by 1) { round => 
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          if ((round % 2) == 0) {
+            Pipe{expand_key()}
+          }
+          add_round_key(round)
+        }
+        // Round 14
+        Pipe {
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{expand_key()}
+          add_round_key(14)
+        }
 
 
         // /* Totally pipelined version */
@@ -1640,7 +1640,7 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
     val P0 = 4 (1 -> 2 -> dim)
     val P1 = 4 (1 -> 2 -> dim)
     val P2 = 4 (1 -> 2 -> dim)
-    val P3 = 8 (1 -> 2 -> numcents)
+    val P3 = 16 (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
     val N     = ArgIn[Int]
@@ -1786,6 +1786,146 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
     println("PASS: " + cksum + " (Kmeans)")
   }
 }
+
+object Sobel extends SpatialApp { // Regression (Dense) // Args: none
+
+
+  val Kh = 3
+  val Kw = 3
+  val Cmax = 1024
+
+  @virtualize
+  def convolve[T:Type:Num](image: Matrix[T]): Matrix[T] = {
+    val B = 16 (1 -> 1 -> 16)
+
+    val R = ArgIn[Int]
+    val C = ArgIn[Int]
+    setArg(R, image.rows)
+    setArg(C, image.cols)
+
+
+    val lb_par = 8 (1 -> 1 -> 16)
+    val par_store = 16
+    val row_stride = 100 (100 -> 100 -> 500)
+    val row_par = 2 (1 -> 1 -> 16)
+    val par_Kh = 3 (1 -> 1 -> 3)
+    val par_Kw = 3 (1 -> 1 -> 3)
+
+    val img = DRAM[T](R, C)
+    val imgOut = DRAM[T](R, C)
+
+    setMem(img, image)
+
+    Accel {
+      Foreach(R by row_stride par row_par){ rr => 
+        val lb = LineBuffer[T](Kh, Cmax)
+        val sr = RegFile[T](Kh, Kw)
+        val lineOut = SRAM[T](Cmax)
+        val kh = LUT[T](3,3)(1.to[T], 0.to[T], -1.to[T],
+                             2.to[T], 0.to[T], -2.to[T],
+                             1.to[T], 0.to[T], -1.to[T])
+        val kv = LUT[T](3,3)(1.to[T],  2.to[T],  1.to[T],
+                             0.to[T],  0.to[T],  0.to[T],
+                            -1.to[T], -2.to[T], -1.to[T])
+
+        Foreach(-2 until row_stride) { r =>
+          lb load img(r+rr, 0::C par lb_par)
+
+          /*println("Row " + r)
+          Foreach(0 until Kh) { i =>
+            Foreach(0 until C) { c => print("" + lb(i,c) + "\t") }
+            println("")
+          }*/
+
+          Foreach(0 until C) { c =>
+            Pipe{sr.reset(c == 0)}
+
+            Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
+            
+            val horz = Reduce(Reg[T])(Kh by 1 par par_Kh){i =>
+              Reduce(Reg[T])(Kw by 1 par par_Kw){j => 
+              // val number = mux((r < 2) || (c < 2) , 0.to[T], sr(i,j))
+              // number * kh(i,j) 
+                sr(i,j) * kh(i,j)
+              }{_+_}
+            }{_+_}
+            val vert = Reduce(Reg[T])(Kh by 1 par par_Kh){i => 
+              Reduce(Reg[T])(Kw by 1 par par_Kw){j => 
+              // val number = mux((r < 2) || (c < 2) , 0.to[T], sr(i,j))
+              // number * kv(i,j) 
+                sr(i,j) * kv(i,j)
+              }{_+_}
+            }{_+_}
+
+            if (r >= 0) {lineOut(c) = abs(horz.value) + abs(vert.value)}// Technically should be sqrt(horz**2 + vert**2)
+          }
+
+          if (r+rr >= 0) {imgOut(r+rr, 0::C par par_store) store lineOut}
+        }
+
+      }
+    }
+
+    getMatrix(imgOut)
+
+  }
+
+  @virtualize
+  def main() {
+    val R = args(0).to[Int] //1895
+    val C = args(1).to[Int] //1024
+    val border = 3
+    // val image = (0::R, 0::C){(i,j) => if (j > 3 && i > 3 && j < 11 && i < 11) 256 else 0 }
+    val image = (0::R, 0::C){(i,j) => if (j > border && j < C-border && i > border && i < C - border) i*16 else 0}
+    val ids = (0::R, 0::C){(i,j) => if (i < 2) 0 else 1}
+
+    val kh = List((List(1,2,1), List(0,0,0), List(-1,-2,-1)))
+    val kv = List((List(1,0,-1), List(2,0,-2), List(1,0,-1)))
+
+    val output = convolve(image)
+
+    /*
+      Filters: 
+      1   2   1 
+      0   0   0 
+     -1  -2  -1
+
+      1   0  -1 
+      2   0  -2 
+      1   0  -1
+
+    */
+    val gold = (0::R, 0::C){(i,j) => 
+      // Shift result down by 2 and over by 2 because of the way accel is written
+      val px00 = if ((j-2) > border && (j-2) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px01 = if ((j-1) > border && (j-1) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px02 = if ((j+0) > border && (j+0) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px10 = if ((j-2) > border && (j-2) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px11 = if ((j-1) > border && (j-1) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px12 = if ((j+0) > border && (j+0) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px20 = if ((j-2) > border && (j-2) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px21 = if ((j-1) > border && (j-1) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px22 = if ((j+0) > border && (j+0) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)
+    };
+
+    // // This contains the "weird scheduling bug"
+    printMatrix(image, "Image")
+    printMatrix(gold, "Gold")
+    printMatrix(output, "Output")
+
+    val gold_sum = gold.map{g => g}.reduce{_+_} 
+    val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
+    println("gold " + gold_sum + " =?= output " + output_sum)
+    val cksum = gold_sum == output_sum
+    // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
+    println("PASS: " + cksum + " (Convolution_FPGA)")
+
+
+
+  }
+}
+
 
 object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
