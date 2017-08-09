@@ -4,7 +4,7 @@ import spatial.targets._
 
 // No opportunities for par
 object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -60,7 +60,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 
     val par_load = 16
     val par_store = 16
-    val row_par = 1 (1 -> 1 -> 8)
+    val row_par = 2 (1 -> 1 -> 8)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -231,7 +231,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 
 // good
 object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -291,12 +291,12 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val par_store = 16 // Wider data type
     val loop_grid0_x = 1 // Temporarily broken because of some issue around #200
     val loop_grid0_y = 1 (1 -> 1 -> 16) 
-    val loop_grid0_z = 1 (1 -> 1 -> 16)
-    val loop_grid1_x = 1 (1 -> 1 -> 16)
+    val loop_grid0_z = 2 (1 -> 1 -> 16)
+    val loop_grid1_x = 2 (1 -> 1 -> 16)
     val loop_grid1_y = 1 (1 -> 1 -> 16)
     val loop_grid1_z = 1 (1 -> 1 -> 16)
-    val loop_p =       2 (1 -> 1 -> 16)
-    val loop_q =       2 (1 -> 1 -> 16)
+    val loop_p =       1 (1 -> 1 -> 16)
+    val loop_q =       1 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
@@ -422,7 +422,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
 }      
 
 object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
                                                                                                   
                                                                                                   
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
@@ -625,7 +625,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
     val loop_ii    = 1 // not sure if this one works
     val loop_kk    = 1 (1 -> 1 -> 8)
-    val loop_i     = 1 (1 -> 1 -> 32)
+    val loop_i     = 2 (1 -> 1 -> 32)
     val loop_k     = 2 (1 -> 1 -> 16)
     val loop_j     = 2 (1 -> 1 -> 16)
     val reduce_col = 4 (1 -> 1 -> 16)
@@ -690,7 +690,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*                                                                                                  
@@ -797,7 +797,7 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
 
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
-  override val target = AWS_F1
+  override val target = Zynq
 
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
@@ -959,7 +959,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 }
 
 object BlackScholes extends SpatialApp {
-  override val target = AWS_F1
+  override val target = Zynq
 
   type T = Float//FixPt[TRUE,_32,_32]
   val margin = 0.2f // Validates true if within +/- margin
@@ -1110,7 +1110,7 @@ object BlackScholes extends SpatialApp {
 
 // good
 object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
-  override val target = AWS_F1
+  override val target = Zynq
 /*
 
 
@@ -1139,7 +1139,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
     val out = ArgOut[T]
 
     val ts = 384 (96 -> 96 -> 192000)
-    val op = 2 (1 -> 6)
+    val op = 3 (1 -> 6)
     val par_load = 16
     val par_store = 16
     val ip = 16 (1 -> 384)
@@ -1215,7 +1215,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
 
 // good, but pipelining vs area
 object AES extends SpatialApp { // Regression (Dense) // Args: 50
-  override val target = AWS_F1
+  override val target = Zynq
 
   /*
   TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
@@ -1269,7 +1269,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
     
     val par_load = 16
     val par_store = 16
-    val outer_par = 1 (1 -> 1 -> 4) // This may crash GC
+    val outer_par = 2 (1 -> 1 -> 4) // This may crash GC
 
     // Setup
     val num_bytes = ArgIn[Int]
@@ -1622,7 +1622,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
 // good
 object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
-  override val target = AWS_F1
+  override val target = Zynq
 
   type X = Int
 
@@ -1649,7 +1649,7 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
     val PX = 1 (1 -> 1)
     val P0 = 4 (1 -> 2 -> dim)
     val P1 = 4 (1 -> 2 -> dim)
-    val P2 = 4 (1 -> 2 -> dim)
+    val P2 = 8 (1 -> 2 -> dim)
     val P3 = 16 (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
@@ -1814,10 +1814,10 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: none
     setArg(C, image.cols)
 
 
-    val lb_par = 8 (1 -> 1 -> 16)
+    val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
     val row_stride = 100 (100 -> 100 -> 500)
-    val row_par = 2 (1 -> 1 -> 16)
+    val row_par = 4 (1 -> 1 -> 16)
     val par_Kh = 3 (1 -> 1 -> 3)
     val par_Kw = 3 (1 -> 1 -> 3)
 
@@ -1950,9 +1950,9 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
   @virtualize
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
-    val rTileSize = 20(96 -> 19200)
-    val op = 1(1 -> 8)
-    val ip = 4(1 -> 12)
+    val rTileSize = 32(96 -> 19200)
+    val op = 2(1 -> 8)
+    val ip = 2(1 -> 12)
     val subLoopPar = 4(1 -> 16)
     val prodLoopPar = 4(1 -> 96)
     val outerAccumPar = 4(1 -> 1)
