@@ -2,6 +2,7 @@
 
 app=$1
 args="${@:2}"
+torun="${@: -2:1}"
 regen="${@: -1}"
 
 timestemp=$(date +"%c")
@@ -64,3 +65,10 @@ passStatus() {
 		progress[$pass]="NOTRUN"
 	fi
 }
+
+function clean_log() {
+	pass=$1
+	log=${logs[$pass]}
+	if [ -e $log ]; then rm $log; fi
+}
+

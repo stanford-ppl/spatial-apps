@@ -79,23 +79,25 @@ def waitProcess():
         time.sleep(5)
         waitProcess()
 
-def runApp(app, args, params, regen):
-    # waitProcess()
+def runApp(app, args, params):
+    if opts.parallel:
+        waitProcess()
     copyApp(app, args, params)
     newname = newAppName(app, args, params)
-    command = "apps/bin/runapp {} {} {}".format(newname, ' '.join([str(a) for a in args]), regen)
+    command = "apps/bin/runapp {} {} {} {}".format(newname, ' '.join([str(a) for a in args]),
+            opts.torun, opts.regen)
     print('command={}'.format(command))
-
     proc = subprocess.Popen(command.split(), shell=False)
     pid = proc.pid
     job_list.append(pid)
     pickle.dump(job_list, open(JOB_PATH, 'wb'))
-    proc.wait()
+    if opts.parallel:
+        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        time.sleep(1)
+    else:
+        proc.wait()
 
-    # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-    # time.sleep(5)
-
-def clear(app, args, params, regen):
+def clear(app, args, params):
     newname = newAppName(app, args, params)
     command = "rm -r gen/{}/Top.vcd".format(newname)
     print(command)
@@ -113,7 +115,7 @@ def clearAll():
                 os.remove(f)
             
 count = 0
-def status(app, args, params, regen):
+def status(app, args, params):
     global count
     newname = newAppName(app, args, params)
     command = "apps/bin/status {}".format(newname)
@@ -124,13 +126,13 @@ def status(app, args, params, regen):
     count += 1
     # proc.kill()
 
-def target(app, args, params, regen):
+def target(app, args, params):
     if opts.run:
-        runApp(app, args, params, regen)
+        runApp(app, args, params)
     elif opts.status:
-        status(app, args, params, regen)
+        status(app, args, params)
 
-def dse(app, args, params, regen):
+def dse(app, args, params):
     # print(params)
     for param in params:
         # print('  param:' + param + ' = ' + str(params[param]))
@@ -143,21 +145,101 @@ def dse(app, args, params, regen):
                 params[param] = [params[param][0]]
             for val in params[param]:
                 newParams[param] = val
-                cnt += dse(app, args, newParams, regen)
+                cnt += dse(app, args, newParams)
             return cnt
         elif type(params[param]) is types.LambdaType:
             newParams = params.copy()
             newParams[param] = params[param](params)
-            return dse(app, args, newParams, regen)
+            return dse(app, args, newParams)
         else:
             continue
     print('{}{} args={} and params=[{}]{}'.format(bcolors.UNDERLINE, app, str(args),
         ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
-    target(app, args, params, regen)
+    target(app, args, params)
     return 1
 
 def irange(start, stop, step):
     return range(start, stop+step, step)
+
+
+apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
+
+def TPCHQ6(args, params):
+    N = 96000
+    args += [N]
+
+    # FINISHED
+    params['outerPar'] = irange(1, 10, 2) 
+    params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
+
+    # Finished
+    params['outerPar'] = irange(6, 10, 2) 
+    params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 800)
+
+    # Finished
+    params['outerPar'] = irange(2, 10, 2) 
+    params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
+
+def GDA(args, params):
+    R = 192000
+    args += [R]
+
+    # Finished 
+    # params['tileSize'] = irange(16, 16, 16) 
+    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+
+    # Finished
+    # params['tileSize'] = irange(16*5, 16*5, 16) 
+    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+
+    # Finished
+    # params['tileSize'] = irange(16*3, 16*3, 16) 
+    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+
+    # TODO 
+    params['tileSize'] = irange(16*3, 16*3, 16) 
+    params['midPar'] = lambda params: irange(2, min(8, params['tileSize']), 2) 
+    params['outerPar'] = lambda params: irange(2, min(10, R/params['tileSize']), 2) 
+
+    # Finihsed
+    # params['tileSize'] = irange(16*5, 16*5, 16) 
+    # params['outerPar'] = lambda params: irange(3, min(10, R/params['tileSize']), 2) 
+    # params['midPar'] = lambda params: irange(3, min(8, params['tileSize']), 2) 
+
+    # TODO 
+    # params['tileSize'] = irange(16, 16, 16) 
+    # params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
+    # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
+
+def GEMM_Blocked(args, params):
+    args += []
+    dim = 64
+
+    params['tileSize'] = irange(16, dim, 16) 
+    params['loop_jj'] = lambda params: irange(1, dim/params['tileSize'], 1) 
+    params['loop_kk'] = lambda params: irange(1, dim/params['tileSize'], 1) 
+    params['loop_ii'] = irange(1, min(dim, 5), 2) 
+    params['loop_k']  = lambda params: irange(1, min(params['tileSize'], 5), 2)
+
+def BlackScholes(args, params):
+    N = 1966080  
+    args += [N]
+
+    #TODO
+    params['outerPar'] = irange(1, 4, 1) 
+    # params['outerPar'] = irange(4, 4, 1) 
+    params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
+
+def PageRank_plasticine(args, params):
+    # regen = 'false'
+    # app = 'PageRank_plasticine'
+    # N = 1966080  
+    # args = [N]
+    pass
+
 
 def expRun():
     #################################################################################################################
@@ -166,90 +248,34 @@ def expRun():
 
     ### TO RUN        ######################################################################################################
     params = OrderedDict()
+    args = OrderedDict()
+    for app in apps:
+        params[app] = OrderedDict()
+        args[app] = []
 
-    regen = 'false'
-    app = 'TPCHQ6'
-    N = 96000
-    args = [N]
+    app = opts.app
 
-    # FINISHED
-    # params['outerPar'] = irange(1, 10, 2) 
-    # params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
+    TPCHQ6(args['TPCHQ6'], params['TPCHQ6'])
+    GDA(args['GDA'], params['GDA'])
+    GEMM_Blocked(args['GEMM_Blocked'], params['GEMM_Blocked'])
+    BlackScholes(args['BlackScholes'], params['BlackScholes'])
 
-    # TODO run one more time
-    # params['outerPar'] = irange(6, 10, 2) 
-    # params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 800)
-
-    # TODO run one more time
-    # params['outerPar'] = irange(2, 10, 2) 
-    # params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
-
-    regen = 'false'
-    app = 'GDA'
-    R = 192000
-    args = [R]
-
-    # TODO 
-    # params['tileSize'] = irange(16, 16, 16) 
-    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
-    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
-
-    # TODO 
-    # params['tileSize'] = irange(16*5, 16*5, 16) 
-    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
-    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
-
-    # TODO 
-    # params['tileSize'] = irange(16*3, 16*3, 16) 
-    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
-    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
-
-    # regen = 'false'
-    # app = 'GEMM_Blocked'
-    # args = []
-    # dim = 64
-
-    # params['tileSize'] = irange(16, dim, 16) 
-    # params['loop_jj'] = lambda params: irange(1, dim/params['tileSize'], 1) 
-    # params['loop_kk'] = lambda params: irange(1, dim/params['tileSize'], 1) 
-    # params['loop_ii'] = irange(1, min(dim, 5), 2) 
-    # params['loop_k']  = lambda params: irange(1, min(params['tileSize'], 5), 2)
-
-    regen = 'false'
-    app = 'BlackScholes'
-    N = 1966080  
-    args = [N]
-
-    #TODO
-    params['outerPar'] = irange(1, 4, 1) 
-    # params['outerPar'] = irange(4, 4, 1) 
-    params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
-
-    # params['tileSize'] = lambda params: irange(1024*1, 1024*1, 1)
-    # params['tileSize'] = lambda params: irange(1024*2, 1024*2, 1)
-    # params['tileSize'] = lambda params: irange(1024*3, 1024*3, 1)
-    # params['tileSize'] = lambda params: irange(1024*4, 1024*4, 1)
-    # params['tileSize'] = lambda params: irange(1024*5, 1024*5, 1)
-    # params['tileSize'] = lambda params: irange(1024*6, 1024*6, 1)
-    # params['tileSize'] = lambda params: irange(1024*7, 1024*7, 1)
-    # params['tileSize'] = lambda params: irange(1024*7, min(bankSize, N/params['outerPar']), 1024)
-
-    # regen = 'false'
-    # app = 'PageRank_plasticine'
-    # N = 1966080  
-    # args = [N]
-
-
-    space = dse(app, args, params, regen)
+    space = dse(app, args[app], params[app])
     print('{} space: {}'.format(app, space))
-    pass
 
 def main():
     parser = argparse.ArgumentParser(description='Run experiments')
+    parser.add_argument('--parallel', dest='parallel', action='store_true', default=False) 
     parser.add_argument('--single', dest='single', action='store_true', default=False) 
     parser.add_argument('--run', dest='run', action='store_true', default=False) 
     parser.add_argument('--status', dest='status', action='store_true', default=False) 
     parser.add_argument('--clearAll', dest='clearAll', action='store_true', default=False) 
+    parser.add_argument('--app', dest='app', action='store', default='DotProduct',help='App name')
+    parser.add_argument('--regen', dest='regen', action='store', default='false',
+        help='force pass to rerun' )
+    parser.add_argument('--torun', dest='torun', action='store', default='ALL',
+        help='Pass to run')
+
     global opts
     (opts, args) = parser.parse_known_args()
 

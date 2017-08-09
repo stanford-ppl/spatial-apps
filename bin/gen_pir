@@ -1,2 +1,8 @@
+#!/bin/bash
+
 cd $SPATIAL_HOME
+pir_dir=$SPATIAL_HOME/gen/$app/pir
+app_file=$PIR_HOME/apps/src/gen/${app}.scala
+if [ -e $pir_dir ]; then rm -r $pir_dir; fi
+if [ -e $app_file ]; then rm -$app_file; fi
 $SPATIAL_HOME/bin/spatial $app --dot --cgra+ &>> $log &
