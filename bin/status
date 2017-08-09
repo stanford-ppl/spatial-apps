@@ -24,15 +24,19 @@ done
 read -p "" RESP
 if [[ $RESP == "k" ]]; then
   for pass in ${passes[@]}; do
-    if [[ ${progress[$pass]} == "RUNNING" ]] && [[ $PID != "" ]] && [[ -e /proc/$PID ]]; then
-	    echo -e "${RED}Kill $pass ($PID)$NC for $SPATIAL_HOME/gen/$app?"
-	    read -p "" RESP
-	    if [ "$RESP" = "y" ]; then
-	    	log=${logs[$pass]}
-	    	echo -e "-------------${CYAN}$pass(KILLED)${NC}------------" >> $log
-	    	kill -9 $PID
-	    	echo "killed $PID"
-	    fi
+    if [[ ${progress[$pass]} == "RUNNING" ]]; then
+      if [[ $PID != "" ]] && [[ -e /proc/$PID ]]; then
+	      echo -e "${RED}Kill $pass ($PID)$NC for $SPATIAL_HOME/gen/$app?"
+	      read -p "" RESP
+	      if [ "$RESP" = "y" ]; then
+	      	log=${logs[$pass]}
+	      	echo -e "-------------${CYAN}$pass(KILLED)${NC}------------" >> $log
+	      	kill -9 $PID
+	      	echo "killed $PID"
+	      fi
+      else
+        clean_log $pass
+      fi
     fi
   done
 elif [[ $RESP == "r "* ]]; then
@@ -45,9 +49,9 @@ elif [[ $RESP == "r "* ]]; then
 	    fi
     fi
   done
-elif [[ $RESP == "s "* ]]; then
+elif [[ $RESP == "s"* ]]; then
   for pass in ${passes[@]}; do
-    if [[ $RESP == "s $pass" ]]; then
+    if [[ $RESP == "s $pass" ]] || [[ ${progress[$pass]} == "RUNNING" ]] || [[ ${progress[$pass]} == "FAILED" ]]; then
 	    echo -e "${CYAN}Show${NC} $pass for $SPATIAL_HOME/gen/$app"
 	    log=${logs[$pass]}
       cat $log

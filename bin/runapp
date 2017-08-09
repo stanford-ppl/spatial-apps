@@ -11,7 +11,7 @@ function runPass() {
 	done
 
 	passStatus $pass
-	if [[ $regen == $pass ]] || [[ ${progress[$pass]} != 'SUCCESS' && ${progress[$pass]} != 'RUNNING' ]]; then
+	if [[ $regen == ALL ]] || [[ $regen == $pass ]] || [[ ${progress[$pass]} != 'SUCCESS' && ${progress[$pass]} != 'RUNNING' ]]; then
 		log=${logs[$pass]}
 		clean_log $pass
 
@@ -25,18 +25,16 @@ function runPass() {
 	fi
 }
 
-echo $app
-
-if [[ $regen == 'ALL' ]]; then
-	for pass in ${passes[@]}; do clean_log $pass; done
-fi
+echo "runapp $app torun=$torun regen=$regen"
 
 mkdir -p $SPATIAL_HOME/gen/$app
 mkdir -p $PIR_HOME/apps/src/gen/
 mkdir -p $PIR_HOME/out/$app
 
 for pass in ${passes[@]}; do
-	runPass $pass
+	if [[ $torun == 'ALL' ]] || [[ $torun == *$pass ]] || [[ $torun == $pass* ]] || [[ $torun == $pass ]]; then
+	  runPass $pass
+  fi
 done
 
 pass="RUN_SIMULATION"; log=${logs[$pass]}; 
