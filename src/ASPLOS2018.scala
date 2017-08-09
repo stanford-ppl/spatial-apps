@@ -293,10 +293,10 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val loop_grid0_y = 1 (1 -> 1 -> 16) 
     val loop_grid0_z = 1 (1 -> 1 -> 16)
     val loop_grid1_x = 1 (1 -> 1 -> 16)
-    val loop_grid1_y = 2 (1 -> 1 -> 16)
-    val loop_grid1_z = 2 (1 -> 1 -> 16)
-    val loop_p =       2 (1 -> 1 -> 16)
-    val loop_q =       2 (1 -> 1 -> 16)
+    val loop_grid1_y = 1 (1 -> 1 -> 16)
+    val loop_grid1_z = 1 (1 -> 1 -> 16)
+    val loop_p =       1 (1 -> 1 -> 16)
+    val loop_q =       1 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
