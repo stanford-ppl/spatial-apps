@@ -17,7 +17,7 @@ import types
 
 lanes = 16
 bankSize = 32 * 1024 / 4
-proc_thresh = 5
+proc_thresh = 10
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIRL_HOME = os.environ['PIR_HOME']
@@ -45,7 +45,7 @@ def copyApp(app, args, params):
     path = '{0}/{1}.scala'.format(APP_DIR, app)
     newname = newAppName(app, args, params) 
     if not os.path.exists('{}/gen'.format(APP_DIR)):
-        os.makedirs(directory)
+        os.makedirs('{}/gen'.format(APP_DIR))
     newpath = '{0}/gen/{1}.scala'.format(APP_DIR, newname)
     paramFound = {}
     with open(newpath, 'w') as newapp:
@@ -80,18 +80,20 @@ def waitProcess():
         waitProcess()
 
 def runApp(app, args, params, regen):
-    waitProcess()
+    # waitProcess()
     copyApp(app, args, params)
     newname = newAppName(app, args, params)
     command = "apps/bin/runapp {} {} {}".format(newname, ' '.join([str(a) for a in args]), regen)
     print('command={}'.format(command))
-    # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+
     proc = subprocess.Popen(command.split(), shell=False)
     pid = proc.pid
     job_list.append(pid)
     pickle.dump(job_list, open(JOB_PATH, 'wb'))
     proc.wait()
-    # time.sleep(1)
+
+    # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+    # time.sleep(5)
 
 def clear(app, args, params, regen):
     newname = newAppName(app, args, params)
@@ -202,16 +204,41 @@ def expRun():
     # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
     # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
 
-    regen = 'false'
-    app = 'GEMM_Blocked'
-    args = []
-    dim = 64
+    # regen = 'false'
+    # app = 'GEMM_Blocked'
+    # args = []
+    # dim = 64
 
-    params['tileSize'] = irange(16, dim, 16) 
-    params['loop_jj'] = lambda params: irange(1, dim/params['tileSize'], 1) 
-    params['loop_kk'] = lambda params: irange(1, dim/params['tileSize'], 1) 
-    params['loop_ii'] = irange(1, min(dim, 5), 2) 
-    params['loop_k']  = lambda params: irange(1, min(params['tileSize'], 5), 2)
+    # params['tileSize'] = irange(16, dim, 16) 
+    # params['loop_jj'] = lambda params: irange(1, dim/params['tileSize'], 1) 
+    # params['loop_kk'] = lambda params: irange(1, dim/params['tileSize'], 1) 
+    # params['loop_ii'] = irange(1, min(dim, 5), 2) 
+    # params['loop_k']  = lambda params: irange(1, min(params['tileSize'], 5), 2)
+
+    regen = 'false'
+    app = 'BlackScholes'
+    N = 1966080  
+    args = [N]
+
+    #TODO
+    params['outerPar'] = irange(1, 4, 1) 
+    # params['outerPar'] = irange(4, 4, 1) 
+    params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
+
+    # params['tileSize'] = lambda params: irange(1024*1, 1024*1, 1)
+    # params['tileSize'] = lambda params: irange(1024*2, 1024*2, 1)
+    # params['tileSize'] = lambda params: irange(1024*3, 1024*3, 1)
+    # params['tileSize'] = lambda params: irange(1024*4, 1024*4, 1)
+    # params['tileSize'] = lambda params: irange(1024*5, 1024*5, 1)
+    # params['tileSize'] = lambda params: irange(1024*6, 1024*6, 1)
+    # params['tileSize'] = lambda params: irange(1024*7, 1024*7, 1)
+    # params['tileSize'] = lambda params: irange(1024*7, min(bankSize, N/params['outerPar']), 1024)
+
+    # regen = 'false'
+    # app = 'PageRank_plasticine'
+    # N = 1966080  
+    # args = [N]
+
 
     space = dse(app, args, params, regen)
     print('{} space: {}'.format(app, space))

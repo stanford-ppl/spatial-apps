@@ -76,8 +76,8 @@ object BlackScholes extends SpatialApp {
     val B  = tileSize (32 -> 96 -> 19200)
     val OP = outerPar (1 -> 2)
     val IP = innerPar (1 -> tileSize)
-    val par_load = tileSize
-    val par_store = tileSize
+    val par_load = innerPar
+    val par_store = innerPar
 
     val size = stypes.length; bound(size) = 9995328
 
