@@ -17,7 +17,7 @@ import types
 
 lanes = 16
 bankSize = 32 * 1024 / 4
-proc_thresh = 5
+proc_thresh = 10
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIRL_HOME = os.environ['PIR_HOME']
@@ -45,7 +45,7 @@ def copyApp(app, args, params):
     path = '{0}/{1}.scala'.format(APP_DIR, app)
     newname = newAppName(app, args, params) 
     if not os.path.exists('{}/gen'.format(APP_DIR)):
-        os.makedirs(directory)
+        os.makedirs('{}/gen'.format(APP_DIR))
     newpath = '{0}/gen/{1}.scala'.format(APP_DIR, newname)
     paramFound = {}
     with open(newpath, 'w') as newapp:
@@ -224,6 +224,23 @@ def GEMM_Blocked(args, params):
     params['loop_ii'] = irange(1, min(dim, 5), 2) 
     params['loop_k']  = lambda params: irange(1, min(params['tileSize'], 5), 2)
 
+def BlackScholes(args, params):
+    N = 1966080  
+    args += [N]
+
+    #TODO
+    params['outerPar'] = irange(1, 4, 1) 
+    # params['outerPar'] = irange(4, 4, 1) 
+    params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
+
+def PageRank_plasticine(args, params):
+    # regen = 'false'
+    # app = 'PageRank_plasticine'
+    # N = 1966080  
+    # args = [N]
+    pass
+
+
 def expRun():
     #################################################################################################################
     ###                                                ASPLOS 2018                                           ########
@@ -241,6 +258,7 @@ def expRun():
     TPCHQ6(args['TPCHQ6'], params['TPCHQ6'])
     GDA(args['GDA'], params['GDA'])
     GEMM_Blocked(args['GEMM_Blocked'], params['GEMM_Blocked'])
+    BlackScholes(args['BlackScholes'], params['BlackScholes'])
 
     space = dse(app, args[app], params[app])
     print('{} space: {}'.format(app, space))
