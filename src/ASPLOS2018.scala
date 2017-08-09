@@ -53,7 +53,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 
     val par_load = 16
     val par_store = 16
-    val row_par = 2 (1 -> 1 -> 8)
+    val row_par = 1 (1 -> 1 -> 8)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -283,8 +283,8 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val loop_grid0_y = 1 (1 -> 1 -> 16) 
     val loop_grid0_z = 1 (1 -> 1 -> 16)
     val loop_grid1_x = 1 (1 -> 1 -> 16)
-    val loop_grid1_y = 2 (1 -> 1 -> 16)
-    val loop_grid1_z = 2 (1 -> 1 -> 16)
+    val loop_grid1_y = 1 (1 -> 1 -> 16)
+    val loop_grid1_z = 1 (1 -> 1 -> 16)
     val loop_p =       2 (1 -> 1 -> 16)
     val loop_q =       2 (1 -> 1 -> 16)
 
@@ -351,7 +351,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
               val qz = dvec_z_sram(b1x, b1y, b1z, q_idx)
               val tmp = if ( !(b0x == b1x && b0y == b1y && b0z == b1z && p_idx == q_idx) ) { // Skip self
                 val delta = XYZ(px - qx, py - qy, pz - qz)
-                val r2inv = 1.0.to[T]/( delta.x*delta.x + delta.y*delta.y + delta.z*delta.z );
+                val r2inv = (1.0.to[FixPt[TRUE,_4,_12]] / ( (delta.x*delta.x + delta.y*delta.y + delta.z*delta.z).to[FixPt[TRUE,_4,_12]] )).to[T]
                 // Assume no cutoff and aways account for all nodes in area
                 val r6inv = r2inv * r2inv * r2inv;
                 val potential = r6inv*(lj1*r6inv - lj2);
@@ -1801,8 +1801,8 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   @virtualize
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
     val rTileSize = 20(96 -> 19200)
-    val op = 4(1 -> 8)
-    val ip = 16(1 -> 12)
+    val op = 2(1 -> 8)
+    val ip = 4(1 -> 12)
     val subLoopPar = 16(1 -> 16)
     val prodLoopPar = 16(1 -> 96)
     val outerAccumPar = 16(1 -> 1)
