@@ -6,16 +6,16 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
   type X = Float
 
-  val MAXC = 96
+  val MAXC = 80
   val C = MAXC
   val margin = 1
 
   val loadPar = 16
   val storePar = 16
   val innerPar = 16
+
   val midPar = 1
   val outerPar = 1
-
   val tileSize = innerPar
 
   @virtualize

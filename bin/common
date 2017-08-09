@@ -16,6 +16,7 @@ export BLUE='\033[0;34m'
 export INFO='\033[1;33m'
 export GREEN='\033[0;32m'
 export RED='\033[0;31m'
+export CYAN='\033[0;36m'
 export NC='\033[0m'
 
 passes=("GEN_PIR" "FIT_PIR" "GEN_CHISEL" "MAKE_VCS" "MAP_PIR" "RUN_SIMULATION")
@@ -29,12 +30,12 @@ logs["MAP_PIR"]=$PIR_HOME/out/$app/map_pir.log
 logs["RUN_SIMULATION"]=$SPATIAL_HOME/gen/$app/sim.log
 
 declare -A scripts
-scripts["GEN_PIR"]=$SPATIAL_HOME/bin/gen_pir
-scripts["FIT_PIR"]=$SPATIAL_HOME/bin/fit_pir
-scripts["GEN_CHISEL"]=$SPATIAL_HOME/bin/gen_chisel
-scripts["MAKE_VCS"]=$SPATIAL_HOME/bin/make_vcs
-scripts["MAP_PIR"]=$SPATIAL_HOME/bin/make_pir
-scripts["RUN_SIMULATION"]=$SPATIAL_HOME/bin/run_sim
+scripts["GEN_PIR"]=$SPATIAL_HOME/apps/bin/gen_pir
+scripts["FIT_PIR"]=$SPATIAL_HOME/apps/bin/fit_pir
+scripts["GEN_CHISEL"]=$SPATIAL_HOME/apps/bin/gen_chisel
+scripts["MAKE_VCS"]=$SPATIAL_HOME/apps/bin/make_vcs
+scripts["MAP_PIR"]=$SPATIAL_HOME/apps/bin/map_pir
+scripts["RUN_SIMULATION"]=$SPATIAL_HOME/apps/bin/run_sim
 
 declare -A progress
 for pass in ${passes[@]}; do
@@ -48,7 +49,7 @@ passStatus() {
 		isDone=$(grep "$pass(DONE)" $log)
 		if [[ $isDone != "" ]]; then
 			isKilled=$(grep 'Killed\|KILLED' $log)
-			isFailed=$(grep 'error\|Error\|ERROR' $log)
+			isFailed=$(grep 'error\|Error\|ERROR\|No rule to make' $log)
 			if [[ $isKilled != "" ]]; then
 				progress[$pass]="KILLED"
 			elif [[ $isFailed != "" ]]; then

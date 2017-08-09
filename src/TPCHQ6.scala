@@ -18,8 +18,9 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   val margin = 1
 
   val innerPar = 16
-  val outerPar = 2
+  val par_load = innerPar
 
+  val outerPar = 2
   val tileSize = 384
 
   @virtualize
@@ -38,8 +39,6 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
     val ts = tileSize (96 -> 96 -> 192000)
     val ip = innerPar (1 -> 384)
     val op = outerPar (1 -> 6)
-    val par_load = innerPar
-    val par_store = innerPar
 
     setMem(dates, datesIn)
     setMem(quants, quantsIn)

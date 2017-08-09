@@ -17,10 +17,12 @@ import types
 
 lanes = 16
 bankSize = 32 * 1024 / 4
+proc_thresh = 5
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIRL_HOME = os.environ['PIR_HOME']
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
+JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
 
 class bcolors:
     HEADER = '\033[95m'
@@ -65,14 +67,31 @@ def copyApp(app, args, params):
             print('Param {} not found|||!'.format(param))
             exit()
 
+def checkProcess():
+    for pid in job_list:
+        if not os.path.exists("/proc/{}".format(pid)):
+            job_list.remove(pid)
+    pickle.dump(job_list, open(JOB_PATH, 'wb'))
+
+def waitProcess():
+    checkProcess()
+    if len(job_list) > proc_thresh:
+        time.sleep(5)
+        waitProcess()
+
 def runApp(app, args, params, regen):
+    waitProcess()
     copyApp(app, args, params)
     newname = newAppName(app, args, params)
     command = "apps/bin/runapp {} {} {}".format(newname, ' '.join([str(a) for a in args]), regen)
     print('command={}'.format(command))
+    # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     proc = subprocess.Popen(command.split(), shell=False)
     pid = proc.pid
-    time.sleep(1)
+    job_list.append(pid)
+    pickle.dump(job_list, open(JOB_PATH, 'wb'))
+    proc.wait()
+    # time.sleep(1)
 
 def clear(app, args, params, regen):
     newname = newAppName(app, args, params)
@@ -99,8 +118,7 @@ def status(app, args, params, regen):
     print(command)
     proc = subprocess.Popen(command, shell=True)
     proc.wait()
-    # time.sleep(0.1)
-    raw_input("status[{}]: Press Enter to continue...\n".format(count))
+    # raw_input("status[{}]: Press Enter to continue...\n".format(count))
     count += 1
     # proc.kill()
 
@@ -131,7 +149,7 @@ def dse(app, args, params, regen):
             return dse(app, args, newParams, regen)
         else:
             continue
-    print('{}{} args={} and params=[{}]{}'.format(bcolors.OKBLUE, app, str(args),
+    print('{}{} args={} and params=[{}]{}'.format(bcolors.UNDERLINE, app, str(args),
         ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
     target(app, args, params, regen)
     return 1
@@ -139,25 +157,64 @@ def dse(app, args, params, regen):
 def irange(start, stop, step):
     return range(start, stop+step, step)
 
-def TPCHQ6(regen):
-    app = 'TPCHQ6'
-    params = OrderedDict()
-    N = 96000
-    args = [N]
-    # params['outerPar'] = irange(1, 10, 2) 
-    params['outerPar'] = irange(1, 10, 2) 
-    params['tileSize'] = lambda params: irange(3000, N/params['outerPar']/4, 3000)
-    space = dse(app, args, params, regen)
-    print('{} space: {}'.format(app, space))
-
 def expRun():
     #################################################################################################################
     ###                                                ASPLOS 2018                                           ########
     #################################################################################################################
 
     ### TO RUN        ######################################################################################################
-    TPCHQ6(regen='true')
+    params = OrderedDict()
 
+    regen = 'false'
+    app = 'TPCHQ6'
+    N = 96000
+    args = [N]
+
+    # FINISHED
+    # params['outerPar'] = irange(1, 10, 2) 
+    # params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
+
+    # TODO run one more time
+    # params['outerPar'] = irange(6, 10, 2) 
+    # params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 800)
+
+    # TODO run one more time
+    # params['outerPar'] = irange(2, 10, 2) 
+    # params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
+
+    regen = 'false'
+    app = 'GDA'
+    R = 192000
+    args = [R]
+
+    # TODO 
+    # params['tileSize'] = irange(16, 16, 16) 
+    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+
+    # TODO 
+    # params['tileSize'] = irange(16*5, 16*5, 16) 
+    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+
+    # TODO 
+    # params['tileSize'] = irange(16*3, 16*3, 16) 
+    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+
+    regen = 'false'
+    app = 'GEMM_Blocked'
+    args = []
+    dim = 64
+
+    params['tileSize'] = irange(16, dim, 16) 
+    params['loop_jj'] = lambda params: irange(1, dim/params['tileSize'], 1) 
+    params['loop_kk'] = lambda params: irange(1, dim/params['tileSize'], 1) 
+    params['loop_ii'] = irange(1, min(dim, 5), 2) 
+    params['loop_k']  = lambda params: irange(1, min(params['tileSize'], 5), 2)
+
+    space = dse(app, args, params, regen)
+    print('{} space: {}'.format(app, space))
     pass
 
 def main():
@@ -170,6 +227,14 @@ def main():
     (opts, args) = parser.parse_known_args()
 
     os.chdir(SPATIAL_HOME)
+    global job_list
+    if not os.path.exists(JOB_PATH):
+        job_list = [] 
+        print('New job list!')
+    else:
+        job_list = pickle.load(open(JOB_PATH, 'rb'))
+        checkProcess()
+        print("Number of active jobs({})={}".format(len(job_list), job_list))
 
     if opts.clearAll:
         clearAll()
