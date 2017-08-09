@@ -4,7 +4,7 @@ import spatial.targets._
 
 // No opportunities for par
 object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
-  override val target = Zynq
+  override val target = AWS_F1
 
 
  /*
@@ -231,7 +231,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 
 // good
 object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = Zynq
+  override val target = AWS_F1
 
 
  /*
@@ -422,7 +422,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
 }      
 
 object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = Zynq
+  override val target = AWS_F1
                                                                                                   
                                                                                                   
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
@@ -690,7 +690,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
-  override val target = Zynq
+  override val target = AWS_F1
 
 
  /*                                                                                                  
@@ -797,7 +797,7 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
 
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
-  override val target = Zynq
+  override val target = AWS_F1
 
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
@@ -959,7 +959,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 }
 
 object BlackScholes extends SpatialApp {
-  override val target = Zynq
+  override val target = AWS_F1
 
   type T = Float//FixPt[TRUE,_32,_32]
   val margin = 0.2f // Validates true if within +/- margin
@@ -1110,7 +1110,7 @@ object BlackScholes extends SpatialApp {
 
 // good
 object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
-  override val target = Zynq
+  override val target = AWS_F1
 /*
 
 
@@ -1215,7 +1215,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
 
 // good, but pipelining vs area
 object AES extends SpatialApp { // Regression (Dense) // Args: 50
-  override val target = Zynq
+  override val target = AWS_F1
 
   /*
   TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
@@ -1622,7 +1622,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 
 // good
 object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
-  override val target = Zynq
+  override val target = AWS_F1
 
   type X = Int
 
