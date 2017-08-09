@@ -17,7 +17,7 @@ function runPass() {
 	done
 
 	passStatus $pass
-	if [[ $regen == 'true' ]] || [[ ${progress[$pass]} != 'SUCCESS' ]]; then
+	if [[ $regen == 'true' ]] || [[ ${progress[$pass]} != 'SUCCESS' && ${progress[$pass]} != 'RUNNING' ]]; then
 		log=${logs[$pass]}
 		clean $pass
 
