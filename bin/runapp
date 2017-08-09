@@ -10,7 +10,6 @@ function runPass() {
 		if [[ $reach == 0 ]] && [[ ${progress[$p]} != "SUCCESS" ]]; then exit; fi
 	done
 
-	passStatus $pass
 	if [[ $regen == ALL ]] || [[ $regen == $pass ]] || [[ ${progress[$pass]} != 'SUCCESS' && ${progress[$pass]} != 'RUNNING' ]]; then
 		log=${logs[$pass]}
 		clean_log $pass
@@ -32,6 +31,7 @@ mkdir -p $PIR_HOME/apps/src/gen/
 mkdir -p $PIR_HOME/out/$app
 
 for pass in ${passes[@]}; do
+	passStatus $pass
 	if [[ $torun == 'ALL' ]] || [[ $torun == *$pass ]] || [[ $torun == $pass* ]] || [[ $torun == $pass ]]; then
 	  runPass $pass
   fi
