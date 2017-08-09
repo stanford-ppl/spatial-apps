@@ -1,2 +1,6 @@
+#!/bin/bash
+
 cd $PIR_HOME
+out_dir=$PIR_HOME/out/$app
+if [ -e $out_dir ]; then rm -r $out_dir; fi
 $PIR_HOME/bin/pir $app --debug --mapping=true --verbose --simulate=false --arch=SN16x8_LD &>> $log &

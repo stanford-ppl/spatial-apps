@@ -80,7 +80,7 @@ def waitProcess():
         waitProcess()
 
 def runApp(app, args, params, regen):
-    waitProcess()
+    # waitProcess()
     copyApp(app, args, params)
     newname = newAppName(app, args, params)
     command = "apps/bin/runapp {} {} {}".format(newname, ' '.join([str(a) for a in args]), regen)
@@ -90,7 +90,7 @@ def runApp(app, args, params, regen):
     pid = proc.pid
     job_list.append(pid)
     pickle.dump(job_list, open(JOB_PATH, 'wb'))
-    proc.wait()
+    # proc.wait()
     # time.sleep(1)
 
 def clear(app, args, params, regen):
@@ -165,53 +165,70 @@ def expRun():
     ### TO RUN        ######################################################################################################
     params = OrderedDict()
 
-    regen = 'false'
+    regen = 'FIT_PIR'
     app = 'TPCHQ6'
     N = 96000
     args = [N]
 
     # FINISHED
-    # params['outerPar'] = irange(1, 10, 2) 
-    # params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
+    params['outerPar'] = irange(1, 10, 2) 
+    params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
 
-    # TODO run one more time
+    # Finished
     # params['outerPar'] = irange(6, 10, 2) 
     # params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 800)
 
-    # TODO run one more time
+    # Finished
     # params['outerPar'] = irange(2, 10, 2) 
     # params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
 
-    regen = 'false'
-    app = 'GDA'
-    R = 192000
-    args = [R]
+    # regen = 'false'
+    # app = 'GDA'
+    # R = 192000
+    # args = [R]
 
-    # TODO 
+    # TODO run one more time
     # params['tileSize'] = irange(16, 16, 16) 
     # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
     # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
 
-    # TODO 
+    # Finished
     # params['tileSize'] = irange(16*5, 16*5, 16) 
+    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+
+    # Finished
+    # params['tileSize'] = irange(16*3, 16*3, 16) 
     # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
     # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
 
     # TODO 
     # params['tileSize'] = irange(16*3, 16*3, 16) 
-    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
-    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(2, min(8, params['tileSize']), 2) 
+    # params['outerPar'] = lambda params: irange(2, min(10, R/params['tileSize']), 2) 
 
-    regen = 'false'
-    app = 'GEMM_Blocked'
-    args = []
-    dim = 64
+    # ----------
 
-    params['tileSize'] = irange(16, dim, 16) 
-    params['loop_jj'] = lambda params: irange(1, dim/params['tileSize'], 1) 
-    params['loop_kk'] = lambda params: irange(1, dim/params['tileSize'], 1) 
-    params['loop_ii'] = irange(1, min(dim, 5), 2) 
-    params['loop_k']  = lambda params: irange(1, min(params['tileSize'], 5), 2)
+    # Finihsed
+    # params['tileSize'] = irange(16*5, 16*5, 16) 
+    # params['outerPar'] = lambda params: irange(3, min(10, R/params['tileSize']), 2) 
+    # params['midPar'] = lambda params: irange(3, min(8, params['tileSize']), 2) 
+
+    # TODO 
+    # params['tileSize'] = irange(16, 16, 16) 
+    # params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
+    # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
+
+    # regen = 'false'
+    # app = 'GEMM_Blocked'
+    # args = []
+    # dim = 64
+
+    # params['tileSize'] = irange(16, dim, 16) 
+    # params['loop_jj'] = lambda params: irange(1, dim/params['tileSize'], 1) 
+    # params['loop_kk'] = lambda params: irange(1, dim/params['tileSize'], 1) 
+    # params['loop_ii'] = irange(1, min(dim, 5), 2) 
+    # params['loop_k']  = lambda params: irange(1, min(params['tileSize'], 5), 2)
 
     space = dse(app, args, params, regen)
     print('{} space: {}'.format(app, space))

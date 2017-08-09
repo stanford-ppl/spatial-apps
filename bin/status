@@ -41,9 +41,7 @@ elif [[ $RESP == "r "* ]]; then
 	    echo -e "${CYAN}Rerun${NC} $pass for $SPATIAL_HOME/gen/$app?"
 	    read -p "" RESP
 	    if [ "$RESP" = "y" ]; then
-	      log=${logs[$pass]}
-        echo "rm $log"
-        rm $log
+        clean_log $pass
 	    fi
     fi
   done

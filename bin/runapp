@@ -2,12 +2,6 @@
 
 source $SPATIAL_HOME/apps/bin/common
 
-function clean() {
-	pass=$1
-	log=${logs[$pass]}
-	if [ -e $log ]; then rm $log; fi
-}
-
 function runPass() {
 	pass=$1
 	reach=0
@@ -17,9 +11,9 @@ function runPass() {
 	done
 
 	passStatus $pass
-	if [[ $regen == 'true' ]] || [[ ${progress[$pass]} != 'SUCCESS' && ${progress[$pass]} != 'RUNNING' ]]; then
+	if [[ $regen == $pass ]] || [[ ${progress[$pass]} != 'SUCCESS' && ${progress[$pass]} != 'RUNNING' ]]; then
 		log=${logs[$pass]}
-		clean $pass
+		clean_log $pass
 
 		source ${scripts[$pass]}
 
@@ -33,11 +27,8 @@ function runPass() {
 
 echo $app
 
-if [[ $regen == 'true' ]]; then
-	for pass in ${passes[@]}; do clean $pass; done
-	rm -r $SPATIAL_HOME/gen/$app
-	rm $PIR_HOME/apps/src/gen/${app}.scala
-	rm -r $PIR_HOME/out/$app
+if [[ $regen == 'ALL' ]]; then
+	for pass in ${passes[@]}; do clean_log $pass; done
 fi
 
 mkdir -p $SPATIAL_HOME/gen/$app
