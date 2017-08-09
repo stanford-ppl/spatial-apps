@@ -1870,7 +1870,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: none
             if (r >= 0) {lineOut(c) = abs(horz.value) + abs(vert.value)}// Technically should be sqrt(horz**2 + vert**2)
           }
 
-          if (r+rr >= 0) {imgOut(r+rr, 0::C par par_store) store lineOut}
+          if (r+rr >= 0 && r >= 0) {imgOut(r+rr, 0::C par par_store) store lineOut}
         }
 
       }
