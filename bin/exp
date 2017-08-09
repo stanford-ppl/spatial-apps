@@ -2,6 +2,7 @@
 
 from os import listdir
 from os.path import isfile, isdir, join, splitext, basename, dirname 
+from collections import OrderedDict
 import os
 import argparse
 import subprocess
@@ -11,10 +12,25 @@ import pickle
 import signal
 import psutil
 import shutil
+import numpy as np
+import types
+
+lanes = 16
+bankSize = 32 * 1024 / 4
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
+PIRL_HOME = os.environ['PIR_HOME']
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
-PID_PATH = '{}/job_pids.pickle'.format(SPATIAL_HOME)
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 def newAppName(app, args, params):
     postfix = '_'.join([str(a) for a in args])
@@ -29,7 +45,6 @@ def copyApp(app, args, params):
     if not os.path.exists('{}/gen'.format(APP_DIR)):
         os.makedirs(directory)
     newpath = '{0}/gen/{1}.scala'.format(APP_DIR, newname)
-    print(newpath)
     paramFound = {}
     with open(newpath, 'w') as newapp:
         with open(path, 'r') as origapp :
@@ -51,17 +66,12 @@ def copyApp(app, args, params):
             exit()
 
 def runApp(app, args, params, regen):
-    print('running {} with args={} and params=[{}]'.format(app, str(args),
-        '='.join(['{}={}'.format(p,params[p]) for p in params])))
     copyApp(app, args, params)
     newname = newAppName(app, args, params)
     command = "apps/bin/runapp {} {} {}".format(newname, ' '.join([str(a) for a in args]), regen)
-    # subprocess.call(command, shell=True)
     print('command={}'.format(command))
     proc = subprocess.Popen(command.split(), shell=False)
     pid = proc.pid
-    print('command={} pid={}'.format(command, pid))
-    job_pids[newname] = pid
     time.sleep(1)
 
 def clear(app, args, params, regen):
@@ -69,12 +79,6 @@ def clear(app, args, params, regen):
     command = "rm -r gen/{}/Top.vcd".format(newname)
     print(command)
     subprocess.call(command, shell=True)
-
-def kill_with_pid(proc_pid):
-    process = psutil.Process(proc_pid)
-    for proc in process.get_children(recursive=True):
-        proc.kill()
-    process.kill()
 
 def clearAll():
     dirs = [join('gen', d) for d in listdir('gen') if isdir(join('gen', d))]
@@ -88,65 +92,63 @@ def clearAll():
                 os.remove(f)
             
 count = 0
-def kill(app, args, params, regen):
-    global count
-    newname = newAppName(app, args, params)
-    pid = job_pids[newname]
-    answer = raw_input("kill[{}]: kill {} ?...\n".format(count, newname))
-    if answer == 'y':
-        print('kill {} pid={}'.format(newname, pid))
-        os.kill(pid, signal.SIGTERM)
-
 def status(app, args, params, regen):
     global count
     newname = newAppName(app, args, params)
     command = "apps/bin/status {}".format(newname)
     print(command)
     proc = subprocess.Popen(command, shell=True)
-    time.sleep(0.1)
+    proc.wait()
+    # time.sleep(0.1)
     raw_input("status[{}]: Press Enter to continue...\n".format(count))
     count += 1
-    proc.kill()
+    # proc.kill()
 
 def target(app, args, params, regen):
     if opts.run:
         runApp(app, args, params, regen)
-    elif opts.kill:
-        kill(app, args, params, regen)
-    else:
+    elif opts.status:
         status(app, args, params, regen)
 
-def testRun():
-    print('Testing with small sizes')
-    # target('DotProduct', [6400], {'tileSize':320, 'innerPar':4, 'outerPar':4}, regen='true')
-    # target('OuterProduct', [192, 192], {'ts1':48, 'ts2':48, 'ip':2, 'op':2}, regen='true')
-    # target('MatMult_inner', [32, 96, 96], {'tsm':16, 'tsn':48, 'tsp':48, 'ip':2, 'mp':8, 'op':2},regen='true')
-    # target('BlackScholes', [9600], {'ip':16, 'op':1, 'ts':320}, regen='true')
-    # target('TPCHQ6', [384], {'ip':2, 'op':1, 'ts':2000}, regen='true')
-    # target('GDA', [128], {'ip':16, 'op':2,  'ts':32}, regen='true')
-    # target('LogReg', [2, 64], {'ip':4, 'op':2, 'ts':16, 'dim':16}, regen='true') 
-    # target('SMV', [768], {'ip':16, 'op':4, 'pp':3840, 'NNZ':60}, regen='true') 
-    # target('SGD', [40, 32, 0.0001], {'ip':16, 'op':12, 'ts':16, 'D':16}, regen='true') 
+def dse(app, args, params, regen):
+    # print(params)
+    for param in params:
+        # print('  param:' + param + ' = ' + str(params[param]))
+        if type(params[param]) is list:
+            if len(params[param])==0:
+                return
+            newParams = params.copy()
+            cnt = 0
+            if opts.single:
+                params[param] = [params[param][0]]
+            for val in params[param]:
+                newParams[param] = val
+                cnt += dse(app, args, newParams, regen)
+            return cnt
+        elif type(params[param]) is types.LambdaType:
+            newParams = params.copy()
+            newParams[param] = params[param](params)
+            return dse(app, args, newParams, regen)
+        else:
+            continue
+    print('{}{} args={} and params=[{}]{}'.format(bcolors.OKBLUE, app, str(args),
+        ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
+    target(app, args, params, regen)
+    return 1
 
-def fpgaRun():
-    # target('MatMult_inner', [48, 768, 384], {'tsm':8, 'tsn':192, 'tsp':192, 'ip':16, 'mp':1, 'op':2,'fpga':'true'}, regen='true')
-    # target('Kmeans', [50, 1536], {'ip':8, 'op':1, 'numcents':20, 'pts_per_ld': 96, 'D':96, 'fpga':'true'}, regen='true')
-    # target('LogReg', [5, 1536], {'ip':4, 'op':4, 'ts':192, 'dim':192, 'fpga':'true'}, regen='true')
-    # target('GDA', [384000],  {'ip':8, 'op': 2, 'ts':192, 'fpga':'true'}, regen='true')
-    # target('SGD', [30, 76800, 0.0001], {'ip':16, 'op':2, 'ts':192, 'D':768, 'fpga':'true'}, regen='true') #not sure which one is right
-    # target('SGD', [30, 76800, 0.0001], {'ip':16, 'op':2, 'ts':768, 'D':192, 'fpga':'true'}, regen='true') 
-    # target('LogReg', [5, 1536], {'ip':4, 'op':4, 'ts':192, 'dim':192, 'fpga':'true_novcd'}, regen='true')
+def irange(start, stop, step):
+    return range(start, stop+step, step)
 
-    # target('OuterProduct', [3840, 3840],  {'ip':8, 'op': 2, 'ts1':192, 'ts2':192, 'fpga':'true'}, regen='true')
-    # target('Kmeans', [50, 1536], {'ip':8, 'op':1, 'numcents':20, 'pts_per_ld':96,'D':96,'fpga':'true_novcd'}, regen='true')
-    # target('GDA', [38400],  {'ip':8, 'op': 2, 'ts':192, 'fpga':'true_novcd'}, regen='true')
-    # target('SGD', [30, 7680, 0.0001], {'ip':16, 'op':2, 'ts':192, 'D':768, 'fpga':'true_novcd'}, regen='true') #not sure which one is right
-
-    # target('Kmeans', [1, 1536], {'ip':8, 'op':1, 'numcents':20, 'pts_per_ld':96,'D':96,'fpga':'true_novcd'}, regen='true')
-    # target('SGD', [1, 7680, 0.0001], {'ip':16, 'op':2, 'ts':192, 'D':768, 'fpga':'true_novcd'}, regen='true') #not sure which one is right
-    # target('SGD', [30, 7680, 0.0001], {'ip':16, 'op':2, 'ts':768, 'D':192, 'fpga':'true_novcd'}, regen='true') 
-    # target('SMV' , [3840]  , {'ip':4 , 'op':1 , 'pp':3840 , 'NNZ':60 , 'ts':192, 'fpga':'false'} , regen='true')
-    pass
+def TPCHQ6(regen):
+    app = 'TPCHQ6'
+    params = OrderedDict()
+    N = 96000
+    args = [N]
+    # params['outerPar'] = irange(1, 10, 2) 
+    params['outerPar'] = irange(1, 10, 2) 
+    params['tileSize'] = lambda params: irange(3000, N/params['outerPar']/4, 3000)
+    space = dse(app, args, params, regen)
+    print('{} space: {}'.format(app, space))
 
 def expRun():
     #################################################################################################################
@@ -154,102 +156,25 @@ def expRun():
     #################################################################################################################
 
     ### TO RUN        ######################################################################################################
-    # target('BFS_plasticine', [], {'ip':16, 'op':1, 'ts':8000, 'D':16}, regen='true') #TODO to be
-    # rewritten
-    # target('Gibbs_Ising2D', [1000, 0.3, 2], {'x_par':1}, regen='true')
-    # target('Gibbs_Ising2D', [1000, 0.3, 2], {'x_par':2}, regen='true')
-    # target('Gibbs_Ising2D', [1000, 0.3, 2], {'x_par':4}, regen='true')
-    # target('Gibbs_Ising2D', [1000, 0.3, 2], {'x_par':8}, regen='true')
-    # target('Gibbs_Ising2D', [1000, 0.3, 2], {'x_par':10}, regen='true')
-    # target('Gibbs_Ising2D', [1000, 0.3, 2], {'x_par':12}, regen='true')
-    # target('Gibbs_Ising2D', [1000, 0.3, 2], {'x_par':14}, regen='true')
-    # target('Gibbs_Ising2D', [1000, 0.3, 2], {'x_par':16}, regen='true')
-    # target('BlackScholes', [94371840], {'OP':1,  'B': 19200/4}, regen='true')
-    # target('BlackScholes', [94371840], {'OP':1,  'B': 19200/2}, regen='true')
-    # target('BlackScholes', [94371840], {'OP':1,  'B': 19200}, regen='true')
-    # target('BlackScholes', [94371840], {'OP':2,  'B': 19200/4}, regen='true')
-    # target('BlackScholes', [94371840], {'OP':2,  'B': 19200/2}, regen='true')
-    # target('BlackScholes', [94371840], {'OP':2,  'B': 19200}, regen='true')
-    ### RUNNING       ######################################################################################################
-    # target('SPMV_CRS', [], {'tile_par':10, 'pt_par':10}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':16, 'pt_par':8}, regen='true')
-    # target('TPCHQ6', [960000], {'innerPar':16, 'outerPar':8, 'ts':6144}, regen='true')
-    # target('TPCHQ6', [960000], {'innerPar':16, 'outerPar':8, 'ts':8192}, regen='true')
-    # target('TPCHQ6', [960000], {'innerPar':16, 'outerPar':8, 'ts':12288}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':10, 'pt_par':16}, regen='true')
-    target('SPMV_CRS', [], {'tile_par':16, 'pt_par':16}, regen='true')
-    target('SPMV_CRS', [], {'tile_par':8,  'pt_par':10}, regen='true')
-    ### FINISHED      ######################################################################################################
-    # target('Backprop', [100], {}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':2,  'pt_par':2}, regen='true')
-    # target('PageRank_plasticine', [1, 7680*2, 0.125], {'tileSize':768}, regen='true')
-    # target('PageRank_plasticine', [1, 7680*2, 0.125], {'tileSize':768*4}, regen='true')
-    # target('TPCHQ6', [96000], {'innerPar':16, 'outerPar':4, 'ts':4000}, regen='true')
-    # target('TPCHQ6', [96000], {'innerPar':16, 'outerPar':4, 'ts':6000}, regen='true')
-    # target('TPCHQ6', [96000], {'innerPar':16, 'outerPar':4, 'ts':8000}, regen='true')
-    # target('TPCHQ6', [96000], {'innerPar':16, 'outerPar':4, 'ts':12000}, regen='true')
-    # target('TPCHQ6', [96000], {'innerPar':16, 'outerPar':6, 'ts':4000}, regen='true')
-    # target('Kmeans_plasticine', [1, 6144], {'ip':16, 'op':1, 'numcents':20, 'pts_per_ld':1536,'D':96}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':2,  'pt_par':2}, regen='true')
-    ### FAILED      ######################################################################################################
-    # target('PageRank_plasticine', [1, 7680*2, 0.125], {'tileSize':768*2}, regen='true')
-    # target('PageRank_plasticine', [1, 7680*2, 0.125], {'tileSize':768*10}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':16, 'pt_par':10}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':2,  'pt_par':16}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':4,  'pt_par':16}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':8,  'pt_par':16}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':4,  'pt_par':2}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':8,  'pt_par':2}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':10, 'pt_par':2}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':16, 'pt_par':2}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':2,  'pt_par':4}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':4,  'pt_par':4}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':8,  'pt_par':4}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':10, 'pt_par':4}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':16, 'pt_par':4}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':2,  'pt_par':8}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':4,  'pt_par':8}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':8,  'pt_par':8}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':10, 'pt_par':8}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':2,  'pt_par':10}, regen='true')
-    # target('SPMV_CRS', [], {'tile_par':4,  'pt_par':10}, regen='true')
+    TPCHQ6(regen='true')
+
     pass
 
 def main():
     parser = argparse.ArgumentParser(description='Run experiments')
-    parser.add_argument('--test', dest='test', action='store_true', default=False) 
+    parser.add_argument('--single', dest='single', action='store_true', default=False) 
     parser.add_argument('--run', dest='run', action='store_true', default=False) 
-    parser.add_argument('--kill', dest='kill', action='store_true', default=False) 
-    parser.add_argument('--fpga', dest='fpga', action='store_true', default=False) 
+    parser.add_argument('--status', dest='status', action='store_true', default=False) 
     parser.add_argument('--clearAll', dest='clearAll', action='store_true', default=False) 
     global opts
     (opts, args) = parser.parse_known_args()
 
     os.chdir(SPATIAL_HOME)
-    global job_pids
-    if os.path.isfile(PID_PATH):
-        with open(PID_PATH, 'rb') as handle:
-            job_pids = pickle.load(handle)
-    else:
-        job_pids = {}
 
-    try:
-        if opts.clearAll:
-            clearAll()
-        elif opts.test:
-            testRun()
-        elif opts.fpga:
-            fpgaRun()
-        else:
-            expRun()
-        with open(PID_PATH, 'wb') as handle:
-            pickle.dump(job_pids, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        print('Saving job ids ... # jobs:{}', len(job_pids))
-    except:
-        with open(PID_PATH, 'wb') as handle:
-            pickle.dump(job_pids, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        print('Saving job ids ... # jobs:{}', len(job_pids))
-        raise
+    if opts.clearAll:
+        clearAll()
+    else:
+        expRun()
 
     #################################################################################################################
 

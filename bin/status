@@ -1,10 +1,40 @@
 #!/bin/bash
 
-app=$1
+source $SPATIAL_HOME/apps/bin/common
 
-echo "$SPATIAL_HOME/gen/$app/sim.log"
-#tail -F spatial.log
-#tail -F $SPATIAL_HOME/gen/$app/build.log
-#tail -F $SPATIAL_HOME/gen/$app/sim.log
-tail -10 $SPATIAL_HOME/gen/$app/sim.log
-#tail -F $LOG_FILE
+PID=$(cat $PID_LOG)
+
+for pass in ${passes[@]}; do
+	log=${logs[$pass]}
+	passStatus $pass
+	prog=${progress[$pass]}
+	if [[ $prog == "SUCCESS" ]]; then
+		echo -e "-------------${GREEN}$pass(SUCCESS)${NC}------------"
+	elif [[ $prog == "KILLED" ]]; then
+		echo -e "-------------${RED}$pass(KILLED)${NC}------------"
+		echo $log
+	elif [[ $prog == "FAILED" ]]; then
+		echo -e "-------------${RED}$pass(FAILED)${NC}------------"
+		echo $log
+		echo -e $isFail
+		tail -5 $log
+	elif [[ $prog == "RUNNING" ]]; then
+		echo -e "-------------${INFO}$pass(RUNNING)${NC}------------"
+		echo $log
+		tail -5 $log
+		break
+	elif [[ $prog == "NOTRUN" ]]; then
+		echo -e "-------------${INFO}$pass(NOTRUN)${NC}------------"
+	fi
+done
+
+if [ "$PID" != "" ] && [ -e /proc/$PID ]; then
+	echo -e "${RED}Kill $pass ($PID)$NC for $SPATIAL_HOME/gen/$app?"
+	read -p "" RESP
+	if [ "$RESP" = "y" ]; then
+		log=${logs[$pass]}
+		echo -e "-------------${RED}$pass(KILLED)${NC}------------" >> $log
+		kill -9 $PID
+		echo "killed $PID"
+	fi
+fi
