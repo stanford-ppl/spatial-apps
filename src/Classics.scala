@@ -3,15 +3,13 @@ import spatial.targets._
 import org.virtualized._
 
 object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
+  override val target = AWS_F1
 
   type X = Int
 
   val numcents = 16
   val dim = 32
   val pts_per_ld = 1 // ???
-
-  val ip = 16
-  val op = 2
 
   val element_max = 10
   val margin = (element_max * 0.2).to[X]
@@ -27,13 +25,13 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
 
     val BN = pts_per_ld (96 -> 96 -> 9600)
     val BD = MAXD
+    val par_load = 16
+    val par_store = 16
     val PX = 1 (1 -> 1)
-    val P0 = ip (32 -> 96 -> 192) // Dimensions loaded in parallel
-    val P1 = op (1 -> 12)         // Sets of points calculated in parallel
-    val P2 = ip (1 -> 4 -> 96)    // Dimensions accumulated in parallel (outer)
-    val P3 = ip (1 -> 4 -> 16)    // Points calculated in parallel
-    val PR = ip (1 -> 4 -> 96)
-    val P4 = ip (1 -> 4 -> 96)
+    val P0 = 4 (1 -> 2 -> dim)
+    val P1 = 4 (1 -> 2 -> dim)
+    val P2 = 4 (1 -> 2 -> dim)
+    val P3 = 16 (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
     val N     = ArgIn[Int]
@@ -57,16 +55,15 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
       val newCents = SRAM[T](MAXK,MAXD)
 
       // Load initial centroids (from points)
-      cts load points(0::K, 0::D par 16)
+      cts load points(0::K, 0::D par par_load)
 
       // Initialize newCents
       // FPGA:
-      // Foreach(K by 1, D by 1) {(i,j) => newCents(i,j) = cts(i,j)} 
+      Foreach(K by 1, D by 1 par P0) {(i,j) => newCents(i,j) = cts(i,j)} 
 
       val DM1 = D - 1
 
       Sequential.Foreach(iters by 1){epoch =>
-
         // Flush centroid accumulator
         // FPGA:
         Foreach(K by 1, D par P0){(ct,d) =>
@@ -76,10 +73,10 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
         // For each set of points
         Foreach(N by BN par PX){i =>
           val pts = SRAM[T](BN, BD)
-          pts load points(i::i+BN, 0::BD par 16)
+          pts load points(i::i+BN, 0::BD par par_load)
 
           // For each point in this set
-          MemFold(newCents)(BN par PX){pt =>
+          MemFold(newCents par P0)(BN par PX){pt =>
             // Find the index of the closest centroid
             val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
             val minCent = Reduce(accum)(K par PX){ct =>
@@ -89,21 +86,6 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
             }{(a,b) =>
               mux(a._2 < b._2, a, b)
             }
-            /*// PIR Version
-            val minCent = Reg[Int]
-            val minDist = Reg[T](100000.to[T])
-            Foreach(K par PX){ct =>
-              val dist = Reduce(Reg[T])(D par P2){d =>
-                val cent = mux(epoch == 0, origCts(ct,d), cts(ct,d))
-                (pts(pt,d) - cent) ** 2
-              }{_+_}
-
-              Pipe {
-                val d = dist.value
-                minDist := min(minDist.value, d)
-                minCent := mux(minDist.value == d, ct, minCent.value)
-              }
-            }*/
 
             // Store this point to the set of accumulators
             val localCent = SRAM[T](MAXK,MAXD)
@@ -117,22 +99,21 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
         }
 
         val centCount = SRAM[T](MAXK)
-        Foreach(K by 1 par PX){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } // Until diagonal banking is allowed
+        Foreach(K by 1 par P3){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } 
 
         // Average each new centroid
         // val centsOut = SRAM[T](MAXK, MAXD)
         Foreach(K by 1, D par P0){(ct,d) =>
-//          val updateMux = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct))
           cts(ct, d) = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct)) //updateMux
         }
       }
 
       val flatCts = SRAM[T](MAXK * MAXD)
-      Foreach(K by 1, D by 1) {(i,j) =>
+      Foreach(K by 1, D by 1 par PX) {(i,j) => // Parallelize when issue #159 is fixed
         flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
       }
       // Store the centroids out
-      centroids(0::K*D par 16) store flatCts
+      centroids(0::K*D par par_store) store flatCts
     }
 
     getMem(centroids)
@@ -147,13 +128,6 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
 
     val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + i }}
     val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + (i*N/K) }}
-    // val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else if (d == 0) random[X](element_max) + i else 0.to[X]}}
-    // val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else if (d == 0) random[X](element_max) + i else 0.to[X]}}
-    // val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else 5*i }}
-    // val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else 5*i+1 }}
-
-    // println("points: ")
-    // for (i <- 0 until N) { println(i.mkString + ": " + pts(i).mkString(", ")) }
 
     val result = kmeans(pts.flatten, cnts.flatten, N, K, D, iters)
 
@@ -198,17 +172,10 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
       printArray(resrow)
     }
 
-    // for (i <- 0 until result.length) {
-    //   val diff = result(i) - gold(i)
-    //   if (abs(diff) > margin)
-    //     println("[" + i + "] gold: " + gold(i) + ", result: " + result(i) + ", diff: " + diff)
-    // }
-
     val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
 
     println("PASS: " + cksum + " (Kmeans)")
   }
-
 }
 
 

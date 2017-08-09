@@ -1170,9 +1170,9 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val loop_grid0_z = 1 (1 -> 1 -> 16)
     val loop_grid1_x = 1 (1 -> 1 -> 16)
     val loop_grid1_y = 1 (1 -> 1 -> 16)
-    val loop_grid1_z = 1 (1 -> 1 -> 16)
-    val loop_p =       1 (1 -> 1 -> 16)
-    val loop_q =       1 (1 -> 1 -> 16)
+    val loop_grid1_z = 2 (1 -> 1 -> 16)
+    val loop_p =       2 (1 -> 1 -> 16)
+    val loop_q =       2 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
@@ -1248,7 +1248,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
               }
               tmp
             }{(a,b) => XYZ(a.x + b.x, a.y + b.y, a.z + b.z)}
-            // println(" " + b1x + "," + b1y + "," + b1z + " " + b0x + "," + b0y + "," + b0z + " = " + q_sum )
+            println(" " + b1x + "," + b1y + "," + b1z + " " + b0x + "," + b0y + "," + b0z + " = " + q_sum )
             b1_cube_contributions(p_idx) = q_sum
           }
           Foreach(p_range until density) { i => b1_cube_contributions(i) = XYZ(0.to[T], 0.to[T], 0.to[T]) } // Zero out untouched interactions          
@@ -1581,7 +1581,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
        .      A        .          .                 .           .               .          .                  .   
        .               .          .                 .           .           C   .          .                  .   
      i .               .          .                 .           .               .          .                  .   
-     ↳ .................__________...................           .................__________....................   
+     ↳ .................__________...............raw_values....           .................__________....................   
        .               |_O________|                 .           .               |__c_tmp___|                  .   
        .```````````````. ↑        .`````````````````.           .```````````````.          .``````````````````.
        .               . k  -->   .                 .           .               .          .                  .   
@@ -1643,27 +1643,32 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     CONCERNS: We need to figure out how HLS is actually managing the srams, or make our management better  
               We cannot do unaligned stores yet, so tilesize of 8 won't work unless we keep ts 16 of c_sram onchip                                                                                          
  */
-  type T = FixPt[TRUE,_32,_32] // Fatter type so that tileSize is burst aligned
+  type T = FixPt[TRUE,_16,_16] // Fatter type so that tileSize is burst aligned
 
   @virtualize
   def main() = {
 
-    val dim = 64
-    val tileSize = 8
+    val dim_arg = args(0).to[Int]
+    val dim = ArgIn[Int]
+    setArg(dim, dim_arg)
+    val tileSize = 16 (16 -> 16 -> 128)
+    val i_tileSize = 64 (64 -> 16 -> 128)
+    val par_load = 16
+    val par_store = 16
+    val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
+    val loop_ii    = 1 // not sure if this one works
+    val loop_kk    = 1 (1 -> 1 -> 8)
+    val loop_i     = 1 (1 -> 1 -> 32)
+    val loop_k     = 2 (1 -> 1 -> 16)
+    val loop_j     = 2 (1 -> 1 -> 16)
+    val reduce_col = 4 (1 -> 1 -> 16)
+    val reduce_tmp = 4 (1 -> 1 -> 16)
 
-    val par_load = 8
-    val par_store = 8
-    val loop_jj    = 1 (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
-    val loop_kk    = 2 (1 -> 1 -> dim/tileSize)
-    val loop_i     = 2 (1 -> 1 -> dim)
-    val loop_k     = 2 (1 -> 1 -> tileSize)
-    val loop_j     = 2 (1 -> 1 -> tileSize)
-    val reduce_col = 2 (1 -> 1 -> tileSize)
-    val reduce_tmp = 2 (1 -> 1 -> tileSize)
-
-    val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
-    val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
-    val c_init = (0::dim, 0::dim){(i,j) => 0.to[T]}
+    // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
+    // val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
+    val a_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
+    val b_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
+    val c_init = (0::dim_arg, 0::dim_arg){(i,j) => 0.to[T]}
     val a_dram = DRAM[T](dim,dim)
     val b_dram = DRAM[T](dim,dim)
     val c_dram = DRAM[T](dim,dim)
@@ -1674,33 +1679,38 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
 
     Accel{
 
-      Foreach(dim by tileSize par loop_jj) { jj => 
-        val c_col = SRAM[T](dim,tileSize)
-        MemReduce(c_col par reduce_col)(dim by tileSize par loop_kk) { kk => 
-          val c_col_partial = SRAM[T](dim,tileSize)
-          val b_sram = SRAM[T](tileSize,tileSize)
-          b_sram load b_dram(kk::kk.to[Index]+tileSize, jj::jj.to[Index]+tileSize par par_load)
-          Foreach(dim by 1 par loop_i) { i => 
-            val a_sram = SRAM[T](tileSize)
-            a_sram load a_dram(i, kk::kk.to[Index]+tileSize)
-            val c_tmp = SRAM[T](tileSize)
-            MemReduce(c_tmp par reduce_tmp)(tileSize by 1 par loop_k) { k => 
-              val c_tmp_partial = SRAM[T](tileSize)
-              val temp_a = a_sram(k)
-              Foreach(tileSize by 1 par loop_j) { j => 
-                c_tmp_partial(j) = b_sram(k, j) * temp_a
-              }
-              c_tmp_partial
-            }{_+_}
-          Foreach(tileSize by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
-          }
-        c_col_partial
-        }{_+_}
-        c_dram(0::dim, jj::jj.to[Index]+tileSize par par_store) store c_col
+      Foreach(dim by i_tileSize par loop_ii) { ii => // this loop defenitilely cant be parallelized right now
+        Foreach(dim by tileSize par loop_jj) { jj => 
+          val c_col = SRAM[T](i_tileSize,tileSize)
+          MemReduce(c_col par reduce_col)(dim by tileSize par loop_kk) { kk => 
+            val c_col_partial = SRAM[T](i_tileSize,tileSize)
+            val b_sram = SRAM[T](tileSize,tileSize)
+            b_sram load b_dram(kk::kk.to[Index]+tileSize, jj::jj.to[Index]+tileSize par par_load)
+            Foreach(i_tileSize by 1 par loop_i) { i => 
+              val a_sram = SRAM[T](tileSize)
+              a_sram load a_dram(ii+i, kk::kk.to[Index]+tileSize)
+              val c_tmp = SRAM[T](tileSize)
+              MemReduce(c_tmp par reduce_tmp)(tileSize by 1 par loop_k) { k => 
+                val c_tmp_partial = SRAM[T](tileSize)
+                val temp_a = a_sram(k)
+                Foreach(tileSize by 1 par loop_j) { j => 
+                  c_tmp_partial(j) = b_sram(k, j) * temp_a
+                }
+                c_tmp_partial
+              }{_+_}
+            Foreach(tileSize by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
+            }
+          c_col_partial
+          }{_+_}
+          c_dram(ii::ii.to[Index]+i_tileSize, jj::jj.to[Index]+tileSize par par_store) store c_col
+        }
       }
     }
 
-    val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
+    // val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
+    val c_gold = (0::dim_arg,0::dim_arg){(i,j) => 
+      Array.tabulate(dim_arg){k => a_data(i,k) * b_data(k,j)}.reduce{_+_}
+    }
     val c_result = getMatrix(c_dram)
 
     printMatrix(c_gold, "C Gold: ")
