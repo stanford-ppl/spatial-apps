@@ -77,7 +77,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 256
+    val max_length = 160
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -1951,7 +1951,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   @virtualize
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
     val rTileSize = 20(96 -> 19200)
-    val op = 2(1 -> 8)
+    val op = 1(1 -> 8)
     val ip = 4(1 -> 12)
     val subLoopPar = 4(1 -> 16)
     val prodLoopPar = 4(1 -> 96)
