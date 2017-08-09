@@ -60,7 +60,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 
     val par_load = 16
     val par_store = 16
-    val row_par = 2 (1 -> 1 -> 8)
+    val row_par = 3 (1 -> 1 -> 8)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -295,8 +295,8 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val loop_grid1_x = 2 (1 -> 1 -> 16)
     val loop_grid1_y = 1 (1 -> 1 -> 16)
     val loop_grid1_z = 1 (1 -> 1 -> 16)
-    val loop_p =       1 (1 -> 1 -> 16)
-    val loop_q =       1 (1 -> 1 -> 16)
+    val loop_p =       2 (1 -> 1 -> 16)
+    val loop_q =       2 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
@@ -624,9 +624,9 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     val par_store = 16
     val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
     val loop_ii    = 1 // not sure if this one works
-    val loop_kk    = 1 (1 -> 1 -> 8)
-    val loop_i     = 2 (1 -> 1 -> 32)
-    val loop_k     = 2 (1 -> 1 -> 16)
+    val loop_kk    = 2 (1 -> 1 -> 8)
+    val loop_i     = 1 (1 -> 1 -> 32)
+    val loop_k     = 1 (1 -> 1 -> 16)
     val loop_j     = 2 (1 -> 1 -> 16)
     val reduce_col = 4 (1 -> 1 -> 16)
     val reduce_tmp = 4 (1 -> 1 -> 16)
@@ -1139,10 +1139,10 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
     val out = ArgOut[T]
 
     val ts = 384 (96 -> 96 -> 192000)
-    val op = 3 (1 -> 6)
+    val op = 4 (1 -> 6)
     val par_load = 16
     val par_store = 16
-    val ip = 16 (1 -> 384)
+    val ip = 8 (1 -> 384)
 
     setMem(dates, datesIn)
     setMem(quants, quantsIn)
@@ -1648,8 +1648,8 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
     val par_store = 16
     val PX = 1 (1 -> 1)
     val P0 = 4 (1 -> 2 -> dim)
-    val P1 = 4 (1 -> 2 -> dim)
-    val P2 = 8 (1 -> 2 -> dim)
+    val P1 = 8 (1 -> 2 -> dim)
+    val P2 = 2 (1 -> 2 -> dim)
     val P3 = 16 (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
@@ -1817,7 +1817,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: none
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
     val row_stride = 100 (100 -> 100 -> 500)
-    val row_par = 4 (1 -> 1 -> 16)
+    val row_par = 6 (1 -> 1 -> 16)
     val par_Kh = 3 (1 -> 1 -> 3)
     val par_Kw = 3 (1 -> 1 -> 3)
 
@@ -1952,7 +1952,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
     val rTileSize = 32(96 -> 19200)
     val op = 2(1 -> 8)
-    val ip = 2(1 -> 12)
+    val ip = 4(1 -> 12)
     val subLoopPar = 4(1 -> 16)
     val prodLoopPar = 4(1 -> 96)
     val outerAccumPar = 4(1 -> 1)
