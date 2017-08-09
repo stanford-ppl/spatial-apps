@@ -3,14 +3,19 @@ import org.virtualized._
 import spatial.targets._
 
 // No opportunities for par
-object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
+object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
   override val target = AWS_F1
 
 
  /*
   
-  Needleman-Wunsch Genetic Alignment algorithm                                                  
+  Smith-Waterman Genetic Alignment algorithm                                                  
   
+  This is just like NW algorithm, except negative scores are capped at 0, backwards traversal starts at highest score from any 
+     element on the perimeter, and end when score is 0
+
+
+    [SIC] NW diagram
     LETTER KEY:         Scores                   Ptrs                                                                                                  
       a = 0                   T  T  C  G                T  T  C  G                                                                                                                          
       c = 1                0 -1 -2 -3 -4 ...         0  ←  ←  ←  ← ...                                                                                                        
@@ -26,13 +31,15 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
       ← = 0 = skipB
       ↑ = 1 = skipA
       ↖ = 2 = align                                                                                      
-                                                                                                           
+                                    
+
                                                                                                            
 
                                                                                                            
  */
 
-  @struct case class nw_tuple(score: Int16, ptr: Int16)
+  @struct case class sw_tuple(score: Int16, ptr: Int16)
+  @struct case class entry_tuple(row: Index, col: Index, score: Int16)
 
   @virtualize
   def main() = {
@@ -53,12 +60,12 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 
     val par_load = 16
     val par_store = 16
-    val row_par = 8 (1 -> 1 -> 8)
+    val row_par = 2 (1 -> 1 -> 8)
 
     val SKIPB = 0
     val SKIPA = 1
     val ALIGN = 2
-    val MATCH_SCORE = 1
+    val MATCH_SCORE = 2
     val MISMATCH_SCORE = -1
     val GAP_SCORE = -1 
     // val seqa_string = "tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc".toText
@@ -108,30 +115,34 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
       seqa_sram_raw load seqa_dram_raw(0::length par par_load)
       seqb_sram_raw load seqb_dram_raw(0::length par par_load)
 
-      val score_matrix = SRAM[nw_tuple](max_length+1,max_length+1)
+      val score_matrix = SRAM[sw_tuple](max_length+1,max_length+1)
 
+      val entry_point = Reg[entry_tuple]
       // Build score matrix
-      Foreach(length+1 by 1 par row_par){ r =>
+      Reduce(entry_point)(length+1 by 1 par row_par){ r =>
+        val possible_entry_point = Reg[entry_tuple]
         val this_body = r % row_par
         Sequential.Foreach(-this_body until length+1 by 1) { c => // Bug #151, should be able to remove previous_result reg when fixed
-          val previous_result = Reg[nw_tuple]
-          val update = if (r == 0) (nw_tuple(-c.as[Int16], 0)) else if (c == 0) (nw_tuple(-r.as[Int16], 1)) else {
+          val previous_result = Reg[sw_tuple]
+          val update = if (r == 0) (sw_tuple(0, 0)) else if (c == 0) (sw_tuple(0, 1)) else {
             val match_score = mux(seqa_sram_raw(c-1) == seqb_sram_raw(r-1), MATCH_SCORE.to[Int16], MISMATCH_SCORE.to[Int16])
             val from_top = score_matrix(r-1, c).score + GAP_SCORE
             val from_left = previous_result.score + GAP_SCORE
             val from_diag = score_matrix(r-1, c-1).score + match_score
-            mux(from_left >= from_top && from_left >= from_diag, nw_tuple(from_left, SKIPB), mux(from_top >= from_diag, nw_tuple(from_top,SKIPA), nw_tuple(from_diag, ALIGN)))
+            mux(from_left >= from_top && from_left >= from_diag, sw_tuple(from_left, SKIPB), mux(from_top >= from_diag, sw_tuple(from_top,SKIPA), sw_tuple(from_diag, ALIGN)))
           }
           previous_result := update
-          if (c >= 0) {score_matrix(r,c) = update}
+          if ((c == length || r == length) && possible_entry_point.score < update.score) possible_entry_point := entry_tuple(r, c, update.score)
+          if (c >= 0) {score_matrix(r,c) = sw_tuple(max(0, update.score),update.ptr)}
           // score_matrix(r,c) = update
         }
-      }
+        possible_entry_point
+      }{(a,b) => mux(a.score > b.score, a, b)}
 
       // Read score matrix
       val b_addr = Reg[Int](0)
       val a_addr = Reg[Int](0)
-      Parallel{b_addr := length; a_addr := length}
+      Parallel{b_addr := entry_point.row; a_addr := entry_point.col}
       val done_backtrack = Reg[Bit](false)
       FSM[Int](state => state != doneState) { state =>
         if (state == traverseState) {
@@ -157,13 +168,12 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
           seqb_fifo_aligned.enq(underscore, !seqb_fifo_aligned.full)
         } else {}
       } { state => 
-        mux(state == traverseState && ((b_addr == 0.to[Int]) || (a_addr == 0.to[Int])), padBothState, 
-          mux(seqa_fifo_aligned.full || seqb_fifo_aligned.full, doneState, state))// Safe to assume they fill at same time?
+        mux(state == traverseState && (score_matrix(b_addr,a_addr).score == 0.to[Int16]), doneState, state) 
       }
 
       Parallel{
-        seqa_dram_aligned(0::length*2 par par_store) store seqa_fifo_aligned
-        seqb_dram_aligned(0::length*2 par par_store) store seqb_fifo_aligned
+        seqa_dram_aligned(0::seqa_fifo_aligned.numel par par_store) store seqa_fifo_aligned
+        seqb_dram_aligned(0::seqb_fifo_aligned.numel par par_store) store seqb_fifo_aligned
       }
 
     }
