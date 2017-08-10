@@ -228,9 +228,13 @@ def BlackScholes(args, params):
     params['tileSize'] = lambda params: irange(1024*16, min(bankSize*lanes,N/params['outerPar']),1024*16)
 
 def PageRank_plasticine(args, params):
-    N = 1966080  
-    args = [N]
-    pass
+    iters = 1
+    NP = 491520
+    damp = 0.125
+    args = [iters, NP, damp]
+
+    maxTile = min(bankSize*lanes,NP)
+    params['tileSize'] = [16, 1024, 1024*6, maxTile/4, maxTile/2, maxTile] 
 
 def Kmeans_plasticine(args, params):
     iter = 1
@@ -240,6 +244,16 @@ def Kmeans_plasticine(args, params):
 
     # Finished 
     params['tileSize'] = irange(16, 16, 1) + irange(128, 512, 128) + irange(1024,min(bankSize*lanes/dim, N), 1024)
+
+def SPMV_CRS(args, params):
+    N = 494
+    args += []
+
+    maxTile = min(bankSize*lanes, N)
+    # TODO: 
+    params['tileSize'] = irange(16, maxTile, 64) 
+    params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 2) 
+    params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 2) 
 
 def expRun():
     #################################################################################################################
@@ -260,6 +274,8 @@ def expRun():
     GEMM_Blocked(args['GEMM_Blocked'], params['GEMM_Blocked'])
     BlackScholes(args['BlackScholes'], params['BlackScholes'])
     Kmeans_plasticine(args['Kmeans_plasticine'], params['Kmeans_plasticine'])
+    PageRank_plasticine(args['PageRank_plasticine'], params['PageRank_plasticine'])
+    SPMV_CRS(args['SPMV_CRS'], params['SPMV_CRS'])
 
     space = dse(app, args[app], params[app])
     print('{} space: {}'.format(app, space))
@@ -281,6 +297,8 @@ def main():
     (opts, args) = parser.parse_known_args()
 
     os.chdir(SPATIAL_HOME)
+    if not os.path.exists('{}/gen'.format(SPATIAL_HOME)):
+        os.makedirs('{}/gen'.format(SPATIAL_HOME))
     global job_list
     if not os.path.exists(JOB_PATH):
         job_list = [] 
