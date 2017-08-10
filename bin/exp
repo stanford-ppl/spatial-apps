@@ -192,14 +192,14 @@ def GDA(args, params):
     args += [R]
 
     # TODO: run mapping + simulation
-    # params['tileSize'] = irange(16, 16*5, 16) 
-    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
-    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+    params['tileSize'] = irange(16, 16*5, 16) 
+    params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
 
-    # TODO: run mapping + simulation
-    params['tileSize'] = irange(16, 16*3, 16*2) 
-    params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
-    params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
+    # Finished 
+    # params['tileSize'] = irange(16, 16*3, 16*2) 
+    # params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
+    # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
 
 def GEMM_Blocked(args, params):
     args += []

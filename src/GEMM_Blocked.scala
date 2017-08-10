@@ -98,7 +98,6 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
        ..............................................          ...............................................     
                                                                                            
                                                                 
->>>>>>> origin/asplos2018
 
         
         # Loop k
@@ -130,7 +129,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
        .      A        .          .                 .           .               .          .                  .   
        .               .          .                 .           .           C   .          .                  .   
      i .               .          .                 .           .               .          .                  .   
-     ↳ .................__________...................           .................__________....................   
+     ↳ .................__________...............raw_values....           .................__________....................   
        .               |_O________|                 .           .               |__c_tmp___|                  .   
        .```````````````. ↑        .`````````````````.           .```````````````.          .``````````````````.
        .               . k  -->   .                 .           .               .          .                  .   
@@ -197,25 +196,26 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
   @virtualize
   def main() = {
 
-    val dim = 64
+    val dim_arg = args(0).to[Int]
+    val dim = ArgIn[Int]
+    setArg(dim, dim_arg)
     val innerPar = 16
+    val tileSize = 16 (16 -> 16 -> 128)
+    val i_tileSize = 64 (64 -> 16 -> 128)
+    val par_load = innerPar
+    val par_store = innerPar
+    val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
+    val loop_ii    = 1 // not sure if this one works
+    val loop_kk    = 2 (1 -> 1 -> 8)
+    val loop_i     = 1 (1 -> 1 -> 32)
+    val loop_k     = 1 (1 -> 1 -> 16)
+    val loop_j     = innerPar (1 -> 1 -> 16)
+    val reduce_col = innerPar (1 -> 1 -> 16)
+    val reduce_tmp = innerPar (1 -> 1 -> 16)
 
-    val tileSize = innerPar
-    val loop_jj    = 2 (1 -> 1 -> dim/tileSize)
-    val loop_kk    = 2 (1 -> 1 -> dim/tileSize)
-    val loop_i     = 2 (1 -> 1 -> dim)
-    val loop_k     = 1 (1 -> 1 -> tileSize)
-
-    val loop_j     = innerPar (1 -> 1 -> tileSize)
-    val reduce_col = innerPar (1 -> 1 -> tileSize)
-    val reduce_tmp = innerPar (1 -> 1 -> tileSize)
-
-    val par_load = tileSize
-    val par_store = tileSize
-
-    val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
-    val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
-    val c_init = (0::dim, 0::dim){(i,j) => 0.to[T]}
+    val a_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
+    val b_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
+    val c_init = (0::dim_arg, 0::dim_arg){(i,j) => 0.to[T]}
     val a_dram = DRAM[T](dim,dim)
     val b_dram = DRAM[T](dim,dim)
     val c_dram = DRAM[T](dim,dim)
@@ -226,33 +226,38 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
 
     Accel{
 
-      Foreach(dim by tileSize par loop_jj) { jj => 
-        val c_col = SRAM[T](dim,tileSize)
-        MemReduce(c_col par reduce_col)(dim by tileSize par loop_kk) { kk => 
-          val c_col_partial = SRAM[T](dim,tileSize)
-          val b_sram = SRAM[T](tileSize,tileSize)
-          b_sram load b_dram(kk::kk+tileSize, jj::jj+tileSize par par_load)
-          Foreach(dim by 1 par loop_i) { i => 
-            val a_sram = SRAM[T](tileSize)
-            a_sram load a_dram(i, kk::kk+tileSize)
-            val c_tmp = SRAM[T](tileSize)
-            MemReduce(c_tmp par reduce_tmp)(tileSize by 1 par loop_k) { k => 
-              val c_tmp_partial = SRAM[T](tileSize)
-              val temp_a = a_sram(k)
-              Foreach(tileSize by 1 par loop_j) { j => 
-                c_tmp_partial(j) = b_sram(k, j) * temp_a
-              }
-              c_tmp_partial
-            }{_+_}
+      Foreach(dim by i_tileSize par loop_ii) { ii => // this loop defenitilely cant be parallelized right now
+        Foreach(dim by tileSize par loop_jj) { jj => 
+          val c_col = SRAM[T](i_tileSize,tileSize)
+          MemReduce(c_col par reduce_col)(dim by tileSize par loop_kk) { kk => 
+            val c_col_partial = SRAM[T](i_tileSize,tileSize)
+            val b_sram = SRAM[T](tileSize,tileSize)
+            b_sram load b_dram(kk::kk.to[Index]+tileSize, jj::jj.to[Index]+tileSize par par_load)
+            Foreach(i_tileSize by 1 par loop_i) { i => 
+              val a_sram = SRAM[T](tileSize)
+              a_sram load a_dram(ii+i, kk::kk.to[Index]+tileSize)
+              val c_tmp = SRAM[T](tileSize)
+              MemReduce(c_tmp par reduce_tmp)(tileSize by 1 par loop_k) { k => 
+                val c_tmp_partial = SRAM[T](tileSize)
+                val temp_a = a_sram(k)
+                Foreach(tileSize by 1 par loop_j) { j => 
+                  c_tmp_partial(j) = b_sram(k, j) * temp_a
+                }
+                c_tmp_partial
+              }{_+_}
             Foreach(tileSize by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
-          }
+            }
           c_col_partial
-        }{_+_}
-        c_dram(0::dim, jj::jj+tileSize par par_store) store c_col
+          }{_+_}
+          c_dram(ii::ii.to[Index]+i_tileSize, jj::jj.to[Index]+tileSize par par_store) store c_col
+        }
       }
     }
 
-    val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
+    // val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
+    val c_gold = (0::dim_arg,0::dim_arg){(i,j) => 
+      Array.tabulate(dim_arg){k => a_data(i,k) * b_data(k,j)}.reduce{_+_}
+    }
     val c_result = getMatrix(c_dram)
 
     printMatrix(c_gold, "C Gold: ")
