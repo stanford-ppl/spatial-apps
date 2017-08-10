@@ -176,8 +176,8 @@ def TPCHQ6(args, params):
     args += [N]
 
     # FINISHED
-    # params['outerPar'] = irange(1, 10, 2) 
-    # params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
+    params['outerPar'] = irange(1, 10, 2) 
+    params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
 
     # Finished
     # params['outerPar'] = irange(6, 10, 2) 
