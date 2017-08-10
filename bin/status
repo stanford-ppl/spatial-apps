@@ -11,6 +11,48 @@ colors["FAILED"]=$RED
 colors["RUNNING"]=$INFO
 colors["NOTRUN"]=$INFO
 
+function act() {
+  if [[ $RESP == "k" ]]; then
+    for pass in ${passes[@]}; do
+      if [[ ${progress[$pass]} == "RUNNING" ]]; then
+        if [[ $PID != "" ]] && [[ -e /proc/$PID ]]; then
+  	      echo -e "${RED}Kill $pass ($PID)$NC for $SPATIAL_HOME/gen/$app?"
+  	      read -p "" RESP
+  	      if [ "$RESP" = "y" ]; then
+  	      	log=${logs[$pass]}
+  	      	echo -e "-------------${CYAN}$pass(KILLED)${NC}------------" >> $log
+  	      	kill -9 $PID
+  	      	echo "killed $PID"
+  	      fi
+        else
+          clean_log $pass
+        fi
+      fi
+    done
+  elif [[ $RESP == "r "* ]]; then
+    for pass in ${passes[@]}; do
+      if [[ $RESP == "r $pass" ]]; then
+        clean_log $pass
+      fi
+    done
+  elif [[ $RESP == "s"* ]]; then
+    for pass in ${passes[@]}; do
+      if [[ $RESP == "s $pass" ]] || [[ ${progress[$pass]} == "RUNNING" ]] || [[ ${progress[$pass]} == "FAILED" ]]; then
+  	    echo -e "${CYAN}Show${NC} $pass for $SPATIAL_HOME/gen/$app"
+  	    log=${logs[$pass]}
+        cat $log
+      fi
+    done
+  elif [[ $RESP == "o"* ]]; then
+    for pass in ${passes[@]}; do
+      if [[ $RESP == "s $pass" ]] || [[ ${progress[$pass]} == "RUNNING" ]] || [[ ${progress[$pass]} == "FAILED" ]]; then
+  	    log=${logs[$pass]}
+        vim $log
+      fi
+    done
+  fi
+}
+
 for pass in ${passes[@]}; do
 	log=${logs[$pass]}
 	passStatus $pass
@@ -22,35 +64,8 @@ for pass in ${passes[@]}; do
 done
 
 read -p "" RESP
-if [[ $RESP == "k" ]]; then
-  for pass in ${passes[@]}; do
-    if [[ ${progress[$pass]} == "RUNNING" ]]; then
-      if [[ $PID != "" ]] && [[ -e /proc/$PID ]]; then
-	      echo -e "${RED}Kill $pass ($PID)$NC for $SPATIAL_HOME/gen/$app?"
-	      read -p "" RESP
-	      if [ "$RESP" = "y" ]; then
-	      	log=${logs[$pass]}
-	      	echo -e "-------------${CYAN}$pass(KILLED)${NC}------------" >> $log
-	      	kill -9 $PID
-	      	echo "killed $PID"
-	      fi
-      else
-        clean_log $pass
-      fi
-    fi
-  done
-elif [[ $RESP == "r "* ]]; then
-  for pass in ${passes[@]}; do
-    if [[ $RESP == "r $pass" ]]; then
-      clean_log $pass
-    fi
-  done
-elif [[ $RESP == "s"* ]]; then
-  for pass in ${passes[@]}; do
-    if [[ $RESP == "s $pass" ]] || [[ ${progress[$pass]} == "RUNNING" ]] || [[ ${progress[$pass]} == "FAILED" ]]; then
-	    echo -e "${CYAN}Show${NC} $pass for $SPATIAL_HOME/gen/$app"
-	    log=${logs[$pass]}
-      cat $log
-    fi
-  done
-fi
+while [[ $RESP != "" ]]; do
+  act $RESP
+  read -p "" RESP
+done
+

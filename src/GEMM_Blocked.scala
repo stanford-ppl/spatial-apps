@@ -196,7 +196,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
   @virtualize
   def main() = {
 
-    val dim_arg = args(0).to[Int]
+    val dim_arg = 512 
     val dim = ArgIn[Int]
     setArg(dim, dim_arg)
     val innerPar = 16
