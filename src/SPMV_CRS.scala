@@ -53,12 +53,13 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
     val vec_dram = DRAM[T](N) 
     val result_dram = DRAM[T](N)
 
-    val par_load = 16
-    val par_store = 16
+    val innerPar = 16
+    val par_load = innerPar
+    val par_store = innerPar
     val tileSize = 494
     val tile_par = 2 (1 -> 1 -> 16)
     val pt_par = 4 (1 -> 1 -> 16)
-    val red_par = 8 (1 -> 1 -> 16)
+    val red_par = innerPar (1 -> 1 -> 16)
 
     setMem(values_dram, raw_values)
     setMem(cols_dram, raw_cols)
