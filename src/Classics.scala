@@ -2380,7 +2380,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
                             -1.to[T], -2.to[T], -1.to[T])
 
         Foreach(-2 until row_stride) { r =>
-          val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index]) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index] || r.to[Index]+rr.to[Index] > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
           lb load img(ldaddr, 0::C par lb_par)
 
           Foreach(0 until C) { c =>
@@ -2404,12 +2404,13 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
             }{_+_}
 
             lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
           }
 
-          if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0) {
+          if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0.to[Index]) {
             // println("storing to row " + {r+rr} + " from " + r + " " + rr)
             // Foreach(0 until C){kk => print(" " + lineOut(kk))}
-            imgOut(r.to[Index]+rr.to[Index] - 2.to[Index], 0::C par par_store) store lineOut
+            imgOut(r.to[Index]+rr.to[Index], 0::C par par_store) store lineOut
           }
         }
 
