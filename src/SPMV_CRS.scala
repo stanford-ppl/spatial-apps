@@ -4,6 +4,7 @@ import spatial.targets._
 
 
 object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
+  override val target = AWS_F1
 
 
  /*                                                                                                  
@@ -31,28 +32,33 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
   @virtualize
   def main() = {
 
-    val NNZ = 1666
-    val N = 494
-    val tileSize = 494
 
     val raw_values = loadCSV1D[T]("/remote/regression/data/machsuite/crs_values.csv", "\n")
     val raw_cols = loadCSV1D[Int]("/remote/regression/data/machsuite/crs_cols.csv", "\n")
     val raw_rowid = loadCSV1D[Int]("/remote/regression/data/machsuite/crs_rowid.csv", "\n")
     val raw_vec = loadCSV1D[T]("/remote/regression/data/machsuite/crs_vec.csv", "\n")
 
+    val NNZ_size = raw_values.length
+    val N_size = raw_vec.length
+    val NNZ = ArgIn[Int]
+    val N = ArgIn[Int]
+    val Np1 = ArgIn[Int]
+    setArg(NNZ,NNZ_size)
+    setArg(N,N_size)
+    setArg(Np1, N_size+1)
+
     val values_dram = DRAM[T](NNZ) 
     val cols_dram = DRAM[Int](NNZ) 
-    val rowid_dram = DRAM[Int](N+1) 
+    val rowid_dram = DRAM[Int](Np1) 
     val vec_dram = DRAM[T](N) 
     val result_dram = DRAM[T](N)
 
-    val innerPar = 16
-    val par_load = innerPar
-    val par_store = innerPar
-    val red_par = innerPar (1 -> 1 -> 16)
-
-    val tile_par = 1 (1 -> 1 -> N/tileSize)
-    val pt_par = 1 (1 -> 1 -> tileSize)
+    val par_load = 16
+    val par_store = 16
+    val tileSize = 494
+    val tile_par = 2 (1 -> 1 -> 16)
+    val pt_par = 4 (1 -> 1 -> 16)
+    val red_par = 8 (1 -> 1 -> 16)
 
     setMem(values_dram, raw_values)
     setMem(cols_dram, raw_cols)
@@ -61,7 +67,7 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
 
     Accel {
       Foreach(N/tileSize by 1 par tile_par) { tile =>
-        val rowid_sram = SRAM[Int](tileSize+1)
+        val rowid_sram = SRAM[Int](tileSize+1) // Should be tileSize+1 and result_sram should be tileSize
         val result_sram = SRAM[T](tileSize)
 
         rowid_sram load rowid_dram(tile*(tileSize+1) :: (tile+1)*(tileSize+1) par par_load)
