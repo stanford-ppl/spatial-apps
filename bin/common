@@ -51,7 +51,7 @@ passStatus() {
 		if [[ $isDone != "" ]]; then
 			isKilled=$(grep 'Killed\|KILLED' $log)
 			isFailed=$(grep 'error\|Error\|ERROR\|No rule to make' $log)
-      if [[ $pass == "RUN_SIMULATION" ]] && [[ $(grep "Design ran for" $log)=="" ]] ; then
+      if [[ $pass == "RUN_SIMULATION" ]] && [[ $(grep "Design ran for" $log) == "" ]] ; then
         isFailed="Simulation not finished!"
       fi
 			if [[ $isKilled != "" ]]; then
