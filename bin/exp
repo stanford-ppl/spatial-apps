@@ -202,8 +202,8 @@ def GDA(args, params):
     # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
 
 def GEMM_Blocked(args, params):
-    args += []
     dim = 512
+    # args += [dim]
 
     params['tileSize']   = [16, 256] # irange(16, dim, 16)
     params['i_tileSize'] = [16, 256] # irange(16, dim, 16)
