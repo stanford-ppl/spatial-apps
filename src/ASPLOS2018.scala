@@ -77,7 +77,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 160
+    val max_length = 224
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
