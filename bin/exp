@@ -176,8 +176,8 @@ def TPCHQ6(args, params):
     args += [N]
 
     # FINISHED
-    # params['outerPar'] = irange(1, 10, 2) 
-    # params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
+    params['outerPar'] = irange(1, 10, 2) 
+    params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
 
     # Finished
     # params['outerPar'] = irange(6, 10, 2) 
@@ -189,10 +189,12 @@ def TPCHQ6(args, params):
 
 def GDA(args, params):
     R = 192000
+    MAXC = 80
     args += [R]
 
-    # TODO: run mapping + simulation
-    params['tileSize'] = irange(16, 16*5, 16) 
+    # Finished 
+    # params['tileSize'] = irange(16, 16*5, 16) 
+    params['tileSize'] = irange(16, bankSize*lanes/MAXC, 512) 
     params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
     params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
 
@@ -256,10 +258,10 @@ def SPMV_CRS(args, params):
     args += []
 
     maxTile = min(bankSize*lanes, N)
-    # TODO: 
+    # Finished
     params['tileSize'] = irange(16, maxTile, 64) 
-    params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 2) 
-    params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 2) 
+    params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 2) + [2]
+    params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 2) + [2]
 
 def expRun():
     #################################################################################################################
