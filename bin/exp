@@ -17,7 +17,7 @@ import types
 
 lanes = 16
 bankSize = 32 * 1024 / 4
-proc_thresh = 10
+proc_thresh = 15
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIRL_HOME = os.environ['PIR_HOME']
@@ -82,6 +82,7 @@ def waitProcess():
 def runApp(app, args, params):
     if opts.parallel:
         waitProcess()
+        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     copyApp(app, args, params)
     newname = newAppName(app, args, params)
     command = "apps/bin/runapp {} {} {} {}".format(newname, ' '.join([str(a) for a in args]),
@@ -92,7 +93,6 @@ def runApp(app, args, params):
     job_list.append(pid)
     pickle.dump(job_list, open(JOB_PATH, 'wb'))
     if opts.parallel:
-        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         time.sleep(1)
     else:
         proc.wait()
@@ -169,8 +169,8 @@ def TPCHQ6(args, params):
     args += [N]
 
     # FINISHED
-    params['outerPar'] = irange(1, 10, 2) 
-    params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
+    # params['outerPar'] = irange(1, 10, 2) 
+    # params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
 
     # Finished
     # params['outerPar'] = irange(6, 10, 2) 
@@ -184,35 +184,15 @@ def GDA(args, params):
     R = 192000
     args += [R]
 
-    # Finished 
-    # params['tileSize'] = irange(16, 16, 16) 
+    # TODO: run mapping + simulation
+    # params['tileSize'] = irange(16, 16*5, 16) 
     # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
     # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
 
-    # Finished
-    # params['tileSize'] = irange(16*5, 16*5, 16) 
-    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
-    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
-
-    # Finished
-    # params['tileSize'] = irange(16*3, 16*3, 16) 
-    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
-    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
-
-    # TODO 
-    # params['tileSize'] = irange(16*3, 16*3, 16) 
-    # params['midPar'] = lambda params: irange(2, min(8, params['tileSize']), 2) 
-    # params['outerPar'] = lambda params: irange(2, min(10, R/params['tileSize']), 2) 
-
-    # Finihsed
-    # params['tileSize'] = irange(16*5, 16*5, 16) 
-    # params['outerPar'] = lambda params: irange(3, min(10, R/params['tileSize']), 2) 
-    # params['midPar'] = lambda params: irange(3, min(8, params['tileSize']), 2) 
-
-    # TODO 
-    # params['tileSize'] = irange(16, 16, 16) 
-    # params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
-    # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
+    # TODO: run mapping + simulation
+    params['tileSize'] = irange(16, 16*3, 16*2) 
+    params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
+    params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
 
 def GEMM_Blocked(args, params):
     args += []
