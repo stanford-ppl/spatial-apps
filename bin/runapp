@@ -26,10 +26,6 @@ function runPass() {
 
 echo "runapp $app torun=$torun regen=$regen"
 
-mkdir -p $SPATIAL_HOME/gen/$app
-mkdir -p $PIR_HOME/apps/src/gen/
-mkdir -p $PIR_HOME/out/$app
-
 for pass in ${passes[@]}; do
 	passStatus $pass
 	if [[ $torun == 'ALL' ]] || [[ $torun == *$pass ]] || [[ $torun == $pass* ]] || [[ $torun == $pass ]]; then

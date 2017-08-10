@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd $PIR_HOME
+mkdir -p $PIR_HOME/out/$app
 out_dir=$PIR_HOME/out/$app
-if [ -e $out_dir ]; then rm -r $out_dir; fi
+if [ -e $out_dir ]; then find $out_dir -type f ! -name $(basename ${logs["FIT_PIR"]}) -delete; fi
 $PIR_HOME/bin/pir $app --debug --mapping=true --verbose --simulate=false --arch=SN16x8_LD &>> $log &

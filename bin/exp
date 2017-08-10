@@ -173,12 +173,12 @@ def TPCHQ6(args, params):
     params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
 
     # Finished
-    params['outerPar'] = irange(6, 10, 2) 
-    params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 800)
+    # params['outerPar'] = irange(6, 10, 2) 
+    # params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 800)
 
     # Finished
-    params['outerPar'] = irange(2, 10, 2) 
-    params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
+    # params['outerPar'] = irange(2, 10, 2) 
+    # params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
 
 def GDA(args, params):
     R = 192000
