@@ -8,10 +8,10 @@ object Kmeans_plasticine extends SpatialApp { // Regression (Dense) // Args: 2 4
 
   val numcents = 20
   val dim = 96
-  val pts_per_ld = 1 // ???
+  val tileSize = 1 // ???
 
-  val ip = 16
-  val op = 1
+  val innerPar = 16
+  val outerPar = 1
 
   val element_max = 10
   val margin = (element_max * 0.2).to[X]
@@ -25,15 +25,15 @@ object Kmeans_plasticine extends SpatialApp { // Regression (Dense) // Args: 2 4
     bound(numCents) = MAXK
     bound(numDims) = MAXD
 
-    val BN = pts_per_ld (96 -> 96 -> 9600)
+    val BN = tileSize (96 -> 96 -> 9600)
     val BD = MAXD
     val PX = 1 (1 -> 1)
-    val P0 = ip (32 -> 96 -> 192) // Dimensions loaded in parallel
-    val P1 = op (1 -> 12)         // Sets of points calculated in parallel
-    val P2 = ip (1 -> 4 -> 96)    // Dimensions accumulated in parallel (outer)
-    val P3 = ip (1 -> 4 -> 16)    // Points calculated in parallel
-    val PR = ip (1 -> 4 -> 96)
-    val P4 = ip (1 -> 4 -> 96)
+    val P0 = innerPar (32 -> 96 -> 192) // Dimensions loaded in parallel
+    val P1 = outerPar (1 -> 12)         // Sets of points calculated in parallel
+    val P2 = innerPar (1 -> 4 -> 96)    // Dimensions accumulated in parallel (outer)
+    val P3 = innerPar (1 -> 4 -> 16)    // Points calculated in parallel
+    val PR = innerPar (1 -> 4 -> 96)
+    val P4 = innerPar (1 -> 4 -> 96)
 
     val iters = ArgIn[Int]
     val N     = ArgIn[Int]
@@ -57,7 +57,7 @@ object Kmeans_plasticine extends SpatialApp { // Regression (Dense) // Args: 2 4
       val newCents = SRAM[T](MAXK,MAXD)
 
       // Load initial centroids (from points)
-      origCts load points(0::K, 0::D par 16) // PIR Version
+      origCts load points(0::K, 0::D par innerPar) // PIR Version
 
       // // Initialize newCents
       // Foreach(K by 1, D by 1) {(i,j) => newCents(i,j) = cts(i,j)} 
@@ -74,7 +74,7 @@ object Kmeans_plasticine extends SpatialApp { // Regression (Dense) // Args: 2 4
         // For each set of points
         Foreach(N by BN par PX){i =>
           val pts = SRAM[T](BN, BD)
-          pts load points(i::i+BN, 0::BD par 16)
+          pts load points(i::i+BN, 0::BD par innerPar)
 
           // For each point in this set
           MemFold(newCents)(BN par PX){pt =>
