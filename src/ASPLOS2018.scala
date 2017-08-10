@@ -4,7 +4,7 @@ import spatial.targets._
 
 // No opportunities for par
 object SW1 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -77,7 +77,7 @@ object SW1 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 224
+    val max_length = 320 
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -229,7 +229,7 @@ object SW1 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
 }
 
 object SW2 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -302,7 +302,7 @@ object SW2 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 208
+    val max_length = 336
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -454,7 +454,7 @@ object SW2 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
 }
 
 object SW3 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -510,7 +510,7 @@ object SW3 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
 
     val par_load = 16
     val par_store = 16
-    val row_par = 3 (1 -> 1 -> 8)
+    val row_par = 4 (1 -> 1 -> 8)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -527,7 +527,7 @@ object SW3 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 224
+    val max_length = 352
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -681,7 +681,7 @@ object SW3 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
 
 // good
 object MD_Grid1 extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -741,10 +741,10 @@ object MD_Grid1 extends SpatialApp { // Regression (Dense) // Args: none
     val par_store = 16 // Wider data type
     val loop_grid0_x = 1 // Temporarily broken because of some issue around #200
     val loop_grid0_y = 1 (1 -> 1 -> 16) 
-    val loop_grid0_z = 2 (1 -> 1 -> 16)
+    val loop_grid0_z = 1 (1 -> 1 -> 16)
     val loop_grid1_x = 1 (1 -> 1 -> 16)
     val loop_grid1_y = 1 (1 -> 1 -> 16)
-    val loop_grid1_z = 2 (1 -> 1 -> 16)
+    val loop_grid1_z = 4 (1 -> 1 -> 16)
     val loop_p =       2 (1 -> 1 -> 16)
     val loop_q =       2 (1 -> 1 -> 16)
 
@@ -871,7 +871,7 @@ object MD_Grid1 extends SpatialApp { // Regression (Dense) // Args: none
   }
 }      
 object MD_Grid2 extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -934,9 +934,9 @@ object MD_Grid2 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_grid0_z = 2 (1 -> 1 -> 16)
     val loop_grid1_x = 1 (1 -> 1 -> 16)
     val loop_grid1_y = 1 (1 -> 1 -> 16)
-    val loop_grid1_z = 1 (1 -> 1 -> 16)
+    val loop_grid1_z = 3 (1 -> 1 -> 16)
     val loop_p =       2 (1 -> 1 -> 16)
-    val loop_q =       4 (1 -> 1 -> 16)
+    val loop_q =       3 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
@@ -1062,7 +1062,7 @@ object MD_Grid2 extends SpatialApp { // Regression (Dense) // Args: none
 }      
 
 object MD_Grid3 extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*
@@ -1123,11 +1123,11 @@ object MD_Grid3 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_grid0_x = 1 // Temporarily broken because of some issue around #200
     val loop_grid0_y = 1 (1 -> 1 -> 16) 
     val loop_grid0_z = 1 (1 -> 1 -> 16)
-    val loop_grid1_x = 2 (1 -> 1 -> 16)
+    val loop_grid1_x = 1 (1 -> 1 -> 16)
     val loop_grid1_y = 2 (1 -> 1 -> 16)
     val loop_grid1_z = 1 (1 -> 1 -> 16)
     val loop_p =       2 (1 -> 1 -> 16)
-    val loop_q =       2 (1 -> 1 -> 16)
+    val loop_q =       8 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
@@ -1254,7 +1254,7 @@ object MD_Grid3 extends SpatialApp { // Regression (Dense) // Args: none
 
 
 object GEMM_Blocked1 extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
                                                                                                   
                                                                                                   
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
@@ -1459,7 +1459,7 @@ object GEMM_Blocked1 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_kk    = 1 (1 -> 1 -> 8)
     val loop_i     = 2 (1 -> 1 -> 32)
     val loop_k     = 1 (1 -> 1 -> 16)
-    val loop_j     = 2 (1 -> 1 -> 16)
+    val loop_j     = 3 (1 -> 1 -> 16)
     val reduce_col = 4 (1 -> 1 -> 16)
     val reduce_tmp = 4 (1 -> 1 -> 16)
 
@@ -1521,7 +1521,7 @@ object GEMM_Blocked1 extends SpatialApp { // Regression (Dense) // Args: none
   }
 }
 object GEMM_Blocked2 extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
                                                                                                   
                                                                                                   
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
@@ -1725,7 +1725,7 @@ object GEMM_Blocked2 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_ii    = 1 // not sure if this one works
     val loop_kk    = 1 (1 -> 1 -> 8)
     val loop_i     = 1 (1 -> 1 -> 32)
-    val loop_k     = 2 (1 -> 1 -> 16)
+    val loop_k     = 4 (1 -> 1 -> 16)
     val loop_j     = 2 (1 -> 1 -> 16)
     val reduce_col = 2 (1 -> 1 -> 16)
     val reduce_tmp = 4 (1 -> 1 -> 16)
@@ -1789,7 +1789,7 @@ object GEMM_Blocked2 extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 object GEMM_Blocked3 extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
                                                                                                   
                                                                                                   
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
@@ -1994,7 +1994,7 @@ object GEMM_Blocked3 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_kk    = 1 (1 -> 1 -> 8)
     val loop_i     = 1 (1 -> 1 -> 32)
     val loop_k     = 1 (1 -> 1 -> 16)
-    val loop_j     = 2 (1 -> 1 -> 16)
+    val loop_j     = 6 (1 -> 1 -> 16)
     val reduce_col = 4 (1 -> 1 -> 16)
     val reduce_tmp = 4 (1 -> 1 -> 16)
 
@@ -2058,7 +2058,7 @@ object GEMM_Blocked3 extends SpatialApp { // Regression (Dense) // Args: none
 
 
 object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
 
 
  /*                                                                                                  
@@ -2165,7 +2165,7 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
 
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
-  override val target = AWS_F1
+  override val target = Zynq
 
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
@@ -2327,7 +2327,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 }
 
 object BlackScholes extends SpatialApp {
-  override val target = AWS_F1
+  override val target = Zynq
 
   type T = Float//FixPt[TRUE,_32,_32]
   val margin = 0.2f // Validates true if within +/- margin
@@ -2478,7 +2478,7 @@ object BlackScholes extends SpatialApp {
 
 // good
 object TPCHQ61 extends SpatialApp { // Regression (Dense) // Args: 3840
-  override val target = AWS_F1
+  override val target = Zynq
 /*
 
 
@@ -2508,8 +2508,8 @@ object TPCHQ61 extends SpatialApp { // Regression (Dense) // Args: 3840
 
     val ts = 768 (96 -> 96 -> 192000)
     val op = 2 (1 -> 2)
-    val par_load = 16
-    val par_store = 16
+    val par_load = 8
+    val par_store = 8
     val ip = 8 (1 -> 384)
 
     setMem(dates, datesIn)
@@ -2582,7 +2582,7 @@ object TPCHQ61 extends SpatialApp { // Regression (Dense) // Args: 3840
 }
 
 object TPCHQ62 extends SpatialApp { // Regression (Dense) // Args: 3840
-  override val target = AWS_F1
+  override val target = Zynq
 /*
 
 
@@ -2614,7 +2614,7 @@ object TPCHQ62 extends SpatialApp { // Regression (Dense) // Args: 3840
     val op = 2 (1 -> 2)
     val par_load = 16
     val par_store = 16
-    val ip = 16 (1 -> 384)
+    val ip = 32 (1 -> 384)
 
     setMem(dates, datesIn)
     setMem(quants, quantsIn)
@@ -2686,7 +2686,7 @@ object TPCHQ62 extends SpatialApp { // Regression (Dense) // Args: 3840
 }
 
 object TPCHQ63 extends SpatialApp { // Regression (Dense) // Args: 3840
-  override val target = AWS_F1
+  override val target = Zynq
 /*
 
 
@@ -2715,10 +2715,10 @@ object TPCHQ63 extends SpatialApp { // Regression (Dense) // Args: 3840
     val out = ArgOut[T]
 
     val ts = 384 (96 -> 96 -> 192000)
-    val op = 2 (1 -> 2)
+    val op = 1 (1 -> 2)
     val par_load = 16
     val par_store = 16
-    val ip = 24 (1 -> 384)
+    val ip = 64 (1 -> 384)
 
     setMem(dates, datesIn)
     setMem(quants, quantsIn)
@@ -2792,7 +2792,7 @@ object TPCHQ63 extends SpatialApp { // Regression (Dense) // Args: 3840
 
 // good, but pipelining vs area
 object AES1 extends SpatialApp { // Regression (Dense) // Args: 50
-  override val target = AWS_F1
+  override val target = Zynq
 
   /*
   TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
@@ -3198,7 +3198,7 @@ object AES1 extends SpatialApp { // Regression (Dense) // Args: 50
 }
 
 object AES2 extends SpatialApp { // Regression (Dense) // Args: 50
-  override val target = AWS_F1
+  override val target = Zynq
 
   /*
   TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
@@ -3605,7 +3605,7 @@ object AES2 extends SpatialApp { // Regression (Dense) // Args: 50
 
 // good
 object Kmeans1 extends SpatialApp { // Regression (Dense) // Args: 3 64
-  override val target = AWS_F1
+  override val target = Zynq
 
   type X = Int
 
@@ -3630,9 +3630,9 @@ object Kmeans1 extends SpatialApp { // Regression (Dense) // Args: 3 64
     val par_load = 16
     val par_store = 16
     val PX = 1 (1 -> 1)
-    val P0 = 4 (1 -> 2 -> dim)
+    val P0 = 2 (1 -> 2 -> dim)
     val P1 = 4 (1 -> 2 -> dim)
-    val P2 = 2 (1 -> 2 -> dim)
+    val P2 = 4 (1 -> 2 -> dim)
     val P3 = 16 (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
@@ -3781,7 +3781,7 @@ object Kmeans1 extends SpatialApp { // Regression (Dense) // Args: 3 64
 }
 
 object Kmeans2 extends SpatialApp { // Regression (Dense) // Args: 3 64
-  override val target = AWS_F1
+  override val target = Zynq
 
   type X = Int
 
@@ -3806,8 +3806,8 @@ object Kmeans2 extends SpatialApp { // Regression (Dense) // Args: 3 64
     val par_load = 16
     val par_store = 16
     val PX = 1 (1 -> 1)
-    val P0 = 4 (1 -> 2 -> dim)
-    val P1 = 2 (1 -> 2 -> dim)
+    val P0 = 1 (1 -> 2 -> dim)
+    val P1 = 8 (1 -> 2 -> dim)
     val P2 = 4 (1 -> 2 -> dim)
     val P3 = 16 (1 -> 2 -> numcents)
 
@@ -3957,7 +3957,7 @@ object Kmeans2 extends SpatialApp { // Regression (Dense) // Args: 3 64
 }
 
 object Kmeans3 extends SpatialApp { // Regression (Dense) // Args: 3 64
-  override val target = AWS_F1
+  override val target = Zynq
 
   type X = Int
 
@@ -3982,10 +3982,10 @@ object Kmeans3 extends SpatialApp { // Regression (Dense) // Args: 3 64
     val par_load = 16
     val par_store = 16
     val PX = 1 (1 -> 1)
-    val P0 = 2 (1 -> 2 -> dim)
-    val P1 = 4 (1 -> 2 -> dim)
-    val P2 = 4 (1 -> 2 -> dim)
-    val P3 = 16 (1 -> 2 -> numcents)
+    val P0 = 1 (1 -> 2 -> dim)
+    val P1 = 6 (1 -> 2 -> dim)
+    val P2 = 6 (1 -> 2 -> dim)
+    val P3 = 4 (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
     val N     = ArgIn[Int]
