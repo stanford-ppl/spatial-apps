@@ -2,6 +2,10 @@
 
 cd $SPATIAL_HOME
 chisel_dir=$SPATIAL_HOME/gen/$app/chisel
+make_file=$SPATIAL_HOME/gen/$app/Makefile
+run_script=$SPATIAL_HOME/gen/$app/run.sh
 if [ -e $chisel_dir ]; then rm -r $chisel_dir; fi
+if [ -e $Makefile ]; then rm $Makefile; fi
+if [ -e $run_script ]; then rm $run_script; fi
 mkdir -p $SPATIAL_HOME/gen/$app
 $SPATIAL_HOME/bin/spatial $app --retiming --synth &>> $log &

@@ -1,10 +1,4 @@
 #!/bin/bash
 
 cd $SPATIAL_HOME/gen/$app/
-
-make_file=$SPATIAL_HOME/gen/$app/Makefile
-run_script=$SPATIAL_HOME/gen/$app/run.sh
-if [ -e $Makefile ]; then rm -r $Makefile; fi
-if [ -e $run_script ]; then rm -r $run_script; fi
-
 make vcs &>> $log &
