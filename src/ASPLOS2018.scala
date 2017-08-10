@@ -422,7 +422,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
 }      
 
 object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
-  override val target = AWS_F1
+  override val target = Zynq
                                                                                                   
                                                                                                   
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
@@ -624,12 +624,14 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     val par_store = 16
     val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
     val loop_ii    = 1 // not sure if this one works
-    val loop_kk    = 2 (1 -> 1 -> 8)
-    val loop_i     = 1 (1 -> 1 -> 32)
-    val loop_k     = 1 (1 -> 1 -> 16)
-    val loop_j     = 2 (1 -> 1 -> 16)
-    val reduce_col = 4 (1 -> 1 -> 16)
-    val reduce_tmp = 4 (1 -> 1 -> 16)
+    val loop_kk    = 2 (1 -> 2 -> 8)
+    val loop_i     = 2 (1 -> 2 -> 4)
+    val loop_k     = 2 (1 -> 1 -> 4)
+    val loop_j     = 2 (1 -> 2 -> 16)
+    val reduce_col = 4 (1 -> 2 -> 16)
+    val reduce_tmp = 4 (1 -> 2 -> 16)
+
+    bound(dim) = 1024
 
     // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
     // val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
@@ -652,10 +654,10 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
           MemReduce(c_col par reduce_col)(dim by tileSize par loop_kk) { kk => 
             val c_col_partial = SRAM[T](i_tileSize,tileSize)
             val b_sram = SRAM[T](tileSize,tileSize)
-            b_sram load b_dram(kk::kk.to[Index]+tileSize, jj::jj.to[Index]+tileSize par par_load)
+            b_sram load b_dram(kk::kk+tileSize, jj::jj+tileSize par par_load)
             Foreach(i_tileSize by 1 par loop_i) { i => 
               val a_sram = SRAM[T](tileSize)
-              a_sram load a_dram(ii+i, kk::kk.to[Index]+tileSize)
+              a_sram load a_dram(ii+i, kk::kk+tileSize)
               val c_tmp = SRAM[T](tileSize)
               MemReduce(c_tmp par reduce_tmp)(tileSize by 1 par loop_k) { k => 
                 val c_tmp_partial = SRAM[T](tileSize)
@@ -669,7 +671,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
             }
           c_col_partial
           }{_+_}
-          c_dram(ii::ii.to[Index]+i_tileSize, jj::jj.to[Index]+tileSize par par_store) store c_col
+          c_dram(ii::ii+i_tileSize, jj::jj+tileSize par par_store) store c_col
         }
       }
     }
