@@ -1139,7 +1139,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
     val out = ArgOut[T]
 
     val ts = 384 (96 -> 96 -> 192000)
-    val op = 4 (1 -> 6)
+    val op = 2 (1 -> 2)
     val par_load = 16
     val par_store = 16
     val ip = 8 (1 -> 384)
