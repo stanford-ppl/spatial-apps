@@ -17,7 +17,7 @@ import types
 
 lanes = 16
 bankSize = 32 * 1024 / 4
-proc_thresh = 20
+proc_thresh = 40
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIRL_HOME = os.environ['PIR_HOME']
@@ -205,13 +205,21 @@ def GEMM_Blocked(args, params):
     dim = 512
     # args += [dim]
 
-    params['tileSize']   = [16, 256] # irange(16, dim, 16)
-    params['i_tileSize'] = [16, 256] # irange(16, dim, 16)
-    params['loop_jj']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
-    params['loop_ii']    = lambda params: irange(1 , min(dim/params['i_tileSize'], 2), 1)
-    params['loop_kk']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
-    params['loop_i']     = lambda params: irange(1 , min(params['i_tileSize']    , 2), 1)
-    params['loop_k']     = lambda params: irange(1 , min(params['tileSize']      , 2), 1)
+    # params['tileSize']   = [16, 256] # irange(16, dim, 16)
+    # params['i_tileSize'] = [16, 256] # irange(16, dim, 16)
+    # params['loop_jj']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
+    # params['loop_ii']    = lambda params: irange(1 , min(dim/params['i_tileSize'], 2), 1)
+    # params['loop_kk']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
+    # params['loop_i']     = lambda params: irange(1 , min(params['i_tileSize']    , 2), 1)
+    # params['loop_k']     = lambda params: irange(1 , min(params['tileSize']      , 2), 1)
+
+    params['tileSize']   = [256] # irange(16, dim, 16)
+    params['i_tileSize'] = [256] # irange(16, dim, 16)
+    params['loop_jj']    = 1 
+    params['loop_ii']    = 1
+    params['loop_kk']    = 1
+    params['loop_i']     = [1,2,3,4]
+    params['loop_k']     = [1,2,3,4]
 
 def BlackScholes(args, params):
     N = 1966080  
