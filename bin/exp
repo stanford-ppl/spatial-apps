@@ -17,7 +17,7 @@ import types
 
 lanes = 16
 bankSize = 32 * 1024 / 4
-proc_thresh = 40
+proc_thresh = 25
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIRL_HOME = os.environ['PIR_HOME']
@@ -250,10 +250,10 @@ def SPMV_CRS(args, params):
     args += []
 
     maxTile = min(bankSize*lanes, N)
-    # TODO: 
+    # Finished
     params['tileSize'] = irange(16, maxTile, 64) 
-    params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 2) 
-    params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 2) 
+    params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 2) + [2]
+    params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 2) + [2]
 
 def expRun():
     #################################################################################################################
