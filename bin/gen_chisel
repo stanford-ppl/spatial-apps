@@ -3,4 +3,5 @@
 cd $SPATIAL_HOME
 chisel_dir=$SPATIAL_HOME/gen/$app/chisel
 if [ -e $chisel_dir ]; then rm -r $chisel_dir; fi
+mkdir -p $SPATIAL_HOME/gen/$app
 $SPATIAL_HOME/bin/spatial $app --retiming --synth &>> $log &

@@ -10,7 +10,7 @@ function runPass() {
 		if [[ $reach == 0 ]] && [[ ${progress[$p]} != "SUCCESS" ]]; then exit; fi
 	done
 
-	if [[ $regen == ALL ]] || [[ $regen == $pass ]] || [[ ${progress[$pass]} != 'SUCCESS' && ${progress[$pass]} != 'RUNNING' ]]; then
+	if [[ $regen == ALL ]] || [[ $regen == *$pass* ]] || [[ ${progress[$pass]} != 'SUCCESS' && ${progress[$pass]} != 'RUNNING' ]]; then
 		log=${logs[$pass]}
 		clean_log $pass
 
@@ -26,19 +26,17 @@ function runPass() {
 
 echo "runapp $app torun=$torun regen=$regen"
 
-mkdir -p $SPATIAL_HOME/gen/$app
-mkdir -p $PIR_HOME/apps/src/gen/
-mkdir -p $PIR_HOME/out/$app
-
 for pass in ${passes[@]}; do
 	passStatus $pass
-	if [[ $torun == 'ALL' ]] || [[ $torun == *$pass ]] || [[ $torun == $pass* ]] || [[ $torun == $pass ]]; then
+	if [[ $torun == 'ALL' ]] || [[ $torun == *$pass* ]]; then
 	  runPass $pass
   fi
 done
 
 pass="RUN_SIMULATION"; log=${logs[$pass]}; 
-cycle=$(grep "Design ran for" $log)
-passed=$(grep "PASS" $log)
-echo "$timestemp $app $cycle args=[$args] $passed" >> $LOG_FILE 
-echo "$timestemp $app $cycle args=[$args] $passed"
+if [ -e $log ]; then
+  cycle=$(grep "Design ran for" $log)
+  passed=$(grep "PASS" $log)
+  echo "$timestemp $app $cycle args=[$args] $passed" >> $LOG_FILE 
+  echo "$timestemp $app $cycle args=[$args] $passed"
+fi
