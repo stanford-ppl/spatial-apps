@@ -159,7 +159,14 @@ def dse(app, args, params):
     return 1
 
 def irange(start, stop, step):
-    return range(start, stop+step, step)
+    r = range(start, stop, step)
+    if (len(r)>0):
+        last = r[-1]
+    else:
+        last = start
+    if(last+step==stop):
+        r.append(stop)
+    return r
 
 
 apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
@@ -240,6 +247,11 @@ def PageRank_plasticine(args, params):
     # args = [N]
     pass
 
+def Kmeans_plasticine(args, params):
+    N = 6144
+    dim = 96
+    args += [N]
+    params['tileSize'] = irange(16, 16, 1) + irange(64, 128, 64) + irange(1024, N, 1024)
 
 def expRun():
     #################################################################################################################
@@ -259,6 +271,7 @@ def expRun():
     GDA(args['GDA'], params['GDA'])
     GEMM_Blocked(args['GEMM_Blocked'], params['GEMM_Blocked'])
     BlackScholes(args['BlackScholes'], params['BlackScholes'])
+    Kmeans_plasticine(args['Kmeans_plasticine'], params['Kmeans_plasticine'])
 
     space = dse(app, args[app], params[app])
     print('{} space: {}'.format(app, space))
