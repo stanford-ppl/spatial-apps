@@ -361,7 +361,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
               val qz = dvec_z_sram(b1x, b1y, b1z, q_idx)
               val tmp = if ( !(b0x == b1x && b0y == b1y && b0z == b1z && p_idx == q_idx) ) { // Skip self
                 val delta = XYZ(px - qx, py - qy, pz - qz)
-                val r2inv = (1.0.to[FixPt[TRUE,_4_12]] / ( (delta.x*delta.x + delta.y*delta.y + delta.z*delta.z).to[FixPt[TRUE,_4_12]] )).to[T]
+                val r2inv = (1.0.to[FixPt[TRUE,_4,_12]] / ( (delta.x*delta.x + delta.y*delta.y + delta.z*delta.z).to[FixPt[TRUE,_4,_12]] )).to[T]
                 // Assume no cutoff and aways account for all nodes in area
                 val r6inv = r2inv * r2inv * r2inv;
                 val potential = r6inv*(lj1*r6inv - lj2);
