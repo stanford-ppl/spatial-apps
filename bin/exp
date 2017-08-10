@@ -215,9 +215,13 @@ def BlackScholes(args, params):
     N = 1966080  
     args += [N]
 
-    #TODO
+    # Finished
     params['outerPar'] = irange(1, 4, 1) 
     params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
+
+    # TODO: make vcs
+    # params['outerPar'] = 1 
+    # params['tileSize'] = lambda params: irange(1024*16, min(bankSize*lanes,N/params['outerPar']),1024*16)
 
 def PageRank_plasticine(args, params):
     # regen = 'false'
