@@ -199,18 +199,19 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     val dim_arg = args(0).to[Int]
     val dim = ArgIn[Int]
     setArg(dim, dim_arg)
+    val innerPar = 16
     val tileSize = 16 (16 -> 16 -> 128)
     val i_tileSize = 64 (64 -> 16 -> 128)
-    val par_load = 16
-    val par_store = 16
+    val par_load = innerPar
+    val par_store = innerPar
     val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
     val loop_ii    = 1 // not sure if this one works
     val loop_kk    = 2 (1 -> 1 -> 8)
     val loop_i     = 1 (1 -> 1 -> 32)
     val loop_k     = 1 (1 -> 1 -> 16)
-    val loop_j     = 2 (1 -> 1 -> 16)
-    val reduce_col = 4 (1 -> 1 -> 16)
-    val reduce_tmp = 4 (1 -> 1 -> 16)
+    val loop_j     = innerPar (1 -> 1 -> 16)
+    val reduce_col = innerPar (1 -> 1 -> 16)
+    val reduce_tmp = innerPar (1 -> 1 -> 16)
 
     val a_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
     val b_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
