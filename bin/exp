@@ -189,10 +189,12 @@ def TPCHQ6(args, params):
 
 def GDA(args, params):
     R = 192000
+    MAXC = 80
     args += [R]
 
-    # TODO: run mapping + simulation
-    params['tileSize'] = irange(16, 16*5, 16) 
+    # Finished 
+    # params['tileSize'] = irange(16, 16*5, 16) 
+    params['tileSize'] = irange(16, bankSize*lanes/MAXC, 512) 
     params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
     params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
 
