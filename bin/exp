@@ -63,8 +63,8 @@ def copyApp(app, args, params):
                 if not found:
                     newapp.write(line)
     for param in params:
-        if param not in paramFound and param!='fpga':
-            print('Param {} not found|||!'.format(param))
+        if param not in paramFound:
+            print('Param {} not found !!!'.format(param))
             exit()
 
 def checkProcess():
@@ -138,7 +138,7 @@ def dse(app, args, params):
         # print('  param:' + param + ' = ' + str(params[param]))
         if type(params[param]) is list:
             if len(params[param])==0:
-                return
+                return 0
             newParams = params.copy()
             cnt = 0
             if opts.single:
@@ -203,40 +203,41 @@ def GDA(args, params):
 
 def GEMM_Blocked(args, params):
     args += []
-    dim = 64
+    dim = 512
 
-    params['tileSize'] = irange(16, dim, 16) 
-    params['loop_jj'] = lambda params: irange(1, dim/params['tileSize'], 1) 
-    params['loop_kk'] = lambda params: irange(1, dim/params['tileSize'], 1) 
-    params['loop_ii'] = irange(1, min(dim, 5), 2) 
-    params['loop_k']  = lambda params: irange(1, min(params['tileSize'], 5), 2)
+    params['tileSize']   = [16, 256] # irange(16, dim, 16)
+    params['i_tileSize'] = [16, 256] # irange(16, dim, 16)
+    params['loop_jj']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
+    params['loop_ii']    = lambda params: irange(1 , min(dim/params['i_tileSize'], 2), 1)
+    params['loop_kk']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
+    params['loop_i']     = lambda params: irange(1 , min(params['i_tileSize']    , 2), 1)
+    params['loop_k']     = lambda params: irange(1 , min(params['tileSize']      , 2), 1)
 
 def BlackScholes(args, params):
     N = 1966080  
     args += [N]
 
     # Finished
-    params['outerPar'] = irange(1, 4, 1) 
-    params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
+    # params['outerPar'] = irange(1, 4, 1) 
+    # params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
 
     # TODO: make vcs
-    # params['outerPar'] = 1 
-    # params['tileSize'] = lambda params: irange(1024*16, min(bankSize*lanes,N/params['outerPar']),1024*16)
+    params['outerPar'] = 1 
+    params['tileSize'] = lambda params: irange(1024*16, min(bankSize*lanes,N/params['outerPar']),1024*16)
 
 def PageRank_plasticine(args, params):
-    # regen = 'false'
-    # app = 'PageRank_plasticine'
-    # N = 1966080  
-    # args = [N]
+    N = 1966080  
+    args = [N]
     pass
 
 def Kmeans_plasticine(args, params):
+    iter = 1
     N = 6144
     dim = 96
-    args += [N]
+    args += [1, N]
 
-    # TODO refit
-    params['tileSize'] = irange(16, 16, 1) + irange(64, 128, 64) + irange(1024, N, 1024)
+    # TODO make vcs
+    params['tileSize'] = irange(16, 16, 1) + irange(128, 512, 128) + irange(1024,min(bankSize*lanes/dim, N), 1024)
 
 def expRun():
     #################################################################################################################
