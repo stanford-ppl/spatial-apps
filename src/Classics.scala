@@ -1301,9 +1301,9 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
     printArray(edgeLens, "edgeLens: ")
     printArray(edgeIds, "edgeIds: ")
 
-    val par_load = 16
-    val par_store = 16
-    val tile_par = 2 (1 -> 1 -> 12)
+    val par_load = 1 // Do not change
+    val par_store = 1 // Do not change
+    val tile_par = 1 // Do not change
     val page_par = 2 (1 -> 1 -> tileSize)
 
     // Arguments
@@ -2338,7 +2338,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
   }
 }
 
-object Sobel extends SpatialApp { // Regression (Dense) // Args: 64 64
+object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
 
 
   val Kh = 3
@@ -2355,7 +2355,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 64 64
     setArg(C, image.cols)
 
 
-    val lb_par = 8 (1 -> 1 -> 16)
+    val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
     val row_stride = 100 (100 -> 100 -> 500)
     val row_par = 2 (1 -> 1 -> 16)
@@ -2380,13 +2380,8 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 64 64
                             -1.to[T], -2.to[T], -1.to[T])
 
         Foreach(-2 until row_stride) { r =>
-          lb load img(r+rr, 0::C par lb_par)
-
-          /*println("Row " + r)
-          Foreach(0 until Kh) { i =>
-            Foreach(0 until C) { c => print("" + lb(i,c) + "\t") }
-            println("")
-          }*/
+          val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index]) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          lb load img(ldaddr, 0::C par lb_par)
 
           Foreach(0 until C) { c =>
             Pipe{sr.reset(c == 0)}
@@ -2408,10 +2403,14 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 64 64
               }{_+_}
             }{_+_}
 
-            if (r >= 0) {lineOut(c) = abs(horz.value) + abs(vert.value)}// Technically should be sqrt(horz**2 + vert**2)
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
           }
 
-          if (r+rr >= 0 && r >= 0) {imgOut(r+rr, 0::C par par_store) store lineOut}
+          if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0) {
+            // println("storing to row " + {r+rr} + " from " + r + " " + rr)
+            // Foreach(0 until C){kk => print(" " + lineOut(kk))}
+            imgOut(r.to[Index]+rr.to[Index] - 2.to[Index], 0::C par par_store) store lineOut
+          }
         }
 
       }

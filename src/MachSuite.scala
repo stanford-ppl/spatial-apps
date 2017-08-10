@@ -2020,9 +2020,10 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
     val result_dram = DRAM[T](N)
 
     val par_load = 16
-    val par_store = 16
-    val tile_par = 2 (1 -> 1 -> 16)
-    val pt_par = 2 (1 -> 1 -> 16)
+    val par_segment_load = 1 // Do not change
+    val par_store = 1 // Do not change
+    val tile_par = 1 (1 -> 1 -> 16) // Do not change
+    val pt_par = 1 (1 -> 1 -> 16) // Do not change?
     val red_par = 2 (1 -> 1 -> 16)
 
     setMem(values_dram, raw_values)
@@ -2044,8 +2045,8 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
           val start_id = rowid_sram(i)
           val stop_id = rowid_sram(i+1)
           Parallel{
-            cols_sram load cols_dram(start_id :: stop_id par par_load)
-            values_sram load values_dram(start_id :: stop_id par par_load)
+            cols_sram load cols_dram(start_id :: stop_id par par_segment_load)
+            values_sram load values_dram(start_id :: stop_id par par_segment_load)
           }
           vec_sram gather vec_dram(cols_sram, stop_id - start_id)
           println("row " + {i + tile})
