@@ -42,11 +42,7 @@ if [[ $RESP == "k" ]]; then
 elif [[ $RESP == "r "* ]]; then
   for pass in ${passes[@]}; do
     if [[ $RESP == "r $pass" ]]; then
-	    echo -e "${CYAN}Rerun${NC} $pass for $SPATIAL_HOME/gen/$app?"
-	    read -p "" RESP
-	    if [ "$RESP" = "y" ]; then
-        clean_log $pass
-	    fi
+      clean_log $pass
     fi
   done
 elif [[ $RESP == "s"* ]]; then
