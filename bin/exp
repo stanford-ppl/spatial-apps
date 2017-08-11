@@ -16,6 +16,7 @@ import numpy as np
 import types
 import csv
 
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.ticker as ticker
@@ -25,6 +26,7 @@ import math
 lanes = 16
 bankSize = 32 * 1024 / 4
 proc_thresh = 40
+max_bw = 12.8*4
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
@@ -41,9 +43,10 @@ summary_headers = ['App', 'cycle', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'sc
     'totalVBufUtil']
 
 def plot():
+    cmap = matplotlib.cm.get_cmap('Oranges')
     for app in apps:
         if app==opts.app or opts.app=='ALL':
-            for args in summary[app][args]:
+            for args in summary[app]:
                 fig, ax = plt.subplots()
                 for fullname in summary[app][args]:
                     used, total = summary[app][args][fullname]['pcuUtil']
@@ -52,9 +55,24 @@ def plot():
                     mcu = futil(used, total)
                     used, total = summary[app][args][fullname]['mcUtil']
                     mc = futil(used, total)
+                    lavgbw = summary[app][args][fullname]['lavgbw']
                     cycle = summary[app][args][fullname]['cycle']
-                    sp = ax.scatter(pcu, cycle, c = color_spd, s = dotSize, marker = marker_pd, edgecolors='none')
-                plt.savefig('{}_{}.png'.format(app, sargs(args)), format='png', dpi=900)
+                    # sp = ax.scatter(pcu, cycle, c = color_spd, s = dotSize, marker = marker_pd, edgecolors='none')
+                    size = mcu * 200
+                    # size = mc * 100
+                    # size = mc * 100
+                    # size = lavgbw
+                    bw = (lavgbw + 3) / 15
+                    color = cmap(bw)
+                    # color = cmap(max_bw - lavgbw/max_bw)
+                    sp = ax.scatter(pcu * 100, cycle, c=color, s=size, edgecolors='none')
+                plot_path = '{}/apps/{}_{}.png'.format(SPATIAL_HOME,app, args)
+                plt.grid(True)
+                plt.xlabel('PCU Utilization (%)')
+                plt.ylabel('Cycle')
+                fig.set_size_inches(6,4)
+                plt.gcf().subplots_adjust(bottom=0.15)
+                plt.savefig(plot_path, format='png', dpi=900)
 
 class bcolors:
     HEADER = '\033[95m'
@@ -596,6 +614,7 @@ def main():
     parser.add_argument('--torun', dest='torun', action='store', default='ALL',
         help='Pass to run')
     parser.add_argument('--summary', dest='summary', action='store_true', default=False) 
+    parser.add_argument('--plot', dest='plot', action='store_true', default=False) 
 
     global opts
     (opts, args) = parser.parse_known_args()

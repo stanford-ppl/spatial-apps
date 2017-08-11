@@ -71,7 +71,7 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
         val rowid_sram = SRAM[Int](tileSize+1) // Should be tileSize+1 and result_sram should be tileSize
         val result_sram = SRAM[T](tileSize)
 
-        rowid_sram load rowid_dram(tile*(tileSize+1) :: (tile+1)*(tileSize+1) par par_load)
+        rowid_sram load rowid_dram(tile*(tileSize+1) :: (tile+1)*(tileSize+1) par par_load) // tileSize+1 x N/tileSize times ~= N
         Foreach(tileSize by 1 par pt_par) { i => 
           val cols_sram = SRAM[Int](tileSize)
           val values_sram = SRAM[T](tileSize)
