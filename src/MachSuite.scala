@@ -1659,10 +1659,10 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
     val loop_ii    = 1 // not sure if this one works
     val loop_kk    = 1 (1 -> 1 -> 8)
     val loop_i     = 1 (1 -> 1 -> 32)
-    val loop_k     = 2 (1 -> 1 -> 16)
-    val loop_j     = 2 (1 -> 1 -> 16)
-    val reduce_col = 4 (1 -> 1 -> 16)
-    val reduce_tmp = 4 (1 -> 1 -> 16)
+    val loop_k     = 1 (1 -> 1 -> 16)
+    val loop_j     = 1 (1 -> 1 -> 16)
+    val reduce_col = 1 (1 -> 1 -> 16)
+    val reduce_tmp = 1 (1 -> 1 -> 16)
 
     // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
     // val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
@@ -1763,8 +1763,8 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
     val levels = STOP-START //ArgIn[Int]
     // setArg(levels, args(0).to[Int])
 
-    val par_load = 16
-    val par_store = 16
+    val par_load = 8
+    val par_store = 8
 
     val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/sort_data.csv", "\n")
 
