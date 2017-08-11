@@ -226,7 +226,7 @@ def avgbw(app, args, params):
         word += R * C # load x
         word += C * C # store sigma
     elif 'BlackScholes' in app:
-        N,_ = args
+        N = args[0]
         word += N * 6 # load 6 data stucture
         word += N # store optpriceBlk
     elif 'GEMM_Blocked' in app:
@@ -240,6 +240,9 @@ def avgbw(app, args, params):
         # store c_col
         word += i_tileSize * tileSize * (dim / tileSize) * (dim / i_tileSize)
     elif 'Kmeans_plasticine' in app:
+        iters = 1
+        D = 96
+        K = 20
         N = 6144
         dim = 96
         tileSize = params['tileSize']
