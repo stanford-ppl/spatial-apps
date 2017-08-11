@@ -30,7 +30,7 @@ apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'Pag
 passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
 progress_cache = {}
 cycle_cache = {}
-summary_headers = ['App', 'cycle', 'avgbw', 'pcuUtil', 'mcuUtil', 'scuUtil', 'ocuUtil', 'mcUtil', 'ocuUtil', 'mcUtil',
+summary_headers = ['App', 'cycle', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'scuUtil', 'ocuUtil', 'mcUtil', 'ocuUtil', 'mcUtil',
     'slinkUtil', 'vlinkUtil', 'clinkUtil', 'totalRegUtil', 'totalFUUtil', 'totalSBufUtil', 
     'totalVBufUtil']
 
@@ -214,55 +214,58 @@ def getUtil(line):
     return (used, total)
 
 def avgbw(app, args, params):
-    word = 0
+    lword = 0
+    sword = 0
     if 'TPCHQ6' in app:
         N, = args
-        word += N * 4 # load 4 data stucture
+        lword += N * 4 # load 4 data stucture
     elif 'GDA' in app:
         R,_ = args
         C = 80
-        word += C * 2 # load mu0, mu1
-        word += R # load y
-        word += R * C # load x
-        word += C * C # store sigma
+        lword += C * 2 # load mu0, mu1
+        lword += R # load y
+        lword += R * C # load x
+        sword += C * C # store sigma
     elif 'BlackScholes' in app:
         N,_ = args
-        word += N * 6 # load 6 data stucture
-        word += N # store optpriceBlk
+        lword += N * 6 # load 6 data stucture
+        sword += N # store optpriceBlk
     elif 'GEMM_Blocked' in app:
         dim = 512
         tileSize = params['tileSize']
         i_tileSize = params['i_tileSize']
         # load b_sram
-        word += (tileSize * tileSize) * (dim / tileSize) * (dim / tileSize) * (dim / i_tileSize)
+        lword += (tileSize * tileSize) * (dim / tileSize) * (dim / tileSize) * (dim / i_tileSize)
         # load a_sram
-        word += (tileSize) * (i_tileSize) * (dim / tileSize) * (dim / tileSize) * (dim / i_tileSize)
+        lword += (tileSize) * (i_tileSize) * (dim / tileSize) * (dim / tileSize) * (dim / i_tileSize)
         # store c_col
-        word += i_tileSize * tileSize * (dim / tileSize) * (dim / i_tileSize)
+        sword += i_tileSize * tileSize * (dim / tileSize) * (dim / i_tileSize)
     elif 'Kmeans_plasticine' in app:
         N = 6144
         dim = 96
         tileSize = params['tileSize']
         BN = tileSize
         BD = dim
-        word += K * D # load orgCts
-        word += (BN * BD) * (N / BN) * iters
-        word += (K * D) # store centroids
+        lword += K * D # load orgCts
+        lword += (BN * BD) * (N / BN) * iters # pts
+        sword += (K * D) # store centroids
     elif 'PageRank_plasticine' in apps:
-        # word += tileSize * 3 * (NP / tileSize) * iters # load initPR, edgesId, edgesLen
-        # word += numEdges * 2 * tileSize * (NP / tileSize) * iters # load edges, counts
-        # word += num2gather * tileSize * (NP / tileSize) * iters # gather
-        # word += tileSize * (NP / tileSize)  * iters # store currentPR
+        # lword += tileSize * 3 * (NP / tileSize) * iters # load initPR, edgesId, edgesLen
+        # lword += numEdges * 2 * tileSize * (NP / tileSize) * iters # load edges, counts
+        # lword += num2gather * tileSize * (NP / tileSize) * iters # gather
+        # sword += tileSize * (NP / tileSize)  * iters # store currentPR
         pass
     elif 'SPMV_CRS' in app:
-        # word += (tileSize + 1) * (N / tileSize) # load rowid_sram 
-        # word += (stop_id - start_id) * tileSize * 
+        # lword += (tileSize + 1) * (N / tileSize) # load rowid_sram 
+        # lword += (stop_id - start_id) * tileSize * 
         pass
 
-    byte = word * 4
+    lbyte = lword * 4
+    sbyte = sword * 4
     second = float(cycleOf(app)) / (10 ** 9)
-    gbps = byte / second / (10 ** 9)
-    return gbps
+    lgbps = lbyte / second / (10 ** 9)
+    sgbps = sbyte / second / (10 ** 9)
+    return (lgbps, sgbps)
 
 def summarize(app, args, params):
     global summary
@@ -275,7 +278,7 @@ def summarize(app, args, params):
             table = summary[app][sargs(args)][fullname]
             cycle = cycleOf(fullname) 
             table['cycle'] = cycle
-            table['avgbw'] = avgbw(fullname, args, params)
+            table['lavgbw'], table['savgbw'] = avgbw(fullname, args, params)
             reslog = logs(fullname, "Utilization")
             with open(reslog, 'rb') as f:
                 for line in f:
@@ -293,10 +296,10 @@ def summaryToCsv():
                 for fullname in summary[app][arg]: 
                     dict = {'App':fullname}
                     for header in summary[app][arg][fullname]:
-                        if header not in ['App', 'cycle', 'avgbw']:
+                        if header not in ['App', 'cycle', 'lavgbw', 'savgbw']:
                             used, total = summary[app][arg][fullname][header]
                             dict[header] = round(float(used) / float(total), 3)
-                        elif header=='avgbw':
+                        elif header in ['lavgbw', 'savgbw']:
                             dict[header] = round(summary[app][arg][fullname][header], 3)
                         else:
                             dict[header] = summary[app][arg][fullname][header]
