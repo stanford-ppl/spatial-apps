@@ -2516,8 +2516,8 @@ object PageRank_Bulk1 extends SpatialApp { // Regression (Sparse) // Args: 50 0.
     val tileSize = 32 (16 -> 16 -> 128)
     val par_load = 1
     val par_store = 1
-    val tile_par = 2 (1 -> 1 -> 12)
-    val page_par = 4 (1 -> 1 -> 16)
+    val tile_par = 1 (1 -> 1 -> 12)
+    val page_par = 2 (1 -> 1 -> 16)
 
     // Arguments
     val itersIN = args(0).to[Int]
@@ -2676,11 +2676,11 @@ object PageRank_Bulk2 extends SpatialApp { // Regression (Sparse) // Args: 50 0.
     printArray(edgeLens, "edgeLens: ")
     printArray(edgeIds, "edgeIds: ")
 
-    val tileSize = 32 (16 -> 16 -> 128)
+    val tileSize = 16 (16 -> 16 -> 128)
     val par_load = 8
     val par_store = 8
     val tile_par = 1 (1 -> 1 -> 12)
-    val page_par = 8 (1 -> 1 -> 16)
+    val page_par = 2 (1 -> 1 -> 16)
 
     // Arguments
     val itersIN = args(0).to[Int]
@@ -2839,11 +2839,11 @@ object PageRank_Bulk3 extends SpatialApp { // Regression (Sparse) // Args: 50 0.
     printArray(edgeLens, "edgeLens: ")
     printArray(edgeIds, "edgeIds: ")
 
-    val tileSize = 16 (16 -> 16 -> 128)
-    val par_load = 16
-    val par_store = 16
+    val tileSize = 32 (16 -> 16 -> 128)
+    val par_load = 8
+    val par_store = 8
     val tile_par = 1 (1 -> 1 -> 12)
-    val page_par = 16 (1 -> 1 -> 16)
+    val page_par = 1 (1 -> 1 -> 16)
 
     // Arguments
     val itersIN = args(0).to[Int]
