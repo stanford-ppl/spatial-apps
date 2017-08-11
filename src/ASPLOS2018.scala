@@ -60,7 +60,7 @@ object SW1 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
 
     val par_load = 16
     val par_store = 16
-    val row_par = 4 (1 -> 1 -> 8)
+    val row_par = 8 (1 -> 1 -> 8)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -77,7 +77,7 @@ object SW1 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 320
+    val max_length = 1024
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -286,7 +286,7 @@ object SW2 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
 
     val par_load = 16
     val par_store = 16
-    val row_par = 6 (1 -> 1 -> 8)
+    val row_par = 4 (1 -> 1 -> 8)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -303,7 +303,7 @@ object SW2 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 512
+    val max_length = 1152
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -528,7 +528,7 @@ object SW3 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 512
+    val max_length = 1024
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -741,9 +741,9 @@ object MD_Grid1 extends SpatialApp { // Regression (Dense) // Args: none
     val par_store = 16 // Wider data type
     val loop_grid0_x = 1 // Temporarily broken because of some issue around #200
     val loop_grid0_y = 1 (1 -> 1 -> 16) 
-    val loop_grid0_z = 2 (1 -> 1 -> 16)
-    val loop_grid1_x = 2 (1 -> 1 -> 16)
-    val loop_grid1_y = 2 (1 -> 1 -> 16)
+    val loop_grid0_z = 1 (1 -> 1 -> 16)
+    val loop_grid1_x = 1 (1 -> 1 -> 16)
+    val loop_grid1_y = 1 (1 -> 1 -> 16)
     val loop_grid1_z = 1 (1 -> 1 -> 16)
     val loop_p =       2 (1 -> 1 -> 16)
     val loop_q =       2 (1 -> 1 -> 16)
@@ -935,9 +935,9 @@ object MD_Grid2 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_grid0_z = 1 (1 -> 1 -> 16)
     val loop_grid1_x = 1 (1 -> 1 -> 16)
     val loop_grid1_y = 1 (1 -> 1 -> 16)
-    val loop_grid1_z = 2 (1 -> 1 -> 16)
-    val loop_p =       4 (1 -> 1 -> 16)
-    val loop_q =       4 (1 -> 1 -> 16)
+    val loop_grid1_z = 1 (1 -> 1 -> 16)
+    val loop_p =       1 (1 -> 1 -> 16)
+    val loop_q =       1 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
@@ -1124,11 +1124,11 @@ object MD_Grid3 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_grid0_x = 1 // Temporarily broken because of some issue around #200
     val loop_grid0_y = 1 (1 -> 1 -> 16) 
     val loop_grid0_z = 1 (1 -> 1 -> 16)
-    val loop_grid1_x = 2 (1 -> 1 -> 16)
+    val loop_grid1_x = 1 (1 -> 1 -> 16)
     val loop_grid1_y = 2 (1 -> 1 -> 16)
     val loop_grid1_z = 2 (1 -> 1 -> 16)
     val loop_p =       2 (1 -> 1 -> 16)
-    val loop_q =       6 (1 -> 1 -> 16)
+    val loop_q =       2 (1 -> 1 -> 16)
 
     val raw_npoints = Array[Int](4,4,3,4,5,5,2,1,1,8,4,8,3,3,7,5,4,5,6,2,2,4,4,3,3,4,7,2,3,2,
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
@@ -1460,8 +1460,8 @@ object GEMM_Blocked1 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_i     = 1 (1 -> 1 -> 32)
     val loop_k     = 1 (1 -> 1 -> 16)
     val loop_j     = 2 (1 -> 1 -> 16)
-    val reduce_col = 4 (1 -> 1 -> 16)
-    val reduce_tmp = 4 (1 -> 1 -> 16)
+    val reduce_col = 8 (1 -> 1 -> 16)
+    val reduce_tmp = 8 (1 -> 1 -> 16)
 
     // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
     // val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
@@ -2164,6 +2164,821 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
 }
 
 
+object PageRank_Bulk1 extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
+  override val target = AWS_F1
+
+  type Elem = FixPt[TRUE,_16,_16] // Float
+  type X = FixPt[TRUE,_16,_16] // Float
+
+  /*
+    Currently testing with DIMACS10 Chesapeake dataset from UF Sparse Matrix collection
+
+  */
+  val margin = 0.3f
+
+  @virtualize
+  def main() {
+    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val rows = sparse_data(0,0)
+    val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
+    val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
+    // Preprocess to get frontier sizes.  We can do this on chip also if we wanted
+    println("Matrix has " + rows + " rows")
+    val edgeLens = Array.tabulate(rows){i => Array.tabulate(node1_list.length){j => 
+      if (node1_list(j) == i) 1 else 0
+    }.reduce{_+_}}
+    val edgeIds = Array.tabulate(rows){i => 
+      var id = -1
+      Array.tabulate(node1_list.length){j => 
+        if (id == -1 && node1_list(j) == i) {
+          id = j
+          j
+        } else { 0 }
+    }.reduce{_+_}}
+
+    // printArray(node1_list, "node1_list:")
+    // printArray(node2_list, "node2_list:")
+    printArray(edgeLens, "edgeLens: ")
+    printArray(edgeIds, "edgeIds: ")
+
+    val tileSize = 64 (16 -> 16 -> 128)
+    val par_load = 1
+    val par_store = 1
+    val tile_par = 1 (1 -> 1 -> 12)
+    val page_par = 1 (1 -> 1 -> 16)
+
+    // Arguments
+    val itersIN = args(0).to[Int]
+    val dampIN = args(1).to[X]
+
+    val iters = ArgIn[Int]
+    val NP    = ArgIn[Int]
+    val damp  = ArgIn[X]
+    val NE    = ArgIn[Int]
+    setArg(iters, itersIN)
+    setArg(NP, rows)
+    setArg(damp, dampIN)
+    setArg(NE, node2_list.length)
+
+    val OCpages    = DRAM[X](NP)
+    val OCedges    = DRAM[Int](NE)    // srcs of edges
+    val OCedgeLens   = DRAM[Int](NP)    // counts for each edge
+    val OCedgeIds   = DRAM[Int](NP) // Start index of edges
+
+    val pagesInit = Array.tabulate(NP){i => 4.to[X]}
+
+    setMem(OCpages, pagesInit)
+    setMem(OCedges, node2_list)
+    setMem(OCedgeLens, edgeLens)
+    setMem(OCedgeIds, edgeIds)
+
+    Accel {
+      Sequential.Foreach(iters by 1){iter => 
+        // Step through each tile
+        Foreach(NP by tileSize par tile_par){page => 
+          val local_pages = SRAM.buffer[X](tileSize)
+          val local_edgeIds = SRAM[Int](tileSize)
+          val local_edgeLens = SRAM[Int](tileSize)
+          val pages_left = min(tileSize.to[Int], NP-page)
+          local_pages load OCpages(page::page+pages_left par par_load)
+          local_edgeLens load OCedgeLens(page::page+pages_left par par_load)
+          local_edgeIds load OCedgeIds(page::page+pages_left par par_load)
+          // Process each page in local tile
+          Sequential.Foreach(pages_left by 1 par page_par){local_page => 
+            // Fetch edge list for this page
+            val edgeList = FIFO[Int](128)
+            val id = local_edgeIds(local_page)
+            val len = local_edgeLens(local_page)
+            edgeList load OCedges(id::id+len)
+            // Triage between edges that exist in local tiles and off chip
+            val nearPages = FIFO[Int](128)
+            val farPages = FIFO[Int](128)
+            Foreach(edgeList.numel by 1){i => 
+              val tmp = edgeList.deq()
+              if (tmp >= page && tmp < page+pages_left) {
+                nearPages.enq(tmp - page)
+              } else {
+                farPages.enq(tmp)
+              }
+            }
+            // Fetch off chip info
+            val local_farPages = FIFO[X](128)
+            val local_farEdgeLens = FIFO[Int](128)
+            Foreach(farPages.numel by 1){ i => 
+              val el = farPages.deq()
+              local_farPages load OCpages(el::el+1)
+              local_farEdgeLens load OCedgeLens(el::el+1)
+            }
+
+            // Do math to find new rank
+            val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+              if (nearPages.empty) {
+                // println("page: " + page + ", local_page: " + local_page + " deq from far")
+                (local_farPages.deq().to[FixPt[TRUE,_8,_8]] / local_farEdgeLens.deq().to[FixPt[TRUE,_8,_8]]).to[X]
+              } else {
+                val addr = nearPages.deq()
+                // println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                (local_pages(addr).to[FixPt[TRUE,_8,_8]] / local_edgeLens(addr).to[FixPt[TRUE,_8,_8]]).to[X]
+              }
+            }{_+_}
+
+            // Write new rank
+            local_pages(local_page) = pagerank * damp + (1.to[X] - damp)
+          }
+          OCpages(page::page+pages_left par par_store) store local_pages
+        }
+      }
+    }
+
+    val result = getMem(OCpages)
+
+    val gold = Array.empty[X](NP)
+    // Init
+    for (i <- 0 until NP) {
+      gold(i) = pagesInit(i)
+    }
+
+    // Really bad imperative version
+    for (ep <- 0 until iters) {
+      // println("Iter " + ep)
+      for (i <- 0 until NP) {
+        val numEdges = edgeLens(i)
+        val startId = edgeIds(i)
+        val iterator = Array.tabulate(numEdges){kk => startId + kk}
+        val these_edges = iterator.map{j => node2_list(j)}
+        val these_pages = these_edges.map{j => gold(j)}
+        val these_counts = these_edges.map{j => edgeLens(j)}
+        val pr = these_pages.zip(these_counts){ (p,c) =>
+          // println("page " + i + " doing " + p + " / " + c)
+          p/c.to[X]
+        }.reduce{_+_}
+        // println("new pr for " + i + " is " + pr)
+        gold(i) = pr*dampIN + (1.to[X]-dampIN)
+      }
+    }
+
+    println("PageRank on DIMACS10 Chesapeake dataset downloaded from UF Sparse Matrix collection")
+    printArray(gold, "gold: ")
+    printArray(result, "result: ")
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin.to[X])) && g > (o - margin.to[X])}.reduce{_&&_}
+    println("PASS: " + cksum + " (PageRank)")
+
+  }
+
+}
+
+object PageRank_Bulk2 extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
+  override val target = AWS_F1
+
+  type Elem = FixPt[TRUE,_16,_16] // Float
+  type X = FixPt[TRUE,_16,_16] // Float
+
+  /*
+    Currently testing with DIMACS10 Chesapeake dataset from UF Sparse Matrix collection
+
+  */
+  val margin = 0.3f
+
+  @virtualize
+  def main() {
+    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val rows = sparse_data(0,0)
+    val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
+    val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
+    // Preprocess to get frontier sizes.  We can do this on chip also if we wanted
+    println("Matrix has " + rows + " rows")
+    val edgeLens = Array.tabulate(rows){i => Array.tabulate(node1_list.length){j => 
+      if (node1_list(j) == i) 1 else 0
+    }.reduce{_+_}}
+    val edgeIds = Array.tabulate(rows){i => 
+      var id = -1
+      Array.tabulate(node1_list.length){j => 
+        if (id == -1 && node1_list(j) == i) {
+          id = j
+          j
+        } else { 0 }
+    }.reduce{_+_}}
+
+    // printArray(node1_list, "node1_list:")
+    // printArray(node2_list, "node2_list:")
+    printArray(edgeLens, "edgeLens: ")
+    printArray(edgeIds, "edgeIds: ")
+
+    val tileSize = 16 (16 -> 16 -> 128)
+    val par_load = 8
+    val par_store = 8
+    val tile_par = 1 (1 -> 1 -> 12)
+    val page_par = 1 (1 -> 1 -> 16)
+
+    // Arguments
+    val itersIN = args(0).to[Int]
+    val dampIN = args(1).to[X]
+
+    val iters = ArgIn[Int]
+    val NP    = ArgIn[Int]
+    val damp  = ArgIn[X]
+    val NE    = ArgIn[Int]
+    setArg(iters, itersIN)
+    setArg(NP, rows)
+    setArg(damp, dampIN)
+    setArg(NE, node2_list.length)
+
+    val OCpages    = DRAM[X](NP)
+    val OCedges    = DRAM[Int](NE)    // srcs of edges
+    val OCedgeLens   = DRAM[Int](NP)    // counts for each edge
+    val OCedgeIds   = DRAM[Int](NP) // Start index of edges
+
+    val pagesInit = Array.tabulate(NP){i => 4.to[X]}
+
+    setMem(OCpages, pagesInit)
+    setMem(OCedges, node2_list)
+    setMem(OCedgeLens, edgeLens)
+    setMem(OCedgeIds, edgeIds)
+
+    Accel {
+      Sequential.Foreach(iters by 1){iter => 
+        // Step through each tile
+        Foreach(NP by tileSize par tile_par){page => 
+          val local_pages = SRAM.buffer[X](tileSize)
+          val local_edgeIds = SRAM[Int](tileSize)
+          val local_edgeLens = SRAM[Int](tileSize)
+          val pages_left = min(tileSize.to[Int], NP-page)
+          local_pages load OCpages(page::page+pages_left par par_load)
+          local_edgeLens load OCedgeLens(page::page+pages_left par par_load)
+          local_edgeIds load OCedgeIds(page::page+pages_left par par_load)
+          // Process each page in local tile
+          Sequential.Foreach(pages_left by 1 par page_par){local_page => 
+            // Fetch edge list for this page
+            val edgeList = FIFO[Int](128)
+            val id = local_edgeIds(local_page)
+            val len = local_edgeLens(local_page)
+            edgeList load OCedges(id::id+len)
+            // Triage between edges that exist in local tiles and off chip
+            val nearPages = FIFO[Int](128)
+            val farPages = FIFO[Int](128)
+            Foreach(edgeList.numel by 1){i => 
+              val tmp = edgeList.deq()
+              if (tmp >= page && tmp < page+pages_left) {
+                nearPages.enq(tmp - page)
+              } else {
+                farPages.enq(tmp)
+              }
+            }
+            // Fetch off chip info
+            val local_farPages = FIFO[X](128)
+            val local_farEdgeLens = FIFO[Int](128)
+            Foreach(farPages.numel by 1){ i => 
+              val el = farPages.deq()
+              local_farPages load OCpages(el::el+1)
+              local_farEdgeLens load OCedgeLens(el::el+1)
+            }
+
+            // Do math to find new rank
+            val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+              if (nearPages.empty) {
+                // println("page: " + page + ", local_page: " + local_page + " deq from far")
+                (local_farPages.deq().to[FixPt[TRUE,_8,_8]] / local_farEdgeLens.deq().to[FixPt[TRUE,_8,_8]]).to[X]
+              } else {
+                val addr = nearPages.deq()
+                // println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                (local_pages(addr).to[FixPt[TRUE,_8,_8]] / local_edgeLens(addr).to[FixPt[TRUE,_8,_8]]).to[X]
+              }
+            }{_+_}
+
+            // Write new rank
+            local_pages(local_page) = pagerank * damp + (1.to[X] - damp)
+          }
+          OCpages(page::page+pages_left par par_store) store local_pages
+        }
+      }
+    }
+
+    val result = getMem(OCpages)
+
+    val gold = Array.empty[X](NP)
+    // Init
+    for (i <- 0 until NP) {
+      gold(i) = pagesInit(i)
+    }
+
+    // Really bad imperative version
+    for (ep <- 0 until iters) {
+      // println("Iter " + ep)
+      for (i <- 0 until NP) {
+        val numEdges = edgeLens(i)
+        val startId = edgeIds(i)
+        val iterator = Array.tabulate(numEdges){kk => startId + kk}
+        val these_edges = iterator.map{j => node2_list(j)}
+        val these_pages = these_edges.map{j => gold(j)}
+        val these_counts = these_edges.map{j => edgeLens(j)}
+        val pr = these_pages.zip(these_counts){ (p,c) =>
+          // println("page " + i + " doing " + p + " / " + c)
+          p/c.to[X]
+        }.reduce{_+_}
+        // println("new pr for " + i + " is " + pr)
+        gold(i) = pr*dampIN + (1.to[X]-dampIN)
+      }
+    }
+
+    println("PageRank on DIMACS10 Chesapeake dataset downloaded from UF Sparse Matrix collection")
+    printArray(gold, "gold: ")
+    printArray(result, "result: ")
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin.to[X])) && g > (o - margin.to[X])}.reduce{_&&_}
+    println("PASS: " + cksum + " (PageRank)")
+
+  }
+
+}
+
+object PageRank_Bulk3 extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
+  override val target = AWS_F1
+
+  type Elem = FixPt[TRUE,_16,_16] // Float
+  type X = FixPt[TRUE,_16,_16] // Float
+
+  /*
+    Currently testing with DIMACS10 Chesapeake dataset from UF Sparse Matrix collection
+
+  */
+  val margin = 0.3f
+
+  @virtualize
+  def main() {
+    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val rows = sparse_data(0,0)
+    val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
+    val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
+    // Preprocess to get frontier sizes.  We can do this on chip also if we wanted
+    println("Matrix has " + rows + " rows")
+    val edgeLens = Array.tabulate(rows){i => Array.tabulate(node1_list.length){j => 
+      if (node1_list(j) == i) 1 else 0
+    }.reduce{_+_}}
+    val edgeIds = Array.tabulate(rows){i => 
+      var id = -1
+      Array.tabulate(node1_list.length){j => 
+        if (id == -1 && node1_list(j) == i) {
+          id = j
+          j
+        } else { 0 }
+    }.reduce{_+_}}
+
+    // printArray(node1_list, "node1_list:")
+    // printArray(node2_list, "node2_list:")
+    printArray(edgeLens, "edgeLens: ")
+    printArray(edgeIds, "edgeIds: ")
+
+    val tileSize = 16 (16 -> 16 -> 128)
+    val par_load = 8
+    val par_store = 8
+    val tile_par = 1 (1 -> 1 -> 12)
+    val page_par = 2 (1 -> 1 -> 16)
+
+    // Arguments
+    val itersIN = args(0).to[Int]
+    val dampIN = args(1).to[X]
+
+    val iters = ArgIn[Int]
+    val NP    = ArgIn[Int]
+    val damp  = ArgIn[X]
+    val NE    = ArgIn[Int]
+    setArg(iters, itersIN)
+    setArg(NP, rows)
+    setArg(damp, dampIN)
+    setArg(NE, node2_list.length)
+
+    val OCpages    = DRAM[X](NP)
+    val OCedges    = DRAM[Int](NE)    // srcs of edges
+    val OCedgeLens   = DRAM[Int](NP)    // counts for each edge
+    val OCedgeIds   = DRAM[Int](NP) // Start index of edges
+
+    val pagesInit = Array.tabulate(NP){i => 4.to[X]}
+
+    setMem(OCpages, pagesInit)
+    setMem(OCedges, node2_list)
+    setMem(OCedgeLens, edgeLens)
+    setMem(OCedgeIds, edgeIds)
+
+    Accel {
+      Sequential.Foreach(iters by 1){iter => 
+        // Step through each tile
+        Foreach(NP by tileSize par tile_par){page => 
+          val local_pages = SRAM.buffer[X](tileSize)
+          val local_edgeIds = SRAM[Int](tileSize)
+          val local_edgeLens = SRAM[Int](tileSize)
+          val pages_left = min(tileSize.to[Int], NP-page)
+          local_pages load OCpages(page::page+pages_left par par_load)
+          local_edgeLens load OCedgeLens(page::page+pages_left par par_load)
+          local_edgeIds load OCedgeIds(page::page+pages_left par par_load)
+          // Process each page in local tile
+          Sequential.Foreach(pages_left by 1 par page_par){local_page => 
+            // Fetch edge list for this page
+            val edgeList = FIFO[Int](128)
+            val id = local_edgeIds(local_page)
+            val len = local_edgeLens(local_page)
+            edgeList load OCedges(id::id+len)
+            // Triage between edges that exist in local tiles and off chip
+            val nearPages = FIFO[Int](128)
+            val farPages = FIFO[Int](128)
+            Foreach(edgeList.numel by 1){i => 
+              val tmp = edgeList.deq()
+              if (tmp >= page && tmp < page+pages_left) {
+                nearPages.enq(tmp - page)
+              } else {
+                farPages.enq(tmp)
+              }
+            }
+            // Fetch off chip info
+            val local_farPages = FIFO[X](128)
+            val local_farEdgeLens = FIFO[Int](128)
+            Foreach(farPages.numel by 1){ i => 
+              val el = farPages.deq()
+              local_farPages load OCpages(el::el+1)
+              local_farEdgeLens load OCedgeLens(el::el+1)
+            }
+
+            // Do math to find new rank
+            val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+              if (nearPages.empty) {
+                // println("page: " + page + ", local_page: " + local_page + " deq from far")
+                (local_farPages.deq().to[FixPt[TRUE,_8,_8]] / local_farEdgeLens.deq().to[FixPt[TRUE,_8,_8]]).to[X]
+              } else {
+                val addr = nearPages.deq()
+                // println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                (local_pages(addr).to[FixPt[TRUE,_8,_8]] / local_edgeLens(addr).to[FixPt[TRUE,_8,_8]]).to[X]
+              }
+            }{_+_}
+
+            // Write new rank
+            local_pages(local_page) = pagerank * damp + (1.to[X] - damp)
+          }
+          OCpages(page::page+pages_left par par_store) store local_pages
+        }
+      }
+    }
+
+    val result = getMem(OCpages)
+
+    val gold = Array.empty[X](NP)
+    // Init
+    for (i <- 0 until NP) {
+      gold(i) = pagesInit(i)
+    }
+
+    // Really bad imperative version
+    for (ep <- 0 until iters) {
+      // println("Iter " + ep)
+      for (i <- 0 until NP) {
+        val numEdges = edgeLens(i)
+        val startId = edgeIds(i)
+        val iterator = Array.tabulate(numEdges){kk => startId + kk}
+        val these_edges = iterator.map{j => node2_list(j)}
+        val these_pages = these_edges.map{j => gold(j)}
+        val these_counts = these_edges.map{j => edgeLens(j)}
+        val pr = these_pages.zip(these_counts){ (p,c) =>
+          // println("page " + i + " doing " + p + " / " + c)
+          p/c.to[X]
+        }.reduce{_+_}
+        // println("new pr for " + i + " is " + pr)
+        gold(i) = pr*dampIN + (1.to[X]-dampIN)
+      }
+    }
+
+    println("PageRank on DIMACS10 Chesapeake dataset downloaded from UF Sparse Matrix collection")
+    printArray(gold, "gold: ")
+    printArray(result, "result: ")
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin.to[X])) && g > (o - margin.to[X])}.reduce{_&&_}
+    println("PASS: " + cksum + " (PageRank)")
+
+  }
+
+}
+
+object PageRank_Bulk4 extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
+  override val target = AWS_F1
+
+  type Elem = FixPt[TRUE,_16,_16] // Float
+  type X = FixPt[TRUE,_16,_16] // Float
+
+  /*
+    Currently testing with DIMACS10 Chesapeake dataset from UF Sparse Matrix collection
+
+  */
+  val margin = 0.3f
+
+  @virtualize
+  def main() {
+    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val rows = sparse_data(0,0)
+    val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
+    val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
+    // Preprocess to get frontier sizes.  We can do this on chip also if we wanted
+    println("Matrix has " + rows + " rows")
+    val edgeLens = Array.tabulate(rows){i => Array.tabulate(node1_list.length){j => 
+      if (node1_list(j) == i) 1 else 0
+    }.reduce{_+_}}
+    val edgeIds = Array.tabulate(rows){i => 
+      var id = -1
+      Array.tabulate(node1_list.length){j => 
+        if (id == -1 && node1_list(j) == i) {
+          id = j
+          j
+        } else { 0 }
+    }.reduce{_+_}}
+
+    // printArray(node1_list, "node1_list:")
+    // printArray(node2_list, "node2_list:")
+    printArray(edgeLens, "edgeLens: ")
+    printArray(edgeIds, "edgeIds: ")
+
+    val tileSize = 16 (16 -> 16 -> 128)
+    val par_load = 16
+    val par_store = 16
+    val tile_par = 1 (1 -> 1 -> 12)
+    val page_par = 8 (1 -> 1 -> 16)
+
+    // Arguments
+    val itersIN = args(0).to[Int]
+    val dampIN = args(1).to[X]
+
+    val iters = ArgIn[Int]
+    val NP    = ArgIn[Int]
+    val damp  = ArgIn[X]
+    val NE    = ArgIn[Int]
+    setArg(iters, itersIN)
+    setArg(NP, rows)
+    setArg(damp, dampIN)
+    setArg(NE, node2_list.length)
+
+    val OCpages    = DRAM[X](NP)
+    val OCedges    = DRAM[Int](NE)    // srcs of edges
+    val OCedgeLens   = DRAM[Int](NP)    // counts for each edge
+    val OCedgeIds   = DRAM[Int](NP) // Start index of edges
+
+    val pagesInit = Array.tabulate(NP){i => 4.to[X]}
+
+    setMem(OCpages, pagesInit)
+    setMem(OCedges, node2_list)
+    setMem(OCedgeLens, edgeLens)
+    setMem(OCedgeIds, edgeIds)
+
+    Accel {
+      Sequential.Foreach(iters by 1){iter => 
+        // Step through each tile
+        Foreach(NP by tileSize par tile_par){page => 
+          val local_pages = SRAM.buffer[X](tileSize)
+          val local_edgeIds = SRAM[Int](tileSize)
+          val local_edgeLens = SRAM[Int](tileSize)
+          val pages_left = min(tileSize.to[Int], NP-page)
+          local_pages load OCpages(page::page+pages_left par par_load)
+          local_edgeLens load OCedgeLens(page::page+pages_left par par_load)
+          local_edgeIds load OCedgeIds(page::page+pages_left par par_load)
+          // Process each page in local tile
+          Sequential.Foreach(pages_left by 1 par page_par){local_page => 
+            // Fetch edge list for this page
+            val edgeList = FIFO[Int](128)
+            val id = local_edgeIds(local_page)
+            val len = local_edgeLens(local_page)
+            edgeList load OCedges(id::id+len)
+            // Triage between edges that exist in local tiles and off chip
+            val nearPages = FIFO[Int](128)
+            val farPages = FIFO[Int](128)
+            Foreach(edgeList.numel by 1){i => 
+              val tmp = edgeList.deq()
+              if (tmp >= page && tmp < page+pages_left) {
+                nearPages.enq(tmp - page)
+              } else {
+                farPages.enq(tmp)
+              }
+            }
+            // Fetch off chip info
+            val local_farPages = FIFO[X](128)
+            val local_farEdgeLens = FIFO[Int](128)
+            Foreach(farPages.numel by 1){ i => 
+              val el = farPages.deq()
+              local_farPages load OCpages(el::el+1)
+              local_farEdgeLens load OCedgeLens(el::el+1)
+            }
+
+            // Do math to find new rank
+            val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+              if (nearPages.empty) {
+                // println("page: " + page + ", local_page: " + local_page + " deq from far")
+                (local_farPages.deq().to[FixPt[TRUE,_8,_8]] / local_farEdgeLens.deq().to[FixPt[TRUE,_8,_8]]).to[X]
+              } else {
+                val addr = nearPages.deq()
+                // println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                (local_pages(addr).to[FixPt[TRUE,_8,_8]] / local_edgeLens(addr).to[FixPt[TRUE,_8,_8]]).to[X]
+              }
+            }{_+_}
+
+            // Write new rank
+            local_pages(local_page) = pagerank * damp + (1.to[X] - damp)
+          }
+          OCpages(page::page+pages_left par par_store) store local_pages
+        }
+      }
+    }
+
+    val result = getMem(OCpages)
+
+    val gold = Array.empty[X](NP)
+    // Init
+    for (i <- 0 until NP) {
+      gold(i) = pagesInit(i)
+    }
+
+    // Really bad imperative version
+    for (ep <- 0 until iters) {
+      // println("Iter " + ep)
+      for (i <- 0 until NP) {
+        val numEdges = edgeLens(i)
+        val startId = edgeIds(i)
+        val iterator = Array.tabulate(numEdges){kk => startId + kk}
+        val these_edges = iterator.map{j => node2_list(j)}
+        val these_pages = these_edges.map{j => gold(j)}
+        val these_counts = these_edges.map{j => edgeLens(j)}
+        val pr = these_pages.zip(these_counts){ (p,c) =>
+          // println("page " + i + " doing " + p + " / " + c)
+          p/c.to[X]
+        }.reduce{_+_}
+        // println("new pr for " + i + " is " + pr)
+        gold(i) = pr*dampIN + (1.to[X]-dampIN)
+      }
+    }
+
+    println("PageRank on DIMACS10 Chesapeake dataset downloaded from UF Sparse Matrix collection")
+    printArray(gold, "gold: ")
+    printArray(result, "result: ")
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin.to[X])) && g > (o - margin.to[X])}.reduce{_&&_}
+    println("PASS: " + cksum + " (PageRank)")
+
+  }
+
+}
+
+object PageRank_Bulk5 extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
+  override val target = AWS_F1
+
+  type Elem = FixPt[TRUE,_16,_16] // Float
+  type X = FixPt[TRUE,_16,_16] // Float
+
+  /*
+    Currently testing with DIMACS10 Chesapeake dataset from UF Sparse Matrix collection
+
+  */
+  val margin = 0.3f
+
+  @virtualize
+  def main() {
+    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val rows = sparse_data(0,0)
+    val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
+    val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
+    // Preprocess to get frontier sizes.  We can do this on chip also if we wanted
+    println("Matrix has " + rows + " rows")
+    val edgeLens = Array.tabulate(rows){i => Array.tabulate(node1_list.length){j => 
+      if (node1_list(j) == i) 1 else 0
+    }.reduce{_+_}}
+    val edgeIds = Array.tabulate(rows){i => 
+      var id = -1
+      Array.tabulate(node1_list.length){j => 
+        if (id == -1 && node1_list(j) == i) {
+          id = j
+          j
+        } else { 0 }
+    }.reduce{_+_}}
+
+    // printArray(node1_list, "node1_list:")
+    // printArray(node2_list, "node2_list:")
+    printArray(edgeLens, "edgeLens: ")
+    printArray(edgeIds, "edgeIds: ")
+
+    val tileSize = 48 (16 -> 16 -> 128)
+    val par_load = 1
+    val par_store = 1
+    val tile_par = 2 (1 -> 1 -> 12)
+    val page_par = 4 (1 -> 1 -> 16)
+
+    // Arguments
+    val itersIN = args(0).to[Int]
+    val dampIN = args(1).to[X]
+
+    val iters = ArgIn[Int]
+    val NP    = ArgIn[Int]
+    val damp  = ArgIn[X]
+    val NE    = ArgIn[Int]
+    setArg(iters, itersIN)
+    setArg(NP, rows)
+    setArg(damp, dampIN)
+    setArg(NE, node2_list.length)
+
+    val OCpages    = DRAM[X](NP)
+    val OCedges    = DRAM[Int](NE)    // srcs of edges
+    val OCedgeLens   = DRAM[Int](NP)    // counts for each edge
+    val OCedgeIds   = DRAM[Int](NP) // Start index of edges
+
+    val pagesInit = Array.tabulate(NP){i => 4.to[X]}
+
+    setMem(OCpages, pagesInit)
+    setMem(OCedges, node2_list)
+    setMem(OCedgeLens, edgeLens)
+    setMem(OCedgeIds, edgeIds)
+
+    Accel {
+      Sequential.Foreach(iters by 1){iter => 
+        // Step through each tile
+        Foreach(NP by tileSize par tile_par){page => 
+          val local_pages = SRAM.buffer[X](tileSize)
+          val local_edgeIds = SRAM[Int](tileSize)
+          val local_edgeLens = SRAM[Int](tileSize)
+          val pages_left = min(tileSize.to[Int], NP-page)
+          local_pages load OCpages(page::page+pages_left par par_load)
+          local_edgeLens load OCedgeLens(page::page+pages_left par par_load)
+          local_edgeIds load OCedgeIds(page::page+pages_left par par_load)
+          // Process each page in local tile
+          Sequential.Foreach(pages_left by 1 par page_par){local_page => 
+            // Fetch edge list for this page
+            val edgeList = FIFO[Int](128)
+            val id = local_edgeIds(local_page)
+            val len = local_edgeLens(local_page)
+            edgeList load OCedges(id::id+len)
+            // Triage between edges that exist in local tiles and off chip
+            val nearPages = FIFO[Int](128)
+            val farPages = FIFO[Int](128)
+            Foreach(edgeList.numel by 1){i => 
+              val tmp = edgeList.deq()
+              if (tmp >= page && tmp < page+pages_left) {
+                nearPages.enq(tmp - page)
+              } else {
+                farPages.enq(tmp)
+              }
+            }
+            // Fetch off chip info
+            val local_farPages = FIFO[X](128)
+            val local_farEdgeLens = FIFO[Int](128)
+            Foreach(farPages.numel by 1){ i => 
+              val el = farPages.deq()
+              local_farPages load OCpages(el::el+1)
+              local_farEdgeLens load OCedgeLens(el::el+1)
+            }
+
+            // Do math to find new rank
+            val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+              if (nearPages.empty) {
+                // println("page: " + page + ", local_page: " + local_page + " deq from far")
+                (local_farPages.deq().to[FixPt[TRUE,_8,_8]] / local_farEdgeLens.deq().to[FixPt[TRUE,_8,_8]]).to[X]
+              } else {
+                val addr = nearPages.deq()
+                // println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                (local_pages(addr).to[FixPt[TRUE,_8,_8]] / local_edgeLens(addr).to[FixPt[TRUE,_8,_8]]).to[X]
+              }
+            }{_+_}
+
+            // Write new rank
+            local_pages(local_page) = pagerank * damp + (1.to[X] - damp)
+          }
+          OCpages(page::page+pages_left par par_store) store local_pages
+        }
+      }
+    }
+
+    val result = getMem(OCpages)
+
+    val gold = Array.empty[X](NP)
+    // Init
+    for (i <- 0 until NP) {
+      gold(i) = pagesInit(i)
+    }
+
+    // Really bad imperative version
+    for (ep <- 0 until iters) {
+      // println("Iter " + ep)
+      for (i <- 0 until NP) {
+        val numEdges = edgeLens(i)
+        val startId = edgeIds(i)
+        val iterator = Array.tabulate(numEdges){kk => startId + kk}
+        val these_edges = iterator.map{j => node2_list(j)}
+        val these_pages = these_edges.map{j => gold(j)}
+        val these_counts = these_edges.map{j => edgeLens(j)}
+        val pr = these_pages.zip(these_counts){ (p,c) =>
+          // println("page " + i + " doing " + p + " / " + c)
+          p/c.to[X]
+        }.reduce{_+_}
+        // println("new pr for " + i + " is " + pr)
+        gold(i) = pr*dampIN + (1.to[X]-dampIN)
+      }
+    }
+
+    println("PageRank on DIMACS10 Chesapeake dataset downloaded from UF Sparse Matrix collection")
+    printArray(gold, "gold: ")
+    printArray(result, "result: ")
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin.to[X])) && g > (o - margin.to[X])}.reduce{_&&_}
+    println("PASS: " + cksum + " (PageRank)")
+
+  }
+
+}
+
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
   override val target = AWS_F1
 
@@ -2508,9 +3323,9 @@ object TPCHQ61 extends SpatialApp { // Regression (Dense) // Args: 3840
 
     val ts = 768 (96 -> 96 -> 192000)
     val op = 2 (1 -> 2)
-    val par_load = 16
-    val par_store = 16
-    val ip = 16 (1 -> 384)
+    val par_load = 8
+    val par_store = 8
+    val ip = 8 (1 -> 384)
 
     setMem(dates, datesIn)
     setMem(quants, quantsIn)
@@ -2610,8 +3425,8 @@ object TPCHQ62 extends SpatialApp { // Regression (Dense) // Args: 3840
     val maxDateIn = MAX_DATE
     val out = ArgOut[T]
 
-    val ts = 384 (96 -> 96 -> 192000)
-    val op = 2 (1 -> 2)
+    val ts = 768 (96 -> 96 -> 192000)
+    val op = 1 (1 -> 2)
     val par_load = 16
     val par_store = 16
     val ip = 16 (1 -> 384)
@@ -2714,7 +3529,7 @@ object TPCHQ63 extends SpatialApp { // Regression (Dense) // Args: 3840
     val maxDateIn = MAX_DATE
     val out = ArgOut[T]
 
-    val ts = 1152 (96 -> 96 -> 192000)
+    val ts = 2048 (96 -> 96 -> 192000)
     val op = 2 (1 -> 2)
     val par_load = 16
     val par_store = 16
@@ -2845,7 +3660,7 @@ object AES1 extends SpatialApp { // Regression (Dense) // Args: 50
     
     val par_load = 16
     val par_store = 16
-    val outer_par = 2 (1 -> 1 -> 4) // This may crash GC
+    val outer_par = 1 (1 -> 1 -> 4) // This may crash GC
 
     // Setup
     val num_bytes = ArgIn[Int]
@@ -2984,64 +3799,64 @@ object AES1 extends SpatialApp { // Regression (Dense) // Args: 50
           }
         }
 
-        /* Loopy version */
-        Sequential.Foreach(niter by 1) { round => 
-          // SubBytes
-          if (round > 0) {
-            Pipe{substitute_bytes()}
-          }
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
 
-          // ShiftRows
-          if (round > 0) {
-            Pipe{shift_rows()}
-          }
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
 
-          // MixColumns
-          if (round > 0 && round < 14 ) {
-            Pipe{mix_columns()}
-          }
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
 
-          // Expand key
-          if (round > 0 && ((round % 2) == 0)) {
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
+
+        //   // AddRoundKey
+        //   add_round_key(round)
+
+        // }
+
+        /* Partially pipelined version */
+        // Round 0
+        add_round_key(0)
+
+        // Rounds 1 - 7
+        Sequential.Foreach(1 until 8 by 1) { round => 
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          if ((round % 2) == 0) {
             Pipe{expand_key()}
           }
-
-          // AddRoundKey
           add_round_key(round)
-
         }
-
-        // /* Partially pipelined version */
-        // // Round 0
-        // add_round_key(0)
-
-        // // Rounds 1 - 7
-        // Sequential.Foreach(1 until 8 by 1) { round => 
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{mix_columns()}
-        //   if ((round % 2) == 0) {
-        //     Pipe{expand_key()}
-        //   }
-        //   add_round_key(round)
-        // }
-        // // Rounds 8 - 14
-        // Sequential.Foreach(8 until 14 by 1) { round => 
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{mix_columns()}
-        //   if ((round % 2) == 0) {
-        //     Pipe{expand_key()}
-        //   }
-        //   add_round_key(round)
-        // }
-        // // Round 14
-        // Pipe {
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{expand_key()}
-        //   add_round_key(14)
-        // }
+        // Rounds 8 - 14
+        Sequential.Foreach(8 until 14 by 1) { round => 
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          if ((round % 2) == 0) {
+            Pipe{expand_key()}
+          }
+          add_round_key(round)
+        }
+        // Round 14
+        Pipe {
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{expand_key()}
+          add_round_key(14)
+        }
 
 
         // /* Totally pipelined version */
@@ -4554,10 +5369,10 @@ object Sobel3 extends SpatialApp { // Regression (Dense) // Args: 400 1024
     setArg(C, image.cols)
 
 
-    val lb_par = 16 (1 -> 1 -> 16)
-    val par_store = 16
+    val lb_par = 8 (1 -> 1 -> 16)
+    val par_store = 8
     val row_stride = 100 (100 -> 100 -> 500)
-    val row_par = 2 (1 -> 1 -> 16)
+    val row_par = 1 (1 -> 1 -> 16)
     val par_Kh = 3 (1 -> 1 -> 3)
     val par_Kw = 3 (1 -> 1 -> 3)
 
@@ -4693,12 +5508,12 @@ object Sobel1 extends SpatialApp { // Regression (Dense) // Args: 400 1024
     setArg(C, image.cols)
 
 
-    val lb_par = 16 (1 -> 1 -> 16)
+    val lb_par = 8 (1 -> 1 -> 16)
     val par_store = 16
     val row_stride = 100 (100 -> 100 -> 500)
-    val row_par = 6 (1 -> 1 -> 16)
-    val par_Kh = 3 (1 -> 1 -> 3)
-    val par_Kw = 3 (1 -> 1 -> 3)
+    val row_par = 3 (1 -> 1 -> 16)
+    val par_Kh = 1 (1 -> 1 -> 3)
+    val par_Kw = 1 (1 -> 1 -> 3)
 
     val img = DRAM[T](R, C)
     val imgOut = DRAM[T](R, C)
@@ -4834,10 +5649,10 @@ object Sobel2 extends SpatialApp { // Regression (Dense) // Args: 400 1024
 
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
-    val row_stride = 100 (100 -> 100 -> 500)
-    val row_par = 8 (1 -> 1 -> 16)
-    val par_Kh = 3 (1 -> 1 -> 3)
-    val par_Kw = 3 (1 -> 1 -> 3)
+    val row_stride = 500 (100 -> 100 -> 500)
+    val row_par = 1 (1 -> 1 -> 16)
+    val par_Kh = 1 (1 -> 1 -> 3)
+    val par_Kw = 1 (1 -> 1 -> 3)
 
     val img = DRAM[T](R, C)
     val imgOut = DRAM[T](R, C)
@@ -4970,9 +5785,9 @@ object GDA1 extends SpatialApp { // Regression (Dense) // Args: 64
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
     val rTileSize = 32(96 -> 19200)
     val op = 2(1 -> 8)
-    val ip = 8(1 -> 12)
-    val subLoopPar = 2(1 -> 16)
-    val prodLoopPar = 2(1 -> 96)
+    val ip = 4(1 -> 12)
+    val subLoopPar = 16(1 -> 16) 
+    val prodLoopPar = 16(1 -> 96)
     val outerAccumPar = 4(1 -> 1)
 
     val rows = yCPU.length;
