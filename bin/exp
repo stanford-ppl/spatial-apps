@@ -309,6 +309,7 @@ def avgbw(app, args, params):
         # sword += tileSize * (NP / tileSize)  * iters # store currentPR
         pass
     elif 'SPMV_CRS' in app:
+        MAGIC = 15162342 
         # lword += (tileSize + 1) * (N / tileSize) # load rowid_sram 
         # lword += (stop_id - start_id) * tileSize * 
         simlog = logs(app, "RUN_SIMULATION")
@@ -316,10 +317,14 @@ def avgbw(app, args, params):
             for line in f:
                 if "Sum of size (#bursts) of dense loads:" in line:
                     burst = int(line.split(":")[1].split("(")[1].split(")")[0])
-                    lword += burst * 16
+                    lword += (burst-MAGIC) * 16
                 if "Sum of size (#bursts) of dense stores:" in line:
-                    burst = int(line.split(":")[1].split("(")[1].strip(")")[0])
-                    sword += burst * 16
+                    burst = int(line.split(":")[1].split("(")[1].split(")")[0])
+                    sword += (burst-MAGIC) * 16
+                if "Sparse reads: " in line:
+                    lword += int(line.split("(")[1].split(")")[0])  
+                if "Sparse write: " in line:
+                    sword += int(line.split("(")[1].split(")")[0])  
         pass
 
     lbyte = lword * 4
@@ -335,19 +340,19 @@ def summarize(app, args, params):
     # for p in passes:
         # print(p, progress(fullname,p))
     if success(fullname, "MAP_PIR") and success(fullname, "RUN_SIMULATION"):
-        # if fullname not in summary[app][sargs(args)]:
-        print('summarize:{}'.format(fullname))
-        summary[app][sargs(args)][fullname] = OrderedDict()
-        table = summary[app][sargs(args)][fullname]
-        cycle = cycleOf(fullname) 
-        table['cycle'] = cycle
-        table['lavgbw'], table['savgbw'] = avgbw(fullname, args, params)
-        reslog = logs(fullname, "Utilization")
-        with open(reslog, 'rb') as f:
-            for line in f:
-                for header in summary_headers:
-                    if header in line:
-                        table[header] = getUtil(line)
+        if fullname not in summary[app][sargs(args)]:
+            print('summarize:{}'.format(fullname))
+            summary[app][sargs(args)][fullname] = OrderedDict()
+            table = summary[app][sargs(args)][fullname]
+            cycle = cycleOf(fullname) 
+            table['cycle'] = cycle
+            table['lavgbw'], table['savgbw'] = avgbw(fullname, args, params)
+            reslog = logs(fullname, "Utilization")
+            with open(reslog, 'rb') as f:
+                for line in f:
+                    for header in summary_headers:
+                        if header in line:
+                            table[header] = getUtil(line)
 
 def futil(used,total):
    return round(float(used) / float(total), 3)
