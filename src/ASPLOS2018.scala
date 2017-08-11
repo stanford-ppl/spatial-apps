@@ -2585,12 +2585,12 @@ object PageRank_Bulk1 extends SpatialApp { // Regression (Sparse) // Args: 50 0.
             // Do math to find new rank
             val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
-                println("page: " + page + ", local_page: " + local_page + " deq from far")
-                local_farPages.deq() / local_farEdgeLens.deq().to[X]
+                // println("page: " + page + ", local_page: " + local_page + " deq from far")
+                (local_farPages.deq().to[FixPt[TRUE,_8,_8]] / local_farEdgeLens.deq().to[FixPt[TRUE,_8,_8]]).to[X]
               } else {
                 val addr = nearPages.deq()
-                println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
-                local_pages(addr) / local_edgeLens(addr).to[X]
+                // println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                (local_pages(addr).to[FixPt[TRUE,_8,_8]] / local_edgeLens(addr)..to[FixPt[TRUE,_8,_8]])to[X]
               }
             }{_+_}
 
@@ -2748,12 +2748,12 @@ object PageRank_Bulk2 extends SpatialApp { // Regression (Sparse) // Args: 50 0.
             // Do math to find new rank
             val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
-                println("page: " + page + ", local_page: " + local_page + " deq from far")
-                local_farPages.deq() / local_farEdgeLens.deq().to[X]
+                // println("page: " + page + ", local_page: " + local_page + " deq from far")
+                (local_farPages.deq().to[FixPt[TRUE,_8,_8]] / local_farEdgeLens.deq().to[FixPt[TRUE,_8,_8]]).to[X]
               } else {
                 val addr = nearPages.deq()
-                println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
-                local_pages(addr) / local_edgeLens(addr).to[X]
+                // println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                (local_pages(addr).to[FixPt[TRUE,_8,_8]] / local_edgeLens(addr)..to[FixPt[TRUE,_8,_8]])to[X]
               }
             }{_+_}
 
@@ -2911,12 +2911,12 @@ object PageRank_Bulk3 extends SpatialApp { // Regression (Sparse) // Args: 50 0.
             // Do math to find new rank
             val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
-                println("page: " + page + ", local_page: " + local_page + " deq from far")
-                local_farPages.deq() / local_farEdgeLens.deq().to[X]
+                // println("page: " + page + ", local_page: " + local_page + " deq from far")
+                (local_farPages.deq().to[FixPt[TRUE,_8,_8]] / local_farEdgeLens.deq().to[FixPt[TRUE,_8,_8]]).to[X]
               } else {
                 val addr = nearPages.deq()
-                println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
-                local_pages(addr) / local_edgeLens(addr).to[X]
+                // println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                (local_pages(addr).to[FixPt[TRUE,_8,_8]] / local_edgeLens(addr)..to[FixPt[TRUE,_8,_8]])to[X]
               }
             }{_+_}
 
@@ -3074,12 +3074,12 @@ object PageRank_Bulk4 extends SpatialApp { // Regression (Sparse) // Args: 50 0.
             // Do math to find new rank
             val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
-                println("page: " + page + ", local_page: " + local_page + " deq from far")
-                local_farPages.deq() / local_farEdgeLens.deq().to[X]
+                // println("page: " + page + ", local_page: " + local_page + " deq from far")
+                (local_farPages.deq().to[FixPt[TRUE,_8,_8]] / local_farEdgeLens.deq().to[FixPt[TRUE,_8,_8]]).to[X]
               } else {
                 val addr = nearPages.deq()
-                println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
-                local_pages(addr) / local_edgeLens(addr).to[X]
+                // println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                (local_pages(addr).to[FixPt[TRUE,_8,_8]] / local_edgeLens(addr)..to[FixPt[TRUE,_8,_8]])to[X]
               }
             }{_+_}
 
@@ -3237,12 +3237,12 @@ object PageRank_Bulk5 extends SpatialApp { // Regression (Sparse) // Args: 50 0.
             // Do math to find new rank
             val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
-                println("page: " + page + ", local_page: " + local_page + " deq from far")
-                local_farPages.deq() / local_farEdgeLens.deq().to[X]
+                // println("page: " + page + ", local_page: " + local_page + " deq from far")
+                (local_farPages.deq().to[FixPt[TRUE,_8,_8]] / local_farEdgeLens.deq().to[FixPt[TRUE,_8,_8]]).to[X]
               } else {
                 val addr = nearPages.deq()
-                println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
-                local_pages(addr) / local_edgeLens(addr).to[X]
+                // println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                (local_pages(addr).to[FixPt[TRUE,_8,_8]] / local_edgeLens(addr)..to[FixPt[TRUE,_8,_8]])to[X]
               }
             }{_+_}
 
