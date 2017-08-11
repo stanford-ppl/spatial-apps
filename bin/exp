@@ -34,6 +34,7 @@ APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
 JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
 SUMMARY_PATH="{}/apps/summary.pickle".format(SPATIAL_HOME)
 SUMMARY_CSV_PATH="{}/apps/summary.csv".format(SPATIAL_HOME)
+BEST_SUMMARY_CSV_PATH="{}/apps/best.csv".format(SPATIAL_HOME)
 apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
 passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
 progress_cache = {}
@@ -42,6 +43,16 @@ summary_headers = ['App', 'cycle', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'sc
     'slinkUtil', 'vlinkUtil', 'clinkUtil', 'totalRegUtil', 'totalFUUtil', 'totalSBufUtil', 
     'totalVBufUtil']
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 def plot():
     cmap = matplotlib.cm.get_cmap('Oranges')
     for app in apps:
@@ -49,6 +60,7 @@ def plot():
             for args in summary[app]:
                 fig, ax = plt.subplots()
                 for fullname in summary[app][args]:
+                    tileSize = int(fullname.split('tileSize_')[1].split('_')[0])
                     used, total = summary[app][args][fullname]['pcuUtil']
                     pcu = futil(used, total)
                     used, total = summary[app][args][fullname]['mcuUtil']
@@ -62,27 +74,25 @@ def plot():
                     # size = mc * 100
                     # size = mc * 100
                     # size = lavgbw
+                    # size = tileSize 
                     bw = (lavgbw + 3) / 15
                     color = cmap(bw)
                     # color = cmap(max_bw - lavgbw/max_bw)
-                    sp = ax.scatter(pcu * 100, cycle, c=color, s=size, edgecolors='none')
+                    cycle = float(cycle) / (7.5 * (10 ** 7))
+                    if tileSize==16:
+                        ec = 'none'
+                    else:
+                        ec = 'k'
+                    sp = ax.scatter(pcu * 100, cycle, c=color, s=size, edgecolors=ec)
                 plot_path = '{}/apps/{}_{}.png'.format(SPATIAL_HOME,app, args)
                 plt.grid(True)
                 plt.xlabel('PCU Utilization (%)')
-                plt.ylabel('Cycle')
+                plt.ylabel('Runtime')
+                ax.set_ylim(0,1)
                 fig.set_size_inches(6,4)
                 plt.gcf().subplots_adjust(bottom=0.15)
                 plt.savefig(plot_path, format='png', dpi=900)
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+                print('Generate {}'.format(plot_path))
 
 def sargs(args):
     return '_'.join([str(a) for a in args])
@@ -331,6 +341,34 @@ def summarize(app, args, params):
 
 def futil(used,total):
    return round(float(used) / float(total), 3)
+
+def bestSummary():
+    best = OrderedDict()
+    best['TPCHQ6'] = ('TPCHQ6_96000_outerPar_8_tileSize_2000', '96000')
+    best['BlackScholes'] = ('BlackScholes_1966080_outerPar_1_tileSize_32768', '1966080')
+    best['Kmeans_plasticine'] = ('Kmeans_plasticine_1_6144_tileSize_512', '1_6144')
+    best['SPMV_CRS'] = ('SPMV_CRS__tileSize_208_tile_par_2_pt_par_1', '')
+    best['GEMM_Blocked'] = ('GEMM_Blocked__tileSize_256_i_tileSize_256_loop_jj_1_loop_ii_1_loop_kk_1_loop_i_4_loop_k_3', '')
+    best['GDA'] = ('GDA_192000_tileSize_16_outerPar_1_midPar_4', '192000')
+
+    headers = ['App', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'mcUtil', 'totalFUUtil']
+    with open(BEST_SUMMARY_CSV_PATH, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=headers)
+        writer.writeheader()
+        for app in best:
+            dict = {'App':app }
+            for header in headers:
+                fullname, args = best[app]
+                if header == 'App':
+                    pass
+                elif header in ['lavgbw', 'savgbw']:
+                    dict[header] = round(summary[app][args][fullname][header] / max_bw * 100, 3)
+                elif header not in ['cycle']:
+                    used, total = summary[app][args][fullname][header]
+                    dict[header] = futil(used, total) * 100
+                else:
+                    dict[header] = summary[app][args][fullname][header]
+            writer.writerow(dict)
 
 def summaryToCsv():
     global summary
@@ -623,6 +661,7 @@ def main():
     parser.add_argument('--torun', dest='torun', action='store', default='ALL',
         help='Pass to run')
     parser.add_argument('--summary', dest='summary', action='store_true', default=False) 
+    parser.add_argument('--best', dest='best', action='store_true', default=False) 
     parser.add_argument('--plot', dest='plot', action='store_true', default=False) 
 
     global opts
@@ -640,7 +679,7 @@ def main():
         checkProcess()
         print("Number of active jobs({})={}".format(len(job_list), job_list))
 
-    if opts.summary or opts.plot:
+    if opts.summary or opts.plot or opts.best:
         global summary
         if not os.path.exists(SUMMARY_PATH):
             print("New app summary at {}".format(SUMMARY_PATH))
@@ -659,6 +698,9 @@ def main():
     if opts.summary:
         pickle.dump(summary, open(SUMMARY_PATH, 'wb'))
         summaryToCsv()
+
+    if opts.best:
+        bestSummary()
 
     if opts.plot:
         plot()
