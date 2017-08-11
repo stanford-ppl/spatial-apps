@@ -18,7 +18,7 @@ import csv
 
 lanes = 16
 bankSize = 32 * 1024 / 4
-proc_thresh = 20
+proc_thresh = 40
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
@@ -227,7 +227,7 @@ def avgbw(app, args, params):
         lword += R * C # load x
         sword += C * C # store sigma
     elif 'BlackScholes' in app:
-        N,_ = args
+        N = args[0]
         lword += N * 6 # load 6 data stucture
         sword += N # store optpriceBlk
     elif 'GEMM_Blocked' in app:
@@ -241,6 +241,9 @@ def avgbw(app, args, params):
         # store c_col
         sword += i_tileSize * tileSize * (dim / tileSize) * (dim / i_tileSize)
     elif 'Kmeans_plasticine' in app:
+        iters = 1
+        D = 96
+        K = 20
         N = 6144
         dim = 96
         tileSize = params['tileSize']
