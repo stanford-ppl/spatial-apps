@@ -53,19 +53,23 @@ function act() {
   fi
 }
 
-for pass in ${passes[@]}; do
-	log=${logs[$pass]}
-	passStatus $pass
-	prog=${progress[$pass]}
-	echo -e "${colors[$prog]}$pass($prog)${NC} $log"
-	if [[ $prog == "RUNNING" ]]; then
-		break
-  fi
-done
+function show() {
+  for pass in ${passes[@]}; do
+  	log=${logs[$pass]}
+  	passStatus $pass
+  	prog=${progress[$pass]}
+  	echo -e "${colors[$prog]}$pass($prog)${NC} $log"
+  	if [[ $prog == "RUNNING" ]]; then
+  		break
+    fi
+  done
+}
 
+show
 read -p "" RESP
 while [[ $RESP != "" ]]; do
   act $RESP
+  show
   read -p "" RESP
 done
 
