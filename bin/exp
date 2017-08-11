@@ -374,8 +374,8 @@ def GEMM_Blocked():
     params['loop_jj']    = 1 
     params['loop_ii']    = 1
     params['loop_kk']    = 1
-    params['loop_i']     = [1,2,3,4]
-    params['loop_k']     = [1,2,3,4]
+    params['loop_i']     = [1,2,3,4,5]
+    params['loop_k']     = [1,2,3,4,5]
     space += dse(app, args, params)
     print('{} space: {}'.format(app, space))
 
