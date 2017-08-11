@@ -14,15 +14,25 @@ import psutil
 import shutil
 import numpy as np
 import types
+import csv
 
 lanes = 16
 bankSize = 32 * 1024 / 4
 proc_thresh = 25
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
-PIRL_HOME = os.environ['PIR_HOME']
+PIR_HOME = os.environ['PIR_HOME']
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
 JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
+SUMMARY_PATH="{}/apps/summary.pickle".format(SPATIAL_HOME)
+SUMMARY_CSV_PATH="{}/apps/summary.csv".format(SPATIAL_HOME)
+apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
+passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
+progress_cache = {}
+cycle_cache = {}
+summary_headers = ['App', 'cycle', 'pcuUtil', 'mcuUtil', 'scuUtil', 'ocuUtil', 'mcUtil', 'ocuUtil', 'mcUtil',
+    'slinkUtil', 'vlinkUtil', 'clinkUtil', 'totalRegUtil', 'totalFUUtil', 'totalSBufUtil', 
+    'totalVBufUtil']
 
 class bcolors:
     HEADER = '\033[95m'
@@ -34,26 +44,29 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def newAppName(app, args, params):
-    postfix = '_'.join([str(a) for a in args])
+def sargs(args):
+    return '_'.join([str(a) for a in args])
+
+def getFullName(app, args, params):
+    postfix = sargs(args) 
     postfix = postfix + ''.join(["_{}_{}".format(k,str(params[k])) for k in params ]) 
-    newname = '{}_{}'.format(app, postfix)
-    newname = newname.replace('.','d')
-    return newname
+    fullname = '{}_{}'.format(app, postfix)
+    fullname = fullname.replace('.','d')
+    return fullname
 
 def copyApp(app, args, params):
     path = '{0}/{1}.scala'.format(APP_DIR, app)
-    newname = newAppName(app, args, params) 
+    fullname = getFullName(app, args, params) 
     if not os.path.exists('{}/gen'.format(APP_DIR)):
         os.makedirs('{}/gen'.format(APP_DIR))
-    newpath = '{0}/gen/{1}.scala'.format(APP_DIR, newname)
+    newpath = '{0}/gen/{1}.scala'.format(APP_DIR, fullname)
     paramFound = {}
     with open(newpath, 'w') as newapp:
         with open(path, 'r') as origapp :
             for line in origapp:
                 found = False
                 if 'object {}'.format(app) in line:
-                    newapp.write(line.replace(app, newname))
+                    newapp.write(line.replace(app, fullname))
                     found = True
                 for param in params:
                     if 'val {} = '.format(param) in line:
@@ -84,8 +97,8 @@ def runApp(app, args, params):
         waitProcess()
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     copyApp(app, args, params)
-    newname = newAppName(app, args, params)
-    command = "apps/bin/runapp {} {} {} {}".format(newname, ' '.join([str(a) for a in args]),
+    fullname = getFullName(app, args, params)
+    command = "apps/bin/runapp {} {} {} {}".format(fullname, ' '.join([str(a) for a in args]),
             opts.torun, opts.regen)
     print('command={}'.format(command))
     proc = subprocess.Popen(command.split(), shell=False)
@@ -98,8 +111,8 @@ def runApp(app, args, params):
         proc.wait()
 
 def clear(app, args, params):
-    newname = newAppName(app, args, params)
-    command = "rm -r gen/{}/Top.vcd".format(newname)
+    fullname = getFullName(app, args, params)
+    command = "rm -r gen/{}/Top.vcd".format(fullname)
     print(command)
     subprocess.call(command, shell=True)
 
@@ -117,8 +130,8 @@ def clearAll():
 count = 0
 def status(app, args, params):
     global count
-    newname = newAppName(app, args, params)
-    command = "apps/bin/status {}".format(newname)
+    fullname = getFullName(app, args, params)
+    command = "apps/bin/status {}".format(fullname)
     print(command)
     proc = subprocess.Popen(command, shell=True)
     proc.wait()
@@ -126,11 +139,123 @@ def status(app, args, params):
     count += 1
     # proc.kill()
 
+def logs(app, passName):
+    if passName=="GEN_PIR":
+        return '{}/gen/{}/gen_pir.log'.format(SPATIAL_HOME, app)
+    elif passName=="FIT_PIR":
+        return '{}/out/{}/fit_pir.log'.format(PIR_HOME,app)
+    elif passName=="GEN_CHISEL":
+        return '{}/gen/{}/gen_chisel.log'.format(SPATIAL_HOME,app)
+    elif passName=="MAKE_VCS":
+        return '{}/gen/{}/vcs.log'.format(SPATIAL_HOME,app)
+    elif passName=="MAP_PIR":
+        return '{}/out/{}/map_pir.log'.format(PIR_HOME,app)
+    elif passName=="RUN_SIMULATION":
+        return '{}/gen/{}/sim.log'.format(SPATIAL_HOME, app)
+    elif passName=="Utilization":
+        return '{}/out/{}/ResourceAnalysis.log'.format(PIR_HOME, app)
+
+def grep(path, patterns):
+    found = None
+    if type(patterns)!=list:
+        patterns = [patterns]
+    with open(path, 'r') as f:
+        for line in f:
+            for pattern in patterns:
+                if pattern in line:
+                    found = line
+                    break
+    return found
+
+def cycleOf(app):
+    if app in cycle_cache:
+        return cycle_cache[app]
+    log = logs(app, "RUN_SIMULATION")
+    line = grep(log, ["Design ran for"])
+    if line is None:
+        return None
+    else:
+        cycle = int(line.split("Design ran for ")[1].split(" ")[0])
+        cycle_cache[app] = cycle
+        return cycle
+
+def progress(app, passName):
+    if (app, passName) in progress_cache:
+        return progress_cache[(app, passName)]
+    log = logs(app, passName)
+    prog = "NONE"
+    if os.path.exists(log):
+        isDone=(grep(log,"{}(DONE)".format(passName)) is not None)
+        if isDone:
+	    isFailed=grep(log, ['error','Error','ERROR','No rule to make', 'Killed', 'KILLED']) is not None
+            if passName=="RUN_SIMULATION":
+	        hasCycle=cycleOf(app) is not None
+	        timeOut=grep(log, 'Hardware timeout after') is not None
+                if not hasCycle or timeOut:
+                    isFailed = True
+            if isFailed: 
+	        prog = "FAILED"
+            else:
+	        prog = "SUCCESS"
+        else:
+	    prog = "RUNNING"
+    else:
+        prog = "NOTRUN"
+    progress_cache[(app,passName)] = prog
+    return prog
+
+def success(app, passName):
+    return progress(app, passName)=="SUCCESS"
+
+def getUtil(line):
+    used,total=line.split("Util(")[1].split(')')[0].split(',')
+    used = int(used)
+    total = int(total)
+    return (used, total)
+
+def summarize(app, args, params):
+    global summary
+    fullname = getFullName(app, args, params)
+    # for p in passes:
+        # print(p, progress(fullname,p))
+    if success(fullname, "MAP_PIR") and success(fullname, "RUN_SIMULATION"):
+        if fullname not in summary[app][sargs(args)]:
+            summary[app][sargs(args)][fullname] = OrderedDict()
+            table = summary[app][sargs(args)][fullname]
+            cycle = cycleOf(fullname) 
+            table['cycle'] = cycle
+            reslog = logs(fullname, "Utilization")
+            with open(reslog, 'rb') as f:
+                for line in f:
+                    for header in summary_headers:
+                        if header in line:
+                            table[header] = getUtil(line)
+
+def summaryToCsv():
+    global summary
+    with open(SUMMARY_CSV_PATH, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=summary_headers)
+        writer.writeheader()
+        for app in summary:
+            for arg in summary[app]:
+                for fullname in summary[app][arg]: 
+                    dict = {'App':fullname}
+                    for header in summary[app][arg][fullname]:
+                        if header not in ['App', 'cycle']:
+                            used, total = summary[app][arg][fullname][header]
+                            dict[header] = round(float(used) / float(total), 3)
+                        else:
+                            dict[header] = summary[app][arg][fullname][header]
+                    writer.writerow(dict)
+
+
 def target(app, args, params):
     if opts.run:
         runApp(app, args, params)
     elif opts.status:
         status(app, args, params)
+    elif opts.summary:
+        summarize(app, args, params)
 
 def dse(app, args, params):
     # print(params)
@@ -168,45 +293,72 @@ def irange(start, stop, step):
         r.append(stop)
     return r
 
+def addArgs(app, args):
+    if opts.summary:
+        if sargs(args) not in summary[app]: 
+            summary[app][sargs(args)] = OrderedDict()
 
-apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
-
-def TPCHQ6(args, params):
+def TPCHQ6():
+    app = 'TPCHQ6'
+    space = 0
     N = 96000
-    args += [N]
+    args = [N]
+    addArgs(app, args)
 
     # FINISHED
+    params = OrderedDict()
     params['outerPar'] = irange(1, 10, 2) 
     params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
+    space += dse(app, args, params)
 
     # Finished
-    # params['outerPar'] = irange(6, 10, 2) 
-    # params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 800)
+    params = OrderedDict()
+    params['outerPar'] = irange(6, 10, 2) 
+    params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 800)
+    space += dse(app, args, params)
 
     # Finished
-    # params['outerPar'] = irange(2, 10, 2) 
-    # params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
+    params = OrderedDict()
+    params['outerPar'] = irange(2, 10, 2) 
+    params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
+    space += dse(app, args, params)
 
-def GDA(args, params):
+    print('{} space: {}'.format(app, space))
+
+def GDA():
+    app = 'GDA'
+    space = 0
     R = 192000
     MAXC = 80
-    args += [R]
+    args = [R]
+    addArgs(app, args)
 
     # Finished 
+    params = OrderedDict()
     # params['tileSize'] = irange(16, 16*5, 16) 
     params['tileSize'] = irange(16, bankSize*lanes/MAXC, 512) 
     params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
     params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+    space += dse(app, args, params)
 
     # Finished 
-    # params['tileSize'] = irange(16, 16*3, 16*2) 
-    # params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
-    # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
+    params = OrderedDict()
+    params['tileSize'] = irange(16, 16*3, 16*2) 
+    params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
+    params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
+    space += dse(app, args, params)
 
-def GEMM_Blocked(args, params):
+    print('{} space: {}'.format(app, space))
+
+def GEMM_Blocked():
+    app = 'GEMM_Blocked'
+    space = 0
     dim = 512
     # args += [dim]
+    args = []
+    addArgs(app, args)
 
+    params = OrderedDict()
     params['tileSize']   = [16, 256] # irange(16, dim, 16)
     params['i_tileSize'] = [16, 256] # irange(16, dim, 16)
     params['loop_jj']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
@@ -214,46 +366,78 @@ def GEMM_Blocked(args, params):
     params['loop_kk']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
     params['loop_i']     = lambda params: irange(1 , min(params['i_tileSize']    , 2), 1)
     params['loop_k']     = lambda params: irange(1 , min(params['tileSize']      , 2), 1)
+    space += dse(app, args, params)
 
-def BlackScholes(args, params):
+    print('{} space: {}'.format(app, space))
+
+def BlackScholes():
+    app = 'BlackScholes'
+    space = 0
     N = 1966080  
-    args += [N]
+    args = [N]
+    addArgs(app, args)
 
     # Finished
-    # params['outerPar'] = irange(1, 4, 1) 
-    # params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
+    params = OrderedDict()
+    params['outerPar'] = irange(1, 4, 1) 
+    params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
+    space += dse(app, args, params)
 
-    # TODO: make vcs
+    params = OrderedDict()
     params['outerPar'] = 1 
     params['tileSize'] = lambda params: irange(1024*16, min(bankSize*lanes,N/params['outerPar']),1024*16)
+    space += dse(app, args, params)
 
-def PageRank_plasticine(args, params):
+    print('{} space: {}'.format(app, space))
+
+def PageRank_plasticine():
+    app = 'PageRank_plasticine'
+    space = 0
     iters = 1
-    NP = 491520
+    NP = 491520 # 2048 in simulation
     damp = 0.125
     args = [iters, NP, damp]
+    addArgs(app, args)
 
+    params = OrderedDict()
     maxTile = min(bankSize*lanes,NP)
     params['tileSize'] = [16, 1024, 1024*6, maxTile/4, maxTile/2, maxTile] 
+    space += dse(app, args, params)
 
-def Kmeans_plasticine(args, params):
+    print('{} space: {}'.format(app, space))
+
+def Kmeans_plasticine():
+    app = 'Kmeans_plasticine'
+    space = 0
     iter = 1
     N = 6144
     dim = 96
-    args += [1, N]
+    args = [1, N]
+    addArgs(app, args)
 
     # Finished 
+    params = OrderedDict()
     params['tileSize'] = irange(16, 16, 1) + irange(128, 512, 128) + irange(1024,min(bankSize*lanes/dim, N), 1024)
+    space += dse(app, args, params)
 
-def SPMV_CRS(args, params):
+    print('{} space: {}'.format(app, space))
+
+def SPMV_CRS():
+    app = 'SPMV_CRS'
+    space = 0
     N = 494
-    args += []
+    args = []
+    addArgs(app, args)
 
+    params = OrderedDict()
     maxTile = min(bankSize*lanes, N)
     # Finished
     params['tileSize'] = irange(16, maxTile, 64) 
     params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 2) + [2]
     params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 2) + [2]
+    space += dse(app, args, params)
+
+    print('{} space: {}'.format(app, space))
 
 def expRun():
     #################################################################################################################
@@ -261,24 +445,22 @@ def expRun():
     #################################################################################################################
 
     ### TO RUN        ######################################################################################################
-    params = OrderedDict()
-    args = OrderedDict()
-    for app in apps:
-        params[app] = OrderedDict()
-        args[app] = []
-
     app = opts.app
 
-    TPCHQ6(args['TPCHQ6'], params['TPCHQ6'])
-    GDA(args['GDA'], params['GDA'])
-    GEMM_Blocked(args['GEMM_Blocked'], params['GEMM_Blocked'])
-    BlackScholes(args['BlackScholes'], params['BlackScholes'])
-    Kmeans_plasticine(args['Kmeans_plasticine'], params['Kmeans_plasticine'])
-    PageRank_plasticine(args['PageRank_plasticine'], params['PageRank_plasticine'])
-    SPMV_CRS(args['SPMV_CRS'], params['SPMV_CRS'])
-
-    space = dse(app, args[app], params[app])
-    print('{} space: {}'.format(app, space))
+    if app in ['TPCHQ6', 'ALL']:
+        TPCHQ6()
+    if app in ['GDA', 'ALL']:
+        GDA()
+    if app in ['GEMM_Blocked', 'ALL']:
+        GEMM_Blocked()
+    if app in ['BlackScholes', 'ALL']:
+        BlackScholes()
+    if app in ['Kmeans_plasticine', 'ALL']:
+        Kmeans_plasticine()
+    if app in ['PageRank_plasticine', 'ALL']:
+        PageRank_plasticine()
+    if app in ['SPMV_CRS', 'ALL']:
+        SPMV_CRS()
 
 def main():
     parser = argparse.ArgumentParser(description='Run experiments')
@@ -292,6 +474,7 @@ def main():
         help='force pass to rerun' )
     parser.add_argument('--torun', dest='torun', action='store', default='ALL',
         help='Pass to run')
+    parser.add_argument('--summary', dest='summary', action='store_true', default=False) 
 
     global opts
     (opts, args) = parser.parse_known_args()
@@ -308,11 +491,25 @@ def main():
         checkProcess()
         print("Number of active jobs({})={}".format(len(job_list), job_list))
 
+    if opts.summary:
+        global summary
+        if not os.path.exists(SUMMARY_PATH):
+            print("New app summary at {}".format(SUMMARY_PATH))
+            summary = OrderedDict()
+        else:
+            summary = pickle.load(open(SUMMARY_PATH, 'rb'))
+        for app in apps:
+            if app not in summary:
+                summary[app] = OrderedDict()
+
     if opts.clearAll:
         clearAll()
     else:
         expRun()
 
+    if opts.summary:
+        pickle.dump(summary, open(SUMMARY_PATH, 'wb'))
+        summaryToCsv()
     #################################################################################################################
 
 if __name__ == "__main__":
