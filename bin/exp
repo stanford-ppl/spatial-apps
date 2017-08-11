@@ -30,7 +30,7 @@ apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'Pag
 passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
 progress_cache = {}
 cycle_cache = {}
-summary_headers = ['App', 'cycle', 'pcuUtil', 'mcuUtil', 'scuUtil', 'ocuUtil', 'mcUtil', 'ocuUtil', 'mcUtil',
+summary_headers = ['App', 'cycle', 'avgbw', 'pcuUtil', 'mcuUtil', 'scuUtil', 'ocuUtil', 'mcUtil', 'ocuUtil', 'mcUtil',
     'slinkUtil', 'vlinkUtil', 'clinkUtil', 'totalRegUtil', 'totalFUUtil', 'totalSBufUtil', 
     'totalVBufUtil']
 
@@ -213,6 +213,57 @@ def getUtil(line):
     total = int(total)
     return (used, total)
 
+def avgbw(app, args, params):
+    word = 0
+    if 'TPCHQ6' in app:
+        N, = args
+        word += N * 4 # load 4 data stucture
+    elif 'GDA' in app:
+        R,_ = args
+        C = 80
+        word += C * 2 # load mu0, mu1
+        word += R # load y
+        word += R * C # load x
+        word += C * C # store sigma
+    elif 'BlackScholes' in app:
+        N,_ = args
+        word += N * 6 # load 6 data stucture
+        word += N # store optpriceBlk
+    elif 'GEMM_Blocked' in app:
+        dim = 512
+        tileSize = params['tileSize']
+        i_tileSize = params['i_tileSize']
+        # load b_sram
+        word += (tileSize * tileSize) * (dim / tileSize) * (dim / tileSize) * (dim / i_tileSize)
+        # load a_sram
+        word += (tileSize) * (i_tileSize) * (dim / tileSize) * (dim / tileSize) * (dim / i_tileSize)
+        # store c_col
+        word += i_tileSize * tileSize * (dim / tileSize) * (dim / i_tileSize)
+    elif 'Kmeans_plasticine' in app:
+        N = 6144
+        dim = 96
+        tileSize = params['tileSize']
+        BN = tileSize
+        BD = dim
+        word += K * D # load orgCts
+        word += (BN * BD) * (N / BN) * iters
+        word += (K * D) # store centroids
+    elif 'PageRank_plasticine' in apps:
+        # word += tileSize * 3 * (NP / tileSize) * iters # load initPR, edgesId, edgesLen
+        # word += numEdges * 2 * tileSize * (NP / tileSize) * iters # load edges, counts
+        # word += num2gather * tileSize * (NP / tileSize) * iters # gather
+        # word += tileSize * (NP / tileSize)  * iters # store currentPR
+        pass
+    elif 'SPMV_CRS' in app:
+        # word += (tileSize + 1) * (N / tileSize) # load rowid_sram 
+        # word += (stop_id - start_id) * tileSize * 
+        pass
+
+    byte = word * 4
+    second = float(cycleOf(app)) / (10 ** 9)
+    gbps = byte / second / (10 ** 9)
+    return gbps
+
 def summarize(app, args, params):
     global summary
     fullname = getFullName(app, args, params)
@@ -224,6 +275,7 @@ def summarize(app, args, params):
             table = summary[app][sargs(args)][fullname]
             cycle = cycleOf(fullname) 
             table['cycle'] = cycle
+            table['avgbw'] = avgbw(fullname, args, params)
             reslog = logs(fullname, "Utilization")
             with open(reslog, 'rb') as f:
                 for line in f:
@@ -241,9 +293,11 @@ def summaryToCsv():
                 for fullname in summary[app][arg]: 
                     dict = {'App':fullname}
                     for header in summary[app][arg][fullname]:
-                        if header not in ['App', 'cycle']:
+                        if header not in ['App', 'cycle', 'avgbw']:
                             used, total = summary[app][arg][fullname][header]
                             dict[header] = round(float(used) / float(total), 3)
+                        elif header=='avgbw':
+                            dict[header] = round(summary[app][arg][fullname][header], 3)
                         else:
                             dict[header] = summary[app][arg][fullname][header]
                     writer.writerow(dict)
@@ -469,8 +523,8 @@ def SPMV_CRS():
     maxTile = min(bankSize*lanes, N)
     # Finished
     params['tileSize'] = irange(16, maxTile, 64) 
-    params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 2) + [2]
-    params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 2) + [2]
+    params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 1)
+    params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 1)
     space += dse(app, args, params)
 
     print('{} space: {}'.format(app, space))
