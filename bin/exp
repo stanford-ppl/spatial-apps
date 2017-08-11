@@ -16,6 +16,12 @@ import numpy as np
 import types
 import csv
 
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.ticker as ticker
+import os, sys
+import math
+
 lanes = 16
 bankSize = 32 * 1024 / 4
 proc_thresh = 40
@@ -33,6 +39,22 @@ cycle_cache = {}
 summary_headers = ['App', 'cycle', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'scuUtil', 'ocuUtil', 'mcUtil', 'ocuUtil', 'mcUtil',
     'slinkUtil', 'vlinkUtil', 'clinkUtil', 'totalRegUtil', 'totalFUUtil', 'totalSBufUtil', 
     'totalVBufUtil']
+
+def plot():
+    for app in apps:
+        if app==opts.app or opts.app=='ALL':
+            for args in summary[app][args]:
+                fig, ax = plt.subplots()
+                for fullname in summary[app][args]:
+                    used, total = summary[app][args][fullname]['pcuUtil']
+                    pcu = futil(used, total)
+                    used, total = summary[app][args][fullname]['mcuUtil']
+                    mcu = futil(used, total)
+                    used, total = summary[app][args][fullname]['mcUtil']
+                    mc = futil(used, total)
+                    cycle = summary[app][args][fullname]['cycle']
+                    sp = ax.scatter(pcu, cycle, c = color_spd, s = dotSize, marker = marker_pd, edgecolors='none')
+                plt.savefig('{}_{}.png'.format(app, sargs(args)), format='png', dpi=900)
 
 class bcolors:
     HEADER = '\033[95m'
@@ -289,6 +311,9 @@ def summarize(app, args, params):
                         if header in line:
                             table[header] = getUtil(line)
 
+def futil(used,total):
+   return round(float(used) / float(total), 3)
+
 def summaryToCsv():
     global summary
     with open(SUMMARY_CSV_PATH, 'w') as csvfile:
@@ -301,7 +326,7 @@ def summaryToCsv():
                     for header in summary[app][arg][fullname]:
                         if header not in ['App', 'cycle', 'lavgbw', 'savgbw']:
                             used, total = summary[app][arg][fullname][header]
-                            dict[header] = round(float(used) / float(total), 3)
+                            dict[header] = futil(used, total)
                         elif header in ['lavgbw', 'savgbw']:
                             dict[header] = round(summary[app][arg][fullname][header], 3)
                         else:
@@ -587,7 +612,7 @@ def main():
         checkProcess()
         print("Number of active jobs({})={}".format(len(job_list), job_list))
 
-    if opts.summary:
+    if opts.summary or opts.plot:
         global summary
         if not os.path.exists(SUMMARY_PATH):
             print("New app summary at {}".format(SUMMARY_PATH))
@@ -606,6 +631,9 @@ def main():
     if opts.summary:
         pickle.dump(summary, open(SUMMARY_PATH, 'wb'))
         summaryToCsv()
+
+    if opts.plot:
+        plot()
     #################################################################################################################
 
 if __name__ == "__main__":
