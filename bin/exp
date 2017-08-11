@@ -328,6 +328,7 @@ def TPCHQ6():
 def GDA():
     app = 'GDA'
     space = 0
+
     R = 192000
     MAXC = 80
     args = [R]
@@ -442,8 +443,8 @@ def SPMV_CRS():
     maxTile = min(bankSize*lanes, N)
     # Finished
     params['tileSize'] = irange(16, maxTile, 64) 
-    params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 2) + [2]
-    params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 2) + [2]
+    params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 1)
+    params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 1)
     space += dse(app, args, params)
 
     print('{} space: {}'.format(app, space))
