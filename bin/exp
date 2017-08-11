@@ -65,11 +65,13 @@ def plot():
                     bw = (lavgbw + 3) / 15
                     color = cmap(bw)
                     # color = cmap(max_bw - lavgbw/max_bw)
+                    cycle = float(cycle) / (7.5 * (10 ** 7))
                     sp = ax.scatter(pcu * 100, cycle, c=color, s=size, edgecolors='none')
                 plot_path = '{}/apps/{}_{}.png'.format(SPATIAL_HOME,app, args)
                 plt.grid(True)
                 plt.xlabel('PCU Utilization (%)')
-                plt.ylabel('Cycle')
+                plt.ylabel('Runtime')
+                ax.set_ylim(0,1)
                 fig.set_size_inches(6,4)
                 plt.gcf().subplots_adjust(bottom=0.15)
                 plt.savefig(plot_path, format='png', dpi=900)
@@ -332,6 +334,18 @@ def summarize(app, args, params):
 def futil(used,total):
    return round(float(used) / float(total), 3)
 
+def bestSummary():
+    best = OrderedDict()
+    best['TPCHQ6'] = 'TPCHQ6_96000_outerPar_8_tileSize_2000'
+    best['BlackScholes'] = 'BlackScholes_1966080_outerPar_1_tileSize_32768'
+    best['Kmeans_plasticine'] = 'Kmeans_plasticine_1_6144_tileSize_512'
+    best['SPMV_CRS'] = 'SPMV_CRS__tileSize_208_tile_par_2_pt_par_1'
+    best['GEMM_Blocked'] = 'GEMM_Blocked__tileSize_256_i_tileSize_256_loop_jj_1_loop_ii_1_loop_kk_1_loop_i_4_loop_k_3'
+    with open(SUMMARY_CSV_PATH, 'w') as csvfile:
+    for app in apps:
+        for args in summary[app]:
+            fig, ax = plt.subplots()
+            for fullname in summary[app][args]:
 def summaryToCsv():
     global summary
     with open(SUMMARY_CSV_PATH, 'w') as csvfile:
