@@ -372,7 +372,7 @@ def bestSummary():
                 if header == 'App':
                     pass
                 elif header in ['lavgbw', 'savgbw']:
-                    dict[header] = round(summary[app][args][fullname][header] / max_bw * 100, 3)
+                    dict[header] = round(summary[app][args][fullname][header] / max_bw * 100, 2)
                 elif header not in ['cycle']:
                     used, total = summary[app][args][fullname][header]
                     dict[header] = futil(used, total) * 100
