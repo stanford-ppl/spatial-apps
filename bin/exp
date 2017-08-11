@@ -18,7 +18,7 @@ import csv
 
 lanes = 16
 bankSize = 32 * 1024 / 4
-proc_thresh = 25
+proc_thresh = 40
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
@@ -368,6 +368,15 @@ def GEMM_Blocked():
     params['loop_k']     = lambda params: irange(1 , min(params['tileSize']      , 2), 1)
     space += dse(app, args, params)
 
+    params = OrderedDict()
+    params['tileSize']   = [256] # irange(16, dim, 16)
+    params['i_tileSize'] = [256] # irange(16, dim, 16)
+    params['loop_jj']    = 1 
+    params['loop_ii']    = 1
+    params['loop_kk']    = 1
+    params['loop_i']     = [1,2,3,4]
+    params['loop_k']     = [1,2,3,4]
+    space += dse(app, args, params)
     print('{} space: {}'.format(app, space))
 
 def BlackScholes():
