@@ -18,7 +18,7 @@ import csv
 
 lanes = 16
 bankSize = 32 * 1024 / 4
-proc_thresh = 40
+proc_thresh = 20
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
@@ -213,6 +213,12 @@ def getUtil(line):
     total = int(total)
     return (used, total)
 
+def avgBandWidth(app, args, params):
+    if 'TPCHQ6' in app:
+        N, = args
+        byte = N * 4 * 4
+        second = float(cycleOf(app)) / (10 ** 9)
+
 def summarize(app, args, params):
     global summary
     fullname = getFullName(app, args, params)
@@ -298,6 +304,7 @@ def addArgs(app, args):
         if sargs(args) not in summary[app]: 
             summary[app][sargs(args)] = OrderedDict()
 
+# tucson
 def TPCHQ6():
     app = 'TPCHQ6'
     space = 0
@@ -325,32 +332,54 @@ def TPCHQ6():
 
     print('{} space: {}'.format(app, space))
 
+# tucson
 def GDA():
     app = 'GDA'
     space = 0
 
-    R = 192000
+    # R = 192000
+    # MAXC = 80
+    # args = [R]
+    # addArgs(app, args)
+
+    # # Finished 
+    # params = OrderedDict()
+    # # params['tileSize'] = irange(16, 16*5, 16) 
+    # params['tileSize'] = irange(16, bankSize*lanes/MAXC, 512) 
+    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+    # space += dse(app, args, params)
+
+    # # Finished 
+    # params = OrderedDict()
+    # params['tileSize'] = irange(16, 16*3, 16*2) 
+    # params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
+    # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
+    # space += dse(app, args, params)
+
+    # portland
+    R = 19200
     MAXC = 80
     args = [R]
     addArgs(app, args)
 
     # Finished 
     params = OrderedDict()
-    # params['tileSize'] = irange(16, 16*5, 16) 
-    params['tileSize'] = irange(16, bankSize*lanes/MAXC, 512) 
+    params['tileSize'] = irange(1024, bankSize*lanes/MAXC, 1024) 
     params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
     params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
     space += dse(app, args, params)
 
     # Finished 
     params = OrderedDict()
-    params['tileSize'] = irange(16, 16*3, 16*2) 
+    params['tileSize'] = irange(1024, bankSize*lanes/MAXC, 1024) 
     params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
     params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
     space += dse(app, args, params)
 
     print('{} space: {}'.format(app, space))
 
+# london
 def GEMM_Blocked():
     app = 'GEMM_Blocked'
     space = 0
@@ -375,11 +404,12 @@ def GEMM_Blocked():
     params['loop_jj']    = 1 
     params['loop_ii']    = 1
     params['loop_kk']    = 1
-    params['loop_i']     = [1,2,3,4]
-    params['loop_k']     = [1,2,3,4]
+    params['loop_i']     = [1,2,3,4,5]
+    params['loop_k']     = [1,2,3,4,5]
     space += dse(app, args, params)
     print('{} space: {}'.format(app, space))
 
+# london
 def BlackScholes():
     app = 'BlackScholes'
     space = 0
@@ -416,6 +446,7 @@ def PageRank_plasticine():
 
     print('{} space: {}'.format(app, space))
 
+# london
 def Kmeans_plasticine():
     app = 'Kmeans_plasticine'
     space = 0
@@ -432,6 +463,7 @@ def Kmeans_plasticine():
 
     print('{} space: {}'.format(app, space))
 
+# tucson
 def SPMV_CRS():
     app = 'SPMV_CRS'
     space = 0
