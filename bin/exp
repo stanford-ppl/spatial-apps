@@ -434,46 +434,55 @@ def GDA():
     app = 'GDA'
     space = 0
 
-    R = 192000
-    MAXC = 80
+    # R = 192000
+    # MAXC = 80
+    # args = [R]
+    # addArgs(app, args)
+
+    # # Finished 
+    # params = OrderedDict()
+    # # params['tileSize'] = irange(16, 16*5, 16) 
+    # params['tileSize'] = irange(16, bankSize*lanes/MAXC, 512) 
+    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+    # space += dse(app, args, params)
+
+    # # Finished 
+    # params = OrderedDict()
+    # params['tileSize'] = irange(16, 16*3, 16*2) 
+    # params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
+    # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
+    # space += dse(app, args, params)
+
+    # # portland
+    # R = 19200
+    # MAXC = 80
+    # args = [R]
+    # addArgs(app, args)
+
+    # # Finished 
+    # params = OrderedDict()
+    # params['tileSize'] = irange(1024, bankSize*lanes/MAXC, 1024) 
+    # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
+    # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+    # space += dse(app, args, params)
+
+    # # Finished 
+    # params = OrderedDict()
+    # params['tileSize'] = irange(1024, bankSize*lanes/MAXC, 1024) 
+    # params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
+    # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
+    # space += dse(app, args, params)
+
+    R = 384000 
+    MAXC = 96
     args = [R]
     addArgs(app, args)
-
-    # Finished 
     params = OrderedDict()
-    # params['tileSize'] = irange(16, 16*5, 16) 
-    params['tileSize'] = irange(16, bankSize*lanes/MAXC, 512) 
-    params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
-    params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
+    params['tileSize'] = 1200
+    params['outerPar'] = 6
+    params['midPar'] = 1 
     space += dse(app, args, params)
-
-    # Finished 
-    params = OrderedDict()
-    params['tileSize'] = irange(16, 16*3, 16*2) 
-    params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
-    params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
-    space += dse(app, args, params)
-
-    # portland
-    R = 19200
-    MAXC = 80
-    args = [R]
-    addArgs(app, args)
-
-    # Finished 
-    params = OrderedDict()
-    params['tileSize'] = irange(1024, bankSize*lanes/MAXC, 1024) 
-    params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
-    params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
-    space += dse(app, args, params)
-
-    # Finished 
-    params = OrderedDict()
-    params['tileSize'] = irange(1024, bankSize*lanes/MAXC, 1024) 
-    params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
-    params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
-    space += dse(app, args, params)
-
     print('{} space: {}'.format(app, space))
 
 # london
