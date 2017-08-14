@@ -1454,7 +1454,7 @@ object GEMM_NCubed extends SpatialApp { // Regression (Dense) // Args: none
   }
 }      
 
-object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: none
+object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
   override val target = AWS_F1
                                                                                                   
                                                                                                   
