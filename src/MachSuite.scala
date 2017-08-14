@@ -408,7 +408,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
 }
 
 
-object Viterbi extends SpatialApp { // Regression (Fixme) // Args: none
+object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
 
@@ -1818,7 +1818,7 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 
-object Sort_Radix extends SpatialApp { // Regression (Fixme) // Args: none
+object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
 
@@ -2159,7 +2159,7 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
 }
 
 
-object Backprop extends SpatialApp { // Regression (Fixme) // Args: 20
+object Backprop extends SpatialApp { // Regression (Dense) // Args: 20
   override val target = AWS_F1
 
  /*                                                                                                  
@@ -2688,7 +2688,7 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
   }
 }
 
-object FFT_Transpose extends SpatialApp { // Regression (Fixme) // Args: none
+object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
 
