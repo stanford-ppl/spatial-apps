@@ -84,7 +84,7 @@ object SRAMChar extends SpatialApp {
 }
 
 
-object FloatBasics extends SpatialApp { // Regression (Fixme) // Args: 3.2752 -283.70
+object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -283.70
   // import IR._
 
   type T = Float//FixPt[TRUE,_16,_16]
