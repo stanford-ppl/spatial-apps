@@ -2380,6 +2380,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
                             -1.to[T], -2.to[T], -1.to[T])
 
         Foreach(-2 until row_stride) { r =>
+          // println(" r is " + r)
           val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index] || r.to[Index]+rr.to[Index] > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
           lb load img(ldaddr, 0::C par lb_par)
 
@@ -2410,6 +2411,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
           if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0.to[Index]) {
             // println("storing to row " + {r+rr} + " from " + r + " " + rr)
             // Foreach(0 until C){kk => print(" " + lineOut(kk))}
+            // println(" ")
             imgOut(r.to[Index]+rr.to[Index], 0::C par par_store) store lineOut
           }
         }
@@ -2447,17 +2449,24 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
 
     */
     val gold = (0::R, 0::C){(i,j) => 
+      if (i >= R-2) {
+        0
+      } else if (i >= 2 && j >= 2) {
+        val px00 = image(i,j)
+        val px01 = image(i,j-1)
+        val px02 = image(i,j-2)
+        val px10 = image(i+1,j)
+        val px11 = image(i+1,j-1)
+        val px12 = image(i+1,j-2)
+        val px20 = image(i+2,j)
+        val px21 = image(i+2,j-1)
+        val px22 = image(i+2,j-2)
+        abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)        
+      } else {
+        0
+      }
       // Shift result down by 2 and over by 2 because of the way accel is written
-      val px00 = if ((j-2) > border && (j-2) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
-      val px01 = if ((j-1) > border && (j-1) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
-      val px02 = if ((j+0) > border && (j+0) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
-      val px10 = if ((j-2) > border && (j-2) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
-      val px11 = if ((j-1) > border && (j-1) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
-      val px12 = if ((j+0) > border && (j+0) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
-      val px20 = if ((j-2) > border && (j-2) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
-      val px21 = if ((j-1) > border && (j-1) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
-      val px22 = if ((j+0) > border && (j+0) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
-      abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)
+      
     };
 
     // // This contains the "weird scheduling bug"
