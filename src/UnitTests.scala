@@ -721,7 +721,7 @@ object MemTest2D extends SpatialApp { // Regression (Unit) // Args: 7
   }
 }
 
-object FifoLoad extends SpatialApp { // Regression (Unit) // Args: 192
+object FifoLoadSRAMStore extends SpatialApp { // Regression (Unit) // Args: 192
 
   @virtualize
   def fifoLoad[T:Type:Num](srcHost: Array[T], N: Int) = {
@@ -737,13 +737,13 @@ object FifoLoad extends SpatialApp { // Regression (Unit) // Args: 192
     Accel {
       val f1 = FIFO[T](tileSize)
       Sequential.Foreach(size by tileSize) { i =>
-        f1 load srcFPGA(i::i + tileSize par 16)
+        f1 load srcFPGA(i::i + tileSize par 1)
         val b1 = SRAM[T](tileSize)
         Sequential.Foreach(tileSize by 1) { i =>
           Pipe{b1(i) = f1.peek()}
           Pipe{f1.deq()}
         }
-        dstFPGA(i::i + tileSize par 16) store b1
+        dstFPGA(i::i + tileSize par 1) store b1
       }
       ()
     }
@@ -900,15 +900,15 @@ object SimpleTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 10
 }
 
 
-object SingleFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
+object UnalignedFifoLoad extends SpatialApp { // Regression (Unit) // Args: 400
 
   
-  val tileSize = 32
+  val tileSize = 20
 
   @virtualize
   def singleFifoLoad[T:Type:Num](src1: Array[T], in: Int) = {
 
-    val P1 = 4 (16 -> 16)
+    val P1 = 1 (16 -> 16)
 
     val N = ArgIn[Int]
     setArg(N, in)
@@ -948,7 +948,7 @@ object SingleFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
     println("out: " + out)
 
     val cksum = out == gold
-    println("PASS: " + cksum + " (SingleFifoLoad)")
+    println("PASS: " + cksum + " (UnalignedFifoLoad)")
   }
 }
 
