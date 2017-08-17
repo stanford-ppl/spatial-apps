@@ -2338,12 +2338,12 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
   }
 }
 
-object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
+object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
 
 
   val Kh = 3
   val Kw = 3
-  val Cmax = 1024
+  val Cmax = 160
 
   @virtualize
   def convolve[T:Type:Num](image: Matrix[T]): Matrix[T] = {
@@ -2357,7 +2357,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
 
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
-    val row_stride = 100 (100 -> 100 -> 500)
+    val row_stride = 10 (100 -> 100 -> 500)
     val row_par = 2 (1 -> 1 -> 16)
     val par_Kh = 3 (1 -> 1 -> 3)
     val par_Kw = 3 (1 -> 1 -> 3)
@@ -2369,6 +2369,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
 
     Accel {
       Foreach(R by row_stride par row_par){ rr => 
+        val rows_todo = min(row_stride, R - rr)
         val lb = LineBuffer[T](Kh, Cmax)
         val sr = RegFile[T](Kh, Kw)
         val lineOut = SRAM[T](Cmax)
@@ -2379,9 +2380,9 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
                              0.to[T],  0.to[T],  0.to[T],
                             -1.to[T], -2.to[T], -1.to[T])
 
-        Foreach(-2 until row_stride) { r =>
+        Foreach(-2 until rows_todo) { r =>
           // println(" r is " + r)
-          val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index] || r.to[Index]+rr.to[Index] > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          val ldaddr = if ((r.to[Index]+rr.to[Index]) < 0.to[Index] || (r.to[Index]+rr.to[Index]) > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
           lb load img(ldaddr, 0::C par lb_par)
 
           Foreach(0 until C) { c =>
@@ -2404,7 +2405,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 400 1024
               }{_+_}
             }{_+_}
 
-            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index] || r.to[Index] + rr.to[Index] >= R-2, 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
             // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
           }
 
