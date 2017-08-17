@@ -178,7 +178,7 @@ object BandwidthTests extends SpatialCompiler {
     }
   }
 
-  override val stagingArgs = Array("--synth")
+  override val stagingArgs = Array("--synth --syncMem")
 
   def main(args: Array[String]): Unit = {
     print("Threads: ")
