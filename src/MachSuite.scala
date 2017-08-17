@@ -1365,7 +1365,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
             // whileCond := (q > 0) && (pattern_sram(i) != pattern_sram(q))
             if ((q > 0) && (string_sram(i) != pattern_sram(q))) q := kmp_next(q)
           }{state => mux((q > 0) && (string_sram(i) != pattern_sram(q)), 0, 1)}
-          if (pattern_sram(q) == string_sram(i)) { q :+= 1 }
+          Pipe{if (pattern_sram(q) == string_sram(i)) { q :+= 1 }}
           if (q >= PATTERN_SIZE) {
             Pipe{
               num_matches :+= 1

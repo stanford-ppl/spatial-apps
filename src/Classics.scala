@@ -2480,7 +2480,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
     println("gold " + gold_sum + " =?= output " + output_sum)
     val cksum = gold_sum == output_sum
     // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
-    println("PASS: " + cksum + " (Convolution_FPGA)")
+    println("PASS: " + cksum + " (Sobel)")
 
 
 

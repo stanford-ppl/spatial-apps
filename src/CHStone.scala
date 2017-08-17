@@ -158,7 +158,6 @@ object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
   }
 }
 
-
 object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
   override val target = AWS_F1
   type UInt8 = FixPt[FALSE, _8, _0]
@@ -208,7 +207,7 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
     val jpg_dram = DRAM[UInt8](jpg_size)
     setMem(jpg_dram, jpg_data)
 
-  	Accel{
+    Accel{
       val jpg_sram = SRAM[UInt8](5207)
       jpg_sram load jpg_dram
 
@@ -268,6 +267,79 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
       //   tmp
       // }
       // val read_byte = fun[Unit, UInt8]((x:Unit) => read_byte_staged())
+
+      def jpeg_init_decompress(): Unit = {
+        def huff_make_dhuff_tb(idx: Int, p_xhtbl_bits: SRAM2[UInt8], p_dhtbl_ml_mem: SRAM1[UInt16], p_dhtbl_maxcode: SRAM2[UInt16], p_dhtbl_mincode: SRAM2[UInt16], p_dhtbl_valptr: SRAM2[UInt16]): Unit = {
+          val huffsize = SRAM[UInt16](257)
+          val huffcode = SRAM[UInt16](257)
+          val p = Reg[Int](0)
+          Foreach(1 until 17 by 1) { i => 
+            val j_max = (p_xhtbl_bits(idx, i) + 1).as[Int]
+            Foreach(1 until j_max by 1) { j => 
+              huffsize(p) = i.as[UInt16]
+              p :+= 1
+            }
+          }
+          huffsize(p) = 0
+          val lastp = p
+          val code = Reg[UInt16](0)
+          val size = Reg[UInt16](0)
+          size := huffsize(0)
+          val pp = Reg[Int](0)
+          code.reset
+
+
+          FSM[Int](whilst1 => whilst1 != -1) { whilst1 => 
+            FSM[Int](whilst2 => whilst2 != -1) { whilst2 => 
+              // println("huffocde " + pp + " = " + code )
+              huffcode(pp) = code.value
+              code :+= 1
+              pp :+= 1
+            } {whilst2 => mux((huffsize(pp) == size.value) && (pp < 257), whilst2, -1)}
+
+            // println("at " + pp + " size is " + huffsize(pp))
+            val break_cond = huffsize(pp) == 0.to[UInt16]
+
+            // if (!break_cond) { // Issue #160
+            FSM[Int](whilst2 => whilst2 != -1) { whilst2 => 
+              if (!break_cond) {
+                code := code << 1
+                size :+= 1
+              }
+            } { whilst2 => mux((huffsize(pp) == size.value) || break_cond, -1, whilst2)}
+            // }
+          } {whilst1 => mux((huffsize(pp) == 0.to[UInt16]), -1, whilst1)}
+
+          val p_dhtbl_ml = Reg[Int](1)
+          val ppp = Reg[Int](0)
+          p_dhtbl_ml.reset
+          Foreach(1 until 17 by 1){l => 
+            if (p_xhtbl_bits(idx, l) == 0.to[UInt8]) {
+              p_dhtbl_maxcode(idx, l) = 65535.to[UInt16] // Signifies skip
+            } else {
+              p_dhtbl_valptr(idx, l) = ppp.value.as[UInt16]
+              p_dhtbl_mincode(idx,l) = huffcode(ppp)
+              Pipe{ppp :+= p_xhtbl_bits(idx,l).as[Int] - 1}
+              p_dhtbl_maxcode(idx,l) = huffcode(ppp)
+              p_dhtbl_ml := l
+              println(" " + p_dhtbl_valptr(idx,l) + " " + p_dhtbl_mincode(idx,l) + " " + ppp + " " + p_dhtbl_maxcode(idx,l) + " " + p_dhtbl_ml)
+              Pipe{ppp :+= 1}
+            }
+          }
+          p_dhtbl_maxcode(idx, p_dhtbl_ml.value) = p_dhtbl_maxcode(idx, p_dhtbl_ml.value) + 1
+          p_dhtbl_ml_mem(idx) = p_dhtbl_ml.value.as[UInt16]
+        }
+
+        p_jinfo_MCUHeight := (p_jinfo_image_height - 1) / 8 + 1
+        p_jinfo_MCUWidth := (p_jinfo_image_width - 1) / 8 + 1
+        p_jinfo_NumMCU := p_jinfo_MCUHeight * p_jinfo_MCUWidth
+
+        huff_make_dhuff_tb(0, p_jinfo_dc_xhuff_tbl_bits, p_jinfo_dc_dhuff_tbl_ml, p_jinfo_dc_dhuff_tbl_maxcode,p_jinfo_dc_dhuff_tbl_mincode,p_jinfo_dc_dhuff_tbl_valptr)
+        huff_make_dhuff_tb(1, p_jinfo_dc_xhuff_tbl_bits, p_jinfo_dc_dhuff_tbl_ml, p_jinfo_dc_dhuff_tbl_maxcode,p_jinfo_dc_dhuff_tbl_mincode,p_jinfo_dc_dhuff_tbl_valptr)
+        huff_make_dhuff_tb(0, p_jinfo_ac_xhuff_tbl_bits, p_jinfo_ac_dhuff_tbl_ml, p_jinfo_ac_dhuff_tbl_maxcode,p_jinfo_ac_dhuff_tbl_mincode,p_jinfo_ac_dhuff_tbl_valptr)
+        huff_make_dhuff_tb(1, p_jinfo_ac_xhuff_tbl_bits, p_jinfo_ac_dhuff_tbl_ml, p_jinfo_ac_dhuff_tbl_maxcode,p_jinfo_ac_dhuff_tbl_mincode,p_jinfo_ac_dhuff_tbl_valptr)
+
+      }
 
       def read_markers(): Unit = {
         val unread_marker = Reg[UInt8](0)
@@ -447,79 +519,6 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
         }{sow_SOI => mux(scan_ptr == -1.to[Int], -1, 1)}
       }
 
-      def jpeg_init_decompress(): Unit = {
-        def huff_make_dhuff_tb(idx: Int, p_xhtbl_bits: SRAM2[UInt8], p_dhtbl_ml_mem: SRAM1[UInt16], p_dhtbl_maxcode: SRAM2[UInt16], p_dhtbl_mincode: SRAM2[UInt16], p_dhtbl_valptr: SRAM2[UInt16]): Unit = {
-          val huffsize = SRAM[UInt16](257)
-          val huffcode = SRAM[UInt16](257)
-          val p = Reg[Int](0)
-          Foreach(1 until 17 by 1) { i => 
-            val j_max = (p_xhtbl_bits(idx, i) + 1).as[Int]
-            Foreach(1 until j_max by 1) { j => 
-              huffsize(p) = i.as[UInt16]
-              p :+= 1
-            }
-          }
-          huffsize(p) = 0
-          val lastp = p
-          val code = Reg[UInt16](0)
-          val size = Reg[UInt16](0)
-          size := huffsize(0)
-          val pp = Reg[Int](0)
-          code.reset
-
-
-          FSM[Int](whilst1 => whilst1 != -1) { whilst1 => 
-            FSM[Int](whilst2 => whilst2 != -1) { whilst2 => 
-              // println("huffocde " + pp + " = " + code )
-              huffcode(pp) = code.value
-              code :+= 1
-              pp :+= 1
-            } {whilst2 => mux((huffsize(pp) == size.value) && (pp < 257), whilst2, -1)}
-
-            // println("at " + pp + " size is " + huffsize(pp))
-            val break_cond = huffsize(pp) == 0.to[UInt16]
-
-            // if (!break_cond) { // Issue #160
-            FSM[Int](whilst2 => whilst2 != -1) { whilst2 => 
-              if (!break_cond) {
-                code := code << 1
-                size :+= 1
-              }
-            } { whilst2 => mux((huffsize(pp) == size.value) || break_cond, -1, whilst2)}
-            // }
-          } {whilst1 => mux((huffsize(pp) == 0.to[UInt16]), -1, whilst1)}
-
-          val p_dhtbl_ml = Reg[Int](1)
-          val ppp = Reg[Int](0)
-          p_dhtbl_ml.reset
-          Foreach(1 until 17 by 1){l => 
-            if (p_xhtbl_bits(idx, l) == 0.to[UInt8]) {
-              p_dhtbl_maxcode(idx, l) = 65535.to[UInt16] // Signifies skip
-            } else {
-              p_dhtbl_valptr(idx, l) = ppp.value.as[UInt16]
-              p_dhtbl_mincode(idx,l) = huffcode(ppp)
-              Pipe{ppp :+= p_xhtbl_bits(idx,l).as[Int] - 1}
-              p_dhtbl_maxcode(idx,l) = huffcode(ppp)
-              p_dhtbl_ml := l
-              println(" " + p_dhtbl_valptr(idx,l) + " " + p_dhtbl_mincode(idx,l) + " " + ppp + " " + p_dhtbl_maxcode(idx,l) + " " + p_dhtbl_ml)
-              Pipe{ppp :+= 1}
-            }
-          }
-          p_dhtbl_maxcode(idx, p_dhtbl_ml.value) = p_dhtbl_maxcode(idx, p_dhtbl_ml.value) + 1
-          p_dhtbl_ml_mem(idx) = p_dhtbl_ml.value.as[UInt16]
-        }
-
-        p_jinfo_MCUHeight := (p_jinfo_image_height - 1) / 8 + 1
-        p_jinfo_MCUWidth := (p_jinfo_image_width - 1) / 8 + 1
-        p_jinfo_NumMCU := p_jinfo_MCUHeight * p_jinfo_MCUWidth
-
-        huff_make_dhuff_tb(0, p_jinfo_dc_xhuff_tbl_bits, p_jinfo_dc_dhuff_tbl_ml, p_jinfo_dc_dhuff_tbl_maxcode,p_jinfo_dc_dhuff_tbl_mincode,p_jinfo_dc_dhuff_tbl_valptr)
-        huff_make_dhuff_tb(1, p_jinfo_dc_xhuff_tbl_bits, p_jinfo_dc_dhuff_tbl_ml, p_jinfo_dc_dhuff_tbl_maxcode,p_jinfo_dc_dhuff_tbl_mincode,p_jinfo_dc_dhuff_tbl_valptr)
-        huff_make_dhuff_tb(0, p_jinfo_ac_xhuff_tbl_bits, p_jinfo_ac_dhuff_tbl_ml, p_jinfo_ac_dhuff_tbl_maxcode,p_jinfo_ac_dhuff_tbl_mincode,p_jinfo_ac_dhuff_tbl_valptr)
-        huff_make_dhuff_tb(1, p_jinfo_ac_xhuff_tbl_bits, p_jinfo_ac_dhuff_tbl_ml, p_jinfo_ac_dhuff_tbl_maxcode,p_jinfo_ac_dhuff_tbl_mincode,p_jinfo_ac_dhuff_tbl_valptr)
-
-      }
-
       def decode_start(): Unit = {
 
         // Go to data start
@@ -635,18 +634,666 @@ object JPEG extends SpatialApp { // DISABLED Regression (Dense) // Args: none
 
       }
 
-
       read_markers()
 
       jpeg_init_decompress()
 
       decode_start()
-
-
     }
 
     val gold_bmp = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_input.csv", ",", "\n")
     // printMatrix(gold_bmp, "gold")
+  }
+}
+
+
+
+object JPEG_Markers extends SpatialApp { // Regression (Dense) // Args: none
+  override val target = AWS_F1
+  type UInt8 = FixPt[FALSE, _8, _0]
+  type UInt2 = FixPt[FALSE, _2, _0]
+  type UInt16 = FixPt[FALSE, _16, _0]
+  type UInt = FixPt[FALSE, _32, _0]
+  @struct case class comp_struct(index: UInt8,
+                                 id: UInt8,
+                                 h_samp_factor: UInt8,
+                                 v_samp_factor: UInt8,
+                                 quant_tbl_no: UInt8
+                                )
+  @struct case class comp_acdc(index: UInt8,
+                               dc: UInt8,
+                               ac: UInt8
+                              )
+
+  @virtualize
+  def main() = {
+
+    val M_SOI = 216 // Start of image
+    val M_SOF0 = 192 // Baseline DCT ( Huffman ) 
+    val M_SOS = 218 // Start of Scan ( Head of Compressed Data )
+    val M_DHT = 196
+    val M_DQT = 219
+    val M_EOI = 217
+    val DCTSIZE2 = 64
+    val NUM_COMPONENT = 3
+    val NUM_HUFF_TBLS = 2
+    val RGB_NUM = 3
+    val SF4_1_1 = 2
+    val SF1_1_1 = 0
+
+    // Validity check values
+    val out_length_get_sof = 17
+    val out_data_precision_get_sof = 8
+    val out_p_jinfo_image_height_get_sof = 59
+    val out_p_jinfo_image_width_get_sof = 90
+    val out_p_jinfo_num_components_get_sof = 3
+
+    val jpg_data = loadCSV1D[UInt8]("/remote/regression/data/machsuite/jpeg_input.csv", ",")
+    val numel = jpg_data.length
+    assert(!(jpg_data(0) != 255.to[UInt8] || jpg_data(1) != M_SOI.to[UInt8]), "Not a jpeg file!")
+
+    val jpg_size = ArgIn[Int]
+    setArg(jpg_size, numel)
+    val jpg_dram = DRAM[UInt8](jpg_size)
+    setMem(jpg_dram, jpg_data)
+
+    // Intermediate results
+    val image_valid = ArgOut[Boolean]
+    val errors_found = ArgOut[Int]
+    val smp_fact = ArgOut[UInt2]
+    val quant_tbl_quantval = DRAM[UInt16](4,DCTSIZE2)
+    val dc_xhuff_tbl_bits = DRAM[UInt8](NUM_HUFF_TBLS,64) // 36)
+    val dc_xhuff_tbl_huffval = DRAM[UInt8](NUM_HUFF_TBLS,320) // 257)
+    val ac_xhuff_tbl_bits = DRAM[UInt8](NUM_HUFF_TBLS,64) // 36)
+    val ac_xhuff_tbl_huffval = DRAM[UInt8](NUM_HUFF_TBLS,320) // 257)
+    // val comp_dram = DRAM[comp_struct](NUM_COMPONENT)
+    // val comp_dram_acdc = DRAM[comp_acdc](NUM_COMPONENT)
+
+    Accel{
+      val jpg_sram = FIFO[UInt8](5207)
+
+      val component = SRAM[comp_struct](NUM_COMPONENT)
+      val component_acdc = SRAM[comp_acdc](NUM_COMPONENT)
+      val izigzag_index = LUT[Int](64)( 0.to[Int], 1.to[Int], 8.to[Int], 16.to[Int], 9.to[Int], 2.to[Int], 3.to[Int], 10.to[Int],
+                                    17.to[Int], 24.to[Int], 32.to[Int], 25.to[Int], 18.to[Int], 11.to[Int], 4.to[Int], 5.to[Int],
+                                    12.to[Int], 19.to[Int], 26.to[Int], 33.to[Int], 40.to[Int], 48.to[Int], 41.to[Int], 34.to[Int],
+                                    27.to[Int], 20.to[Int], 13.to[Int], 6.to[Int], 7.to[Int], 14.to[Int], 21.to[Int], 28.to[Int],
+                                    35.to[Int], 42.to[Int], 49.to[Int], 56.to[Int], 57.to[Int], 50.to[Int], 43.to[Int], 36.to[Int],
+                                    29.to[Int], 22.to[Int], 15.to[Int], 23.to[Int], 30.to[Int], 37.to[Int], 44.to[Int], 51.to[Int],
+                                    58.to[Int], 59.to[Int], 52.to[Int], 45.to[Int], 38.to[Int], 31.to[Int], 39.to[Int], 46.to[Int],
+                                    53.to[Int], 60.to[Int], 61.to[Int], 54.to[Int], 47.to[Int], 55.to[Int], 62.to[Int], 63.to[Int]
+                                  )
+
+      val errors = Reg[Int](0)
+      val scan_ptr = Reg[Int](1)
+      val p_jinfo_smp_fact = Reg[UInt2](0)
+      val p_jinfo_quant_tbl_quantval = SRAM[UInt16](4,DCTSIZE2)
+      val p_jinfo_jpeg_data = Reg[Int](0)
+      val p_jinfo_dc_xhuff_tbl_bits = SRAM[UInt8](NUM_HUFF_TBLS, 64) // 36)
+      val p_jinfo_dc_xhuff_tbl_huffval = SRAM[UInt8](NUM_HUFF_TBLS, 320) // 257)
+      val p_jinfo_ac_xhuff_tbl_bits = SRAM[UInt8](NUM_HUFF_TBLS, 64) // 36)
+      val p_jinfo_ac_xhuff_tbl_huffval = SRAM[UInt8](NUM_HUFF_TBLS, 320) // 257)
+
+      val p_jinfo_num_components = Reg[UInt8](0)
+      val p_jinfo_image_height = Reg[UInt16](0)
+      val p_jinfo_image_width = Reg[UInt16](0)
+      val p_jinfo_MCUHeight = Reg[UInt16](0)
+      val p_jinfo_MCUWidth = Reg[UInt16](0)
+      val p_jinfo_NumMCU = Reg[UInt16](0)
+
+      def read_word(): UInt16 = {
+        val tmp1 = Reg[UInt8]
+        val tmp2 = Reg[UInt8]
+        val tmp = Reg[UInt16]
+        Pipe{tmp1 := jpg_sram.deq()}
+        Pipe{tmp2 := jpg_sram.deq()}
+        Pipe{tmp := (tmp1.value.as[UInt16] << 8) | (tmp2.value.as[UInt16])}
+        tmp.value
+      }
+      def read_byte(): UInt8 = {
+        val tmp = Reg[UInt8]
+        Pipe{tmp := jpg_sram.deq()}
+        tmp.value
+      }
+
+      def read_first(): UInt8 = {
+        val c1 = Reg[UInt8]
+        val c2 = Reg[UInt8]
+        Pipe{c1 := read_byte()}
+        Pipe{c2 := read_byte()}
+        if (c1.value != 255.to[UInt8] || c2.value != M_SOI.to[UInt8]) {
+          println("Not Jpeg File!")
+          errors :+= 1
+        }
+        c2.value
+      }
+
+      val unread_marker = Reg[UInt8](0)
+
+      def next_marker(): UInt8 = {
+        val potential_marker = Reg[UInt8](0)
+        potential_marker.reset
+        FSM[Int](whilst => whilst != -1.to[Int]){whilst => 
+          if (read_byte() == 255.to[UInt8]) {
+            potential_marker := read_byte()
+          }
+        }{whilst => mux(potential_marker.value != 0.to[UInt8] || jpg_sram.empty, -1, whilst)}
+        potential_marker.value
+      }
+
+      def get_dqt(): Unit = {Sequential{
+        val length = Reg[UInt16](0)
+        Pipe{length := read_word() - 2.to[UInt16]}
+        println("lenght " + length.value)
+        // if (length != 65) quit()
+        FSM[Int](iter => iter != -1) { iter => 
+          val tmp = read_byte()
+          val prec = tmp >> 4
+          val num = (tmp & 0x0f).as[Int]
+
+          Foreach(DCTSIZE2 by 1){ i => 
+            val tmp = Reg[UInt16](0)
+            Pipe{
+              if (prec == 1.to[UInt8]) {
+                tmp := read_word()
+              } else {
+                tmp := read_byte().as[UInt16]
+              }
+            }
+            // println("quantvl tbl " + {num+1} + "," + izigzag_index(i) + " = " + tmp.value)
+            // Note CHStone gets a pointer for the last element in row "num", effectively storing into row "num+1"
+            p_jinfo_quant_tbl_quantval(num+1, izigzag_index(i)) = tmp.value
+          }
+          length := length - (DCTSIZE2 + 1).to[UInt16] - mux(prec == 1.to[UInt8], DCTSIZE2.to[UInt16], 0.to[UInt16])
+        }{iter => mux(length == 0.to[UInt16], -1, iter + 1)}
+
+        // Foreach(4 by 1, 64 by 1){(i,j) => println(" " + i + "," + izigzag_index(j) + " = " + p_jinfo_quant_tbl_quantval(i,izigzag_index(j)))}
+
+      }}
+
+      def get_sof(): Unit = { Sequential{
+        val length = Reg[UInt16](0)
+        length := read_word()
+        val p_jinfo_data_precision = read_byte()
+        p_jinfo_image_height := read_word()
+        p_jinfo_image_width := read_word()
+        p_jinfo_num_components := read_byte()
+        println(" " + length.value + " " + p_jinfo_data_precision + " " + p_jinfo_image_height + " " + p_jinfo_image_width + " " + p_jinfo_num_components)
+
+        // if (length.value != out_length_get_sof || p_jinfo_data_precision != out_data_precision_get_sof ...) {error} 
+        Pipe{length :-= 8} // Why the hell do we do this??
+
+        Sequential.Foreach(NUM_COMPONENT by 1) { i => 
+          val p_comp_info_index = i.as[UInt8]
+          val p_comp_info_id = read_byte()
+          val c = read_byte()
+          val p_comp_info_h_samp_factor = (c >> 4) & 15
+          val p_comp_info_v_samp_factor = (c) & 15
+          val p_comp_info_quant_tbl_no = read_byte()
+
+          // Some more checks here
+
+          println("writing " + p_comp_info_index + " " + p_comp_info_id + " " + p_comp_info_h_samp_factor + " " + p_comp_info_v_samp_factor + " " + p_comp_info_quant_tbl_no)
+          component(i) = comp_struct(p_comp_info_index, p_comp_info_id, p_comp_info_h_samp_factor, p_comp_info_v_samp_factor, p_comp_info_quant_tbl_no)
+        }
+
+        p_jinfo_smp_fact := mux(component(0).h_samp_factor == 2.to[UInt8], 2, 0)
+      }}
+
+
+      def get_sos(): Unit = {Sequential{
+        val length = Reg[UInt16](0)
+        length := read_word()
+        val num_comp = read_byte()
+
+        println(" length " + length.value)
+
+        Sequential.Foreach(0 until num_comp.to[Index] by 1) { i => 
+          val cc = read_byte ();
+          val c = read_byte ();
+
+          Foreach(0 until p_jinfo_num_components.value.to[Index] by 1) { ci => 
+            val dc = (c >> 4) & 15
+            val ac = c & 15
+            component_acdc(ci) = comp_acdc(ci.to[UInt8], dc, ac)
+          }
+
+        }
+
+        // pluck off 3 bytes for fun
+        Foreach(3 by 1) { _ => read_byte()}
+        p_jinfo_jpeg_data := scan_ptr.value
+      }}
+
+      def get_dht(): Unit = {Sequential{
+        val length = Reg[UInt16](0)
+        Pipe{length := read_word() - 2}
+        println(" length " + length.value)
+        // if (length != 65) quit()
+        FSM[Int](whilst => whilst != -1) { whilst => 
+          val index = Reg[UInt8](0)
+          Pipe{index := read_byte()}
+          val store_dc = Reg[Boolean](false)
+
+          if ((index.value & 0x10) == 0.to[UInt8]) {
+            store_dc := true
+          } else {
+            store_dc := false
+            index :-= 0x10
+          }
+
+          val count = Reg[Int](0)
+          count.reset
+          Sequential.Foreach(1 until 17 by 1){ i => 
+            val tmp = Reg[UInt8](0)
+            Pipe{tmp := read_byte()}
+            if (store_dc.value) {
+              p_jinfo_dc_xhuff_tbl_bits(index.value.to[Int], i.to[Index]) = tmp
+            } else {
+              p_jinfo_ac_xhuff_tbl_bits(index.value.to[Int], i.to[Index]) = tmp
+            }
+            // println("p_jinfo_dc_xhuff_tbl_bits write " + index.value.to[Int] + "," + i + " = " + tmp.value)
+            Pipe{count := count + tmp.value.to[Int]}
+          }
+
+          println(" dht count " + count.value)
+
+          length :-= 17
+          Sequential.Foreach(0 until count by 1) { i => 
+            if (store_dc.value) {
+              p_jinfo_dc_xhuff_tbl_huffval(index.value.to[Int], i.to[Index]) = read_byte()  
+            } else {
+              p_jinfo_ac_xhuff_tbl_huffval(index.value.to[Int], i.to[Index]) = read_byte()
+            }
+            
+          }
+
+          Pipe{length := length - count.value.to[UInt16]}
+
+        }{whilst => mux(length > 16.to[UInt16], whilst, -1)}
+
+
+      }}
+
+      // START DESIGN
+
+      // Init structures
+      Foreach(4 by 1, DCTSIZE2 by 1){(i,j) => p_jinfo_quant_tbl_quantval(i,j) = 0}
+      Foreach(NUM_HUFF_TBLS by 1, 36 by 1){(i,j) => p_jinfo_dc_xhuff_tbl_bits(i,j) = 0}
+      Foreach(NUM_HUFF_TBLS by 1, 257 by 1){(i,j) => p_jinfo_dc_xhuff_tbl_huffval(i,j) = 0}
+      Foreach(NUM_HUFF_TBLS by 1, 36 by 1){(i,j) => p_jinfo_ac_xhuff_tbl_bits(i,j) = 0}
+      Foreach(NUM_HUFF_TBLS by 1, 257 by 1){(i,j) => p_jinfo_ac_xhuff_tbl_huffval(i,j) = 0}
+
+      // Load values
+      jpg_sram load jpg_dram(0::5207) // TODO: Tile this
+
+      // Read markers
+      FSM[Int,Int](0)(sow_SOI => sow_SOI != -1){sow_SOI => 
+        if (sow_SOI == 0.to[Int]) {
+          Pipe{unread_marker := read_first()}
+        } else {
+          unread_marker := next_marker()
+        }
+
+        println("new marker is " + unread_marker)
+
+        if (unread_marker.value == M_SOI.to[UInt8]) {
+          println("M_SOI")
+          // Continue normally
+        } else if (unread_marker.value == M_SOF0.to[UInt8]) {
+          println("M_SOF0")
+          get_sof()
+        } else if (unread_marker.value == M_DQT.to[UInt8]) {
+          println("M_DQT")
+          get_dqt()
+        } else if (unread_marker.value == M_DHT.to[UInt8]) {
+          println("M_DHT")
+          get_dht()          
+        } else if (unread_marker.value == M_SOS.to[UInt8]) {
+          println("M_SOS")
+          get_sos()
+        } else if (unread_marker.value == M_EOI.to[UInt8]) {
+          println("M_EOI")
+          scan_ptr := -1
+        } else {
+          // Do nothing (probably 0xe0)
+        }
+      }{sow_SOI => mux(scan_ptr == -1.to[Int], -1, 1)}
+    
+      // Store intermediate results
+      smp_fact := p_jinfo_smp_fact
+      quant_tbl_quantval store p_jinfo_quant_tbl_quantval
+      dc_xhuff_tbl_bits store p_jinfo_dc_xhuff_tbl_bits
+      dc_xhuff_tbl_huffval store p_jinfo_dc_xhuff_tbl_huffval
+      ac_xhuff_tbl_bits store p_jinfo_ac_xhuff_tbl_bits
+      ac_xhuff_tbl_huffval store p_jinfo_ac_xhuff_tbl_huffval
+      errors_found := errors
+
+    }
+
+    // Extract results
+    val smp_fact_result = getArg(smp_fact)
+    val errors_result = getArg(errors_found)
+    val quant_tbl_quantval_result = getMatrix(quant_tbl_quantval)
+    val dc_xhuff_tbl_bits_result_algnd = getMatrix(dc_xhuff_tbl_bits)
+    val dc_xhuff_tbl_huffval_result_algnd = getMatrix(dc_xhuff_tbl_huffval)
+    val ac_xhuff_tbl_bits_result_algnd = getMatrix(ac_xhuff_tbl_bits)
+    val ac_xhuff_tbl_huffval_result_algnd = getMatrix(ac_xhuff_tbl_huffval)
+
+    // Reshape results
+    val dc_xhuff_tbl_bits_result = (0::NUM_HUFF_TBLS, 0::36){(i,j) => dc_xhuff_tbl_bits_result_algnd(i,j)}
+    val dc_xhuff_tbl_huffval_result = (0::NUM_HUFF_TBLS, 0::257){(i,j) => dc_xhuff_tbl_huffval_result_algnd(i,j)}
+    val ac_xhuff_tbl_bits_result = (0::NUM_HUFF_TBLS, 0::36){(i,j) => ac_xhuff_tbl_bits_result_algnd(i,j)}
+    val ac_xhuff_tbl_huffval_result = (0::NUM_HUFF_TBLS, 0::257){(i,j) => ac_xhuff_tbl_huffval_result_algnd(i,j)}
+
+    // Get gold checks
+    val smp_fact_gold = 2
+    val quant_tbl_quantval_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_tbl_quantval.csv", " ", "\n")
+    val dc_xhuff_tbl_bits_gold = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_bits.csv", " ", "\n")
+    val dc_xhuff_tbl_huffval_gold = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_huffval.csv", " ", "\n")
+    val ac_xhuff_tbl_bits_gold = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_bits.csv", " ", "\n")
+    val ac_xhuff_tbl_huffval_gold = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_huffval.csv", " ", "\n")
+
+    // Do checks
+    println("\nRESULTS: ")
+    println("Found " + errors_result + " errors")
+    println("smp_fact = " + smp_fact_result)
+    printMatrix(quant_tbl_quantval_result, "tbl_quantval")
+    printMatrix(dc_xhuff_tbl_bits_result, "dc_xhuff_bits")
+    printMatrix(dc_xhuff_tbl_huffval_result, "dc_xhuff_huffval")
+    printMatrix(ac_xhuff_tbl_bits_result, "ac_xhuff_bits")
+    printMatrix(ac_xhuff_tbl_huffval_result, "ac_xhuff_huffval")
+
+    val cksum_smp_fact = smp_fact_result == smp_fact_gold.to[UInt2]
+    val cksum_tbl_quantval = quant_tbl_quantval_result.zip(quant_tbl_quantval_gold){_==_}.reduce{_&&_}
+    val cksum_dc_xhuff_tbl_bits = dc_xhuff_tbl_bits_result.zip(dc_xhuff_tbl_bits_gold){_==_}.reduce{_&&_}
+    val cksum_dc_xhuff_tbl_huffval = dc_xhuff_tbl_huffval_result.zip(dc_xhuff_tbl_huffval_gold){_==_}.reduce{_&&_}
+    val cksum_ac_xhuff_tbl_bits = ac_xhuff_tbl_bits_result.zip(ac_xhuff_tbl_bits_gold){_==_}.reduce{_&&_}
+    val cksum_ac_xhuff_tbl_huffval = ac_xhuff_tbl_huffval_result.zip(ac_xhuff_tbl_huffval_gold){_==_}.reduce{_&&_}
+    println("cksums: " + cksum_smp_fact + " " + cksum_tbl_quantval + " " + cksum_dc_xhuff_tbl_bits + " " + cksum_dc_xhuff_tbl_huffval + " " + cksum_ac_xhuff_tbl_bits + " " + cksum_ac_xhuff_tbl_huffval)
+    val cksum = cksum_tbl_quantval && cksum_smp_fact && cksum_dc_xhuff_tbl_bits && cksum_dc_xhuff_tbl_huffval && cksum_ac_xhuff_tbl_bits && cksum_ac_xhuff_tbl_huffval && (errors_result == 0)
+    println("PASS: " + cksum + " (JPEG_Markers)")
+  }
+}
+
+object JPEG_Decompress extends SpatialApp { // DISABLED Regression (Dense) // Args: none
+  override val target = AWS_F1
+  type UInt8 = FixPt[FALSE, _8, _0]
+  type UInt2 = FixPt[FALSE, _2, _0]
+  type UInt16 = FixPt[FALSE, _16, _0]
+  type UInt = FixPt[FALSE, _32, _0]
+  @struct case class comp_struct(index: UInt8,
+                                 id: UInt8,
+                                 h_samp_factor: UInt8,
+                                 v_samp_factor: UInt8,
+                                 quant_tbl_no: UInt8
+                                )
+  @struct case class comp_acdc(index: UInt8,
+                               dc: UInt8,
+                               ac: UInt8
+                              )
+
+  @virtualize
+  def main() = {
+
+    val M_SOI = 216 // Start of image
+    val M_SOF0 = 192 // Baseline DCT ( Huffman ) 
+    val M_SOS = 218 // Start of Scan ( Head of Compressed Data )
+    val M_DHT = 196
+    val M_DQT = 219
+    val M_EOI = 217
+    val DCTSIZE2 = 64
+    val NUM_COMPONENT = 3
+    val NUM_HUFF_TBLS = 2
+    val RGB_NUM = 3
+    val SF4_1_1 = 2
+    val SF1_1_1 = 0
+
+    // Validity check values
+    val out_length_get_sof = 17
+    val out_data_precision_get_sof = 8
+    val out_p_jinfo_image_height_get_sof = 59
+    val out_p_jinfo_image_width_get_sof = 90
+    val out_p_jinfo_num_components_get_sof = 3
+
+    val jpg_data = loadCSV1D[UInt8]("/remote/regression/data/machsuite/jpeg_input.csv", ",")
+    val numel = jpg_data.length
+    assert(!(jpg_data(0) != 255.to[UInt8] || jpg_data(1) != M_SOI.to[UInt8]), "Not a jpeg file!")
+
+    val jpg_size = ArgIn[Int]
+    setArg(jpg_size, numel)
+    val jpg_dram = DRAM[UInt8](jpg_size)
+    setMem(jpg_dram, jpg_data)
+
+    // Get temp results
+    val quant_tbl_quantval_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_tbl_quantval.csv", " ", "\n")
+    val dc_xhuff_tbl_bits_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_bits.csv", " ", "\n")
+    val dc_xhuff_tbl_huffval_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_huffval.csv", " ", "\n")
+    val ac_xhuff_tbl_bits_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_bits.csv", " ", "\n")
+    val ac_xhuff_tbl_huffval_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_huffval.csv", " ", "\n")
+
+    val smp_fact = ArgIn[Int]
+    val quant_tbl_quantval = DRAM[UInt16](4,DCTSIZE2)
+    val dc_xhuff_tbl_bits = DRAM[UInt8](NUM_HUFF_TBLS,64) // 36)
+    val dc_xhuff_tbl_huffval = DRAM[UInt8](NUM_HUFF_TBLS,320) // 257)
+    val ac_xhuff_tbl_bits = DRAM[UInt8](NUM_HUFF_TBLS,64) // 36)
+    val ac_xhuff_tbl_huffval = DRAM[UInt8](NUM_HUFF_TBLS,320) // 257)
+
+
+    setArg(smp_fact, 2.to[Int])
+    setMem(quant_tbl_quantval, quant_tbl_quantval_data)
+    setMem(dc_xhuff_tbl_bits, dc_xhuff_tbl_bits_data)
+    setMem(dc_xhuff_tbl_huffval, dc_xhuff_tbl_huffval_data)
+    setMem(ac_xhuff_tbl_bits, ac_xhuff_tbl_bits_data)
+    setMem(ac_xhuff_tbl_huffval, ac_xhuff_tbl_huffval_data)
+
+    // Result structures
+    val dc_dhuff_tbl_ml = DRAM[UInt16](NUM_HUFF_TBLS)
+    val dc_dhuff_tbl_maxcode = DRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+    val dc_dhuff_tbl_mincode = DRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+    val dc_dhuff_tbl_valptr = DRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+    val ac_dhuff_tbl_ml = DRAM[UInt16](NUM_HUFF_TBLS)
+    val ac_dhuff_tbl_maxcode = DRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+    val ac_dhuff_tbl_mincode = DRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+    val ac_dhuff_tbl_valptr = DRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+
+    Accel{
+      val jpg_sram = FIFO[UInt8](5207)
+      jpg_sram load jpg_dram(0::5207)
+
+      val component = SRAM[comp_struct](NUM_COMPONENT)
+      val component_acdc = SRAM[comp_acdc](NUM_COMPONENT)
+      val izigzag_index = LUT[Int](64)( 0.to[Int], 1.to[Int], 8.to[Int], 16.to[Int], 9.to[Int], 2.to[Int], 3.to[Int], 10.to[Int],
+                                    17.to[Int], 24.to[Int], 32.to[Int], 25.to[Int], 18.to[Int], 11.to[Int], 4.to[Int], 5.to[Int],
+                                    12.to[Int], 19.to[Int], 26.to[Int], 33.to[Int], 40.to[Int], 48.to[Int], 41.to[Int], 34.to[Int],
+                                    27.to[Int], 20.to[Int], 13.to[Int], 6.to[Int], 7.to[Int], 14.to[Int], 21.to[Int], 28.to[Int],
+                                    35.to[Int], 42.to[Int], 49.to[Int], 56.to[Int], 57.to[Int], 50.to[Int], 43.to[Int], 36.to[Int],
+                                    29.to[Int], 22.to[Int], 15.to[Int], 23.to[Int], 30.to[Int], 37.to[Int], 44.to[Int], 51.to[Int],
+                                    58.to[Int], 59.to[Int], 52.to[Int], 45.to[Int], 38.to[Int], 31.to[Int], 39.to[Int], 46.to[Int],
+                                    53.to[Int], 60.to[Int], 61.to[Int], 54.to[Int], 47.to[Int], 55.to[Int], 62.to[Int], 63.to[Int]
+                                  )
+
+      val scan_ptr = Reg[Int](1)
+
+      val p_jinfo_quant_tbl_quantval = SRAM[UInt16](4,DCTSIZE2)
+      val p_jinfo_dc_xhuff_tbl_bits = SRAM[UInt8](NUM_HUFF_TBLS, 64) // 36)
+      val p_jinfo_dc_xhuff_tbl_huffval = SRAM[UInt8](NUM_HUFF_TBLS, 320) // 256)
+      val p_jinfo_dc_dhuff_tbl_ml = SRAM[UInt16](NUM_HUFF_TBLS)
+      val p_jinfo_dc_dhuff_tbl_maxcode = SRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+      val p_jinfo_dc_dhuff_tbl_mincode = SRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+      val p_jinfo_dc_dhuff_tbl_valptr = SRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+      val p_jinfo_ac_xhuff_tbl_bits = SRAM[UInt8](NUM_HUFF_TBLS, 64) // 36)
+      val p_jinfo_ac_xhuff_tbl_huffval = SRAM[UInt8](NUM_HUFF_TBLS, 320) // 256)
+      val p_jinfo_ac_dhuff_tbl_ml = SRAM[UInt16](NUM_HUFF_TBLS)
+      val p_jinfo_ac_dhuff_tbl_maxcode = SRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+      val p_jinfo_ac_dhuff_tbl_mincode = SRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+      val p_jinfo_ac_dhuff_tbl_valptr = SRAM[UInt16](NUM_HUFF_TBLS, 64) // 36)
+
+      val out_data_comp_vpos = SRAM[UInt16](RGB_NUM)
+      val out_data_comp_hpos = SRAM[UInt16](RGB_NUM)
+
+      val p_jinfo_smp_fact = Reg[UInt2](0)
+      val p_jinfo_num_components = Reg[UInt8](0)
+      val p_jinfo_jpeg_data = Reg[Int](0)
+      val p_jinfo_image_height = Reg[UInt16](0)
+      val p_jinfo_image_width = Reg[UInt16](0)
+
+      def huff_make_dhuff_tb(idx: Int, p_xhtbl_bits: SRAM2[UInt8], p_dhtbl_ml_mem: SRAM1[UInt16], p_dhtbl_maxcode: SRAM2[UInt16], p_dhtbl_mincode: SRAM2[UInt16], p_dhtbl_valptr: SRAM2[UInt16]): Unit = {
+        val huffsize = SRAM[UInt16](257)
+        val huffcode = SRAM[UInt16](257)
+        val p = Reg[Int](0)
+        Foreach(1 until 17 by 1) { i => 
+          println(" this j_max is " + {p_xhtbl_bits(idx, i) + 1} + " from " + idx + " " + i)
+          val j_max = (p_xhtbl_bits(idx, i) + 1).as[Int]
+          Foreach(1 until j_max by 1) { j => 
+            println("huffsize(" + p + ") is " + i)
+            huffsize(p) = i.as[UInt16]
+            Pipe{p :+= 1}
+          }
+        }
+        huffsize(p) = 0
+        val lastp = p
+        val code = Reg[UInt16](0)
+        val size = Reg[UInt16](0)
+        Pipe{size := huffsize(0)}
+        val pp = Reg[Int](0)
+        Pipe{code.reset}
+
+
+        FSM[Int](whilst1 => whilst1 != -1) { whilst1 => 
+          FSM[Int](whilst2 => whilst2 != -1) { whilst2 => 
+            // println("huffocde " + pp + " = " + code )
+            Pipe{huffcode(pp) = code.value}
+            Pipe{code :+= 1}
+            Pipe{pp :+= 1}
+            println("  conclude first fsm " + huffsize(pp) + " at " + pp + " == " + size.value + " code " + code.value)
+          } {whilst2 => mux((huffsize(pp) == size.value) && (pp < 257), whilst2, -1)}
+
+          // println("at " + pp + " size is " + huffsize(pp))
+          val break_cond = huffsize(pp) == 0.to[UInt16]
+
+          // if (!break_cond) { // Issue #160
+          FSM[Int](whilst2 => whilst2 != -1) { whilst2 => 
+            if (!break_cond) {
+              Pipe{code := code << 1}
+              Pipe{size :+= 1}
+            }
+            println("  conclude second fsm " + huffsize(pp) + " at " + pp + " == " + size.value + " " + break_cond + " code "  + code.value)
+          } { whilst2 => mux((huffsize(pp) == size.value) || break_cond, -1, whilst2)}
+          // }
+          println("Conclude outer fsm, " + huffsize(pp) + " at " + pp)
+        } {whilst1 => mux((huffsize(pp) == 0.to[UInt16]), -1, whilst1)}
+
+        val p_dhtbl_ml = Reg[Int](1)
+        val ppp = Reg[Int](0)
+        p_dhtbl_ml.reset
+        Foreach(1 until 17 by 1){l => 
+          if (p_xhtbl_bits(idx, l) == 0.to[UInt8]) {
+            p_dhtbl_maxcode(idx, l) = 65535.to[UInt16] // Signifies skip
+          } else {
+            p_dhtbl_valptr(idx, l) = ppp.value.as[UInt16]
+            p_dhtbl_mincode(idx,l) = huffcode(ppp)
+            Pipe{ppp :+= p_xhtbl_bits(idx,l).as[Int] - 1}
+            p_dhtbl_maxcode(idx,l) = huffcode(ppp)
+            p_dhtbl_ml := l
+            println(" " + p_dhtbl_valptr(idx,l) + " " + p_dhtbl_mincode(idx,l) + " " + ppp + " " + p_dhtbl_maxcode(idx,l) + " " + p_dhtbl_ml)
+            Pipe{ppp :+= 1}
+          }
+        }
+        p_dhtbl_maxcode(idx, p_dhtbl_ml.value) = p_dhtbl_maxcode(idx, p_dhtbl_ml.value) + 1
+        p_dhtbl_ml_mem(idx) = p_dhtbl_ml.value.as[UInt16]
+      }
+
+
+      // START DESIGN
+
+      // Init structures
+      p_jinfo_quant_tbl_quantval load quant_tbl_quantval
+      p_jinfo_dc_xhuff_tbl_bits load dc_xhuff_tbl_bits
+      p_jinfo_dc_xhuff_tbl_huffval load dc_xhuff_tbl_huffval
+      p_jinfo_ac_xhuff_tbl_bits load ac_xhuff_tbl_bits
+      p_jinfo_ac_xhuff_tbl_huffval load ac_xhuff_tbl_huffval
+
+      // Load values
+      jpg_sram load jpg_dram(0::5207) // TODO: Tile this
+
+      // Decompress
+      val p_jinfo_MCUHeight = Reg[UInt16](0)
+      val p_jinfo_MCUWidth = Reg[UInt16](0)
+      val p_jinfo_NumMCU = Reg[UInt16](0)
+
+      p_jinfo_MCUHeight := (p_jinfo_image_height - 1) / 8 + 1
+      p_jinfo_MCUWidth := (p_jinfo_image_width - 1) / 8 + 1
+      p_jinfo_NumMCU := p_jinfo_MCUHeight * p_jinfo_MCUWidth
+
+      huff_make_dhuff_tb(0, p_jinfo_dc_xhuff_tbl_bits, p_jinfo_dc_dhuff_tbl_ml, p_jinfo_dc_dhuff_tbl_maxcode,p_jinfo_dc_dhuff_tbl_mincode,p_jinfo_dc_dhuff_tbl_valptr)
+      huff_make_dhuff_tb(1, p_jinfo_dc_xhuff_tbl_bits, p_jinfo_dc_dhuff_tbl_ml, p_jinfo_dc_dhuff_tbl_maxcode,p_jinfo_dc_dhuff_tbl_mincode,p_jinfo_dc_dhuff_tbl_valptr)
+      huff_make_dhuff_tb(0, p_jinfo_ac_xhuff_tbl_bits, p_jinfo_ac_dhuff_tbl_ml, p_jinfo_ac_dhuff_tbl_maxcode,p_jinfo_ac_dhuff_tbl_mincode,p_jinfo_ac_dhuff_tbl_valptr)
+      huff_make_dhuff_tb(1, p_jinfo_ac_xhuff_tbl_bits, p_jinfo_ac_dhuff_tbl_ml, p_jinfo_ac_dhuff_tbl_maxcode,p_jinfo_ac_dhuff_tbl_mincode,p_jinfo_ac_dhuff_tbl_valptr)
+
+      // Store intermediate results
+      dc_dhuff_tbl_ml store p_jinfo_dc_dhuff_tbl_ml
+      dc_dhuff_tbl_maxcode store p_jinfo_dc_dhuff_tbl_maxcode
+      dc_dhuff_tbl_mincode store p_jinfo_dc_dhuff_tbl_mincode
+      dc_dhuff_tbl_valptr store p_jinfo_dc_dhuff_tbl_valptr
+      ac_dhuff_tbl_ml store p_jinfo_ac_dhuff_tbl_ml
+      ac_dhuff_tbl_maxcode store p_jinfo_ac_dhuff_tbl_maxcode
+      ac_dhuff_tbl_mincode store p_jinfo_ac_dhuff_tbl_mincode
+      ac_dhuff_tbl_valptr store p_jinfo_ac_dhuff_tbl_valptr
+    }
+
+
+    // Extract results
+    val dc_dhuff_tbl_ml_result = getMem(dc_dhuff_tbl_ml)
+    val dc_dhuff_tbl_maxcode_result_algnd = getMatrix(dc_dhuff_tbl_maxcode)
+    val dc_dhuff_tbl_mincode_result_algnd = getMatrix(dc_dhuff_tbl_mincode)
+    val dc_dhuff_tbl_valptr_result_algnd = getMatrix(dc_dhuff_tbl_valptr)
+    val ac_dhuff_tbl_ml_result = getMem(ac_dhuff_tbl_ml)
+    val ac_dhuff_tbl_maxcode_result_algnd = getMatrix(ac_dhuff_tbl_maxcode)
+    val ac_dhuff_tbl_mincode_result_algnd = getMatrix(ac_dhuff_tbl_mincode)
+    val ac_dhuff_tbl_valptr_result_algnd = getMatrix(ac_dhuff_tbl_valptr)
+
+    // Reshape results
+    val dc_dhuff_tbl_maxcode_result = (0::NUM_HUFF_TBLS, 0::36){(i,j) => dc_dhuff_tbl_maxcode_result_algnd(i,j)}
+    val dc_dhuff_tbl_mincode_result = (0::NUM_HUFF_TBLS, 0::36){(i,j) => dc_dhuff_tbl_mincode_result_algnd(i,j)}
+    val dc_dhuff_tbl_valptr_result = (0::NUM_HUFF_TBLS, 0::36){(i,j) => dc_dhuff_tbl_valptr_result_algnd(i,j)}
+    val ac_dhuff_tbl_maxcode_result = (0::NUM_HUFF_TBLS, 0::36){(i,j) => ac_dhuff_tbl_maxcode_result_algnd(i,j)}
+    val ac_dhuff_tbl_mincode_result = (0::NUM_HUFF_TBLS, 0::36){(i,j) => ac_dhuff_tbl_mincode_result_algnd(i,j)}
+    val ac_dhuff_tbl_valptr_result = (0::NUM_HUFF_TBLS, 0::36){(i,j) => ac_dhuff_tbl_valptr_result_algnd(i,j)}
+
+    // Get gold checks
+    val dc_dhuff_tbl_ml_gold = Array[UInt16](9,11)
+    val dc_dhuff_tbl_maxcode_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_maxcode.csv", " ", "\n")
+    val dc_dhuff_tbl_mincode_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_mincode.csv", " ", "\n")
+    val dc_dhuff_tbl_valptr_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_valptr.csv", " ", "\n")
+    val ac_dhuff_tbl_ml_gold = Array[UInt16](16,16)
+    val ac_dhuff_tbl_maxcode_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_maxcode.csv", " ", "\n")
+    val ac_dhuff_tbl_mincode_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_mincode.csv", " ", "\n")
+    val ac_dhuff_tbl_valptr_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_valptr.csv", " ", "\n")
+
+    // Do checks
+    println("\nRESULTS: ")
+    printArray(dc_dhuff_tbl_ml_result, "dc_dhuff_tbl_ml_result")
+    printMatrix(dc_dhuff_tbl_maxcode_result, "dc_dhuff_tbl_maxcode_result")
+    printMatrix(dc_dhuff_tbl_mincode_result, "dc_dhuff_tbl_mincode_result")
+    printMatrix(dc_dhuff_tbl_valptr_result, "dc_dhuff_tbl_valptr_result")
+    printArray(ac_dhuff_tbl_ml_result, "ac_dhuff_tbl_ml_result")
+    printMatrix(ac_dhuff_tbl_maxcode_result, "ac_dhuff_tbl_maxcode_result")
+    printMatrix(ac_dhuff_tbl_mincode_result, "ac_dhuff_tbl_mincode_result")
+    printMatrix(ac_dhuff_tbl_valptr_result, "ac_dhuff_tbl_valptr_result")
+
+
+    val cksum_dc_dhuff_tbl_ml = dc_dhuff_tbl_ml_result.zip(dc_dhuff_tbl_ml_gold){_==_}.reduce{_&&_}
+    val cksum_dc_dhuff_tbl_maxcode = dc_dhuff_tbl_maxcode_result.zip(dc_dhuff_tbl_maxcode_gold){_==_}.reduce{_&&_}
+    val cksum_dc_dhuff_tbl_mincode = dc_dhuff_tbl_mincode_result.zip(dc_dhuff_tbl_mincode_gold){_==_}.reduce{_&&_}
+    val cksum_dc_dhuff_tbl_valptr = dc_dhuff_tbl_valptr_result.zip(dc_dhuff_tbl_valptr_gold){_==_}.reduce{_&&_}
+    val cksum_ac_dhuff_tbl_ml = ac_dhuff_tbl_ml_result.zip(ac_dhuff_tbl_ml_gold){_==_}.reduce{_&&_}
+    val cksum_ac_dhuff_tbl_maxcode = ac_dhuff_tbl_maxcode_result.zip(ac_dhuff_tbl_maxcode_gold){_==_}.reduce{_&&_}
+    val cksum_ac_dhuff_tbl_mincode = ac_dhuff_tbl_mincode_result.zip(ac_dhuff_tbl_mincode_gold){_==_}.reduce{_&&_}
+    val cksum_ac_dhuff_tbl_valptr  = ac_dhuff_tbl_valptr_result.zip(ac_dhuff_tbl_valptr_gold){_==_}.reduce{_&&_}
+
+    val cksum = cksum_dc_dhuff_tbl_ml && cksum_dc_dhuff_tbl_maxcode && cksum_dc_dhuff_tbl_mincode && cksum_dc_dhuff_tbl_valptr && cksum_ac_dhuff_tbl_ml && cksum_ac_dhuff_tbl_maxcode && cksum_ac_dhuff_tbl_mincode && cksum_ac_dhuff_tbl_valptr
+    println("PASS: " + cksum + " (JPEG_Decompress)")
   }
 }
 
