@@ -1889,8 +1889,6 @@ object FifoPushPop extends SpatialApp { // Regression (Unit) // Args: 384
 
 
 object StreamTest extends SpatialApp {
-
-
    override val target = targets.DE1
 
    @virtualize
