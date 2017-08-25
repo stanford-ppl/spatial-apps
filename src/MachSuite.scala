@@ -695,7 +695,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
     val filter_size = 3*3*3
 
     // Setup data
-    val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_data.csv", "\n")
+    val raw_data = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/stencil/stencil3d_data.csv", "\n")
     val data = raw_data.reshape(HEIGHT, COLS, ROWS)
 
     // Setup DRAMs
@@ -757,7 +757,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
 
     // Get results
     val result_data = getTensor3(result_dram)
-    val raw_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_gold.csv", "\n")
+    val raw_gold = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/stencil/stencil3d_gold.csv", "\n")
     val gold = raw_gold.reshape(HEIGHT,COLS,ROWS)
 
     // Printers
