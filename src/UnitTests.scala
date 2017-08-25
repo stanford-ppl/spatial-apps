@@ -3145,7 +3145,7 @@ object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 
     Axpy[T](N, alpha, X, incX, Z, incY, Z)
   }
 
-  type T = FixPt[TRUE,_8,_24]
+  type T = FixPt[TRUE,_16,_16]
 
   @virtualize
   def main() {
