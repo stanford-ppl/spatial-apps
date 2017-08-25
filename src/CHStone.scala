@@ -551,6 +551,7 @@ object JPEG_Markers extends SpatialApp { // Regression (Dense) // Args: none
     val cksum_ac_xhuff_tbl_huffval = ac_xhuff_tbl_huffval_result.zip(ac_xhuff_tbl_huffval_gold){_==_}.reduce{_&&_}
     println("cksums: " + cksum_smp_fact + " " + cksum_tbl_quantval + " " + cksum_dc_xhuff_tbl_bits + " " + cksum_dc_xhuff_tbl_huffval + " " + cksum_ac_xhuff_tbl_bits + " " + cksum_ac_xhuff_tbl_huffval)
     val cksum = cksum_data_start && cksum_tbl_quantval && cksum_smp_fact && cksum_dc_xhuff_tbl_bits && cksum_dc_xhuff_tbl_huffval && cksum_ac_xhuff_tbl_bits && cksum_ac_xhuff_tbl_huffval && (errors_result == 0)
+    println("cksums: " + cksum_data_start + " " + cksum_tbl_quantval + " " + cksum_smp_fact + " " + cksum_dc_xhuff_tbl_bits + " " + cksum_dc_xhuff_tbl_huffval + " " + cksum_ac_xhuff_tbl_bits + " " + cksum_ac_xhuff_tbl_huffval + " " + (errors_result == 0))
     println("PASS: " + cksum + " (JPEG_Markers)")
   }
 }
@@ -905,24 +906,36 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
     val component_ac_2 = ArgIn[UInt8]
     val component_dc_2 = ArgIn[UInt8]
 
+    val dc_xhuff_tbl_bits = DRAM[UInt8](NUM_HUFF_TBLS, 36)
+    val dc_xhuff_tbl_huffval = DRAM[UInt8](NUM_HUFF_TBLS, 257)
     val dc_dhuff_tbl_maxcode = DRAM[UInt16](NUM_HUFF_TBLS, 36)
     val dc_dhuff_tbl_mincode = DRAM[UInt16](NUM_HUFF_TBLS, 36)
     val dc_dhuff_tbl_valptr = DRAM[UInt16](NUM_HUFF_TBLS, 36)
+    val ac_xhuff_tbl_bits = DRAM[UInt8](NUM_HUFF_TBLS, 36)
+    val ac_xhuff_tbl_huffval = DRAM[UInt8](NUM_HUFF_TBLS, 257)
     val ac_dhuff_tbl_maxcode = DRAM[UInt16](NUM_HUFF_TBLS, 36)
     val ac_dhuff_tbl_mincode = DRAM[UInt16](NUM_HUFF_TBLS, 36)
     val ac_dhuff_tbl_valptr = DRAM[UInt16](NUM_HUFF_TBLS, 36)
 
+    val dc_xhuff_tbl_bits_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_bits.csv", " ", "\n")
+    val dc_xhuff_tbl_huffval_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_huffval.csv", " ", "\n")
     val dc_dhuff_tbl_maxcode_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_maxcode.csv", " ", "\n")
     val dc_dhuff_tbl_mincode_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_mincode.csv", " ", "\n")
     val dc_dhuff_tbl_valptr_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_valptr.csv", " ", "\n")
     val ac_dhuff_tbl_ml_data = Array[UInt16](16,16)
+    val ac_xhuff_tbl_bits_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_bits.csv", " ", "\n")
+    val ac_xhuff_tbl_huffval_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_huffval.csv", " ", "\n")
     val ac_dhuff_tbl_maxcode_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_maxcode.csv", " ", "\n")
     val ac_dhuff_tbl_mincode_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_mincode.csv", " ", "\n")
     val ac_dhuff_tbl_valptr_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_valptr.csv", " ", "\n")
 
+    setMem(dc_xhuff_tbl_bits, dc_xhuff_tbl_bits_data)
+    setMem(dc_xhuff_tbl_huffval, dc_xhuff_tbl_huffval_data)
     setMem(dc_dhuff_tbl_maxcode, dc_dhuff_tbl_maxcode_data)
     setMem(dc_dhuff_tbl_mincode, dc_dhuff_tbl_mincode_data)
     setMem(dc_dhuff_tbl_valptr, dc_dhuff_tbl_valptr_data)
+    setMem(ac_xhuff_tbl_bits, ac_xhuff_tbl_bits_data)
+    setMem(ac_xhuff_tbl_huffval, ac_xhuff_tbl_huffval_data)
     setMem(ac_dhuff_tbl_maxcode, ac_dhuff_tbl_maxcode_data)
     setMem(ac_dhuff_tbl_mincode, ac_dhuff_tbl_mincode_data)
     setMem(ac_dhuff_tbl_valptr, ac_dhuff_tbl_valptr_data)
@@ -932,8 +945,8 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
     setArg(ac_dhuff_tbl_ml_1, 16.to[UInt16])
     setArg(jpeg_data_start, 623)
     setArg(smp_fact, 2.to[UInt2])
-    setArg(component_ac_0, 1.to[UInt8])
-    setArg(component_dc_0, 1.to[UInt8])
+    setArg(component_ac_0, 0.to[UInt8])
+    setArg(component_dc_0, 0.to[UInt8])
     setArg(component_ac_1, 1.to[UInt8])
     setArg(component_dc_1, 1.to[UInt8])
     setArg(component_ac_2, 1.to[UInt8])
@@ -1005,8 +1018,12 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
 
       // Load in intermediate results
       p_jinfo_dc_dhuff_tbl_maxcode load dc_dhuff_tbl_maxcode
+      p_jinfo_dc_xhuff_tbl_bits load dc_xhuff_tbl_bits
+      p_jinfo_dc_xhuff_tbl_huffval load dc_xhuff_tbl_huffval
       p_jinfo_dc_dhuff_tbl_mincode load dc_dhuff_tbl_mincode
       p_jinfo_dc_dhuff_tbl_valptr load dc_dhuff_tbl_valptr
+      p_jinfo_ac_xhuff_tbl_bits load ac_xhuff_tbl_bits
+      p_jinfo_ac_xhuff_tbl_huffval load ac_xhuff_tbl_huffval
       p_jinfo_ac_dhuff_tbl_maxcode load ac_dhuff_tbl_maxcode
       p_jinfo_ac_dhuff_tbl_mincode load ac_dhuff_tbl_mincode
       p_jinfo_ac_dhuff_tbl_valptr load ac_dhuff_tbl_valptr
@@ -1087,13 +1104,16 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
         val code = Reg[Int16](0)
         code := buf_getb().as[Int16]
         val l = Reg[Int](1)
+        Pipe{l.reset}
         val max_decode = Reg[Int16](0)
+        Pipe{max_decode.reset}
         FSM[Int](whilst => whilst != -1.to[Int]){whilst => 
           code := (code << 1) + buf_getb().as[Int16]
           l :+= 1
           max_decode := mux(use_dc, p_jinfo_dc_dhuff_tbl_maxcode(tbl_no, l), p_jinfo_ac_dhuff_tbl_maxcode(tbl_no, l)).as[Int16]
           println("fsm probe " + l.value + " " + max_decode + " " + code.value)
         }{whilst => mux(code.value > max_decode.value, whilst, -1)}
+        println("exit fsm because " + code.value + " < " + max_decode.value)
         val ac_dhuff_ml = mux(tbl_no == 0, ac_dhuff_tbl_ml_0.value, ac_dhuff_tbl_ml_1.value)
         val dc_dhuff_ml = mux(tbl_no == 0, dc_dhuff_tbl_ml_0.value, dc_dhuff_tbl_ml_1.value)
         val tbl_ml = mux(use_dc, dc_dhuff_ml, ac_dhuff_ml)
