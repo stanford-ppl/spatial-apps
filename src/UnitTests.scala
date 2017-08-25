@@ -3145,7 +3145,7 @@ object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 
     Axpy[T](N, alpha, X, incX, Z, incY, Z)
   }
 
-  type T = FixPt[TRUE,_4,_12]
+  type T = FixPt[TRUE,_8,_24]
 
   @virtualize
   def main() {
@@ -3234,13 +3234,14 @@ object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 
     val axpby_gold = X_data.zip(Y_data){case (x,y) => alpha*x+beta*y}
 
     // Collect cksums
-    val dot_cksum = dot_res == dot_gold
-    val axpy_cksum = axpy_res.zip(axpy_gold){_==_}.reduce{_&&_}
-    val gemm_cksum = gemm_res.zip(gemm_gold){_==_}.reduce{_&&_}
-    val gemv_cksum = gemv_res.zip(gemv_gold){_==_}.reduce{_&&_}
-    val ger_cksum = ger_res.zip(ger_gold){_==_}.reduce{_&&_}
-    val scal_cksum = scal_res.zip(scal_gold){_==_}.reduce{_&&_}
-    val axpby_cksum = axpby_res.zip(axpby_gold){_==_}.reduce{_&&_}
+    val margin = 0.25.to[T]
+    val dot_cksum = abs(dot_res - dot_gold) < margin
+    val axpy_cksum = axpy_res.zip(axpy_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val gemm_cksum = gemm_res.zip(gemm_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val gemv_cksum = gemv_res.zip(gemv_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val ger_cksum = ger_res.zip(ger_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val scal_cksum = scal_res.zip(scal_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val axpby_cksum = axpby_res.zip(axpby_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
     val cksum = dot_cksum && axpy_cksum && gemm_cksum && gemv_cksum && ger_cksum && scal_cksum && axpby_cksum
 
     // Print results
