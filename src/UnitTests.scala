@@ -2935,23 +2935,23 @@ object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 
 
   // DSE Parameters
   val tileSize  = 16 (16 -> 16 -> 1024)
-  val outer_par = 2 (1 -> 1 -> 32)
-  val inner_par = 2 (1 -> 1 -> 16)
-  val load_par  = 2 (1 -> 1 -> 16)
-  val store_par = 2 (1 -> 1 -> 16)
+  val outer_par = 1 (1 -> 1 -> 32)
+  val inner_par = 1 (1 -> 1 -> 16)
+  val load_par  = 8 (1 -> 1 -> 16)
+  val store_par = 8 (1 -> 1 -> 16)
 
   // gemm and gemmv specific
   val tileSizeN    = 16 (16 -> 16 -> 1024)
   val tileSizeM    = 16 (16 -> 16 -> 1024)
   val tileSizeK    = 16 (16 -> 16 -> 1024)
-  val m_inner_par  = 2 (1 -> 1 -> 8)
-  val n_inner_par  = 2 (1 -> 1 -> 8)
-  val k_inner_par  = 2 (1 -> 1 -> 8)
-  val m_outer_par  = 2 (1 -> 1 -> 8)
-  val n_outer_par  = 2 (1 -> 1 -> 8)
-  val k_outer_par  = 2 (1 -> 1 -> 8)
-  val c_reduce_par = 2 (1 -> 1 -> 8)
-  val y_reduce_par = 2 (1 -> 1 -> 8)
+  val m_inner_par  = 1 (1 -> 1 -> 8)
+  val n_inner_par  = 1 (1 -> 1 -> 8)
+  val k_inner_par  = 1 (1 -> 1 -> 8)
+  val m_outer_par  = 1 (1 -> 1 -> 8)
+  val n_outer_par  = 1 (1 -> 1 -> 8)
+  val k_outer_par  = 1 (1 -> 1 -> 8)
+  val c_reduce_par = 1 (1 -> 1 -> 8)
+  val y_reduce_par = 1 (1 -> 1 -> 8)
 
   @virtualize
   def Dot[T:Type:Num](N: Reg[Int], 
