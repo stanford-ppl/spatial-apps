@@ -14,12 +14,18 @@ object LSTMForward extends SpatialApp {
   
   @virtualize
   def GateForward[T:Type:Num] (
-    W_in: Matrix[T], U_in: Matrix[T],
-    W_forget: Matrix[T], U_forget: Matrix[T],
-    W_output: Matrix[T], U_output: Matrix[T],
-    W_new_mem: Matrix[T], U_new_mem: Matrix[T],
-    W_c_t_1: Matrix[T],
-    x: Matrix[T], h: Matrix[T],
+    /* Input gate */
+    W_in: Array[T], U_in: Array[T],
+    /* Forget gate */
+    W_forget: Array[T], U_forget: Array[T],
+    /* Output gate */
+    W_output: Array[T], U_output: Array[T],
+    /* New memory gate */
+    W_new_mem: Array[T], U_new_mem: Array[T],
+    /* Old memory gate */
+    W_c_t_1: Array[T],
+    /* Inputs */
+    x: Array[T], h: Array[T],
     /* Sizes */
     mm: Int, nn: Int, N_classes: Int
   ) = {
@@ -122,12 +128,7 @@ object LSTMForward extends SpatialApp {
         1.0000000000.to[T], 1.0000000000.to[T], 1.0000000000.to[T], 1.0000000000.to[T], 1.0000000000.to[T], 1.0000000000.to[T], 1.0000000000.to[T], 1.0000000000.to[T])
 
       def sigmoid(p: T) = {
-        println("in sigmoid")
-        println(p - 32.to[T])
-        println(p + 32.to[T])
-        println(((p + lo) * revPrec).to[Int])
-        println("checked...")
-        mux(p > 32.to[T], 1.to[T], mux(p < -32.to[T], -1.to[T], sigmoidLUT(((p + lo) * revPrec).to[Int])))
+        sigmoidLUT(((p + lo) * revPrec).to[Int])
       }
 
       /*
@@ -158,12 +159,7 @@ object LSTMForward extends SpatialApp {
          1.0000000000.to[T],  1.0000000000.to[T],  1.0000000000.to[T],  1.0000000000.to[T],  1.0000000000.to[T],  1.0000000000.to[T],  1.0000000000.to[T],  1.0000000000.to[T])
 
       def tanh(p: T) = {
-        println("in tanh")
-        println(p - 32.to[T])
-        println(p + 32.to[T])
-        println(((p + lo) * revPrec).to[Int])
-        println("checked...")
-        mux(p > 32.to[T], 1.to[T], mux(p < -32.to[T], -1.to[T], tanhLUT(((p + lo) * revPrec).to[Int])))
+        tanhLUT(((p + lo) * revPrec).to[Int])
       }
 
       /*
@@ -198,6 +194,7 @@ object LSTMForward extends SpatialApp {
           }
         }
       }
+
 
       /*
        * The major function that describes the design
@@ -291,13 +288,19 @@ object LSTMForward extends SpatialApp {
 
       /* Main function */
       forward (
+        /* Input gate */
         Wi, Ui,
+        /* Forget gate */
         Wf, Uf,
+        /* Output gate */
         Wo, Uo,
+        /* New memory gate */
         Wc, Uc,
+        /* Old memory gate */
         Wc_t_1,
         /* Inputs */
         xt, h_t_1,
+        /* Sizes */
         D_h, N, d, D_h, b_Dh, b_N, b_Wi_d, b_Ui_Dh
       )
     }
@@ -311,29 +314,34 @@ object LSTMForward extends SpatialApp {
     val D_h = 64
     val d = 64
     val N = 32
-    val data_64_64 = "/Users/tianzhao/Developers/spatial/spatial-lang/apps/data/bi-att-flow/64_by_64_eles.csv"
-    val data_64_32 = "/Users/tianzhao/Developers/spatial/spatial-lang/apps/data/bi-att-flow/64_by_32_eles.csv"
 
     // TODO: Get a pretrained model and fetch out weights from one of the gates
-    val W_i = loadCSV2D[X](data_64_64, ",", "\n")
-    val U_i = loadCSV2D[X](data_64_64, ",", "\n")
-    val W_f = loadCSV2D[X](data_64_64, ",", "\n")
-    val U_f = loadCSV2D[X](data_64_64, ",", "\n")
-    val W_o = loadCSV2D[X](data_64_64, ",", "\n")
-    val U_o = loadCSV2D[X](data_64_64, ",", "\n")
-    val W_c = loadCSV2D[X](data_64_64, ",", "\n")
-    val U_c = loadCSV2D[X](data_64_64, ",", "\n")
-    val x_t = loadCSV2D[X](data_64_32, ",", "\n")
-    val h_t_1 = loadCSV2D[X](data_64_32, ",", "\n")
-    val W_c_t_1 = loadCSV2D[X](data_64_32, ",", "\n")
+    val W_i = loadCSV2D[X]("../data/bi-att-flowdata/64_by_64_eles.csv", ",", "\n")
+    val U_i = loadCSV2D[X]("../data/bi-att-flowdata/64_by_64_eles.csv", ",", "\n")
+    val W_f = loadCSV2D[X]("../data/bi-att-flowdata/64_by_64_eles.csv", ",", "\n")
+    val U_f = loadCSV2D[X]("../data/bi-att-flowdata/64_by_64_eles.csv", ",", "\n")
+    val W_o = loadCSV2D[X]("../data/bi-att-flowdata/64_by_64_eles.csv", ",", "\n")
+    val U_o = loadCSV2D[X]("../data/bi-att-flowdata/64_by_64_eles.csv", ",", "\n")
+    val W_c = loadCSV2D[X]("../data/bi-att-flowdata/64_by_64_eles.csv", ",", "\n")
+    val U_c = loadCSV2D[X]("../data/bi-att-flowdata/64_by_64_eles.csv", ",", "\n")
+    val x_t = loadCSV2D[X]("../data/bi-att-flowdata/64_by_32_eles.csv", ",", "\n")
+    val h_t_1 = loadCSV2D[X]("../data/bi-att-flowdata/64_by_32_eles.csv", ",", "\n")
+    val W_c_t_1 = loadCSV2D[X]("../data/bi-att-flowdata/64_by_32_eles.csv", ",", "\n")
 
     val gateResult = GateForward (
+      /* Input gate */
       W_i, U_i,
+      /* Forget gate */
       W_f, U_f,
+      /* Output gate */
       W_o, U_o,
+      /* New memory gate */
       W_c, U_c,
+      /* Old memory gate */
       W_c_t_1,
+      /* Inputs */
       x_t, h_t_1,
+      /* Sizes */
       D_h, d, N
     )
 
