@@ -304,6 +304,8 @@ object LSTMForward extends SpatialApp {
 
     getMem(next_mem)
     // TODO: how to get two pieces of memory?
+    // TODO: It seems that the weights can all be combined into a continuous DRAM matrix....
+    // Should try that!
   }
 
   @virtualize
