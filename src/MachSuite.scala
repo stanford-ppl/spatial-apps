@@ -476,8 +476,8 @@ object Viterbi extends SpatialApp { // Regression (Dense) // Args: none
   											 40,6,46,24,47,2,2,53,41,0,55,38,5,57,57,57,57,14,57,34,37,
   											 57,30,30,5,1,5,62,25,59,5,2,43,30,26,38,38)
 
-  	val raw_transitions = loadCSV1D[T]("/remote/regression/data/machsuite/viterbi_transition.csv", "\n")
-  	val raw_emissions = loadCSV1D[T]("/remote/regression/data/machsuite/viterbi_emission.csv", "\n")
+  	val raw_transitions = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/viterbi/viterbi_transition.csv", "\n")
+  	val raw_emissions = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/viterbi/viterbi_emission.csv", "\n")
   	val transitions = raw_transitions.reshape(N_STATES, N_STATES)
   	val emissions = raw_emissions.reshape(N_STATES, N_TOKENS)
 
@@ -602,7 +602,7 @@ object Stencil2D extends SpatialApp { // Regression (Dense) // Args: none
     val par_lb_load = 4
 
   	// Setup data
-  	val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil2d_data.csv", "\n")
+  	val raw_data = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/stencil/stencil2d_data.csv", "\n")
   	val data = raw_data.reshape(ROWS, COLS)
 
   	// Setup DRAMs
@@ -636,7 +636,7 @@ object Stencil2D extends SpatialApp { // Regression (Dense) // Args: none
 
   	// Get results
   	val result_data = getMatrix(result_dram)
-  	val raw_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil2d_gold.csv", "\n")
+  	val raw_gold = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/stencil/stencil2d_gold.csv", "\n")
   	val gold = raw_gold.reshape(ROWS,COLS)
 
   	// Printers
@@ -695,7 +695,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
     val filter_size = 3*3*3
 
     // Setup data
-    val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_data.csv", "\n")
+    val raw_data = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/stencil/stencil3d_data.csv", "\n")
     val data = raw_data.reshape(HEIGHT, COLS, ROWS)
 
     // Setup DRAMs
@@ -757,7 +757,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
 
     // Get results
     val result_data = getTensor3(result_dram)
-    val raw_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_gold.csv", "\n")
+    val raw_gold = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/stencil/stencil3d_gold.csv", "\n")
     val gold = raw_gold.reshape(HEIGHT,COLS,ROWS)
 
     // Printers
@@ -1365,7 +1365,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
             // whileCond := (q > 0) && (pattern_sram(i) != pattern_sram(q))
             if ((q > 0) && (string_sram(i) != pattern_sram(q))) q := kmp_next(q)
           }{state => mux((q > 0) && (string_sram(i) != pattern_sram(q)), 0, 1)}
-          if (pattern_sram(q) == string_sram(i)) { q :+= 1 }
+          Pipe{if (pattern_sram(q) == string_sram(i)) { q :+= 1 }}
           if (q >= PATTERN_SIZE) {
             Pipe{
               num_matches :+= 1
@@ -2159,7 +2159,7 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
 }
 
 
-object Backprop extends SpatialApp { // Regression (Dense) // Args: 20
+object Backprop extends SpatialApp { // Regression (Dense) // Args: 15
   override val target = AWS_F1
 
  /*                                                                                                  
