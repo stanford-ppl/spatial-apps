@@ -991,6 +991,18 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
         0x01ffffff.to[UInt], 0x03ffffff.to[UInt], 0x07ffffff.to[UInt], 0x0fffffff.to[UInt],
         0x1fffffff.to[UInt], 0x3fffffff.to[UInt], 0x7fffffff.to[UInt], 0xffffffff.to[UInt]
       )
+      val read_pos_lut = LUT[UInt8](8)( 
+        0x01.to[UInt8], 0x02.to[UInt8],
+        0x04.to[UInt8], 0x08.to[UInt8],
+        0x10.to[UInt8], 0x20.to[UInt8],
+        0x40.to[UInt8], 0x80.to[UInt8]
+      )
+      val extend_mask = LUT[UInt](20)(
+        0xFFFFFFFE.to[UInt], 0xFFFFFFFC.to[UInt], 0xFFFFFFF8.to[UInt], 0xFFFFFFF0.to[UInt], 0xFFFFFFE0.to[UInt], 0xFFFFFFC0.to[UInt],
+        0xFFFFFF80.to[UInt], 0xFFFFFF00.to[UInt], 0xFFFFFE00.to[UInt], 0xFFFFFC00.to[UInt], 0xFFFFF800.to[UInt], 0xFFFFF000.to[UInt],
+        0xFFFFE000.to[UInt], 0xFFFFC000.to[UInt], 0xFFFF8000.to[UInt], 0xFFFF0000.to[UInt], 0xFFFE0000.to[UInt], 0xFFFC0000.to[UInt],
+        0xFFF80000.to[UInt], 0xFFF00000.to[UInt]
+      )
 
 
       val p_jinfo_quant_tbl_quantval = SRAM[UInt16](4,DCTSIZE2)
@@ -1044,11 +1056,10 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
       }
 
       // Go to data start
-      val read_position = Reg[UInt8](0)
       val read_position_idx = Reg[Int](-1)
       val current_read_byte = Reg[UInt8](0)
       val CurrentMCU = Reg[UInt16](0)
-      val HuffBuff = SRAM[UInt16](NUM_COMPONENT,DCTSIZE2)
+      val HuffBuff = SRAM[UInt32](NUM_COMPONENT,DCTSIZE2)
       val IDCTBuff = SRAM[UInt16](6,DCTSIZE2)
 
       def pgetc(): UInt8 = {
@@ -1068,82 +1079,150 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
       def buf_getb(): UInt8 = {
         if (read_position_idx.value < 0.to[Int]) {
           current_read_byte := pgetc()
-          read_position := 0x80.to[UInt8]
           read_position_idx := 7.to[Int]
         }
-        val ret = if ((current_read_byte.value & read_position.value.as[UInt8]) == 0.to[UInt8]){
+        // println("            curbyte " + current_read_byte.value + " and position " + read_pos_lut(read_position_idx.value).to[Index])
+        val ret = if ((current_read_byte.value & read_pos_lut(read_position_idx.value)) == 0.to[UInt8]){
                     0.to[UInt8]
                   } else {
                     1.to[UInt8]
                   }
-        if (read_position_idx.value == 0.to[Int]){read_position_idx := -1} else {read_position := read_position.value >> 1; read_position_idx :-= 1}
+        if (read_position_idx.value == 0.to[Int]){read_position_idx := -1} else {read_position_idx :-= 1}
+        // if (ret != 0.to[UInt8]) {read_position := read_position.value >> 1; read_position_idx :-= 1} else 
         ret
       }
       def buf_getv(n: UInt8): UInt8 = {
         val ret = Reg[UInt8](0)
-        val p = n - 1 - read_position_idx.value.as[UInt8]
-        if (read_position_idx.value > 23.to[Int]) { // Not sure how this is ever possible
-          val rv = Reg[UInt8](0)
-          // val shifter = Reduce(Reg[UInt8](1))(p.as[Int] by 1){i => 2}{_*_}
-          rv := current_read_byte.value
-          // rv = (current_read_byte << p);  /* Manipulate buffer */
-          // current_read_byte := pgetc().as[UInt8]
-        //   val new_rv = Reg[UInt8](0)
-        //   new_rv := current_read_byte.value
-        //   Fold(new_rv)((8 - p).as[Int] by 1){_ => Reg[UInt8](0)}{(a,b) => a >> 1}
-        //   val final_rv = new_rv | rv
-        //   read_position_idx := (7 - p).as[Int]
-        //   read_position := Reduce(Reg[UInt8](1))(read_position_idx - 1 by 1){_ => Reg[UInt8](0)}{(a,b) => a << 1}
-        //   ret := (final_rv)// & lmask[n])
-        //   // more specifically here
-          rv.value
+        val done = Reg[Boolean](false)
+        val p = Reg[Int8]
+        p := n.as[Int8] - read_position_idx.value.as[Int8] - 1.to[Int8]
+        println("p just got " + p.value + " from " + n + " - " + read_position_idx.value)
+        FSM[Int](whilst => whilst != -1.to[Int]){whilst => 
+          if (p.value > 0) {
+            if (read_position_idx.value > 23.to[Int]) { // Not sure how this is ever possible
+              val rv = Reg[UInt8](0)
+              Pipe{rv := current_read_byte.value}
+              Foreach(p.value.to[Index] by 1){i => rv := rv.value << 1} // Manipulate buffer
+              current_read_byte := pgetc() // Change read bytes
+              val tmp = Reg[UInt8](0)
+              Pipe{tmp := current_read_byte}
+              Foreach(8-p.value.to[Index] by 1){i => tmp := tmp.value >> 1}
+              Pipe{rv := tmp.value | rv.value}
+              read_position_idx := 7 - p.value.to[Int]
+              done := true
+              ret := rv & lmask(n.to[Index]).as[UInt8]
+            }
+            if (!done.value) {
+              current_read_byte := (current_read_byte << 8) | pgetc()
+              read_position_idx :+= 8
+              p :-= 8
+              println(" p is now " + p.value)
+            }
+          }
+        }{whilst => mux(p.value <= 0 || done.value, -1, 0)}
+        if (p.value == 0.to[Int8] && !done.value) {
+          read_position_idx := -1.to[Int]
+          done := true
+          ret := current_read_byte & lmask(n.to[Index]).as[UInt8]
         }
-        else {ret.value}
+        if (!done.value) {
+          p := -p.value
+          read_position_idx := p.value.to[Int] - 1
+          println("  setting readposition to " + read_pos_lut(read_position_idx.value))
+          ret := current_read_byte
+          Foreach(p.value.to[Index] by 1) {i => ret := ret.value >> 1}
+          ret := ret & lmask(n.to[Index]).as[UInt8]
+        }
+        ret.value
       }
       def DecodeHuffman(tbl_no: Index, use_dc: Boolean): UInt8 = {
         val code = Reg[Int16](0)
         code := buf_getb().as[Int16]
+        // println("entering fsm, code " + code.value)
         val l = Reg[Int](1)
         Pipe{l.reset}
         val max_decode = Reg[Int16](0)
         Pipe{max_decode.reset}
+        // Foreach(5 by 1) {i => println("   maxcode " + i + " is " + p_jinfo_dc_dhuff_tbl_maxcode(tbl_no, i))}
         FSM[Int](whilst => whilst != -1.to[Int]){whilst => 
-          code := (code << 1) + buf_getb().as[Int16]
+          val tmp = buf_getb().as[Int16]
+          // println("  next getb is " + tmp)
+          code := (code << 1) + tmp
           l :+= 1
           max_decode := mux(use_dc, p_jinfo_dc_dhuff_tbl_maxcode(tbl_no, l), p_jinfo_ac_dhuff_tbl_maxcode(tbl_no, l)).as[Int16]
           println("fsm probe " + l.value + " " + max_decode + " " + code.value)
         }{whilst => mux(code.value > max_decode.value, whilst, -1)}
-        println("exit fsm because " + code.value + " < " + max_decode.value)
+        println("exit fsm because " + code.value + " < " + max_decode.value + "\n")
         val ac_dhuff_ml = mux(tbl_no == 0, ac_dhuff_tbl_ml_0.value, ac_dhuff_tbl_ml_1.value)
         val dc_dhuff_ml = mux(tbl_no == 0, dc_dhuff_tbl_ml_0.value, dc_dhuff_tbl_ml_1.value)
         val tbl_ml = mux(use_dc, dc_dhuff_ml, ac_dhuff_ml)
-        println("tblml is " + tbl_ml + ", code " + code.value)
-        if (code < p_jinfo_dc_dhuff_tbl_maxcode(tbl_no,tbl_ml.as[Index]).to[Int16]) {
+        val error_max_decode = mux(use_dc, p_jinfo_dc_dhuff_tbl_maxcode(tbl_no, tbl_ml.as[Index]).to[Int16], p_jinfo_ac_dhuff_tbl_maxcode(tbl_no, tbl_ml.as[Index]).to[Int16])
+        // println(" do huf read on " + code.value + " max " + error_max_decode.as[UInt16])
+        if (code.value.as[UInt16] < error_max_decode.as[UInt16]) {
           val ptr = mux(use_dc, p_jinfo_dc_dhuff_tbl_valptr(tbl_no, l), p_jinfo_ac_dhuff_tbl_valptr(tbl_no, l))
           val mincode = mux(use_dc, p_jinfo_dc_dhuff_tbl_mincode(tbl_no, l), p_jinfo_ac_dhuff_tbl_mincode(tbl_no, l))
           val p = ptr + code.value.as[UInt16] - mincode
-          println("returning from " + tbl_no + " " + p.as[Int])
-          p_jinfo_dc_xhuff_tbl_huffval(tbl_no, p.as[Int])
+          // println("returning " + ptr + " + " + code.value + " - " + mincode + " == " + p_jinfo_dc_xhuff_tbl_huffval(tbl_no, p.as[Int]) + " or " + p_jinfo_ac_xhuff_tbl_huffval(tbl_no, p.as[Int]))
+          mux(use_dc, p_jinfo_dc_xhuff_tbl_huffval(tbl_no, p.as[Int]), p_jinfo_ac_xhuff_tbl_huffval(tbl_no, p.as[Int]))
         } else {
           println("HUFFMAN READ ERROR")
           0.to[UInt8]
         }
       }
 
-      def DecodeHuffMCU(num_cmp: Index): Unit = {
+      def DecodeHuffMCU(num_cmp: Index, id2: Index): Unit = {
         val tbl_no = component_acdc(num_cmp).dc
         val s = Reg[UInt8](0)
         Pipe{s := DecodeHuffman(tbl_no.to[Index], true)}
         println("decode huf returned " + s)
         if (s.value != 0.to[UInt8]){
-          val diff = buf_getv(s)
+          val diff = Reg[UInt](0)
+          diff := buf_getv(s).to[UInt]
           s :-= 1
+          if ((diff.value & bit_set_mask(s.value.to[Index])) == 0.to[UInt]) {
+            Pipe{diff := diff | extend_mask(s.value.to[Index])}
+            Pipe{diff :+= 1.to[UInt]}
+          }
+
+          Pipe{diff :+= HuffBuff(id2,0)}
+          Pipe{HuffBuff(id2,0) = diff.value}
         }
+
+        Foreach(1 until DCTSIZE2 by 1){i => HuffBuff(id2,i) = 0}
+        val error = 1.to[UInt2]
+        val break = 2.to[UInt2]
+        val action = Reg[UInt2](0)
+        val r = Reg[UInt8](0)
+        val k = Reg[Index](1)
+        k.reset
+        FSM[Int](whilst => whilst != -1){whilst => 
+          Pipe{r := DecodeHuffman(tbl_no.to[Index], false)}
+          println(" s is from " + r.value + " & 0xf")
+          s := r & 0xf.to[UInt8]
+          val n = (r.value >> 4) & 0xf.to[UInt8]; /* n = run-length */
+          if (s.value != 0.to[UInt8]) {
+            k :+= n.to[Index]
+            if(k >= DCTSIZE2) { /* JPEG Mistake */
+              action := error
+            } else {
+              HuffBuff(id2,k) = buf_getv (s).to[UInt32]  /* Get s bits */
+              s :-= 1
+              if ((HuffBuff(id2,k) & bit_set_mask(s.value.to[Index])) == 0.to[UInt32]) {
+                HuffBuff(id2,k) = HuffBuff(id2,k) | extend_mask(s.value.to[Index]) + 1
+              }
+              k :+= 1
+            }
+          } else if (n == 15.to[UInt8]) {
+            k :+= 16
+          } else {
+            action := break
+          }
+        } {whilst => mux(action == break || action == error, -1, 0)}
       }
 
       def decode_block(comp_no: Index, id1: Index, id2:Index): Unit = {
         val QuantBuff = SRAM[UInt16](DCTSIZE2)
-        DecodeHuffMCU(comp_no)
+        DecodeHuffMCU(comp_no, id2)
 
       }
 
