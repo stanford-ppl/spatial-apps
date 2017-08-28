@@ -2,8 +2,6 @@ import spatial.dsl._
 import org.virtualized._
 
 object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
-
-
   @virtualize
   def main() {
     // Declare SW-HW interface vals
@@ -60,6 +58,30 @@ object ExplicitIITest extends SpatialApp {
   }
 }
 
+object SRAMChar extends SpatialApp {
+  val N = 16
+  val len = 8192
+  val depth = 2
+  val p = 2
+  type T = Int
+
+  @virtualize def main(): Unit = {
+    val outs = List.fill(N){ ArgOut[T] }
+
+    Accel {
+      val rfs = List.fill(N){ SRAM.buffer[T](len) }
+
+      Foreach(0 until 1000) { _ =>
+        List.tabulate(depth) { d =>
+          Foreach(0 until 100 par p) { i =>
+            rfs.zip(outs).foreach{case (rf,out) => if (d > 0) rf.update(i, i.to[T]) else out := rf(i) }
+          }
+        }
+        ()
+      }
+    }
+  }
+}
 
 
 object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -283.70
@@ -699,7 +721,7 @@ object MemTest2D extends SpatialApp { // Regression (Unit) // Args: 7
   }
 }
 
-object FifoLoad extends SpatialApp { // Regression (Unit) // Args: 192
+object FifoLoadSRAMStore extends SpatialApp { // Regression (Unit) // Args: 192
 
   @virtualize
   def fifoLoad[T:Type:Num](srcHost: Array[T], N: Int) = {
@@ -715,13 +737,13 @@ object FifoLoad extends SpatialApp { // Regression (Unit) // Args: 192
     Accel {
       val f1 = FIFO[T](tileSize)
       Sequential.Foreach(size by tileSize) { i =>
-        f1 load srcFPGA(i::i + tileSize par 16)
+        f1 load srcFPGA(i::i + tileSize par 1)
         val b1 = SRAM[T](tileSize)
         Sequential.Foreach(tileSize by 1) { i =>
           Pipe{b1(i) = f1.peek()}
           Pipe{f1.deq()}
         }
-        dstFPGA(i::i + tileSize par 16) store b1
+        dstFPGA(i::i + tileSize par 1) store b1
       }
       ()
     }
@@ -877,16 +899,44 @@ object SimpleTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 10
   }
 }
 
+object OHM extends SpatialApp { // Regression (Unit) // Args: 400
 
-object SingleFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
+  @virtualize
+  def main() {
+
+    val src1 = (0::16,0::16){(i,j) => i}
+    val dram1 = DRAM[Int](16,16)
+    val dram2 = DRAM[Int](16,16)
+
+    setMem(dram1,src1)
+
+    Accel {
+      val sram1 = SRAM[Int](16)
+      Foreach(-5 until 15 by 1){i =>
+        val ldrow = if ((i.to[Int] + 1.to[Int]) >= 0.to[Int] && (i.to[Int] + 1.to[Int]) <= 15) {i.to[Int] + 1.to[Int]} else 0
+        sram1 load dram1(ldrow,0::16)
+        dram2(ldrow,0::16) store sram1
+      }
+    }
+    val out = getMatrix(dram2)
+    printMatrix(out, "Result:") 
+    printMatrix(src1, "Gold:")
+
+    val cksum = out.zip(src1){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (OHM)")
+  }
+}
+
+
+object UnalignedFifoLoad extends SpatialApp { // Regression (Unit) // Args: 400
 
   
-  val tileSize = 32
+  val tileSize = 20
 
   @virtualize
   def singleFifoLoad[T:Type:Num](src1: Array[T], in: Int) = {
 
-    val P1 = 4 (16 -> 16)
+    val P1 = 1 (16 -> 16)
 
     val N = ArgIn[Int]
     setArg(N, in)
@@ -926,7 +976,7 @@ object SingleFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
     println("out: " + out)
 
     val cksum = out == gold
-    println("PASS: " + cksum + " (SingleFifoLoad)")
+    println("PASS: " + cksum + " (UnalignedFifoLoad)")
   }
 }
 
@@ -1048,6 +1098,7 @@ object StackLoadStore extends SpatialApp { // Regression (Unit) // Args: none
 
   val N = 32
 
+  @virtualize
   def stackLoadStore[T:Type:Bits](srcHost: Array[T]) = {
     val tileSize = N
 
@@ -1838,8 +1889,6 @@ object FifoPushPop extends SpatialApp { // Regression (Unit) // Args: 384
 
 
 object StreamTest extends SpatialApp {
-
-
    override val target = targets.DE1
 
    @virtualize
@@ -2601,31 +2650,6 @@ object MultiWriteBuffer extends SpatialApp { // Regression (Unit) // Args: none
 
     val cksum = gold.zip(result){_==_}.reduce{_&&_}
     println("PASS: " + cksum + " (MultiWriteBuffer)")
-  }
-}
-
-object SingleIf extends SpatialApp {
-
-  @virtualize
-  def singleIfTest(x: Int) = {
-    val in = ArgIn[Int]
-    val out = ArgOut[Int]
-    setArg(in, x)
-    Accel {
-      val sram = SRAM[Int](3)
-      if (in >= 42.to[Int]) {     // if (43 >= 42)
-        sram(in - 41.to[Int]) = 10.to[Int] // sram(2) = 10
-      } else {
-        sram(in) = 20.to[Int]
-      }
-      out := sram(2)
-    }
-    getArg(out)
-  }
-  @virtualize
-  def main() {
-    val result = singleIfTest(43)
-    println("result:   " + result)
   }
 }
 
