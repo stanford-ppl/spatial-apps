@@ -266,28 +266,5 @@ object LSTMForward extends SpatialApp {
 
     writeCSV2D[X](next_mem_re, projectDir + "apps/results/LSTM_Forward_Single/ct.csv", ",", "\n")
     writeCSV2D[X](next_hidden_re, projectDir + "apps/results/LSTM_Forward_Single/ht.csv", ",", "\n")
-    // printArray(gateResult, "LSTM cell yields: ")
-
-    // Calculate gold
-//    val gold = Array.tabulate(D_h) { i =>
-//     val Wi_Row = W_i.slice(i, 64)
-//     val Ui_Row = U_i.slice(i, 64)
-//     val Wf_Row = W_f.slice(i, 64)
-//     val Uf_Row = U_f.slice(i, 64)
-//     val Wo_Row = W_o.slice(i, 64)
-//     val Uo_Row = U_o.slice(i, 64)
-//     val Wc_Row = W_c.slice(i, 64)
-//     val Uc_Row = U_c.slice(i, 64)
-//     Array.tabulate(N) { j =>
-//       val xt_Col = x_t.map(row => row(j))
-//       val ht1_Col = h_t_1.map(row => row(j))
-//       Wi_Row.zip(xt_Col){_*_}.reduce{_+_} + Ui_Row.zip(ht1_Col){_*_}.reduce{_+_} +
-//       Wf_Row.zip(xt_Col){_*_}.reduce{_+_} + Uf_Row.zip(ht1_Col){_*_}.reduce{_+_} +
-//       Wo_Row.zip(xt_Col){_*_}.reduce{_+_} + Uo_Row.zip(ht1_Col){_*_}.reduce{_+_} +
-//       Wc_Row.zip(xt_Col){_*_}.reduce{_+_} + Uc_Row.zip(ht1_Col){_*_}.reduce{_+_}
-//     }
-//    }.flatten
-//
-    // printArray(gold, "Gold result is: ")
   }
 }
