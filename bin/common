@@ -50,9 +50,16 @@ passStatus() {
 		isDone=$(grep "$pass(DONE)" $log)
 		if [[ $isDone != "" ]]; then
 			isKilled=$(grep 'Killed\|KILLED' $log)
-			isFailed=$(grep 'error\|Error\|ERROR\|No rule to make' $log)
-      if [[ $pass == "RUN_SIMULATION" ]] && [[ $(grep "Design ran for" $log) == "" ]] || [[ $(grep "Hardware timeout after" $log) != "" ]]; then
+      if [[ $pass == "GEN_PIR" ]] || [[ $pass == "GEN_CHISEL" ]]; then
+			  if [[ $(grep 'success' $log) ]]; then
+          isFailed=""
+        else
+          isFailed="True"
+        fi
+      elif [[ $pass == "RUN_SIMULATION" ]] && [[ $(grep "Design ran for" $log) == "" ]] || [[ $(grep "Hardware timeout after" $log) != "" ]]; then
         isFailed="Simulation not finished!"
+      else
+			  isFailed=$(grep 'error\|Error\|ERROR\|No rule to make' $log)
       fi
 			if [[ $isKilled != "" ]]; then
 				progress[$pass]="KILLED"

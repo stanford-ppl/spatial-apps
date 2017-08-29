@@ -100,7 +100,10 @@ def sargs(args):
 def getFullName(app, args, params):
     postfix = sargs(args) 
     postfix = postfix + ''.join(["_{}_{}".format(k,str(params[k])) for k in params ]) 
-    fullname = '{}_{}'.format(app, postfix)
+    if postfix != "":
+        fullname = '{}_{}'.format(app, postfix)
+    else:
+        fullname = app
     fullname = fullname.replace('.','d')
     return fullname
 
@@ -146,7 +149,8 @@ def runApp(app, args, params):
     if opts.parallel:
         waitProcess()
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-    copyApp(app, args, params)
+    if args or params:
+        copyApp(app, args, params)
     fullname = getFullName(app, args, params)
     command = "apps/bin/runapp {} {} {} {}".format(fullname, ' '.join([str(a) for a in args]),
             opts.torun, opts.regen)
@@ -408,9 +412,9 @@ def summaryToCsv():
 def target(app, args, params):
     if opts.run:
         runApp(app, args, params)
-    elif opts.status:
+    if opts.status:
         status(app, args, params)
-    elif opts.summary:
+    if opts.summary:
         summarize(app, args, params)
 
 def dse(app, args, params):
@@ -663,14 +667,37 @@ def expRun():
     if app in ['SPMV_CRS', 'ALL']:
         SPMV_CRS()
 
+def regression():
+    if opts.app=="ALL":
+        apps = []
+        apps.append("DotProduct")
+        apps.append("OuterProduct")
+        apps.append("Backprop")
+        apps.append("Gibbs_Ising2D")
+        apps.append("TPCHQ6")
+        apps.append("SPMV_CRS")
+        apps.append("BlackScholes")
+        apps.append("Kmeans_plasticine")
+        apps.append("PageRank_plasticine")
+        apps.append("GEMM_Blocked")
+        apps.append("GDA")
+        # apps.append("SYRK_col")
+    else:
+        apps = [opts.app]
+
+    opts.torun = "GEN_PIR,FIT_PIR"
+    for app in apps:
+        target(app, [], {})
+
 def main():
     parser = argparse.ArgumentParser(description='Run experiments')
-    parser.add_argument('--parallel', dest='parallel', action='store_true', default=False) 
+    parser.add_argument('--sequential', dest='parallel', action='store_false', default=True) 
+    parser.add_argument('--parallel', dest='parallel', action='store_true', default=True) 
     parser.add_argument('--single', dest='single', action='store_true', default=False) 
     parser.add_argument('--run', dest='run', action='store_true', default=False) 
     parser.add_argument('--status', dest='status', action='store_true', default=False) 
     parser.add_argument('--clearAll', dest='clearAll', action='store_true', default=False) 
-    parser.add_argument('--app', dest='app', action='store', default='DotProduct',help='App name')
+    parser.add_argument('--app', dest='app', action='store', default='ALL',help='App name')
     parser.add_argument('--regen', dest='regen', action='store', default='false',
         help='force pass to rerun' )
     parser.add_argument('--torun', dest='torun', action='store', default='ALL',
@@ -678,6 +705,7 @@ def main():
     parser.add_argument('--summary', dest='summary', action='store_true', default=False) 
     parser.add_argument('--best', dest='best', action='store_true', default=False) 
     parser.add_argument('--plot', dest='plot', action='store_true', default=False) 
+    parser.add_argument('--regression', dest='regression', action='store_true', default=False) 
 
     global opts
     (opts, args) = parser.parse_known_args()
@@ -707,6 +735,8 @@ def main():
 
     if opts.clearAll:
         clearAll()
+    elif opts.regression:
+        regression()
     else:
         expRun()
 
