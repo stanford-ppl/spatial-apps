@@ -1,7 +1,10 @@
 import numpy as np
+
 import matplotlib.pyplot as plt
 from numpy import genfromtxt
 
+
+VERY_SMALL_NUMBER = 1e-1
 
 '''
 f-kernel-d_cell4_bw-1500-100.csv
@@ -42,6 +45,11 @@ o-kernel-second_cell_bw-900-100.csv
 o-kernel-second_cell_fw-900-100.csv
 '''
 
+
+def analyze_sparsity(matrix, name):
+    n_rows, n_cols = matrix.shape
+    print(name + ' contains ' + str((np.abs(matrix) < VERY_SMALL_NUMBER).sum()) + '/' + str(n_rows * n_cols) + ' zero elements') 
+
 def draw_kernel(csvs, name):
     matrices = [ genfromtxt('../bi-att-flow/'+file_name, delimiter=',') for file_name in csvs ]
     cat_matrix = np.concatenate(matrices, axis=1)
@@ -49,6 +57,8 @@ def draw_kernel(csvs, name):
     plt.imshow(cat_matrix)
     plt.colorbar()
     plt.savefig(name+'.pdf')
+
+    analyze_sparsity(cat_matrix, name)
 
 csvs_first_cell_fw  =  ['f-kernel-first_cell_fw-300-100.csv', \
                         'i-kernel-first_cell_fw-300-100.csv', \
