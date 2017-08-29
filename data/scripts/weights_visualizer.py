@@ -98,11 +98,10 @@ csvs = ['f-kernel-first_cell_fw-300-100.csv', \
         'j-kernel-first_cell_fw-300-100.csv', \
         'o-kernel-first_cell_fw-300-100.csv']
 
-matrices = [genfromtxt('../bi-att-flow/'+file_name, delimiter=',') for file_name in csvs]
+matrices = [ genfromtxt('../bi-att-flow/'+file_name, delimiter=',') for file_name in csvs ]
+cat_matrix = np.concatenate(matrices, axis=1)
 plt.figure()
-for idx, matrix in enumerate(matrices):
-  print(matrix.shape)
-  plt.imshow(matrix)
-  plt.colorbar()
+plt.imshow(cat_matrix)
+plt.colorbar()
 
-plt.show()
+plt.savefig('first_cell_kernel.pdf')
