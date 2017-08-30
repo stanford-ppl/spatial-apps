@@ -109,15 +109,16 @@ object BandwidthTests extends SpatialCompiler {
     import spatial.dsl._
     val N_MAX = 16
 
-    val drams = List.fill(N_MAX){ DRAM[T](100,1000000) }
+    val drams = List.fill(N_MAX){ DRAM[T](100,1000) }
     val N      = ArgIn[Int]
     val offset = ArgIn[Int]
     val store  = ArgIn[Int]
     val rows   = ArgIn[Int]
     val cols   = ArgIn[Int]
+    val numIters = ArgIn[Int]
 
-    if (args.length < 5) {
-      println("Args: #Txs isAlign isStore #Rows #Cols")
+    if (args.length < 6) {
+      println("Args: #Txs isAlign isStore #Rows #Cols #numIters")
       println("  isAlign: 0 = unaligned, 1 = aligned")
       println("  isStore: 0 = loads, 1 = stores, 2 = mixed")
     }
@@ -129,6 +130,7 @@ object BandwidthTests extends SpatialCompiler {
     setArg(store, args(2).to[Int])
     setArg(rows, args(3).to[Int])
     setArg(cols, args(4).to[Int])
+    setArg(numIters, args(5).to[Int])
 
     Accel {
       val n: Int = N.value
@@ -136,9 +138,10 @@ object BandwidthTests extends SpatialCompiler {
       val ofs: Int = offset.value
       val numCmds: Int = rows.value
       val cmdWidth: Int = cols.value
+      val nIter: Int = numIters.value
       val srams = List.fill(N_MAX){ SRAM[T](4,96) }  // Won't actually get all the writes but that's ok
 
-      Foreach(100000 by 1){ i =>
+      Foreach(nIter by 1){ i =>
         Parallel {
           srams.zip(drams).zipWithIndex.foreach { case ((sram, dram), j) =>
             Pipe {
@@ -158,7 +161,7 @@ object BandwidthTests extends SpatialCompiler {
   }
 
   case class Program[T<:MetaAny[T]](p: Int, rank: Int)(implicit tp: Type[T], bt: Bits[T]) {
-    def name: String = s"rank=${rank}_p=$p"
+    def name: String = s"rank_${rank}_p_$p"
     def go(): () => Unit = () => {
       if (rank == 1) transfer1D[T](p)
       else           transfer2D[T](p)
@@ -178,7 +181,7 @@ object BandwidthTests extends SpatialCompiler {
     }
   }
 
-  override val stagingArgs = Array("--synth")
+  override val stagingArgs = Array("--synth", "--retiming")
 
   def main(args: Array[String]): Unit = {
     print("Threads: ")
