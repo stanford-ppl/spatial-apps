@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from numpy import genfromtxt
 
 
-VERY_SMALL_NUMBER = 1e-1
+VERY_SMALL_NUMBER = 1e-2
 
 '''
 f-kernel-d_cell4_bw-1500-100.csv
