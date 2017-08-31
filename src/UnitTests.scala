@@ -58,6 +58,21 @@ object ExplicitIITest extends SpatialApp {
   }
 }
 
+object ModRewriteTest extends SpatialApp {
+  @virtualize def main(): Unit = {
+    val y = ArgIn[Int]
+    val o = ArgOut[Int]
+
+    setArg(y, 14)
+
+    Accel {
+      o := y % 8
+    }
+
+    println(getArg(o))
+  }
+}
+
 object SRAMChar extends SpatialApp {
   val N = 16
   val len = 8192
