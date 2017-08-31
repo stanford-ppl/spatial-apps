@@ -1004,7 +1004,6 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
         0xFFF80000.to[UInt], 0xFFF00000.to[UInt]
       )
 
-
       val p_jinfo_quant_tbl_quantval = SRAM[UInt16](4,DCTSIZE2)
       val p_jinfo_dc_xhuff_tbl_bits = SRAM[UInt8](NUM_HUFF_TBLS, 36)
       val p_jinfo_dc_xhuff_tbl_huffval = SRAM[UInt8](NUM_HUFF_TBLS, 257)
@@ -1094,9 +1093,10 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
       def buf_getv(n: UInt8): UInt8 = {
         val ret = Reg[UInt8](0)
         val done = Reg[Boolean](false)
+        done.reset
         val p = Reg[Int8]
         p := n.as[Int8] - read_position_idx.value.as[Int8] - 1.to[Int8]
-        println("p just got " + p.value + " from " + n + " - " + read_position_idx.value)
+        // println("p just got " + p.value + " from " + n + " - " + read_position_idx.value)
         FSM[Int](whilst => whilst != -1.to[Int]){whilst => 
           if (p.value > 0) {
             if (read_position_idx.value > 23.to[Int]) { // Not sure how this is ever possible
@@ -1116,7 +1116,7 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
               current_read_byte := (current_read_byte << 8) | pgetc()
               read_position_idx :+= 8
               p :-= 8
-              println(" p is now " + p.value)
+              // println(" p is now " + p.value)
             }
           }
         }{whilst => mux(p.value <= 0 || done.value, -1, 0)}
@@ -1127,10 +1127,12 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
         }
         if (!done.value) {
           p := -p.value
+          println(" read pos is now set to " + read_position_idx.value)
           read_position_idx := p.value.to[Int] - 1
-          println("  setting readposition to " + read_pos_lut(read_position_idx.value))
+          // println("  setting readposition to " + read_pos_lut(read_position_idx.value))
           ret := current_read_byte
           Foreach(p.value.to[Index] by 1) {i => ret := ret.value >> 1}
+
           ret := ret & lmask(n.to[Index]).as[UInt8]
         }
         ret.value
@@ -1150,9 +1152,9 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
           code := (code << 1) + tmp
           l :+= 1
           max_decode := mux(use_dc, p_jinfo_dc_dhuff_tbl_maxcode(tbl_no, l), p_jinfo_ac_dhuff_tbl_maxcode(tbl_no, l)).as[Int16]
-          println("fsm probe " + l.value + " " + max_decode + " " + code.value)
+          // println("fsm probe " + l.value + " " + max_decode + " " + code.value)
         }{whilst => mux(code.value > max_decode.value, whilst, -1)}
-        println("exit fsm because " + code.value + " < " + max_decode.value + "\n")
+        // println("exit fsm because " + code.value + " < " + max_decode.value + "\n")
         val ac_dhuff_ml = mux(tbl_no == 0, ac_dhuff_tbl_ml_0.value, ac_dhuff_tbl_ml_1.value)
         val dc_dhuff_ml = mux(tbl_no == 0, dc_dhuff_tbl_ml_0.value, dc_dhuff_tbl_ml_1.value)
         val tbl_ml = mux(use_dc, dc_dhuff_ml, ac_dhuff_ml)
@@ -1174,7 +1176,7 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
         val tbl_no = component_acdc(num_cmp).dc
         val s = Reg[UInt8](0)
         Pipe{s := DecodeHuffman(tbl_no.to[Index], true)}
-        println("decode huf returned " + s)
+        // println("decode huf returned " + s)
         if (s.value != 0.to[UInt8]){
           val diff = Reg[UInt](0)
           diff := buf_getv(s).to[UInt]
@@ -1196,8 +1198,9 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
         val k = Reg[Index](1)
         k.reset
         FSM[Int](whilst => whilst != -1){whilst => 
+          println("decoding huff on ac @ " + k.value)
           Pipe{r := DecodeHuffman(tbl_no.to[Index], false)}
-          println(" s is from " + r.value + " & 0xf")
+          // println(" s is from " + r.value + " & 0xf")
           s := r & 0xf.to[UInt8]
           val n = (r.value >> 4) & 0xf.to[UInt8]; /* n = run-length */
           if (s.value != 0.to[UInt8]) {
@@ -1206,6 +1209,7 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
               action := error
             } else {
               HuffBuff(id2,k) = buf_getv (s).to[UInt32]  /* Get s bits */
+              println("and it is " + read_position_idx.value + " outside here")
               s :-= 1
               if ((HuffBuff(id2,k) & bit_set_mask(s.value.to[Index])) == 0.to[UInt32]) {
                 HuffBuff(id2,k) = HuffBuff(id2,k) | extend_mask(s.value.to[Index]) + 1
@@ -1217,13 +1221,27 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
           } else {
             action := break
           }
-        } {whilst => mux(action == break || action == error, -1, 0)}
+        } {whilst => mux(action == break || action == error || k >= DCTSIZE2, -1, 0)}
+        println(" DONE WITH AC")
       }
+
+      def IZigzagMatrix(QuantBuff: SRAM1[UInt16], id2: Index): Unit = {
+        Foreach(DCTSIZE2 by 1) { i => 
+          QuantBuff(i) = HuffBuff(id2, izigzag_index(i)).to[UInt16]
+        }
+      }
+
+      // def IQuantize(matrix: SRAM2[UInt32], qmatrix: SRAM2[UInt16], comp_no: Index, id2: Index): Unit = {
+      //   Foreach(DCTSIZE2 by 1) { mptr => 
+      //     matrix(id2, mptr) = matrix(id2, mptr) * qmatrix(p_comp_info_quant_tbl_no(comp_no).to[Index], mptr)
+      //   }
+      // }
 
       def decode_block(comp_no: Index, id1: Index, id2:Index): Unit = {
         val QuantBuff = SRAM[UInt16](DCTSIZE2)
         DecodeHuffMCU(comp_no, id2)
-
+        IZigzagMatrix(QuantBuff, id2)
+        // IQuantize(HuffBuff, QuantBuff, comp_no, id2)
       }
 
       Foreach(NUM_COMPONENT by 1) { i => HuffBuff(i,0) = 0 }
