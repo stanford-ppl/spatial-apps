@@ -995,7 +995,7 @@ object UnalignedFifoLoad extends SpatialApp { // Regression (Unit) // Args: 400
   }
 }
 
-object CompactingFifo extends SpatialApp { // Regression (Unit) // Args: 400
+object CompactingFifo extends SpatialApp { // Regression (Unit) // Args: 640
 
   
   val tileSize = 64
@@ -1035,7 +1035,7 @@ object CompactingFifo extends SpatialApp { // Regression (Unit) // Args: 400
         }{ filler => mux(fifo.full, 1, 0)}
 
         // Store back
-        out(i :: i + tileSize) store fifo
+        out(i :: i + tileSize par 2) store fifo
       }
     }
 
