@@ -995,7 +995,7 @@ object UnalignedFifoLoad extends SpatialApp { // Regression (Unit) // Args: 400
   }
 }
 
-object CompactingFifo extends SpatialApp { // DISABLED Regression (Unit) // Args: 400
+object CompactingFifo extends SpatialApp { // Regression (Unit) // Args: 400
 
   
   val tileSize = 64
