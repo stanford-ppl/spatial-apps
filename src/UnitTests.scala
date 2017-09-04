@@ -348,20 +348,24 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
   @virtualize 
   def main(): Unit = { 
     val cst1 = 32
-    val cst2 = 23
+    val cst2 = 23;
     val cst3 = 11
     val cst4 = 7
     val io1 = HostIO[Int]
     val io2 = HostIO[Int]
+    val io_unused = HostIO[Int]
     val x1 = ArgIn[Int]
     val x2 = ArgIn[Int]
+    val x_unused = ArgIn[Int]
     val y1 = ArgOut[Int]
     val y2 = ArgOut[Int]
     val y3 = ArgOut[Int]
     val y4 = ArgOut[Int]
     val y5 = ArgOut[Int]
+    val y_unused = ArgOut[Int]
     val m1 = DRAM[Int](16)
     val m2 = DRAM[Int](16)
+    val m_unused = DRAM[Int](16)
     setArg(io1, cst1)
     setArg(io2, cst2)
     setArg(x1, cst3)
