@@ -58,6 +58,18 @@ object ExplicitIITest extends SpatialApp {
   }
 }
 
+object FriendlyTest extends SpatialApp {
+  @virtualize def main(): Unit = {
+    val y = ArgIn[Int]
+    val z = ArgOut[Int]
+    y := 3
+    Accel {
+      setArg(z, getArg(y) + 2)
+    }
+    println("z: " + z.value)
+  }
+}
+
 object ModRewriteTest extends SpatialApp {
   @virtualize def main(): Unit = {
     val y = ArgIn[Int]
