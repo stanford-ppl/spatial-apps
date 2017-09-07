@@ -1085,6 +1085,7 @@ object ParFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
 
 
   val tileSize = 64
+  @virtualize
   def parFifoLoad[T:Type:Num](src1: Array[T], src2: Array[T], src3: Array[T], in: Int) = {
 
     val P1 = 1 (16 -> 16)
