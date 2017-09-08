@@ -70,6 +70,19 @@ object FriendlyTest extends SpatialApp {
   }
 }
 
+object InlineSwitchTest extends SpatialApp {
+  @virtualize def main(): Unit = {
+    val y = ArgIn[Int]
+    val x = ArgOut[Int]
+    y := args(0).to[Int]
+    Accel {
+      val z = if (y == 3.to[Int]) 0 else if (y == 5.to[Int]) 1 else if (y == 7.to[Int]) 2 else 3
+      x := z
+    }
+    println(getArg(x))
+  }
+}
+
 object ModRewriteTest extends SpatialApp {
   @virtualize def main(): Unit = {
     val y = ArgIn[Int]
