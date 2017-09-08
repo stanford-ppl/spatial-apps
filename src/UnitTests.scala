@@ -1011,6 +1011,64 @@ object UnalignedFifoLoad extends SpatialApp { // Regression (Unit) // Args: 400
   }
 }
 
+object StridedConv extends SpatialApp { // DISABLED Regression (Unit) // Args: 192
+
+  
+  val maxcols = 64
+  val stride = 2
+  val kernel = 3
+
+  @virtualize
+  def main() = {
+    val rows = args(0).to[Int]
+    val M = ArgIn[Int]
+    val N = ArgIn[Int]
+    val Md2 = ArgIn[Int]
+    val Nd2 = ArgIn[Int]
+    setArg(M, rows)
+    setArg(N, maxcols)
+    setArg(Md2, rows/2)
+    setArg(Nd2, maxcols/2)
+
+    val src = (0::rows,0::maxcols){(i,j) => i + j}
+    val dram1 = DRAM[Int](M,N)
+    val dram2 = DRAM[Int](Md2,Nd2)
+
+    setMem(dram1, src)
+
+    Accel {
+      val lb = LineBuffer.strided[Int](kernel, maxcols, stride) // Can't it figure this out from the access?
+      val sr = RegFile[Int](kernel, kernel)
+      val filter = LUT[Int](kernel, kernel)(1,0,1,
+                                            2,1,2,
+                                            1,0,1)
+      val buffer = SRAM[Int](maxcols)
+      Foreach(M by stride){line => 
+        lb load dram1(line, 0::N par 4)
+        Foreach(N by stride){j => 
+          Foreach(kernel by 1 par kernel){i => sr(i,*) <<= lb(i,j::j+stride)}
+          val accum = Reduce(Reg[Int](0))(kernel by 1, kernel by 1){(ii,jj) => 
+            sr(ii,jj) * filter(ii,jj)
+          }{_+_}
+          buffer(j/2) = if (j < kernel || line < kernel) 0 else accum.value
+        }
+        dram2(line/2, 0::Nd2) store buffer
+      }
+    }
+
+    val result = getMatrix(dram2)
+    printMatrix(result, "Result: ")
+
+    val gold = (0::rows/2, 0::maxcols/2){(i,j) => 
+      if (i*2 < kernel || j*2 < kernel) 0 else 1 // TODO
+    }
+
+    val cksum = result.zip(gold){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (StridedConv)")
+  }
+
+}
+
 object CompactingFifo extends SpatialApp { // Regression (Unit) // Args: 640
 
   
