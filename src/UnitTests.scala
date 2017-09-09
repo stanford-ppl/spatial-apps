@@ -3102,7 +3102,7 @@ object OldSimpleFold extends SpatialApp {
   }
 }
 
-object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 128 256
+object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 128 96
 
   // DSE Parameters
   val tileSize  = 16 (16 -> 16 -> 1024)
