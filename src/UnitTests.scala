@@ -1083,8 +1083,6 @@ object StridedConv extends SpatialApp { // DISABLED Regression (Unit) // Args: 1
 }
 
 object CompactingFifo extends SpatialApp { // Regression (Unit) // Args: 640
-
-  
   val tileSize = 64
 
   @virtualize
