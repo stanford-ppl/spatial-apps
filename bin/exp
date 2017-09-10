@@ -28,6 +28,7 @@ bankSize = 32 * 1024 / 4
 proc_thresh = 40
 max_bw = 12.8*4
 
+HOME = os.environ['HOME']
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
@@ -52,6 +53,200 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+def plot_zynq():
+    zynq_apps = ['Sobel', 'GEMM', 'GDA', 'SW', 'AES','TPC-H Q6', 'K-Means', 'PageRank']
+
+    apps = zynq_apps
+    zynq_time = {}
+    zynq_time['Sobel'] = 167.84638 * (1024/320)
+    zynq_time['GEMM'] = 14362.10847 * (8) # 1024
+    zynq_time['GDA'] = 96.3459 # 1024 
+    zynq_time['SW'] = 0.19313 * ((512 / 160) ** 2 )# 160
+    zynq_time['AES'] = 72.671889 * (1000 / 200) # 200
+    zynq_time['TPC-H Q6'] = 279.428227
+    zynq_time['K-Means'] = 377.602213 * (4) # 100 320  ??
+    zynq_time['PageRank'] = 2166.915
+
+    f1_time = {}
+    f1_time['Sobel'] = 245.9696
+    f1_time['GEMM'] = 5024.76 # 2048
+    f1_time['GDA'] = 38.0967 # 1024 
+    f1_time['SW'] = 5.08672 # 512 
+    f1_time['AES'] = 74.6296 # 1000
+    f1_time['TPC-H Q6'] = 180.084 
+    f1_time['K-Means'] = 615.012 # (200 640)  ??
+    f1_time['PageRank'] = 1462.61 # (10000 0.5)
+
+    speedups = []
+    for app in apps:
+        speedups.append( zynq_time[app] / f1_time[app] )
+
+    ind = np.arange(len(apps))+0.1  # the x locations for the groups
+    # slices  = (np.arange(len(apps))+1) * 1.0 / len(apps)
+    # bram    = (np.arange(len(apps))+1) * 1.0 / len(apps)
+    # dsp     = (np.arange(len(apps))+1) * 1.0 / len(apps)
+
+    width = 0.6       # the width of the bars
+
+    fig, ax = plt.subplots()
+    bar1 = ax.bar(ind, speedups, width, color='royalblue')
+    # bar2 = ax.bar(ind + width, slices, width, color='gold')
+    # bar3 = ax.bar(ind + 2*width, bram, width, color='olivedrab')
+    # bar4 = ax.bar(ind + 3*width, dsp, width, color='dodgerblue')
+
+    # add some text for labels, title and axes ticks
+    ax.set_ylabel('Speedup')
+    # ax.set_ylim(0, 1)
+    ax.set_xlim(0, len(apps))
+    # ax.set_title('Scores by group and gender')
+    ax.set_xticks(ind + 0.2*width)
+    ax.set_xticklabels(apps, rotation=30)
+
+    plt.grid(True)
+    plot_path = '{}/papers/spatial/figs/zynq_comp.png'.format(HOME)
+    fig.set_size_inches(6,2.5)
+    plt.gcf().subplots_adjust(bottom=0.3)
+    plt.savefig(plot_path, format='png', dpi=900)
+
+def plot_f1():
+    f1_apps = ['AES', 'BlackScholes', 'GEMM', 'K-Means',
+            'SW', 'PageRank', 'TPC-H Q6']
+    # f1_apps = ['AES', 'BlackScholes', 'GEMM', 'K-Means', 'Sobel', 
+            # 'SW', 'PageRank', 'TPC-H Q6']
+
+    apps = f1_apps
+    ind = np.arange(len(apps))+0.1  # the x locations for the groups
+
+    f1_time = {}
+    f1_time['Sobel'] = 245.9696
+    f1_time['BlackScholes'] = 5.47018 # 153600
+    f1_time['GEMM'] = 5024.76 # 2048
+    f1_time['GDA'] = 38.0967 # 1024 
+    f1_time['SW'] = 5.08672 # 512 
+    f1_time['AES'] = 74.6296 # 1000
+    f1_time['TPC-H Q6'] = 180.084 
+    f1_time['K-Means'] = 615.012 # (200 640)  ??
+    f1_time['PageRank'] = 1462.61 # (10000 0.5)
+
+    sd_time = {}
+    sd_time['Sobel'] = 0.33873
+    sd_time['BlackScholes'] = 4.5
+    sd_time['GEMM'] = 6315.4
+    sd_time['GDA'] = 1
+    sd_time['SW'] = 7.036 # 256
+    sd_time['AES'] =  1.243659
+    sd_time['TPC-H Q6'] =  13675.7
+    sd_time['K-Means'] = 985.91
+    sd_time['PageRank'] = 2041.7
+
+    f1_slice= {}
+    f1_bram = {}
+    f1_dsp = {}
+    f1_slice['BlackScholes'] = 550755
+    f1_bram['BlackScholes']  = 64
+    f1_dsp['BlackScholes']   = 985
+
+    f1_slice['Sobel']        = 285926
+    f1_bram['Sobel']         = 241
+    f1_dsp['Sobel']          = 1494
+
+    f1_slice['GEMM']         = 94334
+    f1_bram['GEMM']          = 43 
+    f1_dsp['GEMM']           = 411 
+
+    f1_slice['GDA']          = 80932
+    f1_bram['GDA']           = 246.5
+    f1_dsp['GDA']            = 171 
+
+    f1_slice['SW']           = 69087
+    f1_bram['SW']            = 925
+    f1_dsp['SW']             = 423
+
+    f1_slice['AES']          = 243918
+    f1_bram['AES']           = 62
+    f1_dsp['AES']            = 461
+
+    f1_slice['TPC-H Q6']     = 138954
+    f1_bram['TPC-H Q6']      = 68
+    f1_dsp['TPC-H Q6']       = 162
+
+    f1_slice['K-Means']      = 59997
+    f1_bram['K-Means']       = 25
+    f1_dsp['K-Means']        = 102
+
+    f1_slice['PageRank']     = 50683
+    f1_bram['PageRank']      = 64
+    f1_dsp['PageRank']       = 207
+
+    sd_slice= {}
+    sd_bram = {}
+    sd_dsp = {}
+    sd_slice['BlackScholes'] = 353073
+    sd_bram['BlackScholes']  = 550
+    sd_dsp['BlackScholes']   = 290
+
+    sd_slice['Sobel']        = 1
+    sd_bram['Sobel']         = 1
+    sd_dsp['Sobel']          = 1
+
+    sd_slice['GEMM']         = 94334
+    sd_bram['GEMM']          = 43 
+    sd_dsp['GEMM']           = 411 
+
+    sd_slice['GDA']          = 80932
+    sd_bram['GDA']           = 246.5
+    sd_dsp['GDA']            = 171 
+
+    sd_slice['SW']           = 69087
+    sd_bram['SW']            = 925
+    sd_dsp['SW']             = 423
+
+    sd_slice['AES']          = 339179
+    sd_bram['AES']           = 589
+    sd_dsp['AES']            = 12
+
+    sd_slice['TPC-H Q6']     = 336679
+    sd_bram['TPC-H Q6']      = 578
+    sd_dsp['TPC-H Q6']       = 18
+
+    sd_slice['K-Means']      = 356475
+    sd_bram['K-Means']       = 657
+    sd_dsp['K-Means']        = 539
+
+    sd_slice['PageRank']     = 337250 
+    sd_bram['PageRank']      = 549
+    sd_dsp['PageRank']       = 17
+
+    speedup = [1.0*sd_time[app] / f1_time[app] for app in apps]
+    slices = [1.0*sd_slice[app] / f1_slice[app] for app in apps]
+    bram = [1.0*sd_bram[app] /f1_bram[app]  for app in apps]
+    dsp = [1.0*sd_dsp[app] / f1_dsp[app] for app in apps]
+
+    width = 0.2       # the width of the bars
+
+    fig, ax = plt.subplots()
+    bar1 = ax.bar(ind, speedup, width, color='orangered')
+    bar2 = ax.bar(ind + width, slices, width, color='gold')
+    bar3 = ax.bar(ind + 2*width, bram, width, color='olivedrab')
+    bar4 = ax.bar(ind + 3*width, dsp, width, color='dodgerblue')
+
+    # add some text for labels, title and axes ticks
+    ax.set_ylabel('Improvement')
+    ax.set_yscale('log')
+    # ax.set_ylim(0, 1)
+    ax.set_xlim(0, len(apps))
+    # ax.set_title('Scores by group and gender')
+    ax.set_xticks(ind + width)
+    ax.set_xticklabels(apps, rotation=30)
+    ax.legend((bar1[0], bar2[0], bar3[0], bar4[0]), ('Speedup', 'Slice', 'BRAM', 'DSP'), ncol=4,
+            fontsize=10)
+
+    plt.grid(True)
+    plot_path = '{}/papers/spatial/figs/f1_comp.png'.format(HOME)
+    fig.set_size_inches(8,3)
+    plt.gcf().subplots_adjust(bottom=0.3)
+    plt.savefig(plot_path, format='png', dpi=900)
 
 def plot():
     cmap = matplotlib.cm.get_cmap('Oranges')
@@ -678,6 +873,7 @@ def main():
     parser.add_argument('--summary', dest='summary', action='store_true', default=False) 
     parser.add_argument('--best', dest='best', action='store_true', default=False) 
     parser.add_argument('--plot', dest='plot', action='store_true', default=False) 
+    parser.add_argument('--plot_fpga', dest='plot_fpga', action='store_true', default=False) 
 
     global opts
     (opts, args) = parser.parse_known_args()
@@ -707,6 +903,9 @@ def main():
 
     if opts.clearAll:
         clearAll()
+    if opts.plot_fpga:
+        plot_f1()
+        plot_zynq()
     else:
         expRun()
 
