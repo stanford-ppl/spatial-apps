@@ -12,7 +12,7 @@ import org.virtualized._
 
 object NaiveLSTMForward extends SpatialApp {
   val projectDir = "/home/tianzhao/spatial-lang/apps/src"
-  type X = FixPt[TRUE, _32, _32]
+  type X = FixPt[TRUE, _16, _16]
   
   @virtualize
   def GateForward[T:Type:Num] (
@@ -22,7 +22,6 @@ object NaiveLSTMForward extends SpatialApp {
     W_new_mem: Matrix[T], U_new_mem: Matrix[T],
     W_c_t_1: Matrix[T],
     x: Matrix[T], h: Matrix[T],
-    /* Sizes */
     mm: Int, nn: Int, N_classes: Int
   ) = {
     val D_h = ArgIn[Int]
