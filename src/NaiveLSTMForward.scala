@@ -8,10 +8,9 @@ import org.virtualized._
 // - LSTM Sparse.
 //  - How sparse are these weight matrices? 
 // - Need to figure out a model to describe it.
-// - Codegen from pytorch.
 
 object NaiveLSTMForward extends SpatialApp {
-  val projectDir = "/home/tianzhao/spatial-lang/apps/src"
+  val projectDir = "/home/tianzhao/spatial-lang/"
   type X = FixPt[TRUE, _16, _16]
   
   @virtualize
@@ -258,7 +257,10 @@ object NaiveLSTMForward extends SpatialApp {
       D_h, d, N
     )
 
-    writeCSV2D[X](next_mem_re, projectDir + "apps/results/LSTM_Forward_Single/ct.csv", ",", "\n")
-    writeCSV2D[X](next_hidden_re, projectDir + "apps/results/LSTM_Forward_Single/ht.csv", ",", "\n")
+    // writeCSV2D[X](next_mem_re, projectDir + "apps/results/NaiveLSTMForward/ct.csv", ",", "\n")
+    // writeCSV2D[X](next_hidden_re, projectDir + "apps/results/NaiveLSTMForward/ht.csv", ",", "\n")
+    printMatrix(next_mem_re, "next_mem_re: ") 
+    printMatrix(next_hidden_re, "next_hidden_re: ")
+
   }
 }
