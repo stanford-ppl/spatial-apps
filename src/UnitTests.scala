@@ -1024,63 +1024,63 @@ object UnalignedFifoLoad extends SpatialApp { // Regression (Unit) // Args: 400
   }
 }
 
-object StridedConv extends SpatialApp { // DISABLED Regression (Unit) // Args: 192
+// object StridedConv extends SpatialApp { // DISABLED Regression (Unit) // Args: 192
 
   
-  val maxcols = 64
-  val stride = 2
-  val kernel = 3
+//   val maxcols = 64
+//   val stride = 2
+//   val kernel = 3
 
-  @virtualize
-  def main() = {
-    val rows = args(0).to[Int]
-    val M = ArgIn[Int]
-    val N = ArgIn[Int]
-    val Md2 = ArgIn[Int]
-    val Nd2 = ArgIn[Int]
-    setArg(M, rows)
-    setArg(N, maxcols)
-    setArg(Md2, rows/2)
-    setArg(Nd2, maxcols/2)
+//   @virtualize
+//   def main() = {
+//     val rows = args(0).to[Int]
+//     val M = ArgIn[Int]
+//     val N = ArgIn[Int]
+//     val Md2 = ArgIn[Int]
+//     val Nd2 = ArgIn[Int]
+//     setArg(M, rows)
+//     setArg(N, maxcols)
+//     setArg(Md2, rows/2)
+//     setArg(Nd2, maxcols/2)
 
-    val src = (0::rows,0::maxcols){(i,j) => i + j}
-    val dram1 = DRAM[Int](M,N)
-    val dram2 = DRAM[Int](Md2,Nd2)
+//     val src = (0::rows,0::maxcols){(i,j) => i + j}
+//     val dram1 = DRAM[Int](M,N)
+//     val dram2 = DRAM[Int](Md2,Nd2)
 
-    setMem(dram1, src)
+//     setMem(dram1, src)
 
-    Accel {
-      val lb = LineBuffer.strided[Int](kernel, maxcols, stride) // Can't it figure this out from the access?
-      val sr = RegFile[Int](kernel, kernel)
-      val filter = LUT[Int](kernel, kernel)(1,0,1,
-                                            2,1,2,
-                                            1,0,1)
-      val buffer = SRAM[Int](maxcols)
-      Foreach(M by stride){line => 
-        lb load dram1(line, 0::N par 4)
-        Foreach(N by stride){j => 
-          Foreach(kernel by 1 par kernel){i => sr(i,*) <<= lb(i,j::j+stride)}
-          val accum = Reduce(Reg[Int](0))(kernel by 1, kernel by 1){(ii,jj) => 
-            sr(ii,jj) * filter(ii,jj)
-          }{_+_}
-          buffer(j/2) = if (j < kernel || line < kernel) 0 else accum.value
-        }
-        dram2(line/2, 0::Nd2) store buffer
-      }
-    }
+//     Accel {
+//       val lb = LineBuffer.strided[Int](kernel, maxcols, stride) // Can't it figure this out from the access?
+//       val sr = RegFile[Int](kernel, kernel)
+//       val filter = LUT[Int](kernel, kernel)(1,0,1,
+//                                             2,1,2,
+//                                             1,0,1)
+//       val buffer = SRAM[Int](maxcols)
+//       Foreach(M by stride){line => 
+//         lb load dram1(line, 0::N par 4)
+//         Foreach(N by stride){j => 
+//           Foreach(kernel by 1 par kernel){i => sr(i,*) <<= lb(i,j::j+stride)}
+//           val accum = Reduce(Reg[Int](0))(kernel by 1, kernel by 1){(ii,jj) => 
+//             sr(ii,jj) * filter(ii,jj)
+//           }{_+_}
+//           buffer(j/2) = if (j < kernel || line < kernel) 0 else accum.value
+//         }
+//         dram2(line/2, 0::Nd2) store buffer
+//       }
+//     }
 
-    val result = getMatrix(dram2)
-    printMatrix(result, "Result: ")
+//     val result = getMatrix(dram2)
+//     printMatrix(result, "Result: ")
 
-    val gold = (0::rows/2, 0::maxcols/2){(i,j) => 
-      if (i*2 < kernel || j*2 < kernel) 0 else 1 // TODO
-    }
+//     val gold = (0::rows/2, 0::maxcols/2){(i,j) => 
+//       if (i*2 < kernel || j*2 < kernel) 0 else 1 // TODO
+//     }
 
-    val cksum = result.zip(gold){_==_}.reduce{_&&_}
-    println("PASS: " + cksum + " (StridedConv)")
-  }
+//     val cksum = result.zip(gold){_==_}.reduce{_&&_}
+//     println("PASS: " + cksum + " (StridedConv)")
+//   }
 
-}
+// }
 
 object CompactingFifo extends SpatialApp { // Regression (Unit) // Args: 640
 
@@ -3375,12 +3375,12 @@ object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 
 
     // Run Accel functions
     Accel{
-      Dot[T](NN, X, 1, Y, 1, dot)
-      Axpy[T](NN, a, X, 1, Y, 1, axpy)
+      // Dot[T](NN, X, 1, Y, 1, dot)
+      // Axpy[T](NN, a, X, 1, Y, 1, axpy)
       Gemm[T](MM, NN, KK, a, A, A.cols, B, B.cols, b, C, C.cols)
       Gemv[T](MM, KK, a, A, A.cols, gemv_X, 1, b, gemv_Y, 1)
-      Ger[T](MM, NN, a, ger_X, 1, Y, 1, ger_A, ger_A.cols)
-      Scal[T](NN, a, X, 1, scal_Y)
+      // Ger[T](MM, NN, a, ger_X, 1, Y, 1, ger_A, ger_A.cols)
+      // Scal[T](NN, a, X, 1, scal_Y)
       Axpby[T](NN, a, X, 1, b, Y, 1, axpby_Z)
     }
 
@@ -3450,3 +3450,142 @@ object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 
 
   }
 }
+
+object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
+
+  // DSE Parameters
+  val coltile = 64 // (16 -> 16 -> 1280)
+
+  @virtualize
+  def ConvolutionSlide[T:Type:Num](output: DRAM2[T], 
+                      input: DRAM2[T],
+                      filter: LUT2[T],
+                      colstride: scala.Int, rowstride: scala.Int): Unit = {
+
+    val lb = LineBuffer.strided[T](filter.rows, coltile, rowstride)
+    val sr = RegFile[T](filter.rows, filter.cols)
+    val lineout = SRAM[T](coltile/colstride)
+    Foreach(input.rows by rowstride){row =>
+      lb load input(row, 0::input.cols) // TODO: load with correct rowstride
+      Foreach(input.cols by colstride){j => 
+        Foreach(filter.rows by 1 par filter.rows){i => sr(i,*) <<= lb(i,j::j+colstride)}
+        lineout(j/colstride) = mux(row + (rowstride-1) < filter.rows.to[Int] || j + (colstride-1) < filter.cols.to[Int], 0.to[T], Reduce(Reg[T](0.to[T]))(filter.rows by 1, filter.cols by 1){(ii,jj) => sr(ii,jj) * filter(ii,jj)}{_+_}.value)
+      }
+      output(row/rowstride, 0::output.cols) store lineout
+    }
+  }
+
+  @virtualize
+  def ConvolutionGEMM[T:Type:Num](output: DRAM2[T], 
+                      input: DRAM1[T],
+                      filter: DRAM2[T]): Unit = {
+
+
+  }
+
+  type T = FixPt[TRUE,_16,_16]
+
+  @virtualize
+  def main() {
+
+    // Setup strides
+    val row_stride1 = 1
+    val col_stride1 = 1
+    val row_stride2 = 1
+    val col_stride2 = 2
+    val row_stride3 = 1
+    val col_stride3 = 1
+
+    // cmd-line args (i.e.- "20 0.5 0.5 64 64 64")
+    val in_rows = args(0).to[Int]
+
+    // Create random data structures
+    val data1 = (0::in_rows,0::coltile){(i,j) => random[T](2)}
+    val filter1 = Array[T](1,2,1,0,0,0,-1,-2,-1)
+
+    // Create toeplitz for filter
+    val filter3_tplz = filter1.toeplitz(3,3,in_rows,coltile, row_stride3, col_stride3)
+
+    // Show inputs
+    printMatrix(data1, "Img1")
+    printMatrix(filter3_tplz, "Toeplitz Filter")
+
+    // ArgIns
+    val M = ArgIn[Int]
+    val N = ArgIn[Int]
+    val Mds1 = ArgIn[Int]
+    val Nds1 = ArgIn[Int]
+    val Mds2 = ArgIn[Int]
+    val Nds2 = ArgIn[Int]
+    val Len3 = ArgIn[Int]
+    val Mds3 = ArgIn[Int]
+    val Nds3 = ArgIn[Int]
+    setArg(M, in_rows)
+    setArg(N, coltile)
+    setArg(Mds1, in_rows / row_stride1)
+    setArg(Nds1, coltile / col_stride1)
+    setArg(Mds2, in_rows / row_stride2)
+    setArg(Nds2, coltile / col_stride2)
+    setArg(Len3, coltile / col_stride3 * in_rows / row_stride3)
+    setArg(Mds3, filter3_tplz.rows)
+    setArg(Nds3, filter3_tplz.cols)
+
+    // Offchip structures
+    val image = DRAM[T](M, N)
+    val flatimg = DRAM[T](Len3)
+    val dram1 = DRAM[T](Mds1, Nds1)
+    val dram2 = DRAM[T](Mds2, Nds2)
+    val dram3 = DRAM[T](Mds1, Nds1)
+    val filter3 = DRAM[T](Mds3, Nds3)
+
+    setMem(image, data1)
+    setMem(flatimg, data1.flatten)
+    setMem(filter3, filter3_tplz)
+
+    // Run Accel functions
+    Accel{
+      val filter = LUT[T](3,3)(1,  2,  1,
+                               0,  0,  0,
+                              -1, -2, -1)
+      ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1)
+      ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2)
+    }
+
+    // Get results
+    val res1 = getMatrix(dram1)
+    val res2 = getMatrix(dram2)
+
+    // Compute Golds
+    val gold1 = (0::in_rows / row_stride1, 0::coltile / col_stride1){(i,j) => 
+      if (i < 3 || j < 3) 0 else {
+        Array.tabulate(3){ii => Array.tabulate(3){jj => data1(i*row_stride1-ii,j*col_stride1-jj) * filter1((2-ii)*3+(2-jj))}}.flatten.reduce{_+_}
+      }
+    }
+    val gold2 = (0::in_rows / row_stride2, 0::coltile / col_stride2){(i,j) => 
+      if (i < 3 || j < 3/col_stride2) 0 else {
+        Array.tabulate(3){ii => Array.tabulate(3){jj => data1(i*row_stride2-ii+(row_stride2-1),j*col_stride2-jj+(col_stride2-1)) * filter1((2-ii)*3+(2-jj))}}.flatten.reduce{_+_}
+      }
+    }
+
+    // Collect cksums
+    val margin = 0.25.to[T]
+    val cksum1 = res1.zip(gold1){_==_}.reduce{_&&_}
+    val cksum2 = res2.zip(gold2){_==_}.reduce{_&&_}
+    val cksum = cksum1 && cksum2
+
+    // Print results
+    println("Conv1 Result: ")
+    printMatrix(res1, "  Got")
+    printMatrix(gold1, "  Wanted")
+    println("Conv2 Result: ")
+    printMatrix(res2, "  Got")
+    printMatrix(gold2, "  Wanted")
+
+    println("  cksum: " + cksum1 + " (Conv1)")
+    println("  cksum: " + cksum2 + " (Conv2)")
+
+    println("PASS: " + cksum + " (Convolutions)")
+
+  }
+}
+
