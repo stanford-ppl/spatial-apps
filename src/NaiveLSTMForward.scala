@@ -261,6 +261,5 @@ object NaiveLSTMForward extends SpatialApp {
     // writeCSV2D[X](next_hidden_re, projectDir + "apps/results/NaiveLSTMForward/ht.csv", ",", "\n")
     printMatrix(next_mem_re, "next_mem_re: ") 
     printMatrix(next_hidden_re, "next_hidden_re: ")
-
   }
 }
