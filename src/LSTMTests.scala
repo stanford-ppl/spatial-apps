@@ -60,7 +60,15 @@ object LUTTest extends SpatialApp with LUTBase {
 }
 
 
-trait LSTMBase extends SpatialApp with activations {
+trait LSTMParams extends SpatialApp {
+  // Defines some hyperparmameters of the kernel
+  val kernel_size = (1500, 100)
+  val hidden_size = 100
+}
+
+
+trait LSTM_16_16_Base extends SpatialApp with LSTMParams
+                                          with activations {
   def Forward[T:Type:Num]() {
 
   }
