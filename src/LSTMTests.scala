@@ -66,6 +66,12 @@ trait LSTMParams extends SpatialApp {
   val hidden_size = 100
 }
 
+trait prepro extends SpatialApp {
+  def prepro[T:Type:Num]() {
+    
+  }
+}
+
 
 trait LSTM_16_16_Base extends SpatialApp with LSTMParams
                                           with activations {
@@ -81,6 +87,5 @@ object LSTM_16_16 extends SpatialApp with LSTMBase {
   @virtualize
   def main() {
     val result = Forward[X]()
-
   }
 }
