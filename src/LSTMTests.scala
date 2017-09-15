@@ -4,7 +4,7 @@ import sys.process._
 import scala.math.{log,exp}
 
 
-trait activations extends SpatialApp {
+trait Activations extends SpatialApp {
   val projectDir = "/home/tianzhao/spatial-lang/"
   val lo = 32
   val revPrec = 2
@@ -29,7 +29,7 @@ trait activations extends SpatialApp {
 }
 
 
-trait LUTBase extends SpatialApp with activations {
+trait LUTBase extends SpatialApp with Activations {
   def Forward[T:Type:Num](N: T) = {
     val x = ArgIn[T]
     val y = ArgOut[T]
@@ -45,6 +45,55 @@ trait LUTBase extends SpatialApp with activations {
   }
 }
 
+trait LSTMParams extends SpatialApp {
+  val kernelSize = (1500, 100)
+  val hiddenSize = 100
+  val N = 60
+  val M = 1
+  val JX = 161
+  val idco = 1400
+  val odco = 200
+  val internalPath = "/home/tianzhao/spatial-lang/apps/LSTM-internals"
+  val inputPath = ""
+  val outputPath = ""
+  val kernelPath = "" 
+  val biasPath = ""
+}
+
+
+trait prepro extends SpatialApp { 
+  def prepro[T:Type:Num]() {
+
+  }
+}
+
+
+trait BasicLSTMCell_16_16 extends SpatialApp with LSTMParams
+                                             with Activations {
+  def Forward[T:Type:Num]() {
+
+  }
+}
+
+
+trait RNN extends SpatialApp {
+  def RNNForward[T:Type:Num]() {
+
+  }
+}
+
+
+object LSTM_16_16 extends SpatialApp with BasicLSTMCell_16_16
+                                     with RNN {
+  type X = FixPt[TRUE, _16, _16]
+
+  @virtualize
+  def main() {
+    val result = Forward[X]()
+  }
+}
+
+
 object LUTTest extends SpatialApp with LUTBase {
   type X = FixPt[TRUE, _16, _16]
 
@@ -56,36 +105,5 @@ object LUTTest extends SpatialApp with LUTBase {
 
     val result = Forward[X](N)
     println("result: " + result)
-  }
-}
-
-
-trait LSTMParams extends SpatialApp {
-  // Defines some hyperparmameters of the kernel
-  val kernel_size = (1500, 100)
-  val hidden_size = 100
-}
-
-trait prepro extends SpatialApp {
-  def prepro[T:Type:Num]() {
-    
-  }
-}
-
-
-trait LSTM_16_16_Base extends SpatialApp with LSTMParams
-                                          with activations {
-  def Forward[T:Type:Num]() {
-
-  }
-}
-
-
-object LSTM_16_16 extends SpatialApp with LSTMBase {
-  type X = FixPt[TRUE, _16, _16]
-
-  @virtualize
-  def main() {
-    val result = Forward[X]()
   }
 }
