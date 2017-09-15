@@ -45,7 +45,8 @@ trait LUTBase extends SpatialApp with Activations {
   }
 }
 
-trait LSTMParams extends SpatialApp {
+
+trait LSTMParams_dcell4 extends SpatialApp {
   val kernelSize = (1500, 100)
   val hiddenSize = 100
   val N = 60
@@ -53,43 +54,59 @@ trait LSTMParams extends SpatialApp {
   val JX = 161
   val idco = 1400
   val odco = 200
-  val internalPath = "/home/tianzhao/spatial-lang/apps/LSTM-internals"
-  val inputPath = ""
-  val outputPath = ""
-  val kernelPath = "" 
-  val biasPath = ""
+  val internalPath = "/home/tianzhao/spatial-lang/apps/LSTM-internals/"
+  val inputPath = internalPath + "IOs/input-0.csv"
+  val outputPath = internalPath + "IOs/output-0.csv"
+  val kernelPath_i = internalPath + "weights/i-kernel-d_cell4_fw-1500-100.csv" 
+  val kernelPath_j = internalPath + "weights/j-kernel-d_cell4_fw-1500-100.csv" 
+  val kernelPath_f = internalPath + "weights/f-kernel-d_cell4_fw-1500-100.csv" 
+  val kernelPath_o = internalPath + "weights/o-kernel-d_cell4_fw-1500-100.csv" 
+  val biasPath_i = internalPath + "weights/i-bias-d_cell4_fw-1500-100.csv"
+  val biasPath_j = internalPath + "weights/j-bias-d_cell4_fw-1500-100.csv"
+  val biasPath_f = internalPath + "weights/f-bias-d_cell4_fw-1500-100.csv"
+  val biasPath_o = internalPath + "weights/o-bias-d_cell4_fw-1500-100.csv"
 }
 
 
-trait prepro extends SpatialApp { 
+trait Prepro extends SpatialApp with LSTMParams_dcell4 { 
   def prepro[T:Type:Num]() {
-
+    val ik = loadCSV2D[T](kernelPath_i, ",", "\n")
+    val jk = loadCSV2D[T](kernelPath_j, ",", "\n")
+    val fk = loadCSV2D[T](kernelPath_f, ",", "\n")
+    val ok = loadCSV2D[T](kernelPath_o, ",", "\n")
+    val ib = loadCSV2D[T](biasPath_i, ",", "\n")
+    val jb = loadCSV2D[T](biasPath_j, ",", "\n")
+    val fb = loadCSV2D[T](biasPath_f, ",", "\n")
+    val ob = loadCSV2D[T](biasPath_o, ",", "\n")
+    ((ik, jk, fk, ok), (ib, jb, fb, ob))
   }
 }
 
 
-trait BasicLSTMCell_16_16 extends SpatialApp with LSTMParams
+// Cell implementation
+trait BasicLSTMCell_16_16 extends SpatialApp with Prepro
                                              with Activations {
   def Forward[T:Type:Num]() {
-
+    val (kernel, bias) = prepro[T]()
+    val (ik, jk, fk, ok) = kernel
+    val (ib, jb, fb, ob) = bias
   }
 }
 
-
-trait RNN extends SpatialApp {
+// RNN Sequential Logistics
+trait RNN extends SpatialApp with BasicLSTMCell_16_16 {
   def RNNForward[T:Type:Num]() {
-
+    Forward[T]()
   }
 }
 
 
-object LSTM_16_16 extends SpatialApp with BasicLSTMCell_16_16
-                                     with RNN {
+object LSTM_16_16 extends SpatialApp with RNN {
   type X = FixPt[TRUE, _16, _16]
 
   @virtualize
   def main() {
-    val result = Forward[X]()
+    val result = RNNForward[X]()
   }
 }
 
