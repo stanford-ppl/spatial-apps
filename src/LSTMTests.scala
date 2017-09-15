@@ -1,6 +1,7 @@
 import spatial.dsl._
 import org.virtualized._
 import sys.process._
+import scala.math.{log,exp}
 
 
 trait activations extends SpatialApp {
@@ -28,7 +29,7 @@ trait activations extends SpatialApp {
 }
 
 
-trait LSTMForwardBase extends SpatialApp with activations {
+trait LUTBase extends SpatialApp with activations {
   def Forward[T:Type:Num](N: T) = {
     val x = ArgIn[T]
     val y = ArgOut[T]
@@ -36,7 +37,7 @@ trait LSTMForwardBase extends SpatialApp with activations {
     setArg(x, N)
 
     Accel {
-      y := x.value + sigmoid[T](4.to[T]).value
+      y := x.value + sigmoid[T](4.to[T])
     }
 
     val result = getArg(y)
@@ -44,17 +45,34 @@ trait LSTMForwardBase extends SpatialApp with activations {
   }
 }
 
-
-object LSTM_16_16 extends SpatialApp with LSTMForwardBase {
+object LUTTest extends SpatialApp with LUTBase {
   type X = FixPt[TRUE, _16, _16]
 
   @virtualize
   def main() {
     val N = args(0).to[X]
-    val gold = N + 4
+    val gold = args(0).to[Float] + 1.0 / (1.0 + exp(-4.0))
     println("expected: " + gold)
 
     val result = Forward[X](N)
     println("result: " + result)
+  }
+}
+
+
+trait LSTMBase extends SpatialApp with activations {
+  def Forward[T:Type:Num]() {
+
+  }
+}
+
+
+object LSTM_16_16 extends SpatialApp with LSTMBase {
+  type X = FixPt[TRUE, _16, _16]
+
+  @virtualize
+  def main() {
+    val result = Forward[X]()
+
   }
 }
