@@ -10,19 +10,19 @@ trait activations extends SpatialApp {
   val totalSize = 128
 
   // 128 elements, inputs: -32 to 32, outputs: 0 to 1
-  def sigmoid[T:Type:Num](p: T) = { 
+  def sigmoid[T:Type:Num](p: T) = {
     val sigmoidDir = projectDir + "apps/src/__128_sigmoidLUT.csv"
     val sigmoidLUT = LUT.fromFile[T](totalSize)(sigmoidDir)
-    val lowerMux = (p < -lo.to[T], 0.to[T], sigmoidLUT(((p + lo.to[T]) * revPrec.to[T]).to[Int]))
-    val upperMux = (p > lo.to[T], 1.to[T], lowerMux)
+    val lowerMux = mux(p < -lo.to[T], 0.to[T], sigmoidLUT(((p + lo.to[T]) * revPrec.to[T]).to[Int]))
+    val upperMux = mux(p > lo.to[T], 1.to[T], lowerMux)
     upperMux
   }
   // 128 elements, inputs: -32 to 32, outputs: -1 to 1
-  def tanh[T:Type:Num](p: T) = { 
+  def tanh[T:Type:Num](p: T) = {
     val tanhDir = projectDir + "apps/src/__128_tanhLUT.csv"
     val tanhLUT = LUT.fromFile[T](totalSize) (tanhDir)
-    val lowerMux = (p < -lo.to[T], -1.to[T], tanhLUT(((p + lo.to[T]) * revPrec.to[T]).to[Int]))
-    val upperMux = (p > lo.to[T], 1.to[T], lowerMux)
+    val lowerMux = mux(p < -lo.to[T], -1.to[T], tanhLUT(((p + lo.to[T]) * revPrec.to[T]).to[Int]))
+    val upperMux = mux(p > lo.to[T], 1.to[T], lowerMux)
     upperMux
   }
 }
