@@ -3449,7 +3449,7 @@ object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 
   }
 }
 
-object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
+object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args: 16
 
   // DSE Parameters
   val coltile = 16 // (16 -> 16 -> 1280)
