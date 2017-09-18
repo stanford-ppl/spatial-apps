@@ -65,11 +65,15 @@ trait LSTMParams_dcell4 extends SpatialApp {
   val biasPath_j = internalPath + "weights/j-bias-d_cell4_fw-1500-100.csv"
   val biasPath_f = internalPath + "weights/f-bias-d_cell4_fw-1500-100.csv"
   val biasPath_o = internalPath + "weights/o-bias-d_cell4_fw-1500-100.csv"
+
+  // Paths for the full kernel 
+  val kernelPath = internalPath + "weights/kernel-d_cell4_fw-1500-400.csv"
+  val biasPath = internalPath + "weights/bias-d_cell4_fw-400.csv"
 }
 
 
 trait Prepro extends SpatialApp with LSTMParams_dcell4 { 
-  def prepro[T:Type:Num]() {
+  def prepro[T:Type:Num]()(implicit cast: Cast[MString, T]) = {
     val ik = loadCSV2D[T](kernelPath_i, ",", "\n")
     val jk = loadCSV2D[T](kernelPath_j, ",", "\n")
     val fk = loadCSV2D[T](kernelPath_f, ",", "\n")
@@ -78,7 +82,11 @@ trait Prepro extends SpatialApp with LSTMParams_dcell4 {
     val jb = loadCSV2D[T](biasPath_j, ",", "\n")
     val fb = loadCSV2D[T](biasPath_f, ",", "\n")
     val ob = loadCSV2D[T](biasPath_o, ",", "\n")
-    ((ik, jk, fk, ok), (ib, jb, fb, ob))
+    // val k = loadCSV2D[T](kernelPath, ",", "\n")
+    // val b = loadCSV2D[T](biasPath_i, ",", "\n")
+    val inHidden = loadCSV2D[T](inputPath, ",", "\n")
+    // (ik, jk, fk, ok, ib, jb, fb, ob, inHidden)
+    
   }
 }
 
@@ -86,17 +94,49 @@ trait Prepro extends SpatialApp with LSTMParams_dcell4 {
 // Cell implementation
 trait BasicLSTMCell_16_16 extends SpatialApp with Prepro
                                              with Activations {
-  def Forward[T:Type:Num]() {
-    val (kernel, bias) = prepro[T]()
-    val (ik, jk, fk, ok) = kernel
-    val (ib, jb, fb, ob) = bias
+  def CellForward[T:Type:Num](dramTuple: (DRAM2[T], DRAM2[T], DRAM2[T], 
+                                            DRAM2[T], DRAM2[T], DRAM2[T], 
+                                            DRAM2[T], DRAM2[T], DRAM2[T]))(implicit cast: Cast[MString, T]) = {
+    val (ikdram, jkdram, fkdram, okdram, ibdram, jbdram, fbdram, obdram, inhdram) = dramTuple
+
   }
 }
 
+
 // RNN Sequential Logistics
-trait RNN extends SpatialApp with BasicLSTMCell_16_16 {
-  def RNNForward[T:Type:Num]() {
-    Forward[T]()
+// This is the part where you can swap in various definitions of BasicLSTMCell
+trait RNN extends SpatialApp with BasicLSTMCell_16_16 
+                              with Prepro {
+  def RNNForward[T:Type:Num]()(implicit cast: Cast[MString, T]) {
+    val (ik, jk, fk, ok, ib, jb, fb, ob, inHidden) = prepro[T]()
+    val ikdram = DRAM[T](idco, hiddenSize)
+    val jkdram = DRAM[T](idco, hiddenSize)
+    val fkdram = DRAM[T](idco, hiddenSize) 
+    val okdram = DRAM[T](idco, hiddenSize)
+    val ibdram = DRAM[T](idco, hiddenSize)
+    val jbdram = DRAM[T](idco, hiddenSize)
+    val fbdram = DRAM[T](idco, hiddenSize)
+    val obdram = DRAM[T](idco, hiddenSize)
+    val inhdram = DRAM[T](N*M*JX, (idco+hiddenSize))
+    setMem(ikdram, ik)
+    setMem(jkdram, jk)
+    setMem(fkdram, fk)
+    setMem(okdram, ok)
+    setMem(ibdram, ib)
+    setMem(jbdram, jb)
+    setMem(fbdram, fb)
+    setMem(obdram, ob)
+    setMem(inhdram, inHidden)
+    val dramTuple = (ikdram, jkdram, fkdram, okdram, ibdram, jbdram, fbdram, obdram, inhdram)
+    // TODO: how to compress input x? It needs to be of a dynamic shape
+    // TODO: for now let's assume that it's of fixed shape 161 as JX 
+    Accel {
+      // TODO: Pipelining across different stages?
+      CellForward[T](dramTuple)
+    } 
+
+    // TODO: fill rnnResult
+    // rnnResult
   }
 }
 
@@ -106,7 +146,7 @@ object LSTM_16_16 extends SpatialApp with RNN {
 
   @virtualize
   def main() {
-    val result = RNNForward[X]()
+    val rnnResult = RNNForward[X]()
   }
 }
 
