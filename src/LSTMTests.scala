@@ -4,6 +4,8 @@ import sys.process._
 import scala.math.{log,exp}
 
 
+// TODO: seems that activation is not creating the right value
+// Need better quantization?
 trait Activations extends SpatialApp {
   val projectDir = "/home/tianzhao/spatial-lang/"
   val lo = 32
@@ -62,7 +64,7 @@ trait LSTMParams_dcell4 extends SpatialApp {
   val inputPath = internalPath + "IOs/input-0.csv"
   val outputPath = internalPath + "IOs/output-0.csv"
   val kernelPath = internalPath + "weights/kernel-d_cell4_fw-1500-400.csv"
-  val biasPath = internalPath + "weights/bias-d_cell4_fw-400.csv"
+  val biasPath = internalPath + "weights/bias-d_cell4_fw-1500-400.csv"
 }
 
 
@@ -82,33 +84,40 @@ trait MatMult extends SpatialApp with LSTMParams_dcell4 {
   // val innerPar = 16
   // val midPar = 2
   // val outerPar = 2
+  // val px = 1 (1 -> 1) 
   val op = 2
   val mp = 2 
   val ip = 16
-  val px = 1 (1 -> 1) 
+  val px = 1
   val MM = N*M*JX
   val NN = 4*d
+  // TODO: figure out what the max size of BRAM is allowed here
+  val bm = 10
+  val bp = 10
+  val bn = 10
 
-  def MatMult[T:Type:Num](a: DRAM2[T], b: DRAM2[T], c: DRAM2[T])
-      Foreach(MM by bm, NN by bn par op){(i,j) =>
-        val tileC = SRAM[T](bm, bn)
+  def MatMult[T:Type:Num](a: DRAM2[T], b: DRAM2[T], c: DRAM2[T]) {
+    Foreach(MM by bm, NN by bn par op){(i,j) =>
+      val tileC = SRAM[T](bm, bn)
 
-        Foreach(P by bp par px){k =>
-          val tileA = SRAM[T](bm, bp)
-          val tileB = SRAM[T](bp, bn)
-          Parallel {
-            tileA load a(i::i+bm, k::k+bp par 1) // Reads M*N*P times
-            tileB load b(k::k+bp, j::j+bn par 1)
-          }
-          Foreach(bm by 1, bn by 1 par mp){ (ii,jj) =>    // MetaPipe?
-            val prod = Reduce(Reg[T])(bp by 1 par ip){kk => tileA(ii, kk) * tileB(kk, jj) }{_+_}
-            val prev = mux(k == 0, 0.to[T], tileC(ii,jj))
-            tileC(ii,jj) = prev + prod.value // Is a unit pipe that should be recognized as accum
-          }
+      Foreach(P by bp par px){k =>
+        val tileA = SRAM[T](bm, bp)
+        val tileB = SRAM[T](bp, bn)
+        Parallel {
+          tileA load a(i::i+bm, k::k+bp par 1) // Reads M*N*P times
+          tileB load b(k::k+bp, j::j+bn par 1)
         }
-        c(i::i+bm, j::j+bn) store tileC // Writes M*N times
+        
+        Foreach(bm by 1, bn by 1 par mp){ (ii,jj) =>    // MetaPipe?
+          val prod = Reduce(Reg[T])(bp by 1 par ip){kk => tileA(ii, kk) * tileB(kk, jj) }{_+_}
+          val prev = mux(k == 0, 0.to[T], tileC(ii,jj))
+          tileC(ii,jj) = prev + prod.value // Is a unit pipe that should be recognized as accum
+        }
       }
+
+      c(i::i+bm, j::j+bn) store tileC // Writes M*N times
     }
+  }
 }
 
 
@@ -118,7 +127,7 @@ trait BasicLSTMCell_16_16 extends SpatialApp with Prepro
                                              with MatMult {
   def CellForward[T:Type:Num](dramTuple: (DRAM2[T], DRAM[T], DRAM2[T]))(implicit cast: Cast[MString, T]) = {
     val (kdram, bdram, inhiddram) = dramTuple
-   
+     
   }
 }
 
