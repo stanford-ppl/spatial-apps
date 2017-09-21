@@ -8,3 +8,10 @@ def get_mat(fn):
 
 def get_csv(fn):
     return np.genfromtxt(fn, delimiter=',')
+
+def save_mat(mat, fn):
+    tmp_pkl = open(fn+'.pkl', 'wb')    
+    pickle.dump(mat, tmp_pkl)
+
+def save_csv(mat, fn):
+    np.savetxt(fn+'.csv', mat, delimiter=',', newline='\n', fmt='%.9e')
