@@ -2019,11 +2019,11 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
   
   Smith-Waterman Genetic Alignment algorithm                                                  
   
-  This is just like NW algorithm, except negative scores are capped at 0, backwards traversal starts at highest score from any 
+  This is just like SW algorithm, except negative scores are capped at 0, backwards traversal starts at highest score from any 
      element on the perimeter, and end when score is 0
 
 
-    [SIC] NW diagram
+    [SIC] SW diagram
     LETTER KEY:         Scores                   Ptrs                                                                                                  
       a = 0                   T  T  C  G                T  T  C  G                                                                                                                          
       c = 1                0 -1 -2 -3 -4 ...         0  ←  ←  ←  ← ...                                                                                                        
@@ -2229,7 +2229,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     // val cksumA = seqa_aligned_string == seqa_gold_string //seqa_aligned_result.zip(seqa_gold_bin){_==_}.reduce{_&&_}
     // val cksumB = seqb_aligned_string == seqb_gold_string //seqb_aligned_result.zip(seqb_gold_bin){_==_}.reduce{_&&_}
     // val cksum = cksumA && cksumB
-    println("PASS: " + cksum + " (NW)")
+    println("PASS: " + cksum + " (SW)")
 
 
 

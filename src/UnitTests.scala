@@ -3452,7 +3452,7 @@ object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 
 object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args: 16
 
   // DSE Parameters
-  val coltile = 16 // (16 -> 16 -> 1280)
+  val coltile = 32 // (16 -> 16 -> 1280)
 
   @virtualize
   def ConvolutionSlide[T:Type:Num](output: DRAM2[T], 
@@ -3467,7 +3467,11 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
       lb load input(row, 0::input.cols) // TODO: load with correct rowstride
       Foreach(input.cols by colstride){j => 
         Foreach(filter.rows by 1 par filter.rows){i => sr(i,*) <<= lb(i,j::j+colstride)}
-        lineout(j/colstride) = mux(row + (rowstride-1) < filter.rows.to[Int]-1 || j + (colstride-1) < filter.cols.to[Int]-1, 0.to[T], Reduce(Reg[T](0.to[T]))(filter.rows by 1, filter.cols by 1){(ii,jj) => sr(ii,jj) * filter(ii,jj)}{_+_}.value)
+        lineout(j/colstride) = Reduce(Reg[T](0.to[T]))(filter.rows by 1, filter.cols by 1){(ii,jj) => 
+          val img = if ((row.to[Int]+rowstride-1) - (filter.rows - 1 - ii.to[Int]) < 0 || (j.to[Int]+colstride-1) - (filter.cols - 1 - jj.to[Int]) < 0) 0.to[T] else sr(ii,filter.cols - 1 - jj)
+          img * filter(ii,jj)
+        }{_+_}
+        // lineout(j/colstride) = mux(row + (rowstride-1) < filter.rows.to[Int]-1 || j + (colstride-1) < filter.cols.to[Int]-1, 0.to[T], Reduce(Reg[T](0.to[T]))(filter.rows by 1, filter.cols by 1){(ii,jj) => sr(ii,jj) * filter(ii,jj)}{_+_}.value)
       }
       output(row/rowstride, 0::output.cols) store lineout
     }
@@ -3534,6 +3538,8 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
     val col_stride2 = 2
     val row_stride3 = 1
     val col_stride3 = 1
+    val row_stride4 = 1
+    val col_stride4 = 2
 
     // cmd-line args (i.e.- "20 0.5 0.5 64 64 64")
     val in_rows = args(0).to[Int]
@@ -3544,13 +3550,16 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
 
     // Create toeplitz for filter and padded image
     val data3 = (0::in_rows + 2, 0::coltile+2){(i,j) => if (i < 2 || j < 2) 0 else data1( i-2, j-2 )}.flatten
-    val filter3_tplz = filter1.toeplitz(3,3,in_rows+2,coltile+2, row_stride3, col_stride3)
+    val filter3_tplz = filter1.toeplitz(3,3,in_rows,coltile, row_stride3, col_stride3)
     println("Expanded filter is " + filter3_tplz.rows + " x " + filter3_tplz.cols)
     println("Padded data is " + data3.length + " elements long")
+    val filter4_tplz = filter1.toeplitz(3,3,in_rows,coltile, row_stride4, col_stride4)
 
     // Show inputs
     printMatrix(data1, "Img1")
+    printArray(data3, "Flattened padded img")
     printMatrix(filter3_tplz, "Toeplitz Filter")
+    printMatrix(filter4_tplz, "Toeplitz Filter, colstride=2")
 
     // ArgIns
     val M = ArgIn[Int]
@@ -3560,8 +3569,12 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
     val Mds2 = ArgIn[Int]
     val Nds2 = ArgIn[Int]
     val Len3 = ArgIn[Int]
+    val OutLen3 = ArgIn[Int]
     val Mds3 = ArgIn[Int]
     val Nds3 = ArgIn[Int]
+    val Mds4 = ArgIn[Int]
+    val Nds4 = ArgIn[Int]
+    val OutLen4 = ArgIn[Int]
     setArg(M, in_rows)
     setArg(N, coltile)
     setArg(Mds1, in_rows / row_stride1)
@@ -3569,20 +3582,27 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
     setArg(Mds2, in_rows / row_stride2)
     setArg(Nds2, coltile / col_stride2)
     setArg(Len3, (coltile+2) / col_stride3 * (in_rows+2) / row_stride3)
+    setArg(OutLen3, filter3_tplz.rows)
+    setArg(OutLen4, filter4_tplz.rows)
     setArg(Mds3, filter3_tplz.rows)
     setArg(Nds3, filter3_tplz.cols)
+    setArg(Mds4, filter4_tplz.rows)
+    setArg(Nds4, filter4_tplz.cols)
 
     // Offchip structures
     val image = DRAM[T](M, N)
     val flatimg = DRAM[T](Len3)
     val dram1 = DRAM[T](Mds1, Nds1)
     val dram2 = DRAM[T](Mds2, Nds2)
-    val dram3 = DRAM[T](Len3)
+    val dram3 = DRAM[T](OutLen3)
+    val dram4 = DRAM[T](OutLen4)
     val filter3 = DRAM[T](Mds3, Nds3)
+    val filter4 = DRAM[T](Mds4, Nds4)
 
     setMem(image, data1)
-    setMem(flatimg, data1.flatten)
+    setMem(flatimg, data3)
     setMem(filter3, filter3_tplz)
+    setMem(filter4, filter4_tplz)
 
     // Run Accel functions
     Accel{
@@ -3592,32 +3612,40 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
       ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1)
       ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2)
       ConvolutionGEMM[T](dram3, flatimg, filter3)
+      ConvolutionGEMM[T](dram4, flatimg, filter4)
     }
 
     // Get results
     val res1 = getMatrix(dram1)
     val res2 = getMatrix(dram2)
-    val res3 = getMem(dram3).reshape(Mds1, Nds1)
+    val res3 = getMem(dram3).reshape(in_rows, coltile)
+    // val res4 = getMem(dram4).reshape(res2.rows, res2.cols)
 
     // Compute Golds
     val gold1 = (0::in_rows / row_stride1, 0::coltile / col_stride1){(i,j) => 
-      if (i < 2 || j < 2) 0 else {
-        Array.tabulate(3){ii => Array.tabulate(3){jj => data1(i*row_stride1-ii,j*col_stride1-jj) * filter1((2-ii)*3+(2-jj))}}.flatten.reduce{_+_}
-      }
+      Array.tabulate(3){ii => Array.tabulate(3){jj => 
+        val img = if (i*row_stride1-ii < 0 || j*col_stride1-jj < 0) 0 else data1(i*row_stride1-ii,j*col_stride1-jj)
+        img * filter1((2-ii)*3+(2-jj))
+      }}.flatten.reduce{_+_}
     }
     val gold2 = (0::in_rows / row_stride2, 0::coltile / col_stride2){(i,j) => 
-      if (i < 2 || j < 2/col_stride2) 0 else {
-        Array.tabulate(3){ii => Array.tabulate(3){jj => data1(i*row_stride2-ii+(row_stride2-1),j*col_stride2-jj+(col_stride2-1)) * filter1((2-ii)*3+(2-jj))}}.flatten.reduce{_+_}
-      }
+      Array.tabulate(3){ii => Array.tabulate(3){jj => 
+        val real_i = i*row_stride2-ii+(row_stride2-1)
+        val real_j = j*col_stride2-jj+(col_stride2-1)
+        val img = if (real_i < 0 || real_j < 0) 0 else data1(real_i,real_j)
+        img * filter1((2-ii)*3+(2-jj))
+      }}.flatten.reduce{_+_}
     }
     val gold3 = gold1
+    // val gold4 = gold2
 
     // Collect cksums
     val margin = 0.25.to[T]
     val cksum1 = res1.zip(gold1){_==_}.reduce{_&&_}
     val cksum2 = res2.zip(gold2){_==_}.reduce{_&&_}
     val cksum3 = res3.zip(gold3){_==_}.reduce{_&&_}
-    val cksum = cksum1 && cksum2 //&& cksum3
+    // val cksum4 = res4.zip(gold4){_==_}.reduce{_&&_}
+    val cksum = cksum1 && cksum2 && cksum3 //&& cksum4
 
     // Print results
     println("Conv1 Result: ")
@@ -3629,10 +3657,14 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
     println("Conv3 Result: ")
     printMatrix(res3, "  Got")
     printMatrix(gold3, "  Wanted")
+    // println("Conv4 Result: ")
+    // printMatrix(res4, "  Got")
+    // printMatrix(gold4, "  Wanted")
 
     println("  cksum: " + cksum1 + " (Conv1)")
     println("  cksum: " + cksum2 + " (Conv2)")
     println("  cksum: " + cksum3 + " (Conv3)")
+    // println("  cksum: " + cksum4 + " (Conv4)")
 
     println("PASS: " + cksum + " (Convolutions)")
 
