@@ -12,7 +12,6 @@ def get_mat(fn):
 def sigmoid(x):
   return 1. / (1. + np.exp(-x))
 
-
 JX = 161
 M = 1
 N = 60
@@ -30,6 +29,8 @@ kernel_f = weights + 'kernel-d_cell4_fw-1500-400.csv'
 bias_f = weights + 'bias-first_cell_fw-400.csv'
 seq_f = IOs + 'seq_len-0.pkl'
 sim_result_f = 'sim-state'
+acc_mem = 'acc_c'
+acc_hidden = 'acc_h'
 
 # original input size: (60, 1, 161, 1400)
 kernel = np.genfromtxt(kernel_f, delimiter=',') # (dco+d, 4*d)
@@ -42,6 +43,8 @@ h = np.zeros((N, d))
 c = np.zeros((N, d))
 state = np.concatenate([c, h], 1)
 
+re_c = None
+re_h = None
 
 for idx in range(161):
     print(idx)
@@ -52,5 +55,21 @@ for idx in range(161):
     new_c = np.multiply(c, sigmoid(f + forget_bias)) + np.multiply(sigmoid(i), tanh(j)) # (N, d)
     new_h = np.multiply(tanh(new_c), sigmoid(o)) # (N, d)
     state = np.concatenate([new_c, new_h], 1) # (N, 2d)
+    if re_c is None:
+        print('init')
+        re_c = np.copy(new_c).reshape((N, 1, d))
+    else:
+        re_c = np.append(re_c, np.copy(new_c).reshape((N, 1, d)), axis=1)
 
+    if re_h is None:
+        re_h = np.copy(new_h).reshape((N, 1, d))
+    else:
+        re_h = np.append(re_h, np.copy(new_h).reshape((N, 1, d)), axis=1)
+
+print(re_c.shape)
+print(re_h.shape)
+re_c_flatten = re_c.reshape((-1, d))
+re_h_flatten = re_h.reshape((-1, d))
 np.savetxt(sim_result_f +'.csv', state, delimiter=',', newline='\n', fmt='%.9e')
+np.savetxt(acc_mem + '.csv', re_c_flatten, delimiter=',', newline='\n', fmt='%.9e')
+np.savetxt(acc_hidden + '.csv', re_h_flatten, delimiter=',', newline='\n', fmt='%.9e')
