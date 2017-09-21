@@ -26,18 +26,22 @@ acc_mem = 'acc_c'
 acc_hidden = 'acc_h'
 
 
-kernel = np.genfromtxt(kernel_f, delimiter=',') # (dco+d, 4*d)
-bias = np.genfromtxt(bias_f, delimiter=',') # (4*d, )
+kernel = np.genfromtxt(kernel_f, delimiter=',', dtype='float32') # (dco+d, 4*d)
+bias = np.genfromtxt(bias_f, delimiter=',', dtype='float32') # (4*d, )
 seq_len = np.genfromtxt(seq_f, delimiter=',', dtype='int')
-in_mat = np.genfromtxt(input_f, delimiter=',') # (N*M*JX, dco)
+in_mat = np.genfromtxt(input_f, delimiter=',', dtype='float32') # (N*M*JX, dco)
 input_batch = in_mat.reshape(N, M, JX, -1).squeeze()
 
-# only simulate one link for now
-inputs = tf.placeholder(tf.float32)
-cell_fw = BasicLSTMCell(d, state_is_tuple=True)
-test_rnn = dynamic_rnn(cell_fw, inputs, sequence_length=seq_len, \
-                kernel_initializer=kernel, bias_initializer=bias):
 
+# only simulate one link for now
+inputs = tf.placeholder(tf.float32, shape=(N, JX, dco))
+cell_fw = BasicLSTMCell(d, state_is_tuple=True, \
+                        kernel_initializer=lambda x, dtype, partition_info=None: tf.constant(kernel, dtype), \
+                        bias_initializer=lambda x, dtype, partition_info=None: tf.constant(bias, dtype))
+test_rnn = dynamic_rnn(cell_fw, inputs, sequence_length=seq_len, dtype='float')
+
+init_op = tf.initialize_all_variables()
 sess = tf.Session()
+sess.run(init_op)
 result = sess.run(test_rnn, feed_dict={inputs: input_batch})
 code.interact(local=locals())
