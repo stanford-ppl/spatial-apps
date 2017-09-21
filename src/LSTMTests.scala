@@ -5,7 +5,7 @@ import scala.math.{log,exp}
 
 
 // TODO: seems that activation is not creating the right value
-// Need better quantization?
+// Need better precisions? This is somewhere to test.
 trait Activations extends SpatialApp {
   val projectDir = "/home/tianzhao/spatial-lang/"
   val lo = 32
@@ -53,13 +53,18 @@ trait LUTBase extends SpatialApp with Activations {
 
 
 trait LSTMParams_dcell4 extends SpatialApp {
-  val kernelSize = (1500, 100)
+  // Input at each time stamp: ()
   val d = 100
   val N = 60
   val M = 1
   val JX = 161
   val idco = 1400
   val odco = 200
+  val nrInput = JX
+  val ncInput = idco + d
+  val nrKernel = idco + d
+  val ncKernel = 4*d
+  val nrBias = 4*d
   val internalPath = "/home/tianzhao/spatial-lang/apps/LSTM-internals/"
   val inputPath = internalPath + "IOs/input-0.csv"
   val outputPath = internalPath + "IOs/output-0.csv"
@@ -70,8 +75,11 @@ trait LSTMParams_dcell4 extends SpatialApp {
 
 trait Prepro extends SpatialApp with LSTMParams_dcell4 { 
   def prepro[T:Type:Num]()(implicit cast: Cast[MString, T]) = {
-    val k = loadCSV2D[T](kernelPath, ",", "\n")
-    val b = loadCSV2D[T](biasPath, ",", "\n")
+    // input * kernel + bias
+    // For each datapoint in the batch:
+    // input: (161, 1500), kernel: (1500, 400), bias: (400,) broadcasted to (161, 400)
+    val k = loadCSV2D[T](kernelPath, ",", "\n") // (1500, 400)
+    val b = loadCSV2D[T](biasPath, ",", "\n") // (400)
     val inHidden = loadCSV2D[T](inputPath, ",", "\n")
     (k, b, inHidden)
   }
@@ -79,7 +87,7 @@ trait Prepro extends SpatialApp with LSTMParams_dcell4 {
 
 
 // This traits contain different flavors of matmult
-trait MatMult extends SpatialApp with LSTMParams_dcell4 {
+trait MatMult extends SpatialApp {
   // MatMult parallelization factors
   // val innerPar = 16
   // val midPar = 2
@@ -89,18 +97,17 @@ trait MatMult extends SpatialApp with LSTMParams_dcell4 {
   val mp = 2 
   val ip = 16
   val px = 1
-  val MM = N*M*JX
-  val NN = 4*d
+
   // TODO: figure out what the max size of BRAM is allowed here
   val bm = 10
   val bp = 10
   val bn = 10
 
-  def MatMult[T:Type:Num](a: DRAM2[T], b: DRAM2[T], c: DRAM2[T]) {
+  def MatMult[T:Type:Num](a: DRAM2[T], b: DRAM2[T], c: DRAM2[T], MM: Int, PP: Int, NN: Int) {
     Foreach(MM by bm, NN by bn par op){(i,j) =>
       val tileC = SRAM[T](bm, bn)
 
-      Foreach(P by bp par px){k =>
+      Foreach(PP by bp par px){k =>
         val tileA = SRAM[T](bm, bp)
         val tileB = SRAM[T](bp, bn)
         Parallel {
@@ -109,7 +116,7 @@ trait MatMult extends SpatialApp with LSTMParams_dcell4 {
         }
         
         Foreach(bm by 1, bn by 1 par mp){ (ii,jj) =>    // MetaPipe?
-          val prod = Reduce(Reg[T])(bp by 1 par ip){kk => tileA(ii, kk) * tileB(kk, jj) }{_+_}
+          val prod = Reduce(Reg[T])(bp by 1 par ip) { kk => tileA(ii, kk) * tileB(kk, jj) }{_+_}
           val prev = mux(k == 0, 0.to[T], tileC(ii,jj))
           tileC(ii,jj) = prev + prod.value // Is a unit pipe that should be recognized as accum
         }

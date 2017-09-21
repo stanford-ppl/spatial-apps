@@ -35,6 +35,11 @@ fileDir = '/home/tianzhao/spatial-lang/apps/LSTM-internals/'
 IOs = fileDir + 'IOs/'
 weights = fileDir + 'weights/'
 
-noseq = get_mat(IOs + 'test_rnn_noseq.pkl')
-seq = get_mat(IOs + 'test_rnn_seq.pkl')
+noseq = get_mat('./test_rnn_noseq.pkl')
+seq = get_mat('./test_rnn_seq.pkl')
+output_noseq, states_noseq = noseq
+c_noseq, h_noseq = states_noseq
+output_seq, states_seq = seq
+c_seq, h_seq = states_seq
+
 code.interact(local=locals())
