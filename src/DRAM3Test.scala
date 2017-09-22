@@ -18,7 +18,7 @@ trait Params extends SpatialApp {
 
 
 // This app does np.concatenate([a, hidden], axis=1).dot(kernel) + bias(broadcasted)
-object ConcatAffine extends SpatialApp with Params {
+object ConfigConcatAffine extends SpatialApp with Params {
   type T = FixPt[TRUE, _16, _16]
 
   @virtualize
@@ -32,7 +32,6 @@ object ConcatAffine extends SpatialApp with Params {
 
   }
 }
-
 
 
 object DRAM3ConcatTestAugKernel extends SpatialApp with Params {
