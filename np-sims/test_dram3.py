@@ -16,10 +16,16 @@ h_total = N * JX * d
 hidden = np.linspace(0, h_total-1, num=h_total).reshape((N,JX,d))
 save_csv(hidden.flatten(), 'hidden_3_4_4')
 
-kernel = np.ones((dco+d, 4*d)) * 2
+k_total = (dco+d)*4*d
+kernel = np.linspace(0, k_total-1, num=k_total).reshape((dco+d, 4*d))
 save_csv(kernel.flatten(), 'kernel_6_16')
-bias = np.ones((4*d)) * 3
+
+b_total = 4*d
+bias = np.linspace(0, b_total-1, num=b_total).reshape((4*d))
 save_csv(bias.flatten(), 'bias_16')
 
+# result = np.concatenate([a[:,0,:], hidden[:,0,:]], axis=1).dot(kernel) + bias
 result = np.concatenate([a[:,0,:], hidden[:,0,:]], axis=1).dot(kernel) + bias
 print('result shape:', result.shape)
+print(np.array2string(result.flatten()))
+
