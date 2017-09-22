@@ -1,5 +1,6 @@
 import spatial.dsl._
 import org.virtualized._
+import spatial.stdlib._
 
 object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
   @virtualize
@@ -3373,13 +3374,23 @@ object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 
 
     // Run Accel functions
     Accel{
-      Dot[T](NN, X, 1, Y, 1, dot)
-      Axpy[T](NN, a, X, 1, Y, 1, axpy)
-      Gemm[T](MM, NN, KK, a, A, A.cols, B, B.cols, b, C, C.cols)
-      Gemv[T](MM, KK, a, A, A.cols, gemv_X, 1, b, gemv_Y, 1)
-      Ger[T](MM, NN, a, ger_X, 1, Y, 1, ger_A, ger_A.cols)
-      Scal[T](NN, a, X, 1, scal_Y)
-      Axpby[T](NN, a, X, 1, b, Y, 1, axpby_Z)
+      // Use defs from spatial's stdlib
+      BLAS.Dot[T](NN, X, 1, Y, 1, dot)
+      BLAS.Axpy[T](NN, a, X, 1, Y, 1, axpy)
+      BLAS.Gemm[T](MM, NN, KK, a, A, A.cols, B, B.cols, b, C, C.cols)
+      BLAS.Gemv[T](MM, KK, a, A, A.cols, gemv_X, 1, b, gemv_Y, 1)
+      BLAS.Ger[T](MM, NN, a, ger_X, 1, Y, 1, ger_A, ger_A.cols)
+      BLAS.Scal[T](NN, a, X, 1, scal_Y)
+      BLAS.Axpby[T](NN, a, X, 1, b, Y, 1, axpby_Z)
+
+      // // Use defs in the app
+      // Dot[T](NN, X, 1, Y, 1, dot)
+      // Axpy[T](NN, a, X, 1, Y, 1, axpy)
+      // Gemm[T](MM, NN, KK, a, A, A.cols, B, B.cols, b, C, C.cols)
+      // Gemv[T](MM, KK, a, A, A.cols, gemv_X, 1, b, gemv_Y, 1)
+      // Ger[T](MM, NN, a, ger_X, 1, Y, 1, ger_A, ger_A.cols)
+      // Scal[T](NN, a, X, 1, scal_Y)
+      // Axpby[T](NN, a, X, 1, b, Y, 1, axpby_Z)
     }
 
     // Get results
@@ -3449,7 +3460,7 @@ object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 
   }
 }
 
-object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args: 16
+object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
 
   // DSE Parameters
   val coltile = 32 // (16 -> 16 -> 1280)
@@ -3534,7 +3545,7 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
     // Setup strides
     val row_stride1 = 1
     val col_stride1 = 1
-    val row_stride2 = 1
+    val row_stride2 = 2
     val col_stride2 = 2
     val row_stride3 = 1
     val col_stride3 = 1
@@ -3609,10 +3620,17 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
       val filter = LUT[T](3,3)(1,  2,  1,
                                0,  0,  0,
                               -1, -2, -1)
-      ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1)
-      ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2)
-      ConvolutionGEMM[T](dram3, flatimg, filter3)
-      ConvolutionGEMM[T](dram4, flatimg, filter4)
+      // Use stdlib defs
+      Convolution.ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1, 16, 16)
+      Convolution.ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2, 16, 16)
+      Convolution.ConvolutionGEMM[T](dram3, flatimg, filter3)
+      Convolution.ConvolutionGEMM[T](dram4, flatimg, filter4)
+
+      // // Use defs in this app
+      // ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1)
+      // ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2)
+      // ConvolutionGEMM[T](dram3, flatimg, filter3)
+      // ConvolutionGEMM[T](dram4, flatimg, filter4)
     }
 
     // Get results
@@ -3672,7 +3690,7 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
 }
 
 
-object SimpleStridedConv extends SpatialApp {
+object SimpleRowStridedConv extends SpatialApp { // Regression (Dense) // Args: none
   @virtualize
   def main(): Unit = {
     val R = 10
@@ -3681,7 +3699,7 @@ object SimpleStridedConv extends SpatialApp {
     val mat = (0::R,0::C){(i,j) => i }
 
     val img = DRAM[Int](R, C)
-    val out = DRAM[Int](R, C)
+    val out = DRAM[Int](R/2, C)
     setMem(img, mat)
 
     Accel {
@@ -3692,7 +3710,7 @@ object SimpleStridedConv extends SpatialApp {
         lb load img(row*2::row*2+2, 0::C)
 
         Foreach(C by 1){col =>
-          val conv = Reduce(0)(3 by 1, 3 by 1){(r,c) => lb(r, col + c) : Int }{_+_} / 9
+          val conv = Reduce(0)(3 by 1, 3 by 1){(r,c) => if (row - 1 + r < 0) 0 else lb(r, (col + c)%C)}{_+_} / 9
           line(col) = conv
         }
         out(row,0::C) store line
@@ -3703,6 +3721,10 @@ object SimpleStridedConv extends SpatialApp {
 
     printMatrix(mat, "Input")
     printMatrix(result, "Result")
+    val gold = (0::R/2, 0::C){(i,j) => 2*i}
+
+    val cksum = result.zip(gold){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (SimpleRowStridedConv)")
   }
 }
 
