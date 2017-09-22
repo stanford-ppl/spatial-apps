@@ -78,7 +78,8 @@ LSTM cell implementation in tf
     else:
       c, h = array_ops.split(value=state, num_or_size_splits=2, axis=1)
 
-    concat = _linear([inputs, h], 4 * self._num_units, True)
+    concat = _linear([inputs, h], 4 * self._num_units, True) # inputs: (JX, dco)
+                                                             # hidden: (JX, d)
 
     #   i = input_gate, j = new_input, f = forget_gate, o = output_gate
     i, j, f, o = array_ops.split(value=concat, num_or_size_splits=4, axis=1)
