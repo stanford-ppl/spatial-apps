@@ -3671,3 +3671,39 @@ object Convolutions extends SpatialApp { // DISABLED Regression (Dense) // Args:
   }
 }
 
+
+object SimpleStridedConv extends SpatialApp {
+  @virtualize
+  def main(): Unit = {
+    val R = 10
+    val C = 16
+
+    val mat = (0::R,0::C){(i,j) => i }
+
+    val img = DRAM[Int](R, C)
+    val out = DRAM[Int](R, C)
+    setMem(img, mat)
+
+    Accel {
+      val lb = LineBuffer.strided[Int](3, C, 2)
+
+      Foreach(R/2 by 1){row =>
+        val line = SRAM[Int](C)
+        lb load img(row*2::row*2+2, 0::C)
+
+        Foreach(C by 1){col =>
+          val conv = Reduce(0)(3 by 1, 3 by 1){(r,c) => lb(r, col + c) : Int }{_+_} / 9
+          line(col) = conv
+        }
+        out(row,0::C) store line
+      }
+    }
+
+    val result = getMatrix(out)
+
+    printMatrix(mat, "Input")
+    printMatrix(result, "Result")
+  }
+}
+
+
