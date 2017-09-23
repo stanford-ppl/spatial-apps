@@ -65,6 +65,8 @@ object ScalaSimMath extends SpatialApp {
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
 object BasicLSTMCell extends SpatialApp with Params {
   // type T = FixPt[TRUE, _32, _32]
+  // TODO: seems that the compiler isn't happy about fltpt. Get it back to fixpt with 
+  // LUT implementations
   type T = FltPt[_10, _10]
   def sigmoid(x: T) = { 1.0 / (1.0 + exp(0.0 - x)) }
 
