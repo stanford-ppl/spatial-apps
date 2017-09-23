@@ -4,16 +4,16 @@ import org.virtualized._
 
 trait Params extends SpatialApp {
   val N = 3
-  val JX = 4
-  val dco = 2
-  val d = 4
+  val JX = 16
+  val dco = 32
+  val d = 8
   val dn = 1
   val dJX = 2
   val ddco = 2
   val dd = 2
   val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
-  val dataPaths = List(simFileDir + "/a_3_4_2.csv", simFileDir + "/hidden_3_4_4.csv", 
-                    simFileDir + "/kernel_6_16.csv", simFileDir + "/bias_16.csv")
+  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
+                    simFileDir + "/kernel.csv", simFileDir + "/bias.csv")
 }
 
 
@@ -37,7 +37,7 @@ trait Params extends SpatialApp {
 //                                |                 |
 //                                +-----------------+
 object ConfigConcatAffine extends SpatialApp with Params {
-  type T = FixPt[TRUE, _16, _16]
+  type T = FixPt[TRUE, _32, _32]
 
   @virtualize
   def main() {
@@ -60,7 +60,7 @@ object ConfigConcatAffine extends SpatialApp with Params {
 
       val tileBias = SRAM[T](NN)
       tileBias load bias(0::NN)
-      Foreach(MM by dn, NN by dd) {(i,j) =>
+      Foreach(MM by dn, NN by dd) { (i, j) =>
         val tileC = SRAM[T](dn, dd)
 
         Foreach(PP by ddco) { k =>
@@ -76,19 +76,23 @@ object ConfigConcatAffine extends SpatialApp with Params {
           }
 
           Foreach(dn by 1, dd by 1) { (ii, jj) =>
+            // TODO: multiply add... can I replace this with shift add?
             val prod = Reduce(Reg[T])(ddco by 1) { kk => 
               tileA(ii, kk) * tileB(kk, jj)
             } {_+_}
-            val prev = mux(k == 0, 0.to[T], tileC(ii, jj))
-            tileC(ii,jj) = prev + prod.value + tileBias(j)
+            // val prev = mux(k == 0, 0.to[T], tileC(ii, jj))
+            val prev = mux(k == 0, tileBias(j+jj), tileC(ii, jj))
+            tileC(ii,jj) = prev + prod.value
           }
         }
+
         resultDRAM(i::i+dn, j::j+dd) store tileC
       }
     }
 
     val result = getMem(resultDRAM)
     printArray(result, "resultDRAM = ")
+    writeCSV1D[T](result, simFileDir + "/DRAM3Test_result_bias.csv")
   }
 }
 
