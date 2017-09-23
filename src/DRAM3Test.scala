@@ -11,9 +11,29 @@ trait Params extends SpatialApp {
   val dJX = 2
   val ddco = 2
   val dd = 2
+  val fogetBias = 1
   val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
   val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
                     simFileDir + "/kernel.csv", simFileDir + "/bias.csv")
+}
+
+
+object testScalaMath extends SpatialApp {
+  @virtualize
+  def main() {
+    type T = FltPt[_10, _10]
+    val x = ArgIn[T]
+    val y = ArgOut[T]
+    val N = args(0).to[T]
+    setArg(x, N)
+
+    Accel {
+      y := tanh(x.value)
+    }
+
+    val result = getArg(y)
+    println(result)
+  }
 }
 
 
@@ -36,8 +56,11 @@ trait Params extends SpatialApp {
 //                                |                 |
 //                                |                 |
 //                                +-----------------+
+
+// For split: i, j, f, o = np.split(linear, 4, axis=1)
 object ConfigConcatAffine extends SpatialApp with Params {
-  type T = FixPt[TRUE, _32, _32]
+  // type T = FixPt[TRUE, _32, _32]
+  type T = FltPt[_10, _10]
 
   @virtualize
   def main() {

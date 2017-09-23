@@ -54,7 +54,10 @@ for idx in range(161):
     i, j, f, o = np.split(concat, 4, axis=1) # (N, d)
     new_c = np.multiply(c, sigmoid(f + forget_bias)) + np.multiply(sigmoid(i), tanh(j)) # (N, d)
     new_h = np.multiply(tanh(new_c), sigmoid(o)) # (N, d)
+    # Notice that it is fine to leave the two as a tuple
     state = np.concatenate([new_c, new_h], 1) # (N, 2d)
+
+
     if re_c is None:
         print('init')
         re_c = np.copy(new_c).reshape((N, 1, d))

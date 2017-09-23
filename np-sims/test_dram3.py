@@ -26,11 +26,12 @@ bias = np.linspace(0, b_total-1, num=b_total).reshape((4*d))
 # bias = np.zeros((b_total)).reshape((4*d))
 save_csv(bias.flatten(), 'bias')
 
-# result = np.concatenate([a[:,0,:], hidden[:,0,:]], axis=1).dot(kernel) + bias
-result = np.concatenate([a[:,0,:], hidden[:,0,:]], axis=1).dot(kernel) + bias
-print('result shape:', result.shape)
-print(np.array2string(result.flatten()))
+concat = np.concatenate([a[:,0,:], hidden[:,0,:]], axis=1).dot(kernel) + bias
+print('result shape:', concat.shape)
+print(np.array2string(concat.flatten()))
 
-dram = np.delete(get_csv('DRAM3Test_result_bias.csv'), 0).reshape((N, 4*d))
+i, j, f, o = np.split(concat, 4, axis=1)
+
+# dram = np.delete(get_csv('DRAM3Test_result_bias.csv'), 0).reshape((N, 4*d))
 
 code.interact(local=locals())
