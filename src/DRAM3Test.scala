@@ -11,7 +11,7 @@ trait Params extends SpatialApp {
   val dJX = 2
   val ddco = 2
   val dd = 2
-  val fogetBias = 1
+  val forgetBias = 1
   val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
   val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
                     simFileDir + "/kernel.csv", simFileDir + "/bias.csv")
@@ -37,6 +37,11 @@ object testScalaMath extends SpatialApp {
 }
 
 
+trait Activations extends SpatialApp {
+  def sigmoid[T](x: T) = { 1.0 / (1.0 + exp(-x)) }
+}
+
+
 // At each data point in the batch:
 // This app does np.concatenate([a, hidden], axis=1).dot(kernel) + bias(broadcasted)
 // bias needs to broadcast N
@@ -58,7 +63,7 @@ object testScalaMath extends SpatialApp {
 //                                +-----------------+
 
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
-object ConfigConcatAffine extends SpatialApp with Params {
+object BasicLSTMCell extends SpatialApp with Params with Activations {
   // type T = FixPt[TRUE, _32, _32]
   type T = FltPt[_10, _10]
 
@@ -75,6 +80,7 @@ object ConfigConcatAffine extends SpatialApp with Params {
     val MM = N
     val PP = d + dco
     val NN = 4 * d
+    val splitSize = NN / 4 // i, j, f, o
 
     Accel {
       // TODO: Later this JX needs to be replaced by a different val...
@@ -100,12 +106,22 @@ object ConfigConcatAffine extends SpatialApp with Params {
 
           Foreach(dn by 1, dd by 1) { (ii, jj) =>
             // TODO: multiply add... can I replace this with shift add?
+            val nD2 = j + jj
             val prod = Reduce(Reg[T])(ddco by 1) { kk => 
               tileA(ii, kk) * tileB(kk, jj)
             } {_+_}
-            // val prev = mux(k == 0, 0.to[T], tileC(ii, jj))
-            val prev = mux(k == 0, tileBias(j+jj), tileC(ii, jj))
-            tileC(ii,jj) = prev + prod.value
+            val prev = mux(k == 0, tileBias(nD2), tileC(ii, jj))
+            val ele = prev + prod.value
+            if (k == PP - ddco) {
+              if (nD2 < splitSize || nD2 > splitSize * 3) {
+                tile(ii, jj) = sigmoid(ele)
+              } else if (splitSize <= nD2 && nD2 < splitSize * 2) {
+                tile(ii, jj) = tanh(ele)
+              } else {
+                tile(ii, jj) = sigmoid(ele + forgetBias)
+            } else {
+              tileC(ii,jj) = ele
+            }
           }
         }
 
