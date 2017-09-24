@@ -18,26 +18,61 @@ trait Params extends SpatialApp {
 }
 
 
-// trait Activations extends SpatialApp {
-  // def sigmoid(x: FltPt[_10, _10]) = { 1.0 / (1.0 + exp(0.0 - x)) }
-// }
+trait Activations extends SpatialApp {
+  type aT = FixPt[TRUE, _1, _32]
+  type iT = FixPt[TRUE, _7, _10]
+  val projectDir = "/home/tianzhao/spatial-lang/apps/src/"
+  val lo = 16
+  val spacingShiftBits = 6 // shift down
+  val lutN = 1024
+  val sigF = projectDir + "sigmoid_1024_16_-6.0.csv"
+  val tanhF = projectDir + "tanh_1024_16_-6.0.csv"
+  // val tanhDir = projectDir + "512_tanhLUT.csv"
 
 
-object ScalaSimMath extends SpatialApp {
+  // TODO: it seems fair to save the LUT space by utilizing the symmetry of sigmoid and tanh
+  def sigmoid_(p: aT) = {
+    val halfSigLUT = LUT.fromFile[aT](lutN)(sigF)
+    val index = (abs(p).to[iT] << spacingShiftBits).to[Index]
+    val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
+    val lowerMux = mux(p <= -lo.to[aT], 0.to[aT], valueMux)
+    val upperMux = mux(p >= lo.to[aT], 1.to[aT], lowerMux)
+    upperMux
+  }
+
+
+  def tanh_(p: aT) = {
+    val halfTanhLUT = LUT.fromFile[aT](lutN)(tanhF)
+    val index = (abs(p).to[iT] << spacingShiftBits).to[Index]
+    val valueMux = mux(p < 0.to[aT], 0.to[aT] - halfTanhLUT(index), halfTanhLUT(index))
+    val lowerMux = mux(p <= -lo.to[aT], -1.to[aT], valueMux)
+    val upperMux = mux(p >= lo.to[aT], 1.to[aT], lowerMux)
+    upperMux
+  }
+}
+
+object ActivationTests extends Activations {
+  type T = FixPt[TRUE, _1, _32]
   @virtualize
   def main() {
-    type T = FltPt[_10, _10]
     val x = ArgIn[T]
     val y = ArgOut[T]
+    val y1 = ArgOut[T]
     val N = args(0).to[T]
     setArg(x, N)
 
     Accel {
-      y := tanh(x.value)
+      Parallel {
+        // y := tanh_(x.value)
+        y := tanh_(x.value)
+        y1 := sigmoid_(x.value)
+      }
     }
 
-    val result = getArg(y)
-    println(result)
+    val yre = getArg(y)
+    val yre1 = getArg(y1)
+    println(yre)
+    println(yre1)
   }
 }
 
@@ -67,8 +102,8 @@ object BasicLSTMCell extends SpatialApp with Params {
   // type T = FixPt[TRUE, _32, _32]
   // TODO: seems that the compiler isn't happy about fltpt. Get it back to fixpt with 
   // LUT implementations
-  type T = FltPt[_10, _10]
-  def sigmoid(x: T) = { 1.0 / (1.0 + exp(0.0 - x)) }
+  type T = FixPt[TRUE, _32, _32]
+  // def sigmoid(x: T) = { 1.0 / (1.0 + exp(0.0 - x)) }
 
   @virtualize
   def main() {
@@ -109,10 +144,11 @@ object BasicLSTMCell extends SpatialApp with Params {
 
           Foreach(dn by 1, dd by 1) { (ii, jj) =>
             // TODO: multiply add... can I replace this with shift add?
+            val nD2 = j + jj
             val prod = Reduce(Reg[T])(ddco by 1) { kk => 
               tileA(ii, kk) * tileB(kk, jj)
             } {_+_}
-            val prev = mux(k == 0, tileBias(j + jj), tileC(ii, jj))
+            val prev = mux(k == 0, tileBias(nD2), tileC(ii, jj))
             // val ele = prev + prod.value
             // if (k == PP - ddco) {
             //   if (nD2 < splitSize || nD2 > splitSize * 3)
