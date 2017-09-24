@@ -43,6 +43,7 @@ trait Activations extends SpatialApp {
   }
 
 
+  // TODO: try this number: 0.15623885683914221 seems fail pretty badly... Fix it!
   def tanh_(p: aT) = {
     val halfTanhLUT = LUT.fromFile[aT](lutN)(tanhF)
     val index = (abs(p).to[iT] << spacingShiftBits).to[Index]
