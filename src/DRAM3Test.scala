@@ -151,7 +151,7 @@ object BasicLSTMCell extends SpatialApp with Params with Activations {
             val prev = mux(k == 0, tileBias(nD2), tileC(ii, jj))
             val ele = prev + prod.value
             if (k == PP - ddco) {
-              if (nD2 < splitSize || nD2 > splitSize * 3)
+              if (nD2 < splitSize || nD2 >= splitSize * 3)
                 tileC(ii, jj) = sigmoid_(ele)
               else if (splitSize <= nD2 && nD2 < splitSize * 2)
                 tileC(ii, jj) = tanh_(ele)
