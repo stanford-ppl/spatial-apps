@@ -18,19 +18,21 @@ trait Params extends SpatialApp {
 }
 
 
+// TODO: where to put these activation functions seem to be a big pain too...
 trait Activations extends SpatialApp {
-  type aT = FixPt[TRUE, _1, _32]
-  type iT = FixPt[TRUE, _7, _10]
+  type aT = FixPt[TRUE, _32, _32]
+  type iT = FixPt[TRUE, _32, _32]
   val projectDir = "/home/tianzhao/spatial-lang/apps/src/"
   val lo = 16
-  val spacingShiftBits = 6 // shift down
-  val lutN = 1024
-  val sigF = projectDir + "sigmoid_1024_16_-6.0.csv"
-  val tanhF = projectDir + "tanh_1024_16_-6.0.csv"
+  val spacingShiftBits = 5 // shift down
+  val lutN = 512
+  val sigF = projectDir + "sigmoid_512_16_-5.0.csv"
+  val tanhF = projectDir + "tanh_512_16_-5.0.csv"
   // val tanhDir = projectDir + "512_tanhLUT.csv"
 
 
   // TODO: it seems fair to save the LUT space by utilizing the symmetry of sigmoid and tanh
+  // TODO: we may not need that many bits for sigmoid and tanh. Need to reduce these.
   def sigmoid_(p: aT) = {
     val halfSigLUT = LUT.fromFile[aT](lutN)(sigF)
     val index = (abs(p).to[iT] << spacingShiftBits).to[Index]
@@ -52,7 +54,8 @@ trait Activations extends SpatialApp {
 }
 
 object ActivationTests extends Activations {
-  type T = FixPt[TRUE, _1, _32]
+  // TODO: In the real application, the integer bits shouldn't be more than 1.
+  type T = FixPt[TRUE, _32, _32]
   @virtualize
   def main() {
     val x = ArgIn[T]
@@ -98,12 +101,8 @@ object ActivationTests extends Activations {
 //                                +-----------------+
 
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
-object BasicLSTMCell extends SpatialApp with Params {
-  // type T = FixPt[TRUE, _32, _32]
-  // TODO: seems that the compiler isn't happy about fltpt. Get it back to fixpt with 
-  // LUT implementations
+object BasicLSTMCell extends SpatialApp with Params with Activations {
   type T = FixPt[TRUE, _32, _32]
-  // def sigmoid(x: T) = { 1.0 / (1.0 + exp(0.0 - x)) }
 
   @virtualize
   def main() {
@@ -144,22 +143,22 @@ object BasicLSTMCell extends SpatialApp with Params {
 
           Foreach(dn by 1, dd by 1) { (ii, jj) =>
             // TODO: multiply add... can I replace this with shift add?
+            // TODO: check the paper from bengio. pow2 shift add on matmult
             val nD2 = j + jj
             val prod = Reduce(Reg[T])(ddco by 1) { kk => 
               tileA(ii, kk) * tileB(kk, jj)
             } {_+_}
             val prev = mux(k == 0, tileBias(nD2), tileC(ii, jj))
-            // val ele = prev + prod.value
-            // if (k == PP - ddco) {
-            //   if (nD2 < splitSize || nD2 > splitSize * 3)
-            //     tileC(ii, jj) = sigmoid(ele)
-            //   else if (splitSize <= nD2 && nD2 < splitSize * 2)
-            //     tileC(ii, jj) = tanh(ele)
-            //   else
-            //     tileC(ii, jj) = sigmoid(ele + forgetBias)
-            // } else
-            // tileC(ii,jj) = ele
-            tileC(ii, jj) = prev + prod.value
+            val ele = prev + prod.value
+            if (k == PP - ddco) {
+              if (nD2 < splitSize || nD2 > splitSize * 3)
+                tileC(ii, jj) = sigmoid_(ele)
+              else if (splitSize <= nD2 && nD2 < splitSize * 2)
+                tileC(ii, jj) = tanh_(ele)
+              else
+                tileC(ii, jj) = sigmoid_(ele + forgetBias)
+            } else
+              tileC(ii,jj) = ele
           }
         }
 

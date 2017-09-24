@@ -19,14 +19,14 @@ def gen_fn(hi, totalSize, fn, fnF):
     return result
 
 
-# halfSigLUT = gen_fn(16, 1024, sigmoid, 'sigmoid_') # this should cover 1024 points though we ask for 512
+halfSigLUT = gen_fn(16, 512, sigmoid, 'sigmoid_') # this should cover 1024 points though we ask for 512
 # tval = 6.3125
 # looked_up_result = 1 - LUT[abs(tval) * 2**6]
 # looked_up_result = halfSigLUT[abs(tval) * 2**6]
 # print(looked_up_result, sigmoid(tval))
 
 # tanh
-halfTanhLUT = gen_fn(16, 1024, np.tanh, 'tanh')
+halfTanhLUT = gen_fn(16, 512, np.tanh, 'tanh')
 tval = -6.3125
-looked_up_result = -halfTanhLUT[abs(tval) * 2**6]
+looked_up_result = -halfTanhLUT[abs(tval) * 2**5]
 print(looked_up_result, np.tanh(tval))
