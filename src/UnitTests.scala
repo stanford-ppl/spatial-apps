@@ -1,5 +1,6 @@
 import spatial.dsl._
 import org.virtualized._
+import spatial.stdlib._
 
 object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
   @virtualize
@@ -55,6 +56,46 @@ object ExplicitIITest extends SpatialApp {
         x(i) = (x(i) * 32) / y.value
       }
     }
+  }
+}
+
+object FriendlyTest extends SpatialApp {
+  @virtualize def main(): Unit = {
+    val y = ArgIn[Int]
+    val z = ArgOut[Int]
+    y := 3
+    Accel {
+      setArg(z, getArg(y) + 2)
+    }
+    println("z: " + z.value)
+  }
+}
+
+object InlineSwitchTest extends SpatialApp {
+  @virtualize def main(): Unit = {
+    val y = ArgIn[Int]
+    val x = ArgOut[Int]
+    y := args(0).to[Int]
+    Accel {
+      val z = if (y == 3.to[Int]) 0 else if (y == 5.to[Int]) 1 else if (y == 7.to[Int]) 2 else 3
+      x := z
+    }
+    println(getArg(x))
+  }
+}
+
+object ModRewriteTest extends SpatialApp {
+  @virtualize def main(): Unit = {
+    val y = ArgIn[Int]
+    val o = ArgOut[Int]
+
+    setArg(y, 14)
+
+    Accel {
+      o := y % 8
+    }
+
+    println(getArg(o))
   }
 }
 
@@ -333,20 +374,24 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
   @virtualize 
   def main(): Unit = { 
     val cst1 = 32
-    val cst2 = 23
+    val cst2 = 23;
     val cst3 = 11
     val cst4 = 7
     val io1 = HostIO[Int]
     val io2 = HostIO[Int]
+    val io_unused = HostIO[Int]
     val x1 = ArgIn[Int]
     val x2 = ArgIn[Int]
+    val x_unused = ArgIn[Int]
     val y1 = ArgOut[Int]
     val y2 = ArgOut[Int]
     val y3 = ArgOut[Int]
     val y4 = ArgOut[Int]
     val y5 = ArgOut[Int]
+    val y_unused = ArgOut[Int]
     val m1 = DRAM[Int](16)
     val m2 = DRAM[Int](16)
+    val m_unused = DRAM[Int](16)
     setArg(io1, cst1)
     setArg(io2, cst2)
     setArg(x1, cst3)
@@ -980,10 +1025,137 @@ object UnalignedFifoLoad extends SpatialApp { // Regression (Unit) // Args: 400
   }
 }
 
+// object StridedConv extends SpatialApp { // DISABLED Regression (Unit) // Args: 192
+
+  
+//   val maxcols = 64
+//   val stride = 2
+//   val kernel = 3
+
+//   @virtualize
+//   def main() = {
+//     val rows = args(0).to[Int]
+//     val M = ArgIn[Int]
+//     val N = ArgIn[Int]
+//     val Md2 = ArgIn[Int]
+//     val Nd2 = ArgIn[Int]
+//     setArg(M, rows)
+//     setArg(N, maxcols)
+//     setArg(Md2, rows/2)
+//     setArg(Nd2, maxcols/2)
+
+//     val src = (0::rows,0::maxcols){(i,j) => i + j}
+//     val dram1 = DRAM[Int](M,N)
+//     val dram2 = DRAM[Int](Md2,Nd2)
+
+//     setMem(dram1, src)
+
+//     Accel {
+//       val lb = LineBuffer.strided[Int](kernel, maxcols, stride) // Can't it figure this out from the access?
+//       val sr = RegFile[Int](kernel, kernel)
+//       val filter = LUT[Int](kernel, kernel)(1,0,1,
+//                                             2,1,2,
+//                                             1,0,1)
+//       val buffer = SRAM[Int](maxcols)
+//       Foreach(M by stride){line => 
+//         lb load dram1(line, 0::N par 4)
+//         Foreach(N by stride){j => 
+//           Foreach(kernel by 1 par kernel){i => sr(i,*) <<= lb(i,j::j+stride)}
+//           val accum = Reduce(Reg[Int](0))(kernel by 1, kernel by 1){(ii,jj) => 
+//             sr(ii,jj) * filter(ii,jj)
+//           }{_+_}
+//           buffer(j/2) = if (j < kernel || line < kernel) 0 else accum.value
+//         }
+//         dram2(line/2, 0::Nd2) store buffer
+//       }
+//     }
+
+//     val result = getMatrix(dram2)
+//     printMatrix(result, "Result: ")
+
+//     val gold = (0::rows/2, 0::maxcols/2){(i,j) => 
+//       if (i*2 < kernel || j*2 < kernel) 0 else 1 // TODO
+//     }
+
+//     val cksum = result.zip(gold){_==_}.reduce{_&&_}
+//     println("PASS: " + cksum + " (StridedConv)")
+//   }
+
+// }
+
+object CompactingFifo extends SpatialApp { // Regression (Unit) // Args: 640
+  val tileSize = 64
+
+  @virtualize
+  def main() {
+    val arraySize = args(0).to[Int]
+
+    val bitmask = Array.tabulate(arraySize) { i => random[Int](2)}
+    printArray(bitmask, "Bitmask: ")
+
+    val P1 = 4 (16 -> 16)
+
+    val N = ArgIn[Int]
+    setArg(N, arraySize)
+
+    val bitmaskDRAM = DRAM[Int](N)
+    setMem(bitmaskDRAM, bitmask)
+    val out = DRAM[Int](N)
+
+    Accel{
+      Sequential.Foreach(N by tileSize){ i => 
+        val bitmasks = SRAM[Int](tileSize)
+        val fifo = FIFO[Int](tileSize)
+        bitmasks load bitmaskDRAM(i :: i + tileSize)
+
+        // Load while respecting bitmask
+        Foreach(tileSize by 1 par P1){ j => 
+          fifo.enq(i+j, bitmasks(j) == 1)
+        }
+
+        // Fill remainder with 0s
+        FSM[Int](filler => filler != 1){filler => 
+          if (!fifo.full) {
+            Pipe{fifo.enq(-1)}
+          }
+        }{ filler => mux(fifo.full, 1, 0)}
+
+        // Store back
+        out(i :: i + tileSize par 2) store fifo
+      }
+    }
+
+    val result = getMem(out)
+
+    val gold = Array.empty[Int](arraySize)
+    var head = 0
+    var tail = tileSize-1
+    for (j <- 0 until arraySize by tileSize) {
+      head = 0
+      tail = tileSize-1
+      for (k <- 0 until tileSize) {
+        if (bitmask(j+k) == 1){
+          gold(j+head) = j+k
+          head = head + 1
+        } else {
+          gold(j+tail) = -1
+          tail = tail - 1
+        }
+      }
+    }
+    printArray(gold, "gold: ")
+    printArray(result, "got: ")
+
+    val cksum = result.zip(gold){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (CompactingFifo)")
+  }
+}
+
 object ParFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
 
 
   val tileSize = 64
+  @virtualize
   def parFifoLoad[T:Type:Num](src1: Array[T], src2: Array[T], src3: Array[T], in: Int) = {
 
     val P1 = 1 (16 -> 16)
@@ -2930,4 +3102,630 @@ object OldSimpleFold extends SpatialApp {
     assert(cksum)
   }
 }
+
+object BasicBLAS extends SpatialApp { // Regression (Dense) // Args: 0.2 0.8 64 128 96
+
+  // DSE Parameters
+  val tileSize  = 16 (16 -> 16 -> 1024)
+  val outer_par = 1 (1 -> 1 -> 32)
+  val inner_par = 1 (1 -> 1 -> 16)
+  val load_par  = 8 (1 -> 1 -> 16)
+  val store_par = 8 (1 -> 1 -> 16)
+
+  // gemm and gemmv specific
+  val tileSizeN    = 16 (16 -> 16 -> 1024)
+  val tileSizeM    = 16 (16 -> 16 -> 1024)
+  val tileSizeK    = 16 (16 -> 16 -> 1024)
+  val m_inner_par  = 1 (1 -> 1 -> 8)
+  val n_inner_par  = 1 (1 -> 1 -> 8)
+  val k_inner_par  = 1 (1 -> 1 -> 8)
+  val m_outer_par  = 1 (1 -> 1 -> 8)
+  val n_outer_par  = 1 (1 -> 1 -> 8)
+  val k_outer_par  = 1 (1 -> 1 -> 8)
+  val c_reduce_par = 1 (1 -> 1 -> 8)
+  val y_reduce_par = 1 (1 -> 1 -> 8)
+
+  @virtualize
+  def Dot[T:Type:Num](N: Reg[Int], 
+                      X: DRAM1[T], incX: Int,
+                      Y: DRAM1[T], incY: Int,
+                      res: Reg[T]): Unit = {
+    // Loop over whole vectors
+    val outer_res = Reduce(Reg[T])(N.value by tileSize par outer_par){i => 
+      // Compute elements left in this tile
+      val elements = min(tileSize, N.value - i)
+      // Create onchip structures
+      val x_tile = SRAM[T](tileSize)
+      val y_tile = SRAM[T](tileSize)
+      // Load local tiles
+      x_tile load X(i::i+elements par load_par)
+      y_tile load Y(i::i+elements par load_par)
+      // Loop over elements in local tiles
+      val inner_res = Reduce(Reg[T])(elements by 1 par inner_par){j => 
+        x_tile(j) * y_tile(j)
+      }{_+_}
+      inner_res
+    }{_+_}
+    res := outer_res
+
+  }
+
+  @virtualize
+  def Axpy[T:Type:Num](N: Reg[Int], alpha: T, 
+                       X: DRAM1[T], incX: Int,
+                       Y: DRAM1[T], incY: Int,
+                       res: DRAM1[T]): Unit = {
+    // Loop over whole vectors
+    Foreach(N.value by tileSize par outer_par){i => 
+      // Compute elements left in this tile
+      val elements = min(tileSize, N.value - i)
+      // Create onchip structures
+      val x_tile = SRAM[T](tileSize)
+      val y_tile = SRAM[T](tileSize)
+      val z_tile = SRAM[T](tileSize)
+      // Load local tiles
+      x_tile load X(i::i+elements par load_par)
+      y_tile load Y(i::i+elements par load_par)
+      // Loop over elements in local tiles
+      Foreach(elements by 1 par inner_par){j => 
+        z_tile(j) = alpha * x_tile(j) + y_tile(j)
+      }
+      // Store tile to DRAM
+      res(i::i+elements par store_par) store z_tile
+    }
+  }
+
+  @virtualize
+  def Gemm[T:Type:Num](M: Reg[Int], N: Reg[Int], K: Reg[Int],
+                       alpha: T, 
+                       A: DRAM2[T], lda: Int,
+                       B: DRAM2[T], ldb: Int,
+                       beta: T,
+                       C: DRAM2[T], ldc: Int): Unit = {
+    Foreach(M.value by tileSizeM par m_outer_par){i =>
+      // Compute leftover dim
+      val elements_m = min(tileSizeM, M.value - i)
+      Foreach(N.value by tileSizeN par n_outer_par){j =>
+        // Compute leftover dim
+        val elements_n = min(tileSizeN, N.value - j)
+        // Create C tile for accumulating
+        val c_tile = SRAM[T](tileSizeM, tileSizeN)
+        MemReduce(c_tile par c_reduce_par)(K.value by tileSizeK par k_outer_par){l =>
+          // Create local C tile
+          val c_tile_local = SRAM[T](tileSizeM, tileSizeN)
+          // Compute leftover dim
+          val elements_k = min(tileSizeK, K.value - l)
+          // Generate A and B tiles
+          val a_tile = SRAM[T](tileSizeM, tileSizeK)
+          val b_tile = SRAM[T](tileSizeK, tileSizeN)
+          // Transfer tiles to sram
+          Parallel{
+            a_tile load A(i::i+elements_m, l::l+elements_k par load_par) 
+            b_tile load B(l::l+elements_k, j::j+elements_n par load_par) 
+          }
+          Foreach(elements_m by 1 par m_inner_par){ii => 
+            Foreach(elements_n by 1 par n_inner_par){jj => 
+              c_tile_local(ii,jj) = Reduce(Reg[T])(elements_k by 1 par k_inner_par){ll => 
+                a_tile(ii,ll) * b_tile(ll,jj)
+              }{_+_}
+            }
+          }
+          c_tile_local
+        }{_+_}
+        C(i::i+elements_m, j::j+elements_n par store_par) store c_tile
+      }
+    }
+  }
+
+  @virtualize
+  def Gemv[T:Type:Num](M: Reg[Int], N: Reg[Int],
+                       alpha: T, 
+                       A: DRAM2[T], lda: Int,
+                       X: DRAM1[T], incX: Int,
+                       beta: T,
+                       Y: DRAM1[T], incY: Int): Unit = {
+    Foreach(M.value by tileSizeM par m_outer_par){i =>
+      // Compute leftover dim
+      val elements_m = min(tileSizeM, M.value - i)
+      // Create Y tile
+      val y_tile = SRAM[T](tileSizeM)
+      MemReduce(y_tile par y_reduce_par)(N.value by tileSizeN par n_outer_par){j =>
+        // Compute leftover dim
+        val elements_n = min(tileSizeN, N.value - j)
+        // Create local Y tile for accumulating
+        val y_tile_local = SRAM[T](tileSizeM)
+        // Create X tile
+        val x_tile = SRAM[T](tileSizeN)
+        // Load vector tile
+        x_tile load X(j::j+elements_n par load_par)
+        // Create A tile
+        val a_tile = SRAM[T](tileSizeM, tileSizeN)
+        // Load matrix tile
+        a_tile load A(i::i+elements_m, j::j+elements_n par load_par)
+        Foreach(elements_m by 1 par m_inner_par){ii => 
+          y_tile_local(ii) = Reduce(Reg[T])(elements_n by 1 par n_inner_par){jj => 
+            a_tile(ii,jj) * x_tile(jj)
+          }{_+_}
+        }
+        y_tile_local
+      }{_+_}
+      Y(i::i+elements_m par store_par) store y_tile
+    }
+  }
+
+  @virtualize
+  def Ger[T:Type:Num](M: Reg[Int], N: Reg[Int],
+                       alpha: T, 
+                       X: DRAM1[T], incX: Int,
+                       Y: DRAM1[T], incY: Int,
+                       A: DRAM2[T], lda: Int): Unit = {
+    Foreach(M.value by tileSizeM par m_outer_par){i =>
+      // Compute leftover dim
+      val elements_m = min(tileSizeM, M.value - i)
+      // Create X tile
+      val x_tile = SRAM[T](tileSizeM)
+      // Load x data into tile
+      x_tile load X(i::i+elements_m)
+      Foreach(N.value by tileSizeN par n_outer_par){j => 
+        // Compute leftover dim
+        val elements_n = min(tileSizeN, N.value - j)
+        // Create Y and A tiles
+        val y_tile = SRAM[T](tileSizeN)
+        val a_tile = SRAM[T](tileSizeM, tileSizeN)
+        // Load x data into tile
+        y_tile load Y(j::j+elements_n)
+        Foreach(elements_m by 1 par m_inner_par){ii =>
+          Foreach(elements_n by 1 par n_inner_par){jj =>
+            a_tile(ii,jj) = x_tile(ii) * y_tile(jj)
+          }
+        }
+        A(i::i+elements_m, j::j+elements_n par store_par) store a_tile
+      }
+    }
+  }
+
+  @virtualize
+  def Scal[T:Type:Num](N: Reg[Int], alpha: T, 
+                       X: DRAM1[T], incX: Int,
+                       Y: DRAM1[T]): Unit = {
+    // Loop over whole vectors
+    Foreach(N.value by tileSize par outer_par){i => 
+      // Compute elements left in this tile
+      val elements = min(tileSize, N.value - i)
+      // Create onchip structures
+      val x_tile = SRAM[T](tileSize)
+      val y_tile = SRAM[T](tileSize)
+      // Load local tiles
+      x_tile load X(i::i+elements par load_par)
+      // Loop over elements in local tiles
+      Foreach(elements by 1 par inner_par){j => 
+        y_tile(j) = alpha * x_tile(j)
+      }
+      // Store tile to DRAM
+      Y(i::i+elements par store_par) store y_tile
+    }
+  }
+
+  @virtualize
+  def Axpby[T:Type:Num](N: Reg[Int],
+                       alpha: T, 
+                       X: DRAM1[T], incX: Int,
+                       beta: T,
+                       Y: DRAM1[T], incY: Int,
+                       Z: DRAM1[T]): Unit = {
+    Scal[T](N, beta, Y, incY, Z)
+    Axpy[T](N, alpha, X, incX, Z, incY, Z)
+  }
+
+  type T = FixPt[TRUE,_16,_16]
+
+  @virtualize
+  def main() {
+
+    // cmd-line args (i.e.- "20 0.5 0.5 64 64 64")
+    val alpha  = args(0).to[T]
+    val beta   = args(1).to[T]
+    val dim_M = args(2).to[Int]
+    val dim_N = args(3).to[Int]
+    val dim_K = args(4).to[Int]
+
+    // Create random data structures
+    val X_data = Array.tabulate(dim_N){i => random[T](3)}
+    val ger_X_data = Array.tabulate(dim_M){i => random[T](3)}
+    val Y_data = Array.tabulate(dim_N){i => random[T](3)}
+    val matrix_A = (0::dim_M,0::dim_K){(i,j) => random[T](3)}
+    val matrix_B = (0::dim_K,0::dim_N){(i,j) => random[T](3)}
+    val init_matrix_C = (0::dim_M,0::dim_N){(i,j) => 0.to[T]}
+    val gemv_X_data = Array.tabulate(dim_K){i => random[T](3)}
+    val init_vec_Y = Array.tabulate(dim_M){i => 0.to[T]}
+
+    // Offchip structures
+    val a = ArgIn[T]
+    val b = ArgIn[T]
+    val dot = ArgOut[T]
+    val KK = ArgIn[Int]
+    val NN = ArgIn[Int]
+    val MM = ArgIn[Int]
+    setArg(a, alpha)
+    setArg(b, beta)
+    setArg(MM, dim_M)
+    setArg(NN, dim_N)
+    setArg(KK, dim_K)
+    val X = DRAM[T](NN)
+    val ger_X = DRAM[T](MM)
+    val Y = DRAM[T](NN)
+    val axpby_Z = DRAM[T](NN)
+    val A = DRAM[T](MM,KK)
+    val B = DRAM[T](KK,NN)
+    val C = DRAM[T](MM,NN)
+    val gemv_X = DRAM[T](KK)
+    val gemv_Y = DRAM[T](MM)
+    val ger_A = DRAM[T](MM,NN)
+    val scal_Y = DRAM[T](NN)
+    val axpy = DRAM[T](NN)
+    setMem(X, X_data)
+    setMem(ger_X, ger_X_data)
+    setMem(Y, Y_data)
+    setMem(A, matrix_A)
+    setMem(B, matrix_B)
+    setMem(C, init_matrix_C)
+    setMem(gemv_X, gemv_X_data)
+    setMem(gemv_Y, init_vec_Y)
+
+    // Run Accel functions
+    Accel{
+      // Use defs from spatial's stdlib
+      BLAS.Dot[T](NN, X, 1, Y, 1, dot)
+      BLAS.Axpy[T](NN, a, X, 1, Y, 1, axpy)
+      BLAS.Gemm[T](MM, NN, KK, a, A, A.cols, B, B.cols, b, C, C.cols)
+      BLAS.Gemv[T](MM, KK, a, A, A.cols, gemv_X, 1, b, gemv_Y, 1)
+      BLAS.Ger[T](MM, NN, a, ger_X, 1, Y, 1, ger_A, ger_A.cols)
+      BLAS.Scal[T](NN, a, X, 1, scal_Y)
+      BLAS.Axpby[T](NN, a, X, 1, b, Y, 1, axpby_Z)
+
+      // // Use defs in the app
+      // Dot[T](NN, X, 1, Y, 1, dot)
+      // Axpy[T](NN, a, X, 1, Y, 1, axpy)
+      // Gemm[T](MM, NN, KK, a, A, A.cols, B, B.cols, b, C, C.cols)
+      // Gemv[T](MM, KK, a, A, A.cols, gemv_X, 1, b, gemv_Y, 1)
+      // Ger[T](MM, NN, a, ger_X, 1, Y, 1, ger_A, ger_A.cols)
+      // Scal[T](NN, a, X, 1, scal_Y)
+      // Axpby[T](NN, a, X, 1, b, Y, 1, axpby_Z)
+    }
+
+    // Get results
+    val dot_res = getArg(dot)
+    val axpy_res = getMem(axpy)
+    val gemm_res = getMatrix(C)
+    val gemv_res = getMem(gemv_Y)
+    val ger_res = getMatrix(ger_A)
+    val scal_res = getMem(scal_Y)
+    val axpby_res = getMem(axpby_Z)
+
+    // Compute Golds
+    val dot_gold = X_data.zip(Y_data){_*_}.reduce{_+_}
+    val axpy_gold = X_data.zip(Y_data){case (x,y) => alpha*x+y}
+    val gemm_gold = (0::dim_M,0::dim_N){(i,j) => 
+      Array.tabulate(dim_K){l => matrix_A(i,l)*matrix_B(l,j)}.reduce{_+_}
+    }
+    val gemv_gold = Array.tabulate(dim_M){i => 
+      Array.tabulate(dim_K){l => matrix_A(i,l)*gemv_X_data(l)}.reduce{_+_}
+    }
+    val ger_gold = (0::dim_M, 0::dim_N){(i,j) => ger_X_data(i)*Y_data(j)}
+    val scal_gold = X_data.map{_*alpha}
+    val axpby_gold = X_data.zip(Y_data){case (x,y) => alpha*x+beta*y}
+
+    // Collect cksums
+    val margin = 0.25.to[T]
+    val dot_cksum = abs(dot_res - dot_gold) < margin
+    val axpy_cksum = axpy_res.zip(axpy_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val gemm_cksum = gemm_res.zip(gemm_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val gemv_cksum = gemv_res.zip(gemv_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val ger_cksum = ger_res.zip(ger_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val scal_cksum = scal_res.zip(scal_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val axpby_cksum = axpby_res.zip(axpby_gold){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    val cksum = dot_cksum && axpy_cksum && gemm_cksum && gemv_cksum && ger_cksum && scal_cksum && axpby_cksum
+
+    // Print results
+    println("Dot Result:")
+    println("  " + dot_res + " =?= " + dot_gold)
+    println("Axpy Result:")
+    printArray(axpy_res, "  Got")
+    printArray(axpy_gold, "  Wanted")
+    println("Gemm Result:")
+    printMatrix(gemm_res, "  Got")
+    printMatrix(gemm_gold, "  Wanted")
+    println("Gemv Result:")
+    printArray(gemv_res, "  Got")
+    printArray(gemv_gold, "  Wanted")
+    println("Ger Result:")
+    printMatrix(ger_res, "  Got")
+    printMatrix(ger_gold, "  Wanted")
+    println("Scal Result:")
+    printArray(scal_res, "  Got")
+    printArray(scal_gold, "  Wanted")
+    println("Axpby Result:")
+    printArray(axpby_res, "  Got")
+    printArray(axpby_gold, "  Wanted")
+    println("  cksum: " + dot_cksum + " (Dot)")
+    println("  cksum: " + axpy_cksum + " (Axpy)")
+    println("  cksum: " + gemm_cksum + " (Gemm)")
+    println("  cksum: " + gemv_cksum + " (Gemv)")
+    println("  cksum: " + ger_cksum + " (Ger)")
+    println("  cksum: " + scal_cksum + " (Scal)")
+    println("  cksum: " + axpby_cksum + " (Axpby)")
+
+    println("PASS: " + cksum + " (BasicBLAS)")
+
+  }
+}
+
+object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
+
+  // DSE Parameters
+  val coltile = 32 // (16 -> 16 -> 1280)
+
+  @virtualize
+  def ConvolutionSlide[T:Type:Num](output: DRAM2[T], 
+                      input: DRAM2[T],
+                      filter: LUT2[T],
+                      colstride: scala.Int, rowstride: scala.Int): Unit = {
+
+    val lb = LineBuffer.strided[T](filter.rows, coltile, rowstride)
+    val sr = RegFile[T](filter.rows, filter.cols)
+    val lineout = SRAM[T](coltile/colstride)
+    Foreach(input.rows by rowstride){row =>
+      lb load input(row, 0::input.cols) // TODO: load with correct rowstride
+      Foreach(input.cols by colstride){j => 
+        Foreach(filter.rows by 1 par filter.rows){i => sr(i,*) <<= lb(i,j::j+colstride)}
+        lineout(j/colstride) = Reduce(Reg[T](0.to[T]))(filter.rows by 1, filter.cols by 1){(ii,jj) => 
+          val img = if ((row.to[Int]+rowstride-1) - (filter.rows - 1 - ii.to[Int]) < 0 || (j.to[Int]+colstride-1) - (filter.cols - 1 - jj.to[Int]) < 0) 0.to[T] else sr(ii,filter.cols - 1 - jj)
+          img * filter(ii,jj)
+        }{_+_}
+        // lineout(j/colstride) = mux(row + (rowstride-1) < filter.rows.to[Int]-1 || j + (colstride-1) < filter.cols.to[Int]-1, 0.to[T], Reduce(Reg[T](0.to[T]))(filter.rows by 1, filter.cols by 1){(ii,jj) => sr(ii,jj) * filter(ii,jj)}{_+_}.value)
+      }
+      output(row/rowstride, 0::output.cols) store lineout
+    }
+  }
+
+
+  // gemm and gemmv specific
+  val tileSizeN    = 16 (16 -> 16 -> 1024)
+  val tileSizeM    = 16 (16 -> 16 -> 1024)
+  val tileSizeK    = 16 (16 -> 16 -> 1024)
+  val m_inner_par  = 1 (1 -> 1 -> 8)
+  val n_inner_par  = 1 (1 -> 1 -> 8)
+  val k_inner_par  = 1 (1 -> 1 -> 8)
+  val m_outer_par  = 1 (1 -> 1 -> 8)
+  val n_outer_par  = 1 (1 -> 1 -> 8)
+  val k_outer_par  = 1 (1 -> 1 -> 8)
+  val c_reduce_par = 1 (1 -> 1 -> 8)
+  val y_reduce_par = 1 (1 -> 1 -> 8)
+  val store_par = 1 (1 -> 1 -> 16)
+  val load_par = 1 (1 -> 1 -> 16)
+
+  @virtualize
+  def ConvolutionGEMM[T:Type:Num](output: DRAM1[T], 
+                      input: DRAM1[T],
+                      filter: DRAM2[T]): Unit = {    
+    Foreach(filter.rows by tileSizeM par m_outer_par){i =>
+      // Compute leftover dim
+      val elements_m = min(tileSizeM, filter.rows - i)
+      // Create Y tile
+      val y_tile = SRAM[T](tileSizeM)
+      MemReduce(y_tile par y_reduce_par)(filter.cols by tileSizeN par n_outer_par){j =>
+        // Compute leftover dim
+        val elements_n = min(tileSizeN, filter.cols - j)
+        // Create local Y tile for accumulating
+        val y_tile_local = SRAM[T](tileSizeM)
+        // Create X tile
+        val x_tile = SRAM[T](tileSizeN)
+        // Load vector tile
+        x_tile load input(j::j+elements_n par load_par)
+        // Create A tile
+        val a_tile = SRAM[T](tileSizeM, tileSizeN)
+        // Load matrix tile
+        a_tile load filter(i::i+elements_m, j::j+elements_n par load_par)
+        Foreach(elements_m by 1 par m_inner_par){ii => 
+          y_tile_local(ii) = Reduce(Reg[T])(elements_n by 1 par n_inner_par){jj => 
+            a_tile(ii,jj) * x_tile(jj)
+          }{_+_}
+        }
+        y_tile_local
+      }{_+_}
+      output(i::i+elements_m par store_par) store y_tile
+    }
+}
+
+  type T = FixPt[TRUE,_16,_16]
+
+  @virtualize
+  def main() {
+
+    // Setup strides
+    val row_stride1 = 1
+    val col_stride1 = 1
+    val row_stride2 = 2
+    val col_stride2 = 2
+    val row_stride3 = 1
+    val col_stride3 = 1
+    val row_stride4 = 1
+    val col_stride4 = 2
+
+    // cmd-line args (i.e.- "20 0.5 0.5 64 64 64")
+    val in_rows = args(0).to[Int]
+
+    // Create random data structures
+    val data1 = (0::in_rows,0::coltile){(i,j) => random[T](2)}
+    val filter1 = Array[T](1,2,1,0,0,0,-1,-2,-1)
+
+    // Create toeplitz for filter and padded image
+    val data3 = (0::in_rows + 2, 0::coltile+2){(i,j) => if (i < 2 || j < 2) 0 else data1( i-2, j-2 )}.flatten
+    val filter3_tplz = filter1.toeplitz(3,3,in_rows,coltile, row_stride3, col_stride3)
+    println("Expanded filter is " + filter3_tplz.rows + " x " + filter3_tplz.cols)
+    println("Padded data is " + data3.length + " elements long")
+    val filter4_tplz = filter1.toeplitz(3,3,in_rows,coltile, row_stride4, col_stride4)
+
+    // Show inputs
+    printMatrix(data1, "Img1")
+    printArray(data3, "Flattened padded img")
+    printMatrix(filter3_tplz, "Toeplitz Filter")
+    printMatrix(filter4_tplz, "Toeplitz Filter, colstride=2")
+
+    // ArgIns
+    val M = ArgIn[Int]
+    val N = ArgIn[Int]
+    val Mds1 = ArgIn[Int]
+    val Nds1 = ArgIn[Int]
+    val Mds2 = ArgIn[Int]
+    val Nds2 = ArgIn[Int]
+    val Len3 = ArgIn[Int]
+    val OutLen3 = ArgIn[Int]
+    val Mds3 = ArgIn[Int]
+    val Nds3 = ArgIn[Int]
+    val Mds4 = ArgIn[Int]
+    val Nds4 = ArgIn[Int]
+    val OutLen4 = ArgIn[Int]
+    setArg(M, in_rows)
+    setArg(N, coltile)
+    setArg(Mds1, in_rows / row_stride1)
+    setArg(Nds1, coltile / col_stride1)
+    setArg(Mds2, in_rows / row_stride2)
+    setArg(Nds2, coltile / col_stride2)
+    setArg(Len3, (coltile+2) / col_stride3 * (in_rows+2) / row_stride3)
+    setArg(OutLen3, filter3_tplz.rows)
+    setArg(OutLen4, filter4_tplz.rows)
+    setArg(Mds3, filter3_tplz.rows)
+    setArg(Nds3, filter3_tplz.cols)
+    setArg(Mds4, filter4_tplz.rows)
+    setArg(Nds4, filter4_tplz.cols)
+
+    // Offchip structures
+    val image = DRAM[T](M, N)
+    val flatimg = DRAM[T](Len3)
+    val dram1 = DRAM[T](Mds1, Nds1)
+    val dram2 = DRAM[T](Mds2, Nds2)
+    val dram3 = DRAM[T](OutLen3)
+    val dram4 = DRAM[T](OutLen4)
+    val filter3 = DRAM[T](Mds3, Nds3)
+    val filter4 = DRAM[T](Mds4, Nds4)
+
+    setMem(image, data1)
+    setMem(flatimg, data3)
+    setMem(filter3, filter3_tplz)
+    setMem(filter4, filter4_tplz)
+
+    // Run Accel functions
+    Accel{
+      val filter = LUT[T](3,3)(1,  2,  1,
+                               0,  0,  0,
+                              -1, -2, -1)
+      // Use stdlib defs
+      Convolution.ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1, 16, 16)
+      Convolution.ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2, 16, 16)
+      Convolution.ConvolutionGEMM[T](dram3, flatimg, filter3)
+      Convolution.ConvolutionGEMM[T](dram4, flatimg, filter4)
+
+      // // Use defs in this app
+      // ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1)
+      // ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2)
+      // ConvolutionGEMM[T](dram3, flatimg, filter3)
+      // ConvolutionGEMM[T](dram4, flatimg, filter4)
+    }
+
+    // Get results
+    val res1 = getMatrix(dram1)
+    val res2 = getMatrix(dram2)
+    val res3 = getMem(dram3).reshape(in_rows, coltile)
+    // val res4 = getMem(dram4).reshape(res2.rows, res2.cols)
+
+    // Compute Golds
+    val gold1 = (0::in_rows / row_stride1, 0::coltile / col_stride1){(i,j) => 
+      Array.tabulate(3){ii => Array.tabulate(3){jj => 
+        val img = if (i*row_stride1-ii < 0 || j*col_stride1-jj < 0) 0 else data1(i*row_stride1-ii,j*col_stride1-jj)
+        img * filter1((2-ii)*3+(2-jj))
+      }}.flatten.reduce{_+_}
+    }
+    val gold2 = (0::in_rows / row_stride2, 0::coltile / col_stride2){(i,j) => 
+      Array.tabulate(3){ii => Array.tabulate(3){jj => 
+        val real_i = i*row_stride2-ii+(row_stride2-1)
+        val real_j = j*col_stride2-jj+(col_stride2-1)
+        val img = if (real_i < 0 || real_j < 0) 0 else data1(real_i,real_j)
+        img * filter1((2-ii)*3+(2-jj))
+      }}.flatten.reduce{_+_}
+    }
+    val gold3 = gold1
+    // val gold4 = gold2
+
+    // Collect cksums
+    val margin = 0.25.to[T]
+    val cksum1 = res1.zip(gold1){_==_}.reduce{_&&_}
+    val cksum2 = res2.zip(gold2){_==_}.reduce{_&&_}
+    val cksum3 = res3.zip(gold3){_==_}.reduce{_&&_}
+    // val cksum4 = res4.zip(gold4){_==_}.reduce{_&&_}
+    val cksum = cksum1 && cksum2 && cksum3 //&& cksum4
+
+    // Print results
+    println("Conv1 Result: ")
+    printMatrix(res1, "  Got")
+    printMatrix(gold1, "  Wanted")
+    println("Conv2 Result: ")
+    printMatrix(res2, "  Got")
+    printMatrix(gold2, "  Wanted")
+    println("Conv3 Result: ")
+    printMatrix(res3, "  Got")
+    printMatrix(gold3, "  Wanted")
+    // println("Conv4 Result: ")
+    // printMatrix(res4, "  Got")
+    // printMatrix(gold4, "  Wanted")
+
+    println("  cksum: " + cksum1 + " (Conv1)")
+    println("  cksum: " + cksum2 + " (Conv2)")
+    println("  cksum: " + cksum3 + " (Conv3)")
+    // println("  cksum: " + cksum4 + " (Conv4)")
+
+    println("PASS: " + cksum + " (Convolutions)")
+
+  }
+}
+
+
+object SimpleRowStridedConv extends SpatialApp { // Regression (Dense) // Args: none
+  @virtualize
+  def main(): Unit = {
+    val R = 10
+    val C = 16
+
+    val mat = (0::R,0::C){(i,j) => i }
+
+    val img = DRAM[Int](R, C)
+    val out = DRAM[Int](R/2, C)
+    setMem(img, mat)
+
+    Accel {
+      val lb = LineBuffer.strided[Int](3, C, 2)
+
+      Foreach(R/2 by 1){row =>
+        val line = SRAM[Int](C)
+        lb load img(row*2::row*2+2, 0::C)
+
+        Foreach(C by 1){col =>
+          val conv = Reduce(0)(3 by 1, 3 by 1){(r,c) => if (row - 1 + r < 0) 0 else lb(r, (col + c)%C)}{_+_} / 9
+          line(col) = conv
+        }
+        out(row,0::C) store line
+      }
+    }
+
+    val result = getMatrix(out)
+
+    printMatrix(mat, "Input")
+    printMatrix(result, "Result")
+    val gold = (0::R/2, 0::C){(i,j) => 2*i}
+
+    val cksum = result.zip(gold){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (SimpleRowStridedConv)")
+  }
+}
+
 

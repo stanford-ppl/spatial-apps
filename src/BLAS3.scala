@@ -328,48 +328,35 @@ object TRSM extends SpatialApp { // Regression (Dense) // Args: none
     getMem(OCX)
   }
 
-  def printArr(a: Array[T], numel: Int, str: String = "") {
-    println(str)
-    (0 until numel) foreach { i => print(a(i) + " ") }
-    println("")
-  }
-
   @virtualize
   def main() = {
-
-    // val image = (0::R, 0::C){(i,j) => if (j > border && j < C-border && i > border && i < C - border) i*16 else 0}
-
-    val B = Array.fill(full_N) {
-      Array.fill(full_K) { abs(random[T](2)) }
+    val B = (0::full_N, 0::full_K){(i,j) => 
+      abs(random[T](2))
     }
-    val L = Array.tabulate(full_N) { i =>
-      Array.tabulate(full_N) { j =>
-        if (j > i) 0.to[T]
-        else if (j == i) abs(random[T](5)) + 1
-        else if (i - j == 4) 1.to[T] // Just a courtesy to make the validation easier
-        // else if (i - j == 4) 1.to[T]
-        else 0.to[T]
-        // else abs(random[T](2))
-      }
+    val L = (0::full_N, 0::full_N){(i,j) =>
+      if (j > i) 0.to[T]
+      else if (j == i) abs(random[T](5)) + 1
+      else if (i - j == 4) 1.to[T] // Just a courtesy to make the validation easier
+      // else if (i - j == 4) 1.to[T]
+      else 0.to[T]
+      // else abs(random[T](2))
     }
 
     val result = trsm(B.flatten, L.flatten)
 
-    printArr(B.flatten, full_N * full_K, "B: ")
-    printArr(L.flatten, full_N * full_N, "L: ")
-    printArr(result, full_N * full_K, "X: ")
+    printMatrix(B, "B: ")
+    printMatrix(L, "L: ")
+    printMatrix(result.reshape(full_N, full_K), "X: ")
 
     val X_check = Array.tabulate(full_N) { i => Array.tabulate(full_K) { j => result(i * full_K + j) } }
     val L_check = Array.tabulate(full_N) { i =>
       Array.tabulate(full_N) { j =>
-        val row = L(i)
-        row(j)
+        L(i,j)
       }
     }
     val B_check = Array.tabulate(full_N) { i =>
       Array.tabulate(full_K) { j =>
-        val row = B(i)
-        row(j)
+        B(i,j)
       }
     }.flatten
     val B_computed = Array.tabulate(full_N) { i =>
@@ -380,8 +367,8 @@ object TRSM extends SpatialApp { // Regression (Dense) // Args: none
       }
     }.flatten
 
-    printArray(B_check, "Wanted: ")
-    printArray(B_computed, "Computed: ")
+    printMatrix(B_check.reshape(full_N, full_K), "Wanted: ")
+    printMatrix(B_computed.reshape(full_N, full_K), "Computed: ")
     val cksum = B_check.zip(B_computed){ (a,b) => a > b - margin && a < b + margin}.reduce{_&&_}
     println("PASS: " + cksum + " (TRSM)")
   }

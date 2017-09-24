@@ -296,108 +296,6 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
 }
 
 
-object BFS_FSM extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
-  val tileSize = 8000
-
-  @virtualize
-  def bfs(nodesIn: Array[Int], edgesIn: Array[Int], lensIn: Array[Int], idsIn: Array[Int], n: Int, e: Int, average_nodes_per_edge: Int) = {
-    val edges = DRAM[Int](e)
-    val lens = DRAM[Int](n)
-    val ids = DRAM[Int](n)
-    val result = DRAM[Int](n)
-
-    setMem(edges, edgesIn)
-    setMem(lens, lensIn)
-    setMem(ids, idsIn)
-
-    val depth = ArgIn[Int]
-    val d = args(1).to[Int]
-    setArg(depth, d)
-    // val anpe = ArgIn[Int]
-    // setArg(anpe, average_nodes_per_edge)
-
-    Accel {
-      val init = 0
-      val gatherEdgeInfo = 1
-      val denseEdgeLoads = 2
-      val scatterDepths = 3
-      val done = 4
-
-      val layer = Reg[Int](0)
-      val depths = SRAM[Int](tileSize)
-      val frontierStack = FILO[Int](tileSize) // TODO: Eventually allow scatters on stacks
-      val idList = SRAM[Int](tileSize)
-      val lenList = SRAM[Int](tileSize)
-      val frontier = SRAM[Int](tileSize)
-      val size = Reg[Int](1)
-      FSM[Int]{state => state < done}{state =>
-        if (state == init.to[Int]) {
-          frontier(0) = 0.to[Int]
-        } else if (state == gatherEdgeInfo.to[Int]) {
-          // Increment layer
-          layer :+= 1
-          // Collect edge ids and lens
-          idList gather ids(frontier par 1, size.value)
-          lenList gather lens(frontier par 1, size.value)
-        } else if (state == denseEdgeLoads.to[Int]) {
-          // Accumulate frontier
-          Foreach(size.value by 1) {i =>
-            val start = idList(i)
-            val end = lenList(i) + start
-            frontierStack load edges(start::end par 1)
-          }
-        } else if (state == scatterDepths.to[Int]) {
-          // Grab size of this scatter
-          size := frontierStack.numel
-          // Drain stack and set up scatter addrs + depth srams
-          Foreach(frontierStack.numel by 1) { i => 
-            depths(i) = layer.value
-            frontier(i) = frontierStack.pop()
-          }
-          result(frontier, size) scatter depths
-        }
-      }{state => 
-
-        mux(state == init.to[Int], gatherEdgeInfo, 
-          mux(state == gatherEdgeInfo, denseEdgeLoads,
-            mux(state == denseEdgeLoads, scatterDepths, 
-              mux(state == scatterDepths && layer.value < depth, gatherEdgeInfo, done))))
-        }
-
-    }
-
-    getMem(result)
-  }
-
-  @virtualize
-  def main() {
-    /* NEW VERSION FOR PERFORMANCE MEASUREMENTS */
-    val E = 9600000
-    val N = 96000
-    val average_nodes_per_edge = args(0).to[Int]
-    val spacing = 3 
-    val ed = E //args(1).to[SInt] // Set to roughly max_edges_per_node * N 
-
-    val OCnodes = Array.tabulate(N) {i => 0.to[Int]}
-    val OCedges = Array.tabulate(ed){ i => i*2 % N}
-    val OCids = Array.tabulate(N)( i => average_nodes_per_edge*average_nodes_per_edge*i+1 % E)
-    val OCcounts = Array.tabulate(N){ i => random[Int](average_nodes_per_edge-1)*2+1}
-
-    val result = bfs(OCnodes, OCedges, OCcounts, OCids, N, E, average_nodes_per_edge)
-    val gold = 0
-    // println("Cksum: " + gold + " == " + result.reduce{_+_})
-
-    val cksum = gold == result.reduce{_+_}
-    printArray(result, "result: ")
-    println("Cksum = " + result.reduce{_+_})
-    // println("PASS: " + cksum + " (BFS)")
-
-
-
-  }
-
-}
-
 object BlackScholes extends SpatialApp {
 
 
@@ -2121,11 +2019,11 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
   
   Smith-Waterman Genetic Alignment algorithm                                                  
   
-  This is just like NW algorithm, except negative scores are capped at 0, backwards traversal starts at highest score from any 
+  This is just like SW algorithm, except negative scores are capped at 0, backwards traversal starts at highest score from any 
      element on the perimeter, and end when score is 0
 
 
-    [SIC] NW diagram
+    [SIC] SW diagram
     LETTER KEY:         Scores                   Ptrs                                                                                                  
       a = 0                   T  T  C  G                T  T  C  G                                                                                                                          
       c = 1                0 -1 -2 -3 -4 ...         0  ←  ←  ←  ← ...                                                                                                        
@@ -2331,7 +2229,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     // val cksumA = seqa_aligned_string == seqa_gold_string //seqa_aligned_result.zip(seqa_gold_bin){_==_}.reduce{_&&_}
     // val cksumB = seqb_aligned_string == seqb_gold_string //seqb_aligned_result.zip(seqb_gold_bin){_==_}.reduce{_&&_}
     // val cksum = cksumA && cksumB
-    println("PASS: " + cksum + " (NW)")
+    println("PASS: " + cksum + " (SW)")
 
 
 

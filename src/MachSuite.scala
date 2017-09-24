@@ -695,7 +695,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
     val filter_size = 3*3*3
 
     // Setup data
-    val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_data.csv", "\n")
+    val raw_data = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/stencil/stencil3d_data.csv", "\n")
     val data = raw_data.reshape(HEIGHT, COLS, ROWS)
 
     // Setup DRAMs
@@ -757,7 +757,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
 
     // Get results
     val result_data = getTensor3(result_dram)
-    val raw_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/stencil3d_gold.csv", "\n")
+    val raw_gold = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/stencil/stencil3d_gold.csv", "\n")
     val gold = raw_gold.reshape(HEIGHT,COLS,ROWS)
 
     // Printers
@@ -1581,7 +1581,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
        .      A        .          .                 .           .               .          .                  .   
        .               .          .                 .           .           C   .          .                  .   
      i .               .          .                 .           .               .          .                  .   
-     ↳ .................__________...............raw_values....           .................__________....................   
+     ↳ .................__________...................           .................__________....................   
        .               |_O________|                 .           .               |__c_tmp___|                  .   
        .```````````````. ↑        .`````````````````.           .```````````````.          .``````````````````.
        .               . k  -->   .                 .           .               .          .                  .   
@@ -1653,8 +1653,8 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
     setArg(dim, dim_arg)
     val tileSize = 16 (16 -> 16 -> 128)
     val i_tileSize = 64 (64 -> 16 -> 128)
-    val par_load = 16
-    val par_store = 16
+    val par_load = 1
+    val par_store = 1
     val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
     val loop_ii    = 1 // not sure if this one works
     val loop_kk    = 1 (1 -> 1 -> 8)
