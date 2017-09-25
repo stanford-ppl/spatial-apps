@@ -3700,7 +3700,7 @@ object SimpleRowStridedConv extends SpatialApp { // Regression (Dense) // Args: 
 
     val img = DRAM[Int](R, C)
     val out = DRAM[Int](R/2, C)
-    val out2 = DRAM[Int](R/2-1, C)
+    val out2 = DRAM[Int](R/2-2, C)
     setMem(img, mat)
 
     Accel {
@@ -3717,14 +3717,14 @@ object SimpleRowStridedConv extends SpatialApp { // Regression (Dense) // Args: 
       }
 
       // Test lb with transient load
-      val lb2 = LineBuffer.strided[Int](3, C, 2)
-      lb2 load img(0, 0::C)
-      Foreach(R/2-1 by 1){row =>
+      val lb2 = LineBuffer.strided[Int](5, C, 2)
+      lb2 load img(0::3, 0::C)
+      Foreach(R/2-2 by 1){row =>
         val line = SRAM[Int](C)
-        val rowstart = 1 + row*2
+        val rowstart = 3 + row*2
         lb2 load img(rowstart::rowstart+2, 0::C)
         Foreach(C by 1){col =>
-          val conv = Reduce(0)(3 by 1, 3 by 1){(r,c) => lb2(r, (col + c)%C)}{_+_} / 9
+          val conv = Reduce(0)(5 by 1, 3 by 1){(r,c) => lb2(r, (col + c)%C)}{_+_} / 15
           line(col) = conv
         }
         out2(row,0::C) store line
@@ -3739,7 +3739,7 @@ object SimpleRowStridedConv extends SpatialApp { // Regression (Dense) // Args: 
     printMatrix(result, "Result")
     printMatrix(result2, "Result2")
     val gold = (0::R/2, 0::C){(i,j) => 2*i}
-    val gold2 = (0::R/2-1, 0::C){(i,j) => 2*i+1}
+    val gold2 = (0::R/2-2, 0::C){(i,j) => 2*i+2}
 
     val cksum = result.zip(gold){_==_}.reduce{_&&_}
     val cksum2 = result2.zip(gold2){_==_}.reduce{_&&_}
