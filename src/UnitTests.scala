@@ -3551,26 +3551,42 @@ object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
     val col_stride3 = 1
     val row_stride4 = 1
     val col_stride4 = 2
+    val D = 3
 
     // cmd-line args (i.e.- "20 0.5 0.5 64 64 64")
     val in_rows = args(0).to[Int]
 
     // Create random data structures
     val data1 = (0::in_rows,0::coltile){(i,j) => random[T](2)}
-    val filter1 = Array[T](1,2,1,0,0,0,-1,-2,-1)
+    val filter1_data = Array[T](1,2,1,0,0,0,-1,-2,-1)
+    val filter1_list = List[T](1,2,1,0,0,0,-1,-2,-1)
+    val img3d = (0::D, 0::in_rows, 0::coltile){(i,j,k) => ((i*10 + j + k)%32).to[T]}
+    val filter5_data = List[T](1,0,0,
+                              0,0,1,
+                              1,0,0,
+
+                              0,1,0,
+                              1,1,1,
+                              0,1,0,
+
+                              0,0,0,
+                              0,0,0,
+                              0,1,1
+                            )
+
 
     // Create toeplitz for filter and padded image
     val data3 = (0::in_rows + 2, 0::coltile+2){(i,j) => if (i < 2 || j < 2) 0 else data1( i-2, j-2 )}.flatten
-    val filter3_tplz = filter1.toeplitz(3,3,in_rows,coltile, row_stride3, col_stride3)
+    val filter3_tplz = filter1_data.toeplitz(3,3,in_rows,coltile, row_stride3, col_stride3)
     println("Expanded filter is " + filter3_tplz.rows + " x " + filter3_tplz.cols)
     println("Padded data is " + data3.length + " elements long")
-    val filter4_tplz = filter1.toeplitz(3,3,in_rows,coltile, row_stride4, col_stride4)
+    val filter4_tplz = filter1_data.toeplitz(3,3,in_rows,coltile, row_stride4, col_stride4)
 
     // Show inputs
     printMatrix(data1, "Img1")
-    printArray(data3, "Flattened padded img")
-    printMatrix(filter3_tplz, "Toeplitz Filter")
-    printMatrix(filter4_tplz, "Toeplitz Filter, colstride=2")
+    // printArray(data3, "Flattened padded img")
+    // printMatrix(filter3_tplz, "Toeplitz Filter")
+    // printMatrix(filter4_tplz, "Toeplitz Filter, colstride=2")
 
     // ArgIns
     val M = ArgIn[Int]
@@ -3607,24 +3623,30 @@ object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
     val dram2 = DRAM[T](Mds2, Nds2)
     val dram3 = DRAM[T](OutLen3)
     val dram4 = DRAM[T](OutLen4)
+    val dram5 = DRAM[T](M, N)
+    val dram6 = DRAM[T](Mds1, Nds1)
     val filter3 = DRAM[T](Mds3, Nds3)
     val filter4 = DRAM[T](Mds4, Nds4)
+    val image3d = DRAM[T](D,M,N)
 
     setMem(image, data1)
+    setMem(image3d, img3d)
     setMem(flatimg, data3)
     setMem(filter3, filter3_tplz)
     setMem(filter4, filter4_tplz)
 
     // Run Accel functions
     Accel{
-      val filter = LUT[T](3,3)(1,  2,  1,
-                               0,  0,  0,
-                              -1, -2, -1)
+      val filter = LUT[T](3,3)(filter1_list:_*)
+      val filter5 = LUT[T](3,3,3)(filter5_data:_*)
+
       // Use stdlib defs
-      Convolution.ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1, 16, 16)
-      Convolution.ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2, 16, 16)
-      Convolution.ConvolutionGEMM[T](dram3, flatimg, filter3)
-      Convolution.ConvolutionGEMM[T](dram4, flatimg, filter4)
+      Pipe{Convolution.ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1, 16, 16)}
+      Pipe{Convolution.ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2, 16, 16)}
+      Pipe{Convolution.ConvolutionGEMM[T](dram3, flatimg, filter3)}
+      Pipe{Convolution.ConvolutionGEMM[T](dram4, flatimg, filter4)}
+      Pipe{Convolution.MultichannelConvolutionSlide(dram5, image3d, filter5, 1, 1, 16, 16, 3)}
+      Pipe{Convolution.ConvolutionSlideFast[T](dram6, image, filter, col_stride1, row_stride1, 16, 16)}
 
       // // Use defs in this app
       // ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1)
@@ -3638,12 +3660,14 @@ object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
     val res2 = getMatrix(dram2)
     val res3 = getMem(dram3).reshape(in_rows, coltile)
     // val res4 = getMem(dram4).reshape(res2.rows, res2.cols)
+    val res5 = getMatrix(dram5)
+    val res6 = getMatrix(dram6)
 
     // Compute Golds
     val gold1 = (0::in_rows / row_stride1, 0::coltile / col_stride1){(i,j) => 
       Array.tabulate(3){ii => Array.tabulate(3){jj => 
         val img = if (i*row_stride1-ii < 0 || j*col_stride1-jj < 0) 0 else data1(i*row_stride1-ii,j*col_stride1-jj)
-        img * filter1((2-ii)*3+(2-jj))
+        img * filter1_data((2-ii)*3+(2-jj))
       }}.flatten.reduce{_+_}
     }
     val gold2 = (0::in_rows / row_stride2, 0::coltile / col_stride2){(i,j) => 
@@ -3651,11 +3675,21 @@ object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
         val real_i = i*row_stride2-ii+(row_stride2-1)
         val real_j = j*col_stride2-jj+(col_stride2-1)
         val img = if (real_i < 0 || real_j < 0) 0 else data1(real_i,real_j)
-        img * filter1((2-ii)*3+(2-jj))
+        img * filter1_data((2-ii)*3+(2-jj))
       }}.flatten.reduce{_+_}
     }
     val gold3 = gold1
     // val gold4 = gold2
+    val friendly_filter5 = Array[T](filter5_data:_*)
+    val gold5 = (0::M, 0::N){(i,j) => 
+      Array.tabulate(D){page => 
+        Array.tabulate(3){ii => Array.tabulate(3){jj => 
+          val pxl = if (i-ii < 0 || j-jj < 0) 0.to[T] else img3d(page,i-ii,j-jj)
+          pxl * friendly_filter5(page*9+(2-ii)*3+(2-jj))
+        }}.flatten.reduce{_+_}
+      }.reduce{_+_}
+    }
+    val gold6 = gold1
 
     // Collect cksums
     val margin = 0.25.to[T]
@@ -3663,7 +3697,9 @@ object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
     val cksum2 = res2.zip(gold2){_==_}.reduce{_&&_}
     val cksum3 = res3.zip(gold3){_==_}.reduce{_&&_}
     // val cksum4 = res4.zip(gold4){_==_}.reduce{_&&_}
-    val cksum = cksum1 && cksum2 && cksum3 //&& cksum4
+    val cksum5 = res5.zip(gold5){_==_}.reduce{_&&_}
+    val cksum6 = res6.zip(gold6){_==_}.reduce{_&&_}
+    val cksum = cksum1 && cksum2 && cksum3 /* && cksum4 */&& cksum5 && cksum6 
 
     // Print results
     println("Conv1 Result: ")
@@ -3678,11 +3714,19 @@ object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
     // println("Conv4 Result: ")
     // printMatrix(res4, "  Got")
     // printMatrix(gold4, "  Wanted")
+    println("Conv5 Result: ")
+    printMatrix(res5, "  Got")
+    printMatrix(gold5, "  Wanted")
+    println("Conv6 Result: ")
+    printMatrix(res6, "  Got")
+    printMatrix(gold6, "  Wanted")
 
     println("  cksum: " + cksum1 + " (Conv1)")
     println("  cksum: " + cksum2 + " (Conv2)")
     println("  cksum: " + cksum3 + " (Conv3)")
     // println("  cksum: " + cksum4 + " (Conv4)")
+    println("  cksum: " + cksum5 + " (Conv5)")
+    println("  cksum: " + cksum6 + " (Conv6)")
 
     println("PASS: " + cksum + " (Convolutions)")
 
