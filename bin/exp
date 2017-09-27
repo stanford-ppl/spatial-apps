@@ -677,15 +677,15 @@ def regression():
         apps.append("TPCHQ6")
         apps.append("SPMV_CRS")
         apps.append("BlackScholes")
-        apps.append("Kmeans_plasticine")
-        apps.append("PageRank_plasticine")
+        # apps.append("Kmeans_plasticine")
+        # apps.append("PageRank_plasticine")
         apps.append("GEMM_Blocked")
         apps.append("GDA")
         # apps.append("SYRK_col")
     else:
         apps = [opts.app]
 
-    opts.torun = "GEN_PIR,FIT_PIR"
+    opts.torun = "GEN_PIR,MAP_PIR"
     for app in apps:
         target(app, [], {})
 
