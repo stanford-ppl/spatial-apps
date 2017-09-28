@@ -38,7 +38,7 @@ def regression():
         # apps.append("PageRank_plasticine")
         apps.append("GEMM_Blocked")
         apps.append("GDA")
-        apps.append("SYRK_col")
+        # apps.append("SYRK_col")
     else:
         apps = [opts.app]
 
