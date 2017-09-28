@@ -27,6 +27,7 @@ from task import *
 def regression():
     if opts.app=="ALL":
         apps = []
+        apps.append("SimpleIf")
         apps.append("DotProduct")
         apps.append("OuterProduct")
         apps.append("Backprop")
@@ -38,6 +39,16 @@ def regression():
         # apps.append("PageRank_plasticine")
         apps.append("GEMM_Blocked")
         apps.append("GDA")
+
+        # apps.append("AES")
+        # apps.append("BFS_Queue")
+        # apps.append("Differentiator")
+        # apps.append("LogReg")
+        # apps.append("PageRank")
+        # apps.append("Kmeans")
+        # apps.append("SW")
+        # apps.append("FFT_Strided")
+        # apps.append("Sobel")
         # apps.append("SYRK_col")
     else:
         apps = [opts.app]
