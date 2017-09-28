@@ -1,7 +1,10 @@
 #!/bin/bash
 
+app=$1
+log=$2
+
 cd $SPATIAL_HOME
-pir_src_dir=$PIR_HOME/apps/src/gen
+pir_src_dir=$PIR_HOME/pir/apps/src/gen
 app_file=$pir_src_dir/$app.scala
 pir_dir=$SPATIAL_HOME/gen/$app/pir
 if [ -e $pir_dir ]; then rm -r $pir_dir; fi
@@ -9,4 +12,6 @@ if [ -e $app_file ]; then rm $app_file; fi
 mkdir -p $SPATIAL_HOME/gen/$app
 mkdir -p $pir_src_dir 
 mkdir -p $pir_dir
-$SPATIAL_HOME/bin/spatial $app --dot --cgra+ --pirsrc $pir_src_dir &>> $log &
+$SPATIAL_HOME/bin/spatial $app --dot --cgra+ --pirsrc $pir_src_dir &>> $log
+
+echo "-------------PASS (DONE)------------" >> $log

@@ -1,4 +1,9 @@
 #!/bin/bash
 
+app=$1
+log=$2
+
 cd $SPATIAL_HOME/gen/$app/
-make vcs &>> $log &
+make vcs &>> $log
+
+echo "-------------PASS (DONE)------------" >> $log
