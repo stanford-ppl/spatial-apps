@@ -86,7 +86,7 @@ def cycleOf(app):
     if app in cycle_cache:
         return cycle_cache[app]
     log = logs(app, "RUN_SIMULATION")
-    line = grep(log, ["Design ran for"])
+    line = grep(log, ["Design ran for"])[0]
     if line is None:
         return None
     else:

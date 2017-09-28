@@ -88,15 +88,14 @@ def mkdir(path):
         os.makedirs(path)
 
 def grep(path, patterns):
-    found = None
+    found = []
     if type(patterns)!=list:
         patterns = [patterns]
     with open(path, 'r') as f:
         for line in f:
             for pattern in patterns:
                 if pattern in line:
-                    found = line
-                    break
+                    found.append(line)
     return found
 
 def openfile(path, flag):

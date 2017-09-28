@@ -131,7 +131,7 @@ def act(fullname, resp):
                 log = logs(fullname, passName)
                 rm(log)
                 # del progress_cache[(fullname, passName)]
-    def show(passName):
+    def printlog(passName):
         log = logs(fullname, passName)
         print("{}Show {} {}{}".format(bcolors.CYAN, passName, log, bcolors.NC))
         cat(log)
@@ -146,10 +146,10 @@ def act(fullname, resp):
         removeLog()
     elif resp == "s":
         for passName in passes:
-            if running(fullname, passName) or failed(fullname, passName): show(passName); break
+            if running(fullname, passName) or failed(fullname, passName): printlog(passName); break
     elif "s " in resp:
         for passName in passes:
-            if passName in resp: show(passName);
+            if passName in resp: printlog(passName);
     elif resp == "o":
         for passName in passes:
             if running(fullname, passName) or failed(fullname, passName): open(passName); break
@@ -159,11 +159,21 @@ def act(fullname, resp):
 
 def show(fullname):
     for passName in passes:
+        if passName=="GEN_PIR":
+            keywords = ["Except"]
+        elif passName=="MAP_PIR":
+            keywords = ["error"]
+        else:
+            keywords = ["error"]
+
         log = logs(fullname, passName)
         prog = progress(fullname, passName)
         print("{}{}({}){} {}".format(colors[prog], passName, prog, bcolors.NC, log))
-        if running(fullname, passName):
-            break
+        if failed(fullname, passName):
+            lines = grep(log, keywords)
+            for line in lines:
+                sys.stdout.write('- ' + line)
+    print("{}-------------------------------------------------------{}".format(bcolors.CYAN, bcolors.NC))
     return
 
 def status(app, args, params):
@@ -182,12 +192,12 @@ def progress(fullname, passName):
     log = logs(fullname, passName)
     prog = "NONE"
     if os.path.exists(log):
-        isDone=(grep(log,"PASS (DONE)".format(passName)) is not None)
+        isDone = (len(grep(log,"PASS (DONE)".format(passName))) != 0)
         if isDone:
-	    isFailed=grep(log, ['error','Error','ERROR','No rule to make', 'Killed', 'KILLED']) is not None
+	    isFailed = (len(grep(log, ['error','Error','ERROR','No rule to make', 'Killed', 'KILLED'])) != 0)
             if passName=="RUN_SIMULATION":
 	        hasCycle=cycleOf(fullname) is not None
-	        timeOut=grep(log, 'Hardware timeout after') is not None
+	        timeOut = len(grep(log, 'Hardware timeout after') != 0)
                 if not hasCycle or timeOut:
                     isFailed = True
             if isFailed: 

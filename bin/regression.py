@@ -27,18 +27,25 @@ from task import *
 def regression():
     if opts.app=="ALL":
         apps = []
-        apps.append("SimpleIf")
+
+        # mapping working
         apps.append("DotProduct")
         apps.append("OuterProduct")
+        apps.append("TPCHQ6")
+
+        # pirgen working
+        apps.append("BlackScholes")
+        apps.append("GDA")
+
+        # not working 
+        apps.append("SimpleIf")
         apps.append("Backprop")
         apps.append("Gibbs_Ising2D")
-        apps.append("TPCHQ6")
         apps.append("SPMV_CRS")
-        apps.append("BlackScholes")
         # apps.append("Kmeans_plasticine")
         # apps.append("PageRank_plasticine")
         apps.append("GEMM_Blocked")
-        apps.append("GDA")
+
 
         # apps.append("AES")
         # apps.append("BFS_Queue")
