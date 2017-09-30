@@ -269,7 +269,7 @@ object Tensor4D extends SpatialApp { // Regression (Unit) // Args: 32 4 4 4
     // Extract results from accelerator
     val result4 = getTensor4(dstDRAM4)
     printTensor4(result4, "got: ")
-    printTensor4(data4, "wanted; ")
+    printTensor4(data4, "wanted: ")
     println("")
     val cksum = result4.zip(data4){_ == _}.reduce{_&&_}
     println("PASS: " + cksum + " (Tensor4D)")
@@ -3741,7 +3741,7 @@ object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
 }
 
 
-object SimpleRowStridedConv extends SpatialApp { // Regression (Dense) // Args: none
+object SimpleRowStridedConv extends SpatialApp { // Regression (Unit) // Args: none
   @virtualize
   def main(): Unit = {
     val R = 20
