@@ -35,6 +35,16 @@ trait Activations extends SpatialApp {
   // TODO: we may not need that many bits for sigmoid and tanh. Need to reduce these.
   def sigmoid_(p: aT) = {
     val halfSigLUT = LUT.fromFile[aT](lutN)(sigF)
+    val index = (abs(p).to[iT] << spacingShiftBits).to[Index] + 1.to[Index]
+    val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
+    val lowerMux = mux(p <= -lo.to[aT], 0.to[aT], valueMux)
+    val upperMux = mux(p >= lo.to[aT], 1.to[aT], lowerMux)
+    upperMux
+  }
+
+
+  def sigmoid_old(p: aT) = {
+    val halfSigLUT = LUT.fromFile[aT](lutN)(sigF)
     val index = (abs(p).to[iT] << spacingShiftBits).to[Index]
     val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
     val lowerMux = mux(p <= -lo.to[aT], 0.to[aT], valueMux)
@@ -43,10 +53,9 @@ trait Activations extends SpatialApp {
   }
 
 
-  // TODO: try this number: 0.15623885683914221 seems fail pretty badly... Fix it!
   def tanh_(p: aT) = {
     val halfTanhLUT = LUT.fromFile[aT](lutN)(tanhF)
-    val index = (abs(p).to[iT] << spacingShiftBits).to[Index]
+    val index = (abs(p).to[iT] << spacingShiftBits).to[Index] // + 1.to[Index]
     val valueMux = mux(p < 0.to[aT], 0.to[aT] - halfTanhLUT(index), halfTanhLUT(index))
     val lowerMux = mux(p <= -lo.to[aT], -1.to[aT], valueMux)
     val upperMux = mux(p >= lo.to[aT], 1.to[aT], lowerMux)
@@ -62,21 +71,26 @@ object ActivationTests extends Activations {
     val x = ArgIn[T]
     val y = ArgOut[T]
     val y1 = ArgOut[T]
+    val y2 = ArgOut[T]
     val N = args(0).to[T]
     setArg(x, N)
 
+  // TODO: try this number: 0.15623885683914221 seems fail pretty badly... Fix it!
     Accel {
       Parallel {
         // y := tanh_(x.value)
-        y := tanh_(x.value)
-        y1 := sigmoid_(x.value)
+        y := tanh_(x.value)   // numpy would give: 0.15497985487440297
+        y1 := sigmoid_(x.value) // numpy would give: 0.53866759904966222
+        y2 := sigmoid_old(x.value)
       }
     }
 
     val yre = getArg(y)
     val yre1 = getArg(y1)
+    val yre2 = getArg(y2)
     println(yre)
     println(yre1)
+    println(yre2)
   }
 }
 
@@ -149,15 +163,20 @@ object BasicLSTMCell extends SpatialApp with Params with Activations {
             val prod = Reduce(Reg[T])(ddco by 1) { kk => 
               tileA(ii, kk) * tileB(kk, jj)
             } {_+_}
+            // adding in a bias
             val prev = mux(k == 0, tileBias(nD2), tileC(ii, jj))
             val ele = prev + prod.value
+            // if the last element, then perform sigmoid overall
             if (k == PP - ddco) {
               if (nD2 < splitSize || nD2 >= splitSize * 3)
                 tileC(ii, jj) = sigmoid_(ele)
+                // tileC(ii, jj) = ele
               else if (splitSize <= nD2 && nD2 < splitSize * 2)
                 tileC(ii, jj) = tanh_(ele)
+                // tileC(ii, jj) = ele
               else
                 tileC(ii, jj) = sigmoid_(ele + forgetBias)
+                // tileC(ii, jj) = ele + forgetBias
             } else
               tileC(ii,jj) = ele
           }
