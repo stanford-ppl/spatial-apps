@@ -8,7 +8,6 @@ trait Params extends SpatialApp {
   val dco = 1400
   val d = 100
   val dn = 10
-  val dJX = 23
   val ddco = 100
   val dd = 10
   val forgetBias = 1
@@ -144,6 +143,7 @@ object BasicLSTMCell extends SpatialApp with Params with Activations {
 
     Accel {
       // TODO: Later this JX needs to be replaced by a different val...
+      // TODO: currently it's all set to 0
       // TODO: for higher dimension matrices, would the alignment matter? 
       //       need to test on this matter. 
 
@@ -176,14 +176,14 @@ object BasicLSTMCell extends SpatialApp with Params with Activations {
             // if the last element, then perform sigmoid overall
             if (k == PP - ddco) {
               if (nD2 < splitSize || nD2 >= splitSize * 3)
-                // tileC(ii, jj) = sigmoid_(ele)
-                tileC(ii, jj) = ele
+                tileC(ii, jj) = sigmoid_(ele)
+                // tileC(ii, jj) = ele
               else if (splitSize <= nD2 && nD2 < splitSize * 2)
-                // tileC(ii, jj) = tanh_(ele)
-                tileC(ii, jj) = ele
+                tileC(ii, jj) = tanh_(ele)
+                // tileC(ii, jj) = ele
               else
-                // tileC(ii, jj) = sigmoid_(ele + forgetBias)
-                tileC(ii, jj) = ele + forgetBias
+                tileC(ii, jj) = sigmoid_(ele + forgetBias)
+                // tileC(ii, jj) = ele + forgetBias
             } else
               tileC(ii,jj) = ele
           }

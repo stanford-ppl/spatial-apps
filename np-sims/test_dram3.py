@@ -27,31 +27,43 @@ acc_mem = 'acc_c'
 acc_hidden = 'acc_h'
 
 
-# a_total = N * JX * dco
-a = np.genfromtxt(input_f, delimiter=',').reshape((N,JX,dco))[:,0,:] # (N*M*JX, dco)
+np.random.seed(42)
+
+a_total = N * JX * dco
 # a = np.linspace(0, 0.2, num=a_total).reshape((N,JX,dco))
+a = np.genfromtxt(input_f, delimiter=',').reshape((N,JX,dco)) # (N*M*JX, dco)
+# a = np.random.uniform(0, 0.2, a_total).reshape((N,JX,dco))
 save_csv(a.flatten(), 'a')
 
 # hidden size should be: (N, JX, d)
 h_total = N*JX*d 
 hidden = np.linspace(0, 0.1, num=h_total).reshape((N,JX,d))
+# hidden = np.random.uniform(0, 0.1, h_total).reshape((N,JX,d))
 save_csv(hidden.flatten(), 'hidden')
 
-# k_total = (dco+d)*4*d
+k_total = (dco+d)*4*d
 # kernel = np.linspace(0, 0.5, num=k_total).reshape((dco+d, 4*d))
-kernel = np.genfromtxt(kernel_f, delimiter=',') # (dco+d, 4*d)
+kernel = np.genfromtxt(kernel_f, delimiter=',').reshape((dco+d, 4*d)) # (dco+d, 4*d)
+# kernel = np.random.uniform(0, 0.5, k_total).reshape((dco+d, 4*d))
 save_csv(kernel.flatten(), 'kernel')
 
 b_total = 4*d
-bias = np.genfromtxt(bias_f, delimiter=',') # (4*d, )
 # bias = np.linspace(0, 0.3, num=b_total).reshape((4*d))
+bias = np.genfromtxt(bias_f, delimiter=',').reshape((4*d)) # (4*d, )
+# bias = np.random.uniform(0, 0.3, b_total).reshape((4*d))
 save_csv(bias.flatten(), 'bias')
 
-concat = np.concatenate([a, hidden[:,0,:]], axis=1).dot(kernel) + bias
+print(a.shape)
+print(hidden.shape)
+print(kernel.shape)
+print(bias.shape)
+concat = np.concatenate([a[:,0,:], hidden[:,0,:]], axis=1).dot(kernel) + bias
 i, j, f, o = np.split(concat, 4, axis=1)
-test_result = np.concatenate([i, j, f + forget_bias, o], axis=1)
-# test_result = np.concatenate([sigmoid(i), tanh(j), sigmoid(f + forget_bias), sigmoid(o)], axis=1)
+# test_result = np.concatenate([i, j, f + forget_bias, o], axis=1)
+test_result = np.concatenate([sigmoid(i), tanh(j), sigmoid(f + forget_bias), sigmoid(o)], axis=1)
 print(test_result.shape)
+code.interact(local=locals())
+
 dram = np.delete(get_csv('DRAM3Test_result_bias.csv'), 0).reshape(N, 4*d)
 tr_splits = np.split(test_result, 4, axis=1)
 dram_splits = np.split(dram, 4, axis=1)
@@ -61,4 +73,4 @@ print('relative error in i:', np.amax(np.abs(tr_i - dram_i) / np.abs(tr_i)))
 print('relative error in j:', np.amax(np.abs(tr_j - dram_j) / np.abs(tr_j)))
 print('relative error in f:', np.amax(np.abs(tr_f - dram_f) / np.abs(tr_f)))
 print('relative error in o:', np.amax(np.abs(tr_o - dram_o) / np.abs(tr_o)))
-code.interact(local=locals())
+# # code.interact(local=locals())
