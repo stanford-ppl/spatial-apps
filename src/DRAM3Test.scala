@@ -26,11 +26,11 @@ trait Activations extends SpatialApp {
   val loSig = 16
   val loTanh = 4
   val spacingShiftBitsSig = 5 // shift down for sig
-  val spacingShiftBitsTanh = 8 // shift down for tanh
+  val spacingShiftBitsTanh = 7 // shift down for tanh
   val lutNSig = 512
-  val lutNTanh = 1024
+  val lutNTanh = 512
   val sigF = projectDir + "sigmoid_512_16_-5.0.csv"
-  val tanhF = projectDir + "tanh_1024_4_-8.0.csv"
+  val tanhF = projectDir + "tanh_512_4_-7.0.csv"
 
   // TODO: we may not need that many bits for sigmoid and tanh. Need to reduce these.
   def sigmoid_(p: aT) = {
