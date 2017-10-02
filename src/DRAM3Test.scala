@@ -3,14 +3,14 @@ import org.virtualized._
 
 
 trait Params extends SpatialApp {
-  val N = 3
-  val JX = 16
-  val dco = 32
-  val d = 8
-  val dn = 1
-  val dJX = 2
-  val ddco = 2
-  val dd = 2
+  val N = 60
+  val JX = 161
+  val dco = 1400
+  val d = 100
+  val dn = 10
+  val dJX = 23
+  val ddco = 100
+  val dd = 10
   val forgetBias = 1
   val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
   val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
@@ -31,6 +31,7 @@ trait Activations extends SpatialApp {
   val lutNTanh = 512
   val sigF = projectDir + "sigmoid_512_16_-5.0.csv"
   val tanhF = projectDir + "tanh_512_4_-7.0.csv"
+
 
   // TODO: we may not need that many bits for sigmoid and tanh. Need to reduce these.
   def sigmoid_(p: aT) = {
@@ -72,6 +73,7 @@ trait Activations extends SpatialApp {
     (sigmoid_(p << 1) << 1) - 1
   }
 }
+
 
 object ActivationTests extends Activations {
   // TODO: In the real application, the integer bits shouldn't be more than 1.
@@ -149,7 +151,6 @@ object BasicLSTMCell extends SpatialApp with Params with Activations {
       tileBias load bias(0::NN)
       Foreach(MM by dn, NN by dd) { (i, j) =>
         val tileC = SRAM[T](dn, dd)
-
         Foreach(PP by ddco) { k =>
           val tileA = SRAM[T](dn, ddco)
           val tileB = SRAM[T](ddco, dd)
@@ -176,13 +177,10 @@ object BasicLSTMCell extends SpatialApp with Params with Activations {
             if (k == PP - ddco) {
               if (nD2 < splitSize || nD2 >= splitSize * 3)
                 tileC(ii, jj) = sigmoid_(ele)
-                // tileC(ii, jj) = ele
               else if (splitSize <= nD2 && nD2 < splitSize * 2)
                 tileC(ii, jj) = tanh_(ele)
-                // tileC(ii, jj) = ele
               else
                 tileC(ii, jj) = sigmoid_(ele + forgetBias)
-                // tileC(ii, jj) = ele + forgetBias
             } else
               tileC(ii,jj) = ele
           }
