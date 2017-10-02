@@ -176,11 +176,14 @@ object BasicLSTMCell extends SpatialApp with Params with Activations {
             // if the last element, then perform sigmoid overall
             if (k == PP - ddco) {
               if (nD2 < splitSize || nD2 >= splitSize * 3)
-                tileC(ii, jj) = sigmoid_(ele)
+                // tileC(ii, jj) = sigmoid_(ele)
+                tileC(ii, jj) = ele
               else if (splitSize <= nD2 && nD2 < splitSize * 2)
-                tileC(ii, jj) = tanh_(ele)
+                // tileC(ii, jj) = tanh_(ele)
+                tileC(ii, jj) = ele
               else
-                tileC(ii, jj) = sigmoid_(ele + forgetBias)
+                // tileC(ii, jj) = sigmoid_(ele + forgetBias)
+                tileC(ii, jj) = ele + forgetBias
             } else
               tileC(ii,jj) = ele
           }
@@ -191,7 +194,7 @@ object BasicLSTMCell extends SpatialApp with Params with Activations {
     }
 
     val result = getMem(resultDRAM)
-    printArray(result, "resultDRAM = ")
+    // printArray(result, "resultDRAM = ")
     writeCSV1D[T](result, simFileDir + "/DRAM3Test_result_bias.csv")
   }
 }

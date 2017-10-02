@@ -49,14 +49,16 @@ save_csv(bias.flatten(), 'bias')
 
 concat = np.concatenate([a, hidden[:,0,:]], axis=1).dot(kernel) + bias
 i, j, f, o = np.split(concat, 4, axis=1)
-test_result = np.concatenate([sigmoid(i), tanh(j), sigmoid(f + forget_bias), sigmoid(o)], axis=1)
-print(test_result)
-# dram = np.delete(get_csv('DRAM3Test_result_bias.csv'), 0).reshape(N, 4*d)
-# tr_splits = np.split(test_result, 4, axis=1)
-# dram_splits = np.split(dram, 4, axis=1)
-# tr_i, tr_j, tr_f, tr_o = tr_splits 
-# dram_i, dram_j, dram_f, dram_o = dram_splits
-# print('relative error in i:', np.amax(np.abs(tr_i - dram_i) / np.abs(tr_i)))
-# print('relative error in j:', np.amax(np.abs(tr_j - dram_j) / np.abs(tr_j)))
-# print('relative error in f:', np.amax(np.abs(tr_f - dram_f) / np.abs(tr_f)))
-# print('relative error in o:', np.amax(np.abs(tr_o - dram_o) / np.abs(tr_o)))
+test_result = np.concatenate([i, j, f + forget_bias, o], axis=1)
+# test_result = np.concatenate([sigmoid(i), tanh(j), sigmoid(f + forget_bias), sigmoid(o)], axis=1)
+print(test_result.shape)
+dram = np.delete(get_csv('DRAM3Test_result_bias.csv'), 0).reshape(N, 4*d)
+tr_splits = np.split(test_result, 4, axis=1)
+dram_splits = np.split(dram, 4, axis=1)
+tr_i, tr_j, tr_f, tr_o = tr_splits 
+dram_i, dram_j, dram_f, dram_o = dram_splits
+print('relative error in i:', np.amax(np.abs(tr_i - dram_i) / np.abs(tr_i)))
+print('relative error in j:', np.amax(np.abs(tr_j - dram_j) / np.abs(tr_j)))
+print('relative error in f:', np.amax(np.abs(tr_f - dram_f) / np.abs(tr_f)))
+print('relative error in o:', np.amax(np.abs(tr_o - dram_o) / np.abs(tr_o)))
+code.interact(local=locals())
