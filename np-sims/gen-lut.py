@@ -26,7 +26,7 @@ halfSigLUT = gen_fn(16, 512, sigmoid, 'sigmoid_') # this should cover 1024 point
 # print(looked_up_result, sigmoid(tval))
 
 # tanh
-halfTanhLUT = gen_fn(16, 512, np.tanh, 'tanh')
+halfTanhLUT = gen_fn(4, 1024, np.tanh, 'tanh')
 tval = 0.156238856725394725799560546875
-looked_up_result = halfTanhLUT[int((abs(tval)) * 2**5)+1]
+looked_up_result = halfTanhLUT[int((abs(tval)) * 2**8)+1]
 print(looked_up_result, np.tanh(tval))

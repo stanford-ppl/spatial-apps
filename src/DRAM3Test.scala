@@ -23,43 +23,53 @@ trait Activations extends SpatialApp {
   type aT = FixPt[TRUE, _32, _32]
   type iT = FixPt[TRUE, _32, _32]
   val projectDir = "/home/tianzhao/spatial-lang/apps/src/"
-  val lo = 16
-  val spacingShiftBits = 5 // shift down
-  val lutN = 512
+  val loSig = 16
+  val loTanh = 4
+  val spacingShiftBitsSig = 5 // shift down for sig
+  val spacingShiftBitsTanh = 8 // shift down for tanh
+  val lutNSig = 512
+  val lutNTanh = 1024
   val sigF = projectDir + "sigmoid_512_16_-5.0.csv"
-  val tanhF = projectDir + "tanh_512_16_-5.0.csv"
-  // val tanhDir = projectDir + "512_tanhLUT.csv"
+  val tanhF = projectDir + "tanh_1024_4_-8.0.csv"
 
-
-  // TODO: it seems fair to save the LUT space by utilizing the symmetry of sigmoid and tanh
   // TODO: we may not need that many bits for sigmoid and tanh. Need to reduce these.
   def sigmoid_(p: aT) = {
-    val halfSigLUT = LUT.fromFile[aT](lutN)(sigF)
-    val index = (abs(p).to[iT] << spacingShiftBits).to[Index] + 1.to[Index]
+    val halfSigLUT = LUT.fromFile[aT](lutNSig)(sigF)
+    val index = (abs(p).to[iT] << spacingShiftBitsSig).to[Index] + 1.to[Index]
     val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
-    val lowerMux = mux(p <= -lo.to[aT], 0.to[aT], valueMux)
-    val upperMux = mux(p >= lo.to[aT], 1.to[aT], lowerMux)
+    val lowerMux = mux(p <= -loSig.to[aT], 0.to[aT], valueMux)
+    val upperMux = mux(p >= loSig.to[aT], 1.to[aT], lowerMux)
     upperMux
   }
 
 
   def sigmoid_old(p: aT) = {
-    val halfSigLUT = LUT.fromFile[aT](lutN)(sigF)
-    val index = (abs(p).to[iT] << spacingShiftBits).to[Index]
+    val halfSigLUT = LUT.fromFile[aT](lutNSig)(sigF)
+    val index = (abs(p).to[iT] << spacingShiftBitsSig).to[Index]
     val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
-    val lowerMux = mux(p <= -lo.to[aT], 0.to[aT], valueMux)
-    val upperMux = mux(p >= lo.to[aT], 1.to[aT], lowerMux)
+    val lowerMux = mux(p <= -loSig.to[aT], 0.to[aT], valueMux)
+    val upperMux = mux(p >= loSig.to[aT], 1.to[aT], lowerMux)
     upperMux
   }
 
 
+  // Implement tanh using a LUT
   def tanh_(p: aT) = {
-    val halfTanhLUT = LUT.fromFile[aT](lutN)(tanhF)
-    val index = (abs(p).to[iT] << spacingShiftBits).to[Index] // + 1.to[Index]
+    val halfTanhLUT = LUT.fromFile[aT](lutNTanh)(tanhF)
+    val index = (abs(p).to[iT] << spacingShiftBitsTanh).to[Index] // + 1.to[Index]
     val valueMux = mux(p < 0.to[aT], 0.to[aT] - halfTanhLUT(index), halfTanhLUT(index))
-    val lowerMux = mux(p <= -lo.to[aT], -1.to[aT], valueMux)
-    val upperMux = mux(p >= lo.to[aT], 1.to[aT], lowerMux)
+    val lowerMux = mux(p <= -loTanh.to[aT], -1.to[aT], valueMux)
+    val upperMux = mux(p >= loTanh.to[aT], 1.to[aT], lowerMux)
     upperMux
+  }
+
+  // A few ideas about implementing tanh: 
+  // range doesn't need to go that much. -8 to 8 would be fine.
+  // However more precisions need to be provided within 0 to 8.
+
+  // Implement a tanh using: tanh(x) = 2 * sigmoid(2*x) - 1
+  def tanh_approx(p: aT) = {
+    (sigmoid_(p << 1) << 1) - 1
   }
 }
 
@@ -71,26 +81,22 @@ object ActivationTests extends Activations {
     val x = ArgIn[T]
     val y = ArgOut[T]
     val y1 = ArgOut[T]
-    val y2 = ArgOut[T]
     val N = args(0).to[T]
     setArg(x, N)
 
-  // TODO: try this number: 0.15623885683914221 seems fail pretty badly... Fix it!
+    // Try: 0.09800561, 0.12712223
     Accel {
       Parallel {
         // y := tanh_(x.value)
-        y := tanh_(x.value)   // numpy would give: 0.15497985487440297
-        y1 := sigmoid_(x.value) // numpy would give: 0.53866759904966222
-        y2 := sigmoid_old(x.value)
+        y := tanh_(x.value)   // numpy would give: 0.097693026355715917, 0.126441859911746
+        y1 := sigmoid_(x.value) // numpy would give: 0.52448180978452119, 0.53173782856894825
       }
     }
 
     val yre = getArg(y)
     val yre1 = getArg(y1)
-    val yre2 = getArg(y2)
     println(yre)
     println(yre1)
-    println(yre2)
   }
 }
 
