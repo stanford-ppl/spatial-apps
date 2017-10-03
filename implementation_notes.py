@@ -85,7 +85,7 @@ LSTM cell implementation in tf
     i, j, f, o = array_ops.split(value=concat, num_or_size_splits=4, axis=1)
 
     new_c = (
-        c * sigmoid(f + self._forget_bias) + sigmoid(i) * self._activation(j))
+        c * sigmoid(f + self._forget_bias) + sigmoid(i) * tanh(j))
     new_h = self._activation(new_c) * sigmoid(o)
 
     if self._state_is_tuple:
