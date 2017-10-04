@@ -115,7 +115,7 @@ object Regression {
     Array("Dense" -> dense, "Sparse" -> sparse, "Unit" -> unit)
   }
 
-  case class Backend(name: String, stagingArgs: Array[String], make: String => ProcessBuilder, run: (String,Array[String]) => ProcessBuilder) {
+  case class Backend(name: String, stagingArgs: Array[String], make: String => ProcessBuilder, run: (String,String) => ProcessBuilder) {
     override def toString: String = name
   }
   case class Test(backend: Backend, category: String, app: SpatialApp, runtimeArgs: Array[Any], compile: Boolean) {
@@ -176,18 +176,26 @@ object Regression {
       try {
         var passed = false
         var failed = false
+        var prev = ""
+        var cause = ""
 
-        val cmd = backend.run(app.IR.config.genDir, targs.map(_.toString))
+        val args = targs.map(_.toString).mkString("\"", " ", "\"")
+        val cmd = backend.run(app.IR.config.genDir, args)
         val runLog = new PrintStream(app.IR.config.logDir + "/" + "run.log")
         def log(line: String): Unit = {
+          if (line.trim.startsWith("at") && cause == "") cause = prev
           passed = passed || line.contains("PASS: 1") || line.contains("PASS: true")
           failed = failed || line.contains("PASS: 0") || line.contains("PASS: false")
           runLog.println(line)
+          prev = line
         }
         val logger = ProcessLogger(log,log)
         val code = cmd.!(logger)
 
-        if (code != 0)   results.put(s"$backend.$cat.$name: Fail [Execution]\n  Cause: Non-zero exit code\n    See ${app.IR.config.logDir}run.log")
+        if (code != 0)   {
+          val expl = if (cause == "") s"Non-zero exit code\n    See ${app.IR.config.logDir}run.log" else cause
+          results.put(s"$backend.$cat.$name: Fail [Execution]\n  Cause: $expl")
+        }
         else if (failed) results.put(s"$backend.$cat.$name: Fail [Validation]\n  Cause: Application reported that it did not pass validation.")
         else if (passed) results.put(s"$backend.$cat.$name: Pass")
         else             results.put(s"$backend.$cat.$name: Indeterminate\n  Cause: Application did not report validation result.")
@@ -250,13 +258,13 @@ object Regression {
     name = "Scala",
     stagingArgs = Array("--sim"),
     make = genDir => Process(Seq("make"), new java.io.File(genDir)),
-    run = (genDir, args) => Process(Seq("bash","run.sh") ++ args.toSeq, new java.io.File(genDir))
+    run = (genDir, args) => Process(Seq("bash","run.sh", args), new java.io.File(genDir))
   )
   backends ::= Backend(
     name = "Chisel",
     stagingArgs = Array("--synth"),
     make = genDir => Process(Seq("make","vcs"), new java.io.File(genDir)),
-    run  = (genDir,args) => Process(Seq("bash", "run.sh") ++ args.toSeq, new java.io.File(genDir))
+    run  = (genDir,args) => Process(Seq("bash", "run.sh", args), new java.io.File(genDir))
   )
 
   def main(args: Array[String]): Unit = {
@@ -265,13 +273,18 @@ object Regression {
     val timestamp = fmt.format(now)
 
     val threads: Int = try { args(0).toInt } catch { case _:Throwable => 8 }
-    val nPrograms = tests.map(_._2.length).sum
+    var testBackends = backends.filter{b => args.contains(b.name) }
+    if (testBackends.isEmpty) testBackends = backends
+    var testDomains = tests.filter{t => args.contains(t._1) }
+    if (testDomains.isEmpty) testDomains = tests
+
+    val nPrograms = testDomains.map(_._2.length).sum
 
     val regressionLog = new PrintStream(s"regression_$timestamp.log")
 
     // TODO: This could use some optimization
     // Can potentially overlap next backend with current as long as the same app is never compiling
-    backends.zipWithIndex.foreach{case (backend,i) =>
+    testBackends.zipWithIndex.foreach{case (backend,i) =>
       val pool = Executors.newFixedThreadPool(threads)
       val workQueue = new LinkedBlockingQueue[Test](nPrograms)
       val resultQueue = new LinkedBlockingQueue[String](nPrograms)
@@ -281,7 +294,7 @@ object Regression {
       printerPool.submit(Printer(regressionLog, resultQueue))
 
       //testTests.foreach{case (cat,apps) =>
-      tests.foreach{case (cat,apps) =>
+      testDomains.foreach{case (cat,apps) =>
         apps.foreach{case (app,targs) =>
           workQueue.put(Test(backend, cat, app, targs, true))
         }
