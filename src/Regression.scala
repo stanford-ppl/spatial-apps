@@ -115,7 +115,7 @@ object Regression {
     Array("Dense" -> dense, "Sparse" -> sparse, "Unit" -> unit)
   }
 
-  case class Backend(name: String, stagingArgs: Array[String], make: String => String, run: (String,Array[String]) => String) {
+  case class Backend(name: String, stagingArgs: Array[String], make: String => ProcessBuilder, run: (String,Array[String]) => ProcessBuilder) {
     override def toString: String = name
   }
   case class Test(backend: Backend, category: String, app: SpatialApp, runtimeArgs: Array[Any], compile: Boolean) {
@@ -130,12 +130,12 @@ object Regression {
     var isAlive = true
 
     def compileTest(test: Test): Unit = {
-      val Test(backend, cat, app, targs, _) = test
+      val Test(backend, cat, app, _, _) = test
       val name = app.name
       app.__stagingArgs = backend.stagingArgs   // just in case the app refers to this
       try {
         app.init(backend.stagingArgs)
-        app.IR.config.verbosity = 0
+        app.IR.config.verbosity = -2  // Won't see any of this output anyway
         app.IR.config.genDir = s"${app.IR.config.cwd}/gen/$backend/$cat/$name/"
         app.IR.config.logDir = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/"
         val consoleLog = argon.core.createLog(s"${app.IR.config.logDir}", "console.log")
@@ -153,10 +153,16 @@ object Regression {
       val Test(backend, cat, app, targs, _) = test
       val name = app.name
       try {
-        //val makeLog = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/make.log"
-        //s"rm -f $makeLog".!
-        //s"touch $makeLog".!
-        backend.make(app.IR.config.genDir)
+        val cmd = backend.make(app.IR.config.genDir)
+        val makeLog = new PrintStream(app.IR.config.logDir + "/" + "make.log")
+        def log(line: String): Unit = makeLog.println(line)
+        val logger = ProcessLogger(log,log)
+        val code = cmd.!(logger)
+
+        if (code != 0) {
+          results.put(s"$backend.$cat.$name: Fail [Backend Compile]\n  Cause: Non-zero exit code\n    See ${app.IR.config.logDir}make.log")
+          throw new Exception("Failed backend compilation")
+        }
       }
       catch {case e: Throwable =>
         results.put(s"$backend.$cat.$name: Fail [Backend Compile]\n  Cause: $e\n    ${e.getMessage}")
@@ -164,42 +170,35 @@ object Regression {
       }
     }
 
-    def runTest(test: Test): String = {
+    def runTest(test: Test): Unit = {
       val Test(backend, cat, app, targs, _) = test
       val name = app.name
       try {
-        //val runLog = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/run.log"
-        //s"rm -f $runLog".!
-        //s"touch $runLog".!
-        backend.run(app.IR.config.genDir, targs.map(_.toString))
+        var passed = false
+        var failed = false
+
+        val cmd = backend.run(app.IR.config.genDir, targs.map(_.toString))
+        val runLog = new PrintStream(app.IR.config.logDir + "/" + "run.log")
+        def log(line: String): Unit = {
+          passed = passed || line.contains("PASS: 1") || line.contains("PASS: true")
+          failed = failed || line.contains("PASS: 0") || line.contains("PASS: false")
+          runLog.println(line)
+        }
+        val logger = ProcessLogger(log,log)
+        val code = cmd.!(logger)
+
+        if (code != 0)   results.put(s"$backend.$cat.$name: Fail [Execution]\n  Cause: Non-zero exit code\n    See ${app.IR.config.logDir}run.log")
+        else if (failed) results.put(s"$backend.$cat.$name: Fail [Validation]\n  Cause: Application reported that it did not pass validation.")
+        else if (passed) results.put(s"$backend.$cat.$name: Pass")
+        else             results.put(s"$backend.$cat.$name: Indeterminate\n  Cause: Application did not report validation result.")
+
+        runLog.close()
       }
       catch {case e: Throwable =>
         results.put(s"$backend.$cat.$name: Fail [Execution]\n  Cause: $e\n    ${e.getMessage}")
         throw e
       }
     }
-
-    def validateTest(result: String, test: Test): Unit = {
-      val Test(backend, cat, app, targs, _) = test
-      val name = app.name
-      //val runLog = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/run.log"
-      //val src = Source.fromFile(runLog)
-      val lines = result.split("\n")
-
-      var passed = false
-      var failed = false
-      lines.foreach{line =>
-        passed = passed || line.contains("PASS: 1") || line.contains("PASS: true")
-        failed = failed || line.contains("PASS: 0") || line.contains("PASS: false")
-      }
-
-      if (failed)      results.put(s"$backend.$cat.$name: Fail [Validation]")
-      else if (passed) results.put(s"$backend.$cat.$name: Pass")
-      else             results.put(s"$backend.$cat.$name: Indeterminate")
-
-      //src.close()
-    }
-
 
     def run(): Unit = {
       println(s"[T$id] Started")
@@ -210,8 +209,7 @@ object Regression {
           try {
             compileTest(test)
             makeTest(test)
-            val result = runTest(test)
-            validateTest(result, test)
+            runTest(test)
           }
           catch{ case t: Throwable =>
             import argon.core._
@@ -234,18 +232,31 @@ object Regression {
     }
   }
 
+  case class Printer(log: PrintStream, queue: BlockingQueue[String]) extends Runnable {
+    var isAlive = true
+    def run(): Unit = {
+      while (isAlive) {
+        val result = queue.take()
+        if (result != "") {
+          log.println(result)
+        }
+        else isAlive = false
+      }
+    }
+  }
+
   private var backends = List[Backend]()
   backends ::= Backend(
     name = "Scala",
     stagingArgs = Array("--sim"),
-    make = genDir => Process(Seq("make"), new java.io.File(genDir)).!!,
-    run = (genDir, args) => Process(Seq("bash","run.sh") ++ args.toSeq, new java.io.File(genDir)).!!
+    make = genDir => Process(Seq("make"), new java.io.File(genDir)),
+    run = (genDir, args) => Process(Seq("bash","run.sh") ++ args.toSeq, new java.io.File(genDir))
   )
   backends ::= Backend(
     name = "Chisel",
     stagingArgs = Array("--synth"),
-    make = genDir => Process(Seq("make","vcs"), new java.io.File(genDir)).!!,
-    run  = (genDir,args) => Process(Seq("bash", "run.sh") ++ args.toSeq, new java.io.File(genDir)).!!
+    make = genDir => Process(Seq("make","vcs"), new java.io.File(genDir)),
+    run  = (genDir,args) => Process(Seq("bash", "run.sh") ++ args.toSeq, new java.io.File(genDir))
   )
 
   def main(args: Array[String]): Unit = {
@@ -256,18 +267,18 @@ object Regression {
     val threads: Int = try { args(0).toInt } catch { case _:Throwable => 8 }
     val nPrograms = tests.map(_._2.length).sum
 
-    val testTests = Array("Dense" -> List(tests(0)._2.head))
-
     val regressionLog = new PrintStream(s"regression_$timestamp.log")
 
     // TODO: This could use some optimization
     // Can potentially overlap next backend with current as long as the same app is never compiling
-    // Could also print out results to file on the fly
     backends.zipWithIndex.foreach{case (backend,i) =>
       val pool = Executors.newFixedThreadPool(threads)
       val workQueue = new LinkedBlockingQueue[Test](nPrograms)
       val resultQueue = new LinkedBlockingQueue[String](nPrograms)
       (0 until threads).foreach{id => pool.submit(Worker(id, workQueue, resultQueue)) }
+
+      val printerPool = Executors.newFixedThreadPool(1)
+      printerPool.submit(Printer(regressionLog, resultQueue))
 
       //testTests.foreach{case (cat,apps) =>
       tests.foreach{case (cat,apps) =>
@@ -280,11 +291,9 @@ object Regression {
       pool.shutdown()
       pool.awaitTermination(14L, TimeUnit.DAYS)
 
-      val iter = resultQueue.iterator()
-      while (iter.hasNext) {
-        val item = iter.next()
-        regressionLog.println(item)
-      }
+      resultQueue.put("")
+      printerPool.shutdown()
+      printerPool.awaitTermination(14L, TimeUnit.DAYS)
     }
 
     regressionLog.close()
