@@ -269,8 +269,8 @@ object Regression {
       val resultQueue = new LinkedBlockingQueue[String](nPrograms)
       (0 until threads).foreach{id => pool.submit(Worker(id, workQueue, resultQueue)) }
 
-      //tests.foreach{case (cat,apps) =>
-      testTests.foreach{case (cat,apps) =>
+      //testTests.foreach{case (cat,apps) =>
+      tests.foreach{case (cat,apps) =>
         apps.foreach{case (app,targs) =>
           workQueue.put(Test(backend, cat, app, targs, true))
         }
