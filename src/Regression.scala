@@ -1,12 +1,20 @@
 import java.io.PrintStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.concurrent.{BlockingQueue, Executors, LinkedBlockingQueue, TimeUnit}
+import java.util.concurrent._
+import scala.concurrent._
+import ExecutionContext.Implicits.global   // implicit execution context for Futures
 
 import sys.process._
 import spatial.SpatialApp
 
+import scala.concurrent.{Await, Future, TimeoutException}
+
 object Regression {
+  // Times to wait for compilation and running, in seconds
+  val MAKE_TIMEOUT = 600
+  val RUN_TIMEOUT = 400
+
   private final val NoArgs = Array[Any]()
 
   lazy val tests = {
@@ -129,7 +137,18 @@ object Regression {
   case class Worker(id: Int, queue: BlockingQueue[Test], results: BlockingQueue[String]) extends Runnable {
     var isAlive = true
 
-    def compileTest(test: Test): Unit = {
+    def logExcept(test: Test, t: Throwable): Unit = {
+      import argon.core._
+      implicit val IR: State = test.app.IR
+      config.verbosity = 10
+      withLog(config.logDir, config.name + "_exception.log") {
+        if (t.getMessage != null) { dbg(t.getMessage); dbg("") }
+        if (t.getCause != null) { dbg(t.getCause); dbg("") }
+        t.getStackTrace.foreach{elem => dbg(elem.toString) }
+      }
+    }
+
+    def compileTest(test: Test): Boolean = {
       val Test(backend, cat, app, _, _) = test
       val name = app.name
       app.__stagingArgs = backend.stagingArgs   // just in case the app refers to this
@@ -142,69 +161,103 @@ object Regression {
         argon.core.withLog(consoleLog){
           app.compileProgram{ () => app.main() }
         }(app.IR)
+        if (app.IR.hadErrors) {
+          results.put(s"$backend.$cat.$name: Fail [Spatial Compile]\n  Cause: Error(s) during Spatial compilation")
+        }
+        !app.IR.hadErrors
       }
       catch {case e: Throwable =>
         results.put(s"$backend.$cat.$name: Fail [Spatial Compile]\n  Cause: $e\n    ${e.getMessage}")
-        throw e
+        logExcept(test, e)
+        false
       }
     }
 
-    def makeTest(test: Test): Unit = {
+    def makeTest(test: Test): Boolean = {
       val Test(backend, cat, app, targs, _) = test
       val name = app.name
+      val makeLog = new PrintStream(app.IR.config.logDir + "/" + "make.log")
+      val cmd = backend.make(app.IR.config.genDir)
+      def log(line: String): Unit = makeLog.println(line)
+      val logger = ProcessLogger(log,log)
+      val p = cmd.run(logger)
+
       try {
-        val cmd = backend.make(app.IR.config.genDir)
-        val makeLog = new PrintStream(app.IR.config.logDir + "/" + "make.log")
-        def log(line: String): Unit = makeLog.println(line)
-        val logger = ProcessLogger(log,log)
-        val code = cmd.!(logger)
+        val f = Future(blocking(p.exitValue()))
+        val code = Await.result(f, duration.Duration(MAKE_TIMEOUT, "sec"))
 
         if (code != 0) {
           results.put(s"$backend.$cat.$name: Fail [Backend Compile]\n  Cause: Non-zero exit code\n    See ${app.IR.config.logDir}make.log")
-          throw new Exception("Failed backend compilation")
         }
+        code == 0
       }
-      catch {case e: Throwable =>
-        results.put(s"$backend.$cat.$name: Fail [Backend Compile]\n  Cause: $e\n    ${e.getMessage}")
-        throw e
+      catch {
+        case e: TimeoutException =>
+          results.put(s"$backend.$cat.$name: Fail [Backend Compile]\n  Cause: Backend compile timed out after $MAKE_TIMEOUT seconds")
+          p.destroy()
+          p.exitValue()
+          false
+        case e: Throwable =>
+          results.put(s"$backend.$cat.$name: Fail [Backend Compile]\n  Cause: $e\n    ${e.getMessage}")
+          logExcept(test, e)
+          false
+      }
+      finally {
+        makeLog.close()
       }
     }
 
-    def runTest(test: Test): Unit = {
+    def runTest(test: Test): Boolean = {
       val Test(backend, cat, app, targs, _) = test
+      var passed = false
+      var failed = false
+      var prev = ""
+      var cause = ""
       val name = app.name
-      try {
-        var passed = false
-        var failed = false
-        var prev = ""
-        var cause = ""
+      val runLog = new PrintStream(app.IR.config.logDir + "/" + "run.log")
+      val args = targs.map(_.toString).mkString(" ")
+      val cmd = backend.run(app.IR.config.genDir, args)
+      def log(line: String): Unit = {
+        // Couple of really dumb heuristics for finding reported errors at runtime
+        if (line.trim.startsWith("at") && cause == "") cause = prev     // Exceptions in Scala
+        if (line.trim.endsWith("failed.") && cause == "") cause = line // Assertion failures in VCS
+        passed = passed || line.contains("PASS: 1") || line.contains("PASS: true")
+        failed = failed || line.contains("PASS: 0") || line.contains("PASS: false")
+        runLog.println(line)
+        prev = line
+      }
 
-        val args = targs.map(_.toString).mkString("\"", " ", "\"")
-        val cmd = backend.run(app.IR.config.genDir, args)
-        val runLog = new PrintStream(app.IR.config.logDir + "/" + "run.log")
-        def log(line: String): Unit = {
-          if (line.trim.startsWith("at") && cause == "") cause = prev
-          passed = passed || line.contains("PASS: 1") || line.contains("PASS: true")
-          failed = failed || line.contains("PASS: 0") || line.contains("PASS: false")
-          runLog.println(line)
-          prev = line
-        }
-        val logger = ProcessLogger(log,log)
-        val code = cmd.!(logger)
+      val logger = ProcessLogger(log,log)
+      val p = cmd.run(logger)
+
+      try {
+        val f = Future(blocking(p.exitValue()))
+        val code = Await.result(f, duration.Duration(RUN_TIMEOUT, "sec"))
 
         if (code != 0)   {
           val expl = if (cause == "") s"Non-zero exit code\n    See ${app.IR.config.logDir}run.log" else cause
           results.put(s"$backend.$cat.$name: Fail [Execution]\n  Cause: $expl")
         }
+        else if (cause != "") results.put(s"$backend.$cat.$name: Fail [Execution]\n  Cause: $cause")
         else if (failed) results.put(s"$backend.$cat.$name: Fail [Validation]\n  Cause: Application reported that it did not pass validation.")
         else if (passed) results.put(s"$backend.$cat.$name: Pass")
         else             results.put(s"$backend.$cat.$name: Indeterminate\n  Cause: Application did not report validation result.")
-
-        runLog.close()
+        code == 0 && cause == ""
       }
-      catch {case e: Throwable =>
-        results.put(s"$backend.$cat.$name: Fail [Execution]\n  Cause: $e\n    ${e.getMessage}")
-        throw e
+      catch {
+        case e: TimeoutException =>
+          results.put(s"$backend.$cat.$name: Fail [Execution]\n  Cause: Execution timed out after $RUN_TIMEOUT seconds")
+          p.destroy()
+          p.exitValue() // Block waiting for kill
+          false
+
+        case e: Throwable =>
+          results.put(s"$backend.$cat.$name: Fail [Execution]\n  Cause: $e\n    ${e.getMessage}")
+          logExcept(test, e)
+          false
+      }
+      finally {
+        runLog.close()
       }
     }
 
@@ -215,24 +268,19 @@ object Regression {
         val test = queue.take()
         if (test.isValid) {
           try {
-            compileTest(test)
-            makeTest(test)
-            runTest(test)
+            val compiled = compileTest(test)
+            val made = compiled && makeTest(test)
+            val success = made && runTest(test)
+            val msg = if (success) "PASS" else "FAIL"
+            println(s"[T$id] ${test.backend}.${test.category}.${test.app.name}: $msg")
           }
           catch{ case t: Throwable =>
-            import argon.core._
-            implicit val IR: State = test.app.IR
-            config.verbosity = 10
-            withLog(config.logDir, config.name + "_exception.log") {
-              if (t.getMessage != null) { dbg(t.getMessage); dbg("") }
-              if (t.getCause != null) { dbg(t.getCause); dbg("") }
-              t.getStackTrace.foreach{elem => dbg(elem.toString) }
-            }
+            println(s"[T$id] ${test.backend}.${test.category}.${test.app.name}: UNCAUGHT EXCEPTION\n  Cause: $t\n    ${t.getMessage}")
           }
         }
         else {
           isAlive = false
-          println(s"[T#$id] Received kill signal")
+          println(s"[T$id] Received kill signal")
         }
       }
 
@@ -284,6 +332,7 @@ object Regression {
 
     // TODO: This could use some optimization
     // Can potentially overlap next backend with current as long as the same app is never compiling
+    // TODO: Actually, can we run two compilations of the same app at the same time?
     testBackends.zipWithIndex.foreach{case (backend,i) =>
       val pool = Executors.newFixedThreadPool(threads)
       val workQueue = new LinkedBlockingQueue[Test](nPrograms)
@@ -293,8 +342,12 @@ object Regression {
       val printerPool = Executors.newFixedThreadPool(1)
       printerPool.submit(Printer(regressionLog, resultQueue))
 
-      //testTests.foreach{case (cat,apps) =>
-      testDomains.foreach{case (cat,apps) =>
+      var testApps = testDomains.map{case (cat,apps) =>
+        cat -> apps.filter{case (app,targs) => args.contains(app.name) }
+      }
+      if (testApps.forall(_._2.isEmpty)) testApps = testDomains
+
+      testApps.foreach{case (cat,apps) =>
         apps.foreach{case (app,targs) =>
           workQueue.put(Test(backend, cat, app, targs, true))
         }
