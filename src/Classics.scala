@@ -2354,12 +2354,12 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
         val px00 = image(i,j)
         val px01 = image(i,j-1)
         val px02 = image(i,j-2)
-        val px10 = image(i+1,j)
-        val px11 = image(i+1,j-1)
-        val px12 = image(i+1,j-2)
-        val px20 = image(i+2,j)
-        val px21 = image(i+2,j-1)
-        val px22 = image(i+2,j-2)
+        val px10 = image(i-1,j)
+        val px11 = image(i-1,j-1)
+        val px12 = image(i-1,j-2)
+        val px20 = image(i-2,j)
+        val px21 = image(i-2,j-1)
+        val px22 = image(i-2,j-2)
         abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)        
       } else {
         0
