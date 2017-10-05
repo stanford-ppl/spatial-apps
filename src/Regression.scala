@@ -158,18 +158,25 @@ object Regression {
         app.IR.config.genDir = s"${app.IR.config.cwd}/gen/$backend/$cat/$name/"
         app.IR.config.logDir = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/"
         val consoleLog = argon.core.createLog(s"${app.IR.config.logDir}", "console.log")
-        argon.core.withLog(consoleLog){
-          app.compileProgram{ () => app.main() }
-        }(app.IR)
+        val f = Future(blocking{
+          argon.core.withLog(consoleLog){
+            app.compileProgram{ () => app.main() }
+          }(app.IR)
+        })
+        Await.result(f, duration.Duration(MAKE_TIMEOUT, "sec"))
         if (app.IR.hadErrors) {
           results.put(s"$backend.$cat.$name: Fail [Spatial Compile]\n  Cause: Error(s) during Spatial compilation")
         }
         !app.IR.hadErrors
       }
-      catch {case e: Throwable =>
-        results.put(s"$backend.$cat.$name: Fail [Spatial Compile]\n  Cause: $e\n    ${e.getMessage}")
-        logExcept(test, e)
-        false
+      catch {
+        case e: TimeoutException =>
+          results.put(s"$backend.$cat.$name: Fail [Spatial Compile]\n Cause: Spatial compile timed out after $MAKE_TIMEOUT seconds")
+          false
+        case e: Throwable =>
+          results.put(s"$backend.$cat.$name: Fail [Spatial Compile]\n  Cause: $e\n    ${e.getMessage}")
+          logExcept(test, e)
+          false
       }
     }
 
@@ -195,7 +202,7 @@ object Regression {
         case e: TimeoutException =>
           results.put(s"$backend.$cat.$name: Fail [Backend Compile]\n  Cause: Backend compile timed out after $MAKE_TIMEOUT seconds")
           p.destroy()
-          p.exitValue()
+          //p.exitValue()
           false
         case e: Throwable =>
           results.put(s"$backend.$cat.$name: Fail [Backend Compile]\n  Cause: $e\n    ${e.getMessage}")
@@ -248,7 +255,7 @@ object Regression {
         case e: TimeoutException =>
           results.put(s"$backend.$cat.$name: Fail [Execution]\n  Cause: Execution timed out after $RUN_TIMEOUT seconds")
           p.destroy()
-          p.exitValue() // Block waiting for kill
+          //p.exitValue() // Block waiting for kill
           false
 
         case e: Throwable =>
@@ -335,8 +342,8 @@ object Regression {
     // TODO: Actually, can we run two compilations of the same app at the same time?
     testBackends.zipWithIndex.foreach{case (backend,i) =>
       val pool = Executors.newFixedThreadPool(threads)
-      val workQueue = new LinkedBlockingQueue[Test](nPrograms)
-      val resultQueue = new LinkedBlockingQueue[String](nPrograms)
+      val workQueue = new LinkedBlockingQueue[Test](threads)
+      val resultQueue = new LinkedBlockingQueue[String](threads)
       (0 until threads).foreach{id => pool.submit(Worker(id, workQueue, resultQueue)) }
 
       val printerPool = Executors.newFixedThreadPool(1)
@@ -355,11 +362,11 @@ object Regression {
 
       (0 until threads).foreach{_ => workQueue.put(Test.empty) }
       pool.shutdown()
-      pool.awaitTermination(14L, TimeUnit.DAYS)
+      pool.awaitTermination(MAKE_TIMEOUT + RUN_TIMEOUT, TimeUnit.SECONDS)
 
       resultQueue.put("")
       printerPool.shutdown()
-      printerPool.awaitTermination(14L, TimeUnit.DAYS)
+      printerPool.awaitTermination(MAKE_TIMEOUT + RUN_TIMEOUT, TimeUnit.SECONDS)
     }
 
     regressionLog.close()
