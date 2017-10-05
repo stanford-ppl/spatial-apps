@@ -12,8 +12,8 @@ import scala.concurrent.{Await, Future, TimeoutException}
 
 object Regression {
   // Times to wait for compilation and running, in seconds
-  val MAKE_TIMEOUT = 600
-  val RUN_TIMEOUT = 400
+  val MAKE_TIMEOUT = 1800
+  val RUN_TIMEOUT = 1800
 
   private final val NoArgs = Array[Any]()
 
