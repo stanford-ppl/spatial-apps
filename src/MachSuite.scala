@@ -1791,6 +1791,7 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
           Foreach(from until mid+1 by 1){ i => lower_fifo.enq(data_sram(i)) }
           Foreach(mid+1 until to+1 by 1){ j => upper_fifo.enq(data_sram(j)) }
           Pipe(ii=6).Foreach(from until to+1 by 1) { k =>  // Bug # 202
+          // Pipe.Foreach(from until to+1 by 1) { k =>  // Bug # 202
             data_sram(k) = 
               if (lower_fifo.empty) { upper_fifo.deq() }
               else if (upper_fifo.empty) { lower_fifo.deq() }
@@ -1887,6 +1888,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
       def sum_scan(): Unit = {
         sum_sram(0) = 0
         Pipe(ii=3).Foreach(1 until SCAN_RADIX by 1) { radixID => // Remove manual II when bug #207 (or #151?) is fixed
+        // Pipe.Foreach(1 until SCAN_RADIX by 1) { radixID => 
           val bucket_indx = radixID.to[Index]*SCAN_BLOCK - 1
           sum_sram(radixID) = sum_sram(radixID.to[Index]-1) + bucket_sram(bucket_indx)
         }

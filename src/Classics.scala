@@ -1267,7 +1267,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
             local_farEdgeLens gather OCedgeLens(farPages2)
 
             // Do math to find new rank
-            val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+            val pagerank = Pipe.Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
                 println("page: " + page + ", local_page: " + local_page + " deq from far")
                 local_farPages.deq() / local_farEdgeLens.deq().to[X]
@@ -2492,7 +2492,8 @@ object PageRank_Bulk extends SpatialApp { // Regression (Sparse) // Args: 50 0.1
             }
 
             // Do math to find new rank
-            val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+            // val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+            val pagerank = Pipe.Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
                 println("page: " + page + ", local_page: " + local_page + " deq from far")
                 local_farPages.deq() / local_farEdgeLens.deq().to[X]
