@@ -165,16 +165,16 @@ object Regression {
         })
         Await.result(f, duration.Duration(MAKE_TIMEOUT, "sec"))
         if (app.IR.hadErrors) {
-          results.put(s"$backend.$cat.$name: Fail [Spatial Compile][newline]  Cause: Error(s) during Spatial compilation")
+          results.put(s"$backend.$cat.$name: Fail [Spatial Compile][newline]&nbsp;&nbsp;Cause: Error(s) during Spatial compilation")
         }
         !app.IR.hadErrors
       }
       catch {
         case e: TimeoutException =>
-          results.put(s"$backend.$cat.$name: Fail [Spatial Compile][newline] Cause: Spatial compile timed out after $MAKE_TIMEOUT seconds")
+          results.put(s"$backend.$cat.$name: Fail [Spatial Compile][newline]&nbsp;&nbsp;ause: Spatial compile timed out after $MAKE_TIMEOUT seconds")
           false
         case e: Throwable =>
-          results.put(s"$backend.$cat.$name: Fail [Spatial Compile][newline]  Cause: $e[newline]    ${e.getMessage}")
+          results.put(s"$backend.$cat.$name: Fail [Spatial Compile][newline]&nbsp;&nbsp;Cause: $e[newline]&nbsp;&nbsp;&nbsp;&nbsp;${e.getMessage}")
           logExcept(test, e)
           false
       }
@@ -184,6 +184,7 @@ object Regression {
       val Test(backend, cat, app, targs, _) = test
       val name = app.name
       val makeLog = new PrintStream(app.IR.config.logDir + "/" + "make.log")
+      Console.println(s"path is ${sys.env.get("PATH")}")
       val cmd = backend.make(app.IR.config.genDir)
       def log(line: String): Unit = makeLog.println(line)
       val logger = ProcessLogger(log,log)
@@ -194,18 +195,18 @@ object Regression {
         val code = Await.result(f, duration.Duration(MAKE_TIMEOUT, "sec"))
 
         if (code != 0) {
-          results.put(s"$backend.$cat.$name: Fail [Backend Compile][newline]  Cause: Non-zero exit code[newline]    See ${app.IR.config.logDir}make.log")
+          results.put(s"$backend.$cat.$name: Fail [Backend Compile][newline]&nbsp;&nbsp;Cause: Non-zero exit code[newline]&nbsp;&nbsp;&nbsp;&nbsp;See ${app.IR.config.logDir}make.log")
         }
         code == 0
       }
       catch {
         case e: TimeoutException =>
-          results.put(s"$backend.$cat.$name: Fail [Backend Compile][newline]  Cause: Backend compile timed out after $MAKE_TIMEOUT seconds")
+          results.put(s"$backend.$cat.$name: Fail [Backend Compile][newline]&nbsp;&nbsp;Cause: Backend compile timed out after $MAKE_TIMEOUT seconds")
           p.destroy()
           //p.exitValue()
           false
         case e: Throwable =>
-          results.put(s"$backend.$cat.$name: Fail [Backend Compile][newline]  Cause: $e[newline]    ${e.getMessage}")
+          results.put(s"$backend.$cat.$name: Fail [Backend Compile][newline]&nbsp;&nbsp;Cause: $e[newline]&nbsp;&nbsp;&nbsp;&nbsp;${e.getMessage}")
           logExcept(test, e)
           false
       }
@@ -242,24 +243,24 @@ object Regression {
         val code = Await.result(f, duration.Duration(RUN_TIMEOUT, "sec"))
 
         if (code != 0)   {
-          val expl = if (cause == "") s"Non-zero exit code[newline]    See ${app.IR.config.logDir}run.log" else cause
-          results.put(s"$backend.$cat.$name: Fail [Execution][newline]  Cause: $expl")
+          val expl = if (cause == "") s"Non-zero exit code[newline]&nbsp;&nbsp;&nbsp;&nbsp;See ${app.IR.config.logDir}run.log" else cause
+          results.put(s"$backend.$cat.$name: Fail [Execution][newline]&nbsp;&nbsp;Cause: $expl")
         }
-        else if (cause != "") results.put(s"$backend.$cat.$name: Fail [Execution][newline]  Cause: $cause")
-        else if (failed) results.put(s"$backend.$cat.$name: Fail [Validation][newline]  Cause: Application reported that it did not pass validation.")
+        else if (cause != "") results.put(s"$backend.$cat.$name: Fail [Execution][newline]&nbsp;&nbsp;Cause: $cause")
+        else if (failed) results.put(s"$backend.$cat.$name: Fail [Validation][newline]&nbsp;&nbsp;Cause: Application reported that it did not pass validation.")
         else if (passed) results.put(s"$backend.$cat.$name: Pass")
-        else             results.put(s"$backend.$cat.$name: Indeterminate[newline]  Cause: Application did not report validation result.")
+        else             results.put(s"$backend.$cat.$name: Indeterminate[newline]&nbsp;&nbsp;Cause: Application did not report validation result.")
         code == 0 && cause == ""
       }
       catch {
         case e: TimeoutException =>
-          results.put(s"$backend.$cat.$name: Fail [Execution][newline]  Cause: Execution timed out after $RUN_TIMEOUT seconds")
+          results.put(s"$backend.$cat.$name: Fail [Execution][newline]&nbsp;&nbsp;Cause: Execution timed out after $RUN_TIMEOUT seconds")
           p.destroy()
           //p.exitValue() // Block waiting for kill
           false
 
         case e: Throwable =>
-          results.put(s"$backend.$cat.$name: Fail [Execution][newline]  Cause: $e[newline]    ${e.getMessage}")
+          results.put(s"$backend.$cat.$name: Fail [Execution][newline]&nbsp;&nbsp;Cause: $e[newline]&nbsp;&nbsp;&nbsp;&nbsp;${e.getMessage}")
           logExcept(test, e)
           false
       }
@@ -282,7 +283,7 @@ object Regression {
             println(s"[T$id] ${test.backend}.${test.category}.${test.app.name}: $msg")
           }
           catch{ case t: Throwable =>
-            println(s"[T$id] ${test.backend}.${test.category}.${test.app.name}: UNCAUGHT EXCEPTION[newline]  Cause: $t[newline]    ${t.getMessage}")
+            println(s"[T$id] ${test.backend}.${test.category}.${test.app.name}: UNCAUGHT EXCEPTION[newline]&nbsp;&nbsp;Cause: $t[newline]&nbsp;&nbsp; ${t.getMessage}")
           }
         }
         else {
