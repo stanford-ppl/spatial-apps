@@ -236,13 +236,13 @@ object Regression {
 
       val logger = ProcessLogger(log,log)
       val p = cmd.run(logger)
+      val env = sys.env.get("PATH")
+      results.put(s"$env")
+
 
       try {
         val f = Future(blocking(p.exitValue()))
         val code = Await.result(f, duration.Duration(RUN_TIMEOUT, "sec"))
-
-        val env = sys.env.get("PATH")
-        results.put(s"$env")
 
         if (code != 0)   {
           val expl = if (cause == "") s"Non-zero exit code[newline]&nbsp;&nbsp;&nbsp;&nbsp;See ${app.IR.config.logDir}run.log" else cause
