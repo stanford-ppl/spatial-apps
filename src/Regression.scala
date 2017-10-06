@@ -151,6 +151,9 @@ object Regression {
     def compileTest(test: Test): Boolean = {
       val Test(backend, cat, app, _, _) = test
       val name = app.name
+      val env = sys.env.get("PATH")
+      results.put(s"$env")
+
       app.__stagingArgs = backend.stagingArgs   // just in case the app refers to this
       try {
         app.init(backend.stagingArgs)
@@ -236,9 +239,6 @@ object Regression {
 
       val logger = ProcessLogger(log,log)
       val p = cmd.run(logger)
-      val env = sys.env.get("PATH")
-      results.put(s"$env")
-
 
       try {
         val f = Future(blocking(p.exitValue()))
