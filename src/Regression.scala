@@ -316,7 +316,7 @@ object Regression {
     var backends = List[Backend]()
 
     val threads: Int = try { args(0).toInt } catch { case _:Throwable => 8 }
-    val branch: Int = try { args(1) } catch { case _:Throwable => "nobranch" }
+    val branch: String = try { args(1) } catch { case _:Throwable => "nobranch" }
     var flags = Array[String]()
     if (branch.contains("retim")) flags = flags :+ "--retiming"
     if (branch.contains("syncMem")) flags = flags :+ "--syncMem"
