@@ -184,7 +184,6 @@ object Regression {
       val Test(backend, cat, app, targs, _) = test
       val name = app.name
       val makeLog = new PrintStream(app.IR.config.logDir + "/" + "make.log")
-      Console.println(s"path is ${sys.env.get("PATH")}")
       val cmd = backend.make(app.IR.config.genDir)
       def log(line: String): Unit = makeLog.println(line)
       val logger = ProcessLogger(log,log)
@@ -241,6 +240,9 @@ object Regression {
       try {
         val f = Future(blocking(p.exitValue()))
         val code = Await.result(f, duration.Duration(RUN_TIMEOUT, "sec"))
+
+        val env = sys.env.get("PATH")
+        results.put(s"$env")
 
         if (code != 0)   {
           val expl = if (cause == "") s"Non-zero exit code[newline]&nbsp;&nbsp;&nbsp;&nbsp;See ${app.IR.config.logDir}run.log" else cause
