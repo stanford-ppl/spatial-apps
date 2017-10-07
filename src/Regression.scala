@@ -347,6 +347,10 @@ object Regression {
     val nPrograms = testDomains.map(_._2.length).sum
 
     val regressionLog = new PrintStream(s"regression_$timestamp.log")
+    val flagsLog = new PrintStream(s"flags_$timestamp.log")
+    flagsLog.println(s"Flags: ${testBackends.map{x => s"${x.stagingArgs.toList.mkString(" ")}"}.mkString(", ")}")
+    // TODO: Good way to get the make target? (vcs, xsim, etc)
+    // flagsLog.println(s"Make: ${testBackends.map{x => s"${x.make}"}.mkString(", ")}")
 
     // TODO: This could use some optimization
     // Can potentially overlap next backend with current as long as the same app is never compiling
@@ -380,6 +384,7 @@ object Regression {
       printerPool.awaitTermination(MAKE_TIMEOUT + RUN_TIMEOUT, TimeUnit.SECONDS)
     }
 
+    flagsLog.close()
     regressionLog.close()
   }
 }
