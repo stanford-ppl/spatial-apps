@@ -1314,7 +1314,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
 
   @virtualize
   def main() = {
-    val raw_string_data = loadCSV1D[MString]("/remote/regression/data/machsuite/kmp_string.csv", "\n")
+    val raw_string_data = loadCSV1D[MString](sys.env("SPATIAL_HOME") + "/apps/data/kmp/kmp_string.csv", "\n")
     val raw_string_pattern = args(0).to[MString]//"bull"//Array[Int](98,117,108,108)
     val raw_string = argon.lang.String.string2num(raw_string_data(0))
     val raw_pattern = argon.lang.String.string2num(raw_string_pattern)
