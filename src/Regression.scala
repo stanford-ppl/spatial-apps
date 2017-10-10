@@ -49,7 +49,7 @@ object Regression {
     dense ::= (Sort_Radix, NoArgs)
     dense ::= (GEMM_Blocked, Array(128))
     dense ::= (GEMM_NCubed, NoArgs)
-    dense ::= (KMP, Array("the"))
+    // dense ::= (KMP, Array("the"))
     dense ::= (MD_Grid, NoArgs)
     dense ::= (MD_KNN, NoArgs)
     dense ::= (NW, Array("tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"))
@@ -60,15 +60,15 @@ object Regression {
     dense ::= (AES, Array(50))
 
     var sparse = List[(SpatialApp, Array[Any])]()
-    sparse ::= (ScatterGather, Array(160))
-    sparse ::= (GatherStore, NoArgs)
+    // sparse ::= (ScatterGather, Array(160))
+    // sparse ::= (GatherStore, NoArgs)
     sparse ::= (PageRank_Bulk, Array(50, 0.125))
-    sparse ::= (SPMV_DumbPack, Array(1536))
-    sparse ::= (PageRank, Array(50, 0.125))
+    // sparse ::= (SPMV_DumbPack, Array(1536))
+    // sparse ::= (PageRank, Array(50, 0.125))
     sparse ::= (BFS_Queue, NoArgs)
     sparse ::= (BFS_Bulk, NoArgs)
-    sparse ::= (SPMV_ELL, NoArgs)
-    sparse ::= (SPMV_CRS, NoArgs)
+    // sparse ::= (SPMV_ELL, NoArgs)
+    // sparse ::= (SPMV_CRS, NoArgs)
 
     var unit = List[(SpatialApp, Array[Any])]()
     unit ::= (ArbitraryLambda, Array(8))
@@ -120,7 +120,18 @@ object Regression {
     unit ::= (Tensor4D, Array(32, 4, 4, 4))
     unit ::= (SequentialWrites, Array(7))
 
-    Array("Dense" -> dense, "Sparse" -> sparse, "Unit" -> unit)
+    var fixme = List[(SpatialApp, Array[Any])]()
+    fixme ::= (KMP, Array("the"))
+    fixme ::= (ScatterGather, Array(160))
+    fixme ::= (PageRank, Array(50, 0.125))
+    fixme ::= (GatherStore, NoArgs)
+    fixme ::= (SPMV_DumbPack, Array(1536))
+    fixme ::= (SPMV_ELL, NoArgs)
+    fixme ::= (SPMV_CRS, NoArgs)
+
+
+
+    Array("Dense" -> dense, "Sparse" -> sparse, "Unit" -> unit, "Fixme" -> fixme)
   }
 
   case class Backend(name: String, stagingArgs: Array[String], make: String => ProcessBuilder, run: (String,String) => ProcessBuilder) {
