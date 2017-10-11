@@ -2161,7 +2161,7 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
 }
 
 
-object Backprop extends SpatialApp { // Regression (Dense) // Args: 15
+object Backprop extends SpatialApp { // Regression (Dense) // Args: 5
   override val target = AWS_F1
 
  /*                                                                                                  
