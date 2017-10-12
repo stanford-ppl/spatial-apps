@@ -45,7 +45,7 @@ object Regression {
     dense ::= (Kmeans, Array(3, 64))
     dense ::= (FFT_Transpose, NoArgs)
     dense ::= (FFT_Strided, NoArgs)
-    dense ::= (Backprop, Array(5))
+    // dense ::= (Backprop, Array(5))
     dense ::= (Sort_Radix, NoArgs)
     dense ::= (GEMM_Blocked, Array(128))
     dense ::= (GEMM_NCubed, NoArgs)
@@ -128,6 +128,8 @@ object Regression {
     fixme ::= (SPMV_DumbPack, Array(1536))
     fixme ::= (SPMV_ELL, NoArgs)
     fixme ::= (SPMV_CRS, NoArgs)
+    fixme ::= (Backprop, Array(5))
+
 
 
 
