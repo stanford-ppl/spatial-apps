@@ -1,0 +1,459 @@
+import spatial.dsl._
+import org.virtualized._
+
+
+trait TestParams extends SpatialApp {
+  val N = 32
+  val JX = 10
+  val dco = 100
+  val d = 20
+
+  val dn = 4
+  val ddco = 10
+  val dd = 2
+  val forgetBias = 1
+  val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
+  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
+                       simFileDir + "/memory.csv", simFileDir + "/kernel.csv", 
+                       simFileDir + "/bias.csv")
+}
+
+
+trait CharRNNTestParams extends SpatialApp {
+  val input_size = 65
+  val rnn_size = 128 
+  val n = 2
+
+  // TODO: port lua values to here
+  // val charRNNDir = ""
+  // val dataPaths = List()
+}
+
+
+trait Params extends SpatialApp {
+  val N = 60
+  val JX = 161
+  val dco = 1400
+  val d = 100
+
+  val dn = 10
+  val ddco = 100
+  val dd = 10
+  val forgetBias = 1
+  val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
+  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
+                       simFileDir + "/memory.csv", simFileDir + "/kernel.csv", 
+                       simFileDir + "/bias.csv")
+  val n = 2 // iteration steps
+}
+
+
+trait CharRNNParams extends SpatialApp {
+  val N = 50
+  val JX = 2
+  val dco = 100 // TODO: need to determine on the actual size
+  val d = 100
+  val dn = 10
+  val ddco = 100
+  val dd = 10
+  // TODO: Need to port the data here
+  val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
+  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
+                       simFileDir + "/memory.csv", simFileDir + "/kernel.csv", 
+                       simFileDir + "/bias.csv")
+}
+
+
+// TODO: where to put these activation functions seem to be a big pain too...
+trait Activations extends SpatialApp {
+  type aT = FixPt[TRUE, _32, _32]
+  type iT = FixPt[TRUE, _32, _32]
+  val projectDir = "/home/tianzhao/spatial-lang/apps/src/"
+  val loSig = 16
+  val loTanh = 4
+  val spacingShiftBitsSig = 5 // shift down for sig
+  val spacingShiftBitsTanh = 7 // shift down for tanh
+  val lutNSig = 512
+  val lutNTanh = 512
+  val sigF = projectDir + "sigmoid_512_16_-5.0.csv"
+  val tanhF = projectDir + "tanh_512_4_-7.0.csv"
+
+
+  // TODO: we may not need that many bits for sigmoid and tanh. Need to reduce these.
+  def sigmoid_(p: aT) = {
+    val halfSigLUT = LUT.fromFile[aT](lutNSig)(sigF)
+    val index = (abs(p).to[iT] << spacingShiftBitsSig).to[Index] + 1.to[Index]
+    val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
+    val lowerMux = mux(p <= -loSig.to[aT], 0.to[aT], valueMux)
+    val upperMux = mux(p >= loSig.to[aT], 1.to[aT], lowerMux)
+    upperMux
+  }
+
+
+  def sigmoid_old(p: aT) = {
+    val halfSigLUT = LUT.fromFile[aT](lutNSig)(sigF)
+    val index = (abs(p).to[iT] << spacingShiftBitsSig).to[Index]
+    val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
+    val lowerMux = mux(p <= -loSig.to[aT], 0.to[aT], valueMux)
+    val upperMux = mux(p >= loSig.to[aT], 1.to[aT], lowerMux)
+    upperMux
+  }
+
+
+  // Implement tanh using a LUT
+  def tanh_(p: aT) = {
+    val halfTanhLUT = LUT.fromFile[aT](lutNTanh)(tanhF)
+    val index = (abs(p).to[iT] << spacingShiftBitsTanh).to[Index] // + 1.to[Index]
+    val valueMux = mux(p < 0.to[aT], 0.to[aT] - halfTanhLUT(index), halfTanhLUT(index))
+    val lowerMux = mux(p <= -loTanh.to[aT], -1.to[aT], valueMux)
+    val upperMux = mux(p >= loTanh.to[aT], 1.to[aT], lowerMux)
+    upperMux
+  }
+
+  // A few ideas about implementing tanh: 
+  // range doesn't need to go that much. -8 to 8 would be fine.
+  // However more precisions need to be provided within 0 to 8.
+
+  // Implement a tanh using: tanh(x) = 2 * sigmoid(2*x) - 1
+  def tanh_approx(p: aT) = {
+    (sigmoid_(p << 1) << 1) - 1
+  }
+}
+
+
+object ActivationTests extends Activations {
+  // TODO: In the real application, the integer bits shouldn't be more than 1.
+  type T = FixPt[TRUE, _32, _32]
+  @virtualize
+  def main() {
+    val x = ArgIn[T]
+    val y = ArgOut[T]
+    val y1 = ArgOut[T]
+    val N = args(0).to[T]
+    setArg(x, N)
+
+    // Try: 0.09800561, 0.12712223
+    Accel {
+      Parallel {
+        // y := tanh_(x.value)
+        y := tanh_(x.value)   // numpy would give: 0.097693026355715917, 0.126441859911746
+        y1 := sigmoid_(x.value) // numpy would give: 0.52448180978452119, 0.53173782856894825
+      }
+    }
+
+    val yre = getArg(y)
+    val yre1 = getArg(y1)
+    println(yre)
+    println(yre1)
+  }
+}
+
+
+// object CharRNN extends SpatialApp with CharRNNTestParams with Activations {
+//   type T = FixPt[TRUE, _16, _16]
+
+//   @virtualize
+//   def main() {
+//     // TODO: seems that size need to be determined? 
+//     val (inputs, outputs, i2h, h2h) = (DRAM[T](2*n+1, rnn_size), 
+//                                         DRAM[T](2*n+1, rnn_size),
+//                                         DRAM[T](rnn_size, 4*rnn_size),
+//                                         DRAM[T](rnn_size, 4*rnn_size))
+
+//     // TODO: set memory vals
+//     // TODO: for now assuming that input size is equal to rnn size
+//     Accel {
+//       // Sequential: for 1,n do 
+//       val prev_h = SRAM[rnn_size]
+//       val prev_c = SRAM[rnn_size]
+//       Sequential.Foreach(n by 1) { L =>
+//         prev_h load inputs(2*L+1, 0::rnn_size)
+//         prev_c load inputs(2*L, 0::rnn_size)
+//         x load inputs(L, 0::rnn_size) // TODO: determine what to load
+
+//       }
+//     }
+//   }
+// }
+
+
+// For split: i, j, f, o = np.split(linear, 4, axis=1)
+object CharRNN extends SpatialApp with CharRNNParams with Activations {
+  type T = FixPt[TRUE, _32, _32]
+
+  @virtualize
+  def main() {
+    val (a, hidden, memory, kernel, bias) = (DRAM[T](N, JX, dco), DRAM[T](N, JX, d), 
+                                             DRAM[T](N, JX, d), DRAM[T](dco+d, 4*d), 
+                                             DRAM[T](4*d))
+    val drams = List(a, hidden, memory, kernel, bias)
+    drams.zipWithIndex.foreach { case(e, idx) =>
+      setMem(e, loadCSV1D[T](dataPaths(idx), ","))
+    }
+
+    val linearDRAM = DRAM[T](N, 4*d)
+    val resultHiddenDRAM = DRAM[T](N, d)
+    val resultMemoryDRAM = DRAM[T](N, d)
+    val MM = N
+    val PP = d + dco
+    val NN = 4 * d
+
+    Accel {
+      Sequential.Foreach(JX by 1) { L =>
+        Foreach(MM by dn, NN by dd) { (i, j) =>
+          val tileC = SRAM[T](dn, dd)
+          Foreach(PP by ddco) { k =>
+            val tileA = SRAM[T](dn, ddco)
+            val tileB = SRAM[T](ddco, dd)
+            Parallel {
+              tileB load kernel(k::k+ddco, j::j+dd)
+              if (k < dco) {
+                tileA load a(i::i+dn, L, k::k+ddco)
+              } else {
+                tileA load hidden(i::i+dn, L, (k-dco)::(k-dco)+ddco)
+              }
+            }
+
+            Foreach(dn by 1, dd by 1) { (ii, jj) =>
+              // TODO: multiply add... can I replace this with shift add?
+              // TODO: check the paper from bengio. pow2 shift add on matmult
+              val nD2 = j + jj
+              val prod = Reduce(Reg[T])(ddco by 1) { kk => 
+                tileA(ii, kk) * tileB(kk, jj)
+              } {_+_}
+              // adding in a bias
+              val prev = mux(k == 0, 0.to[T], tileC(ii, jj))
+              val ele = prev + prod.value
+              // if the last element, then perform sigmoid overall
+              if (k == PP - ddco) {
+                if (nD2 < d || nD2 >= d * 3)
+                  tileC(ii, jj) = sigmoid_(ele)
+                else if (d <= nD2 && nD2 < d * 2)
+                  tileC(ii, jj) = tanh_(ele)
+                else
+                  tileC(ii, jj) = sigmoid_(ele)
+              } else
+                tileC(ii,jj) = ele
+            }
+          }
+
+          linearDRAM(i::i+dn, j::j+dd) store tileC
+        }
+
+        // Reduce the results to hidden and memory
+        //                    4*d
+        //     +---------+---------+---------+----------+
+        //     | sigm(i) | tanh(j) | sigm(f) | sigm(o)  |
+        // N   |         |         |         |          |
+        //     +---------v---------v---------v----------+
+
+        // TODO: change it to list tabulate?
+        // val (tileI, tileJ, tileF, tileO, tileH, tileM) = (SRAM[T](dn, dd), SRAM[T](dn, dd), 
+        //                                                   SRAM[T](dn, dd), SRAM[T](dn, dd),
+        //                                                   SRAM[T](dn, dd), SRAM[T](dn, dd))
+        val tileMM = SRAM[T](dn, dd)
+        val tileI = SRAM[T](dn, dd)
+        val tileJ = SRAM[T](dn, dd)
+        val tileF = SRAM[T](dn, dd)
+        val tileO = SRAM[T](dn, dd)
+        val tileM = SRAM[T](dn, dd)
+        val tileH = SRAM[T](dn, dd)
+        Foreach(MM by dn, d by dd) { (il, jl) =>
+          Parallel {
+            tileI load linearDRAM(il::il+dn, jl::jl+dd)
+            tileJ load linearDRAM(il::il+dn, jl+d::jl+d+dd)
+            tileF load linearDRAM(il::il+dn, jl+2*d::jl+2*d+dd)
+            tileO load linearDRAM(il::il+dn, jl+3*d::jl+3*d+dd)
+            tileM load memory(il::il+dn, L, jl::jl+dd)
+          } 
+
+          Foreach(dn by 1, dd by 1) { (ild, jld) =>
+            val newC = Reg[T](0)
+            newC := tileM(ild, jld) * tileF(ild, jld) + tileI(ild, jld) * tileJ(ild, jld)
+            tileH(ild, jld) = tanh_(newC.value) * tileO(ild, jld)
+            tileMM(ild, jld) = newC.value
+          }
+
+          memory(il::il+dn, L+1, jl::jl+dd) store tileMM
+          hidden(il::il+dn, L+1, jl::jl+dd) store tileH
+        }
+      }
+    }
+
+    val hiddenRe = getMem(hidden)
+    // printArray(result, "resultDRAM = ")
+    writeCSV1D[T](hiddenRe, simFileDir + "/hidden_re.csv")
+    val memRe = getMem(memory)
+    writeCSV1D[T](memRe, simFileDir + "/mem_re.csv")
+  }
+}
+
+
+// At each data point in the batch:
+// This app does np.concatenate([a, hidden], axis=1).dot(kernel) + bias(broadcasted)
+// bias needs to broadcast N
+//          dco        d                 4d               1
+//   +--------------+-----+       +-----------------+    +--+
+//   |              |     |       |                 |    |  |
+//   |              |     |       |                 |    |  |
+//   |              |     |       |                 |    |  |
+// N |     a        |hidden   *   |     kernel      | +  |  |4d
+//   |              |     |       |                 |    |  |
+//   |              |     |       |d + dco          |    |  |
+//   |              |     |       |                 |    |  |
+//   +--------------+-----+       |                 |    |  |
+//                                |                 |    +--+
+//                                |                 |
+//                                |                 |
+//                                |                 |
+//                                |                 |
+//                                +-----------------+
+
+// For split: i, j, f, o = np.split(linear, 4, axis=1)
+object BasicLSTMCell extends SpatialApp with TestParams with Activations {
+  type T = FixPt[TRUE, _32, _32]
+
+  @virtualize
+  def main() {
+    val (a, hidden, memory, kernel, bias) = (DRAM[T](N, JX, dco), DRAM[T](N, JX, d), 
+                                             DRAM[T](N, JX, d), DRAM[T](dco+d, 4*d), 
+                                             DRAM[T](4*d))
+    val drams = List(a, hidden, memory, kernel, bias)
+    drams.zipWithIndex.foreach { case(e, idx) =>
+      setMem(e, loadCSV1D[T](dataPaths(idx), ","))
+    }
+
+    val linearDRAM = DRAM[T](N, 4*d)
+    val resultHiddenDRAM = DRAM[T](N, d)
+    val resultMemoryDRAM = DRAM[T](N, d)
+    val MM = N
+    val PP = d + dco
+    val NN = 4 * d
+
+    Accel {
+      // TODO: Later this JX needs to be replaced by a different val...
+      // TODO: currently it's all set to 0
+      // TODO: for higher dimension matrices, would the alignment matter? 
+      // TODO: I use a fused matrix to follow implementation in tf and pt. 
+      // however would this be faster than having four separate ones? 
+      // Or was this only for training time speed-up concerns?
+      //       need to test on this matter. 
+
+      val tileBias = SRAM[T](NN)
+      tileBias load bias(0::NN)
+      Foreach(MM by dn, NN by dd) { (i, j) =>
+        val tileC = SRAM[T](dn, dd)
+        Foreach(PP by ddco) { k =>
+          val tileA = SRAM[T](dn, ddco)
+          val tileB = SRAM[T](ddco, dd)
+          Parallel {
+            tileB load kernel(k::k+ddco, j::j+dd)
+            if (k < dco) {
+              tileA load a(i::i+dn, 0, k::k+ddco)
+            } else {
+              tileA load hidden(i::i+dn, 0, (k-dco)::(k-dco)+ddco)
+            }
+          }
+
+          Foreach(dn by 1, dd by 1) { (ii, jj) =>
+            // TODO: multiply add... can I replace this with shift add?
+            // TODO: check the paper from bengio. pow2 shift add on matmult
+            val nD2 = j + jj
+            val prod = Reduce(Reg[T])(ddco by 1) { kk => 
+              tileA(ii, kk) * tileB(kk, jj)
+            } {_+_}
+            // adding in a bias
+            val prev = mux(k == 0, tileBias(nD2), tileC(ii, jj))
+            val ele = prev + prod.value
+            // if the last element, then perform sigmoid overall
+            if (k == PP - ddco) {
+              if (nD2 < d || nD2 >= d * 3)
+                tileC(ii, jj) = sigmoid_(ele)
+                // tileC(ii, jj) = ele
+              else if (d <= nD2 && nD2 < d * 2)
+                tileC(ii, jj) = tanh_(ele)
+                // tileC(ii, jj) = ele
+              else
+                tileC(ii, jj) = sigmoid_(ele + forgetBias)
+                // tileC(ii, jj) = ele + forgetBias
+            } else
+              tileC(ii,jj) = ele
+          }
+        }
+
+        linearDRAM(i::i+dn, j::j+dd) store tileC
+      }
+
+      // Reduce the results to hidden and memory
+      //                    4*d
+      //     +---------+---------+---------+----------+
+      //     | sigm(i) | tanh(j) | sigm(f) | sigm(o)  |
+      // N   |         |         |         |          |
+      //     +---------v---------v---------v----------+
+
+      // TODO: change it to list tabulate?
+      val (tileI, tileJ, tileF, tileO, tileH, tileM) = (SRAM[T](dn, dd), SRAM[T](dn, dd), 
+                                                        SRAM[T](dn, dd), SRAM[T](dn, dd),
+                                                        SRAM[T](dn, dd), SRAM[T](dn, dd))
+      val tileMM = SRAM[T](dn, dd)
+      Foreach(MM by dn, d by dd) { (il, jl) =>
+        Parallel {
+          tileI load linearDRAM(il::il+dn, jl::jl+dd)
+          tileJ load linearDRAM(il::il+dn, jl+d::jl+d+dd)
+          tileF load linearDRAM(il::il+dn, jl+2*d::jl+2*d+dd)
+          tileO load linearDRAM(il::il+dn, jl+3*d::jl+3*d+dd)
+          tileM load memory(il::il+dn, 0, jl::jl+dd)
+        } 
+
+        Foreach(dn by 1, dd by 1) { (ild, jld) =>
+          val newC = Reg[T](0)
+          newC := tileM(ild, jld) * tileF(ild, jld) + tileI(ild, jld) * tileJ(ild, jld)
+          tileH(ild, jld) = tanh_(newC.value) * tileO(ild, jld)
+          tileMM(ild, jld) = newC.value
+        }
+
+        memory(il::il+dn, 0, jl::jl+dd) store tileMM
+        hidden(il::il+dn, 0, jl::jl+dd) store tileH
+      }
+    }
+
+    val hiddenRe = getMem(hidden)
+    // printArray(result, "resultDRAM = ")
+    writeCSV1D[T](hiddenRe, simFileDir + "/hidden_re.csv")
+    val memRe = getMem(memory)
+    writeCSV1D[T](memRe, simFileDir + "/mem_re.csv")
+  }
+}
+
+// This test multiply each element in a high-dim DRAM with a constant
+object DRAM3ConcatTestAugKernel extends SpatialApp with Params {
+  type T = FixPt[TRUE, _16, _16] 
+
+  @virtualize
+  def main() {
+    val (a, hidden, kernel, bias) = (DRAM[T](N, JX, dco), DRAM[T](N, JX, d), 
+                                     DRAM[T](dco+d, 4*d), DRAM[T](4*d))
+    val drams = List(a, hidden, kernel, bias)
+    drams.zipWithIndex.foreach { case(e, idx) =>
+      setMem(e, loadCSV1D[T](dataPaths(idx), ","))
+    } 
+
+    val rk = DRAM[T](dco+d, 4*d)
+
+    Accel {
+      val tileA = SRAM[T](ddco, dd)
+      val tileB = SRAM[T](ddco, dd)
+      Foreach(dco+d by ddco, 4*d by dd) { (i,j) =>
+        tileA load kernel(i::i+ddco, j::j+dd)
+        Foreach(ddco by 1, dd by 1) { (ii,jj) =>
+          tileB(ii,jj) = tileA(ii,jj) * 2
+        }
+
+        rk(i::i+ddco, j::j+dd) store tileB
+      }
+    } 
+
+    val rkresult = getMem(rk)
+    printArray(rkresult, "Result: ")
+  }
+}
