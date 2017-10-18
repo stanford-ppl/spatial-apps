@@ -10,6 +10,7 @@ import spatial.SpatialApp
 
 import scala.concurrent.{Await, Future, TimeoutException}
 
+// Usage: <threads> <branch> <type [Scala, Chisel]>
 object Regression {
   // Times to wait for compilation and running, in seconds
   val MAKE_TIMEOUT = 1800
@@ -350,6 +351,18 @@ object Regression {
       stagingArgs = flags :+ "--synth",
       make = genDir => Process(Seq("make","vcs"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "run.sh", args), new java.io.File(genDir))
+    )
+    backends ::= Backend(
+      name = "Zynq",
+      stagingArgs = flags :+ "--synth" :+ "--retime",
+      make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "zynq"), new java.io.File(genDir))
+    )
+    backends ::= Backend(
+      name = "F1",
+      stagingArgs = flags :+ "--synth" :+ "--retime",
+      make = genDir => Process(Seq("make","aws-f1"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "f1"), new java.io.File(genDir))
     )
 
     var testBackends = backends.filter{b => args.contains(b.name) }
