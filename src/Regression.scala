@@ -13,8 +13,9 @@ import scala.concurrent.{Await, Future, TimeoutException}
 // Usage: <threads> <branch> <type [Scala, Chisel]>
 object Regression {
   // Times to wait for compilation and running, in seconds
-  val MAKE_TIMEOUT = 1800
-  val RUN_TIMEOUT = 1800
+  var MAKE_TIMEOUT = 1800
+  var RUN_TIMEOUT = 1800
+  var ZYNQ_TIMEOUT = 9000
 
   private final val NoArgs = Array[Any]()
 
@@ -366,6 +367,7 @@ object Regression {
     )
 
     var testBackends = backends.filter{b => args.contains(b.name) }
+    if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
     if (testBackends.isEmpty) testBackends = backends
     var testDomains = tests.filter{t => args.contains(t._1) }
     if (testDomains.isEmpty) testDomains = tests
