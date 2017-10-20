@@ -2604,7 +2604,7 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
           so we can either use an FSM or use strict loops that take this mutation into account and I chose the latter
  */
 
-  type T = FixPt[TRUE,_32,_32]
+  type T = FixPt[TRUE,_16,_16]
   @virtualize
   def main() = {
 
@@ -2699,7 +2699,7 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
               Also, is their algorithm even correct?!  It's very suspicion and I can even comment out some of their code and it still passes....
  */
 
-  type T = FixPt[TRUE,_32,_32]
+  type T = FixPt[TRUE,_16,_16]
   @virtualize
   def main() = {
 
