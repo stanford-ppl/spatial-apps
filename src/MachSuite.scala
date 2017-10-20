@@ -1016,7 +1016,7 @@ object MD_KNN extends SpatialApp { // Regression (Dense) // Args: none
  */
 
   // Max pos seems to be about 19
-  type T = FixPt[TRUE, _12, _52]
+  type T = FixPt[TRUE, _12, _20]
   @struct case class XYZ(x: T, y: T, z: T) 
 
   @virtualize
@@ -1149,7 +1149,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
  */
 
   // Max pos seems to be about 19
-  type T = FixPt[TRUE, _12, _52]
+  type T = FixPt[TRUE, _12, _20]
   @struct case class XYZ(x: T, y: T, z: T) 
 
   @virtualize
