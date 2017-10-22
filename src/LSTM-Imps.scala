@@ -13,20 +13,9 @@ trait TestParams extends SpatialApp {
   val dd = 2
   val forgetBias = 1
   val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
-  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
+  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv",
                        simFileDir + "/memory.csv", simFileDir + "/kernel.csv", 
                        simFileDir + "/bias.csv")
-}
-
-
-trait CharRNNTestParams extends SpatialApp {
-  val input_size = 65
-  val rnn_size = 128 
-  val n = 2
-
-  // TODO: port lua values to here
-  // val charRNNDir = ""
-  // val dataPaths = List()
 }
 
 
@@ -45,22 +34,6 @@ trait Params extends SpatialApp {
                        simFileDir + "/memory.csv", simFileDir + "/kernel.csv", 
                        simFileDir + "/bias.csv")
   val n = 2 // iteration steps
-}
-
-
-trait CharRNNParams extends SpatialApp {
-  val N = 50
-  val JX = 2
-  val dco = 100 // TODO: need to determine on the actual size
-  val d = 100
-  val dn = 10
-  val ddco = 100
-  val dd = 10
-  // TODO: Need to port the data here
-  val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
-  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
-                       simFileDir + "/memory.csv", simFileDir + "/kernel.csv", 
-                       simFileDir + "/bias.csv")
 }
 
 
@@ -110,6 +83,7 @@ trait Activations extends SpatialApp {
     upperMux
   }
 
+
   // A few ideas about implementing tanh: 
   // range doesn't need to go that much. -8 to 8 would be fine.
   // However more precisions need to be provided within 0 to 8.
@@ -117,6 +91,58 @@ trait Activations extends SpatialApp {
   // Implement a tanh using: tanh(x) = 2 * sigmoid(2*x) - 1
   def tanh_approx(p: aT) = {
     (sigmoid_(p << 1) << 1) - 1
+  }
+}
+
+trait CharRNNTestParams extends SpatialApp {
+  val N = 50
+  val JX = 2
+  val dco = 100 // TODO: need to determine on the actual size
+  val d = 100
+  val dn = 10
+  val ddco = 100
+  val dd = 10
+  // TODO: Need to port the data here
+  val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
+  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
+                       simFileDir + "/memory.csv", simFileDir + "/kernel.csv", 
+                       simFileDir + "/bias.csv")
+}
+
+trait CharRNNParams extends SpatialApp {
+  val input_size = 65
+  val rnn_size = 128
+  val batch_size = 50
+
+  val charRNNDir = "./char-rnn-weights"
+  val dataPaths = List(charRNNDir + "/i2h_1-weights.csv", charRNNDir + "/i2h_1-bias.csv", 
+                        charRNNDir + "/h2h_1-weights.csv", charRNNDir + "/h2h_1-bias.csv",
+                        charRNNDir + "/i2h_2-weights.csv", charRNNDir + "/i2h_2-bias.csv",
+                        charRNNDir + "/h2h_2-weights.csv", charRNNDir + "/h2h_2-bias.csv",
+                        charRNNDir + "/decoder-weights.csv", charRNNDir + "/decoder-bias.csv")
+}
+
+
+object CharRNNStandard extends SpatialApp with CharRNNParams {
+  type T = FixPt[TRUE, _16, _16] 
+
+  @virtualize
+  def main() {
+    val lout = rnn_size*4
+    val i2h_1w = DRAM[T](input_size, lout)
+    val i2h_1b = DRAM[T](lout)
+    val i2h_2w = DRAM[T](rnn_size, lout)
+    val i2h_2b = DRAM[T](lout)
+    val h2h_1w = DRAM[T](rnn_size, lout)
+    val h2h_1b = DRAM[T](lout)
+    val h2h_2w = DRAM[T](rnn_size, lout)
+    val h2h_2b = DRAM[T](lout)
+    val decoder_w = DRAM[T](rnn_size, input_size)
+    val decoder_b = DRAM[T](input_size)
+    val drams = List(i2h_1w, i2h_1b, i2h_2w, i2h_2b, h2h_1w, h2h_1b, h2h_2w, h2h_2b, decoder_w, decoder_b)
+    drams.zipWithIndex.foreach { case(e, idx) =>
+      setMem(e, loadCSV1D)
+    }
   }
 }
 
@@ -148,37 +174,8 @@ object ActivationTests extends Activations {
   }
 }
 
-
-// object CharRNN extends SpatialApp with CharRNNTestParams with Activations {
-//   type T = FixPt[TRUE, _16, _16]
-
-//   @virtualize
-//   def main() {
-//     // TODO: seems that size need to be determined? 
-//     val (inputs, outputs, i2h, h2h) = (DRAM[T](2*n+1, rnn_size), 
-//                                         DRAM[T](2*n+1, rnn_size),
-//                                         DRAM[T](rnn_size, 4*rnn_size),
-//                                         DRAM[T](rnn_size, 4*rnn_size))
-
-//     // TODO: set memory vals
-//     // TODO: for now assuming that input size is equal to rnn size
-//     Accel {
-//       // Sequential: for 1,n do 
-//       val prev_h = SRAM[rnn_size]
-//       val prev_c = SRAM[rnn_size]
-//       Sequential.Foreach(n by 1) { L =>
-//         prev_h load inputs(2*L+1, 0::rnn_size)
-//         prev_c load inputs(2*L, 0::rnn_size)
-//         x load inputs(L, 0::rnn_size) // TODO: determine what to load
-
-//       }
-//     }
-//   }
-// }
-
-
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
-object CharRNN extends SpatialApp with CharRNNParams with Activations {
+object CharRNNLarge extends SpatialApp with CharRNNParams with Activations {
   type T = FixPt[TRUE, _32, _32]
 
   @virtualize
@@ -287,6 +284,34 @@ object CharRNN extends SpatialApp with CharRNNParams with Activations {
     writeCSV1D[T](memRe, simFileDir + "/mem_re.csv")
   }
 }
+
+
+// object CharRNN extends SpatialApp with CharRNNTestParams with Activations {
+//   type T = FixPt[TRUE, _16, _16]
+
+//   @virtualize
+//   def main() {
+//     // TODO: seems that size need to be determined? 
+//     val (inputs, outputs, i2h, h2h) = (DRAM[T](2*n+1, rnn_size), 
+//                                         DRAM[T](2*n+1, rnn_size),
+//                                         DRAM[T](rnn_size, 4*rnn_size),
+//                                         DRAM[T](rnn_size, 4*rnn_size))
+
+//     // TODO: set memory vals
+//     // TODO: for now assuming that input size is equal to rnn size
+//     Accel {
+//       // Sequential: for 1,n do 
+//       val prev_h = SRAM[rnn_size]
+//       val prev_c = SRAM[rnn_size]
+//       Sequential.Foreach(n by 1) { L =>
+//         prev_h load inputs(2*L+1, 0::rnn_size)
+//         prev_c load inputs(2*L, 0::rnn_size)
+//         x load inputs(L, 0::rnn_size) // TODO: determine what to load
+
+//       }
+//     }
+//   }
+// }
 
 
 // At each data point in the batch:
