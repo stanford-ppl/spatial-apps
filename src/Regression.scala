@@ -361,15 +361,15 @@ object Regression {
       run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "Zynq"), new java.io.File(genDir))
     )
     backends ::= Backend(
-      name = "F1",
+      name = "AWS",
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","aws-F1-afi"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "F1"), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "AWS"), new java.io.File(genDir))
     )
 
     var testBackends = backends.filter{b => args.contains(b.name) }
     if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
-    else if (args.contains("F1")) MAKE_TIMEOUT = AWS_TIMEOUT
+    else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
     if (testBackends.isEmpty) testBackends = backends
     var testDomains = tests.filter{t => args.contains(t._1) }
     if (testDomains.isEmpty) testDomains = tests
