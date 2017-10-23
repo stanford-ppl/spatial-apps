@@ -57,7 +57,7 @@ object AES extends SpatialApp { // Regression (Dense) // Args: 50
     
     val par_load = 16
     val par_store = 16
-    val outer_par = 3 (1 -> 1 -> 4)
+    val outer_par = 1 (1 -> 1 -> 4)
 
     // Setup
     val num_bytes = ArgIn[Int]
