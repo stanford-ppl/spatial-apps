@@ -39,8 +39,8 @@ trait Params extends SpatialApp {
 
 // TODO: where to put these activation functions seem to be a big pain too...
 trait Activations extends SpatialApp {
-  type aT = FixPt[TRUE, _32, _32]
-  type iT = FixPt[TRUE, _32, _32]
+  type aT = FixPt[TRUE, _16, _16]
+  type iT = FixPt[TRUE, _16, _16]
   val projectDir = "/home/tianzhao/spatial-lang/apps/src/"
   val loSig = 16
   val loTanh = 4
@@ -113,17 +113,20 @@ trait CharRNNParams extends SpatialApp {
   val input_size = 65
   val rnn_size = 128
   val batch_size = 50
+  val seq_length = 50
 
   val charRNNDir = "./char-rnn-weights"
   val dataPaths = List(charRNNDir + "/i2h_1-weights.csv", charRNNDir + "/i2h_1-bias.csv", 
-                        charRNNDir + "/h2h_1-weights.csv", charRNNDir + "/h2h_1-bias.csv",
                         charRNNDir + "/i2h_2-weights.csv", charRNNDir + "/i2h_2-bias.csv",
+                        charRNNDir + "/h2h_1-weights.csv", charRNNDir + "/h2h_1-bias.csv",
                         charRNNDir + "/h2h_2-weights.csv", charRNNDir + "/h2h_2-bias.csv",
-                        charRNNDir + "/decoder-weights.csv", charRNNDir + "/decoder-bias.csv")
+                        charRNNDir + "/decoder-weights.csv", charRNNDir + "/decoder-bias.csv", 
+                        charRNNDir + "/c.csv", charRNNDir + "/h.csv", 
+                        charRNNDir + "/input.csv")
 }
 
 
-object CharRNNStandard extends SpatialApp with CharRNNParams {
+object CharRNNStandard_Zynq extends SpatialApp with CharRNNParams with Activations {
   type T = FixPt[TRUE, _16, _16] 
 
   @virtualize
@@ -137,19 +140,114 @@ object CharRNNStandard extends SpatialApp with CharRNNParams {
     val h2h_1b = DRAM[T](lout)
     val h2h_2w = DRAM[T](rnn_size, lout)
     val h2h_2b = DRAM[T](lout)
-    val decoder_w = DRAM[T](rnn_size, input_size)
-    val decoder_b = DRAM[T](input_size)
-    val drams = List(i2h_1w, i2h_1b, i2h_2w, i2h_2b, h2h_1w, h2h_1b, h2h_2w, h2h_2b, decoder_w, decoder_b)
+    val decoder_w_ = DRAM[T](rnn_size, input_size)
+    val decoder_b_ = DRAM[T](input_size)
+    val c_ = DRAM[T](batch_size, rnn_size)
+    val h_ = DRAM[T](batch_size, rnn_size)
+    val input = DRAM[T](batch_size, input_size)
+    val drams = List(i2h_1w, i2h_1b, i2h_2w, i2h_2b, h2h_1w, h2h_1b, h2h_2w, h2h_2b, decoder_w_, decoder_b_, c_, h_, input)
     drams.zipWithIndex.foreach { case(e, idx) =>
-      setMem(e, loadCSV1D)
+      setMem(e, loadCSV1D[T](dataPaths(idx), ","))
     }
+
+    Accel {
+      val i2h1w = SRAM[T](input_size, lout)
+      val i2h1b = SRAM[T](lout)
+      val h2h1w = SRAM[T](rnn_size, lout)
+      val h2h1b = SRAM[T](lout)
+      val i2h2w = SRAM[T](rnn_size, lout)
+      val i2h2b = SRAM[T](lout)
+      val h2h2w = SRAM[T](rnn_size, lout)
+      val h2h2b = SRAM[T](lout)
+      val decoder_w = SRAM[T](rnn_size, input_size)
+      val decoder_b = SRAM[T](input_size)
+      val c = SRAM[T](batch_size, rnn_size)
+      val h = SRAM[T](batch_size, rnn_size)
+      val x = SRAM[T](batch_size, input_size)
+      val in_gate = SRAM[T](batch_size, rnn_size)
+      val forget_gate = SRAM[T](batch_size, rnn_size)
+      val out_gate = SRAM[T](batch_size, rnn_size)
+      val in_transform = SRAM[T](batch_size, rnn_size)
+
+      i2h1w load i2h_1w(0::input_size, 0::lout)
+      i2h1b load i2h_1b(0::lout)
+      h2h1w load h2h_1w(0::rnn_size, 0::lout)
+      h2h1b load h2h_1b(0::lout)
+      i2h2w load i2h_2w(0::rnn_size, 0::lout)
+      i2h2b load i2h_2b(0::lout)
+      h2h2w load h2h_2w(0::rnn_size, 0::lout)
+      h2h2b load h2h_2b(0::lout)
+      decoder_w load decoder_w_(0::rnn_size, 0::lout)
+      decoder_b load decoder_b_(0::lout)
+      c load c_ (0::batch_size, 0::rnn_size)
+      h load h_ (0::batch_size, 0::rnn_size)
+      x load input(0::batch_size, 0::input_size)
+
+      // stage 1
+      Foreach (batch_size by 1, lout by 1) { (i, j) =>
+        val i2h_prod = Reduce(Reg[T])(input_size by 1) { k => x(i, k) * i2h1w(k, j) } {_+_}
+        val i2h_ele = i2h1b(j) + i2h_prod.value
+        val h2h_prod = Reduce(Reg[T])(rnn_size by 1) { k => h(i, k) * h2h1w(k, j) } {_+_}
+        val ele = h2h1b(j) + h2h_prod.value + i2h_ele
+        if (j < rnn_size)
+          in_gate(i, j) = sigmoid_(ele)
+        else if (rnn_size <= j && j < rnn_size * 2)
+          forget_gate(i, j - rnn_size) = sigmoid_(ele)
+        else if (rnn_size * 2 <= j && j < rnn_size * 3)
+          out_gate(i, j - rnn_size * 2) = sigmoid_(ele)
+        else
+          in_transform(i, j - rnn_size * 3) = tanh_(ele)
+      }
+
+      Foreach (batch_size by 1, rnn_size by 1) { (i, j) =>
+        Pipe {
+          c(i, j) = c(i, j) * forget_gate(i, j) + in_gate(i, j) * in_transform(i, j)
+          h(i, j) = tanh_(c(i, j)) * out_gate(i, j)
+        }
+      }
+
+      // stage 2
+      Foreach (batch_size by 1, lout by 1) { (i, j) =>
+        val i2h_prod = Reduce(Reg[T])(rnn_size by 1) { k => x(i, k) * i2h2w(k, j) } {_+_}
+        val i2h_ele = i2h2b(j) + i2h_prod.value
+        val h2h_prod = Reduce(Reg[T])(rnn_size by 1) { k => h(i, k) * h2h2w(k, j) } {_+_}
+        val ele = h2h2b(j) + h2h_prod.value + i2h_ele
+        if (j < rnn_size)
+          in_gate(i, j) = sigmoid_(ele)
+        else if (rnn_size <= j && j < rnn_size * 2)
+          forget_gate(i, j - rnn_size) = sigmoid_(ele)
+        else if (rnn_size * 2 <= j && j < rnn_size * 3)
+          out_gate(i, j - rnn_size * 2) = sigmoid_(ele)
+        else
+          in_transform(i, j - rnn_size * 3) = tanh_(ele)
+      }
+
+      Foreach (batch_size by 1, rnn_size by 1) { (i, j) =>
+        Pipe {
+          c(i, j) = c(i, j) * forget_gate(i, j) + in_gate(i, j) * in_transform(i, j)
+          h(i, j) = tanh_(c(i, j)) * out_gate(i, j)
+        }
+      }
+
+      // decoder for h. Don't keep intermediate hidden and memory states
+      Foreach(batch_size by 1, input_size by 1) { (i, j) =>
+        val proj = Reduce(Reg[T])(rnn_size by 1) { k => h(i, k) * decoder_w(k, j) } {_+_}
+        h(i, j) = proj + decoder_b(j)
+      }
+
+      h_(0::batch_size, 0::rnn_size) store h
+    }
+
+    val decoded_re = getMem(h_)
+    // Provides a distribution over each char in the batch
+    writeCSV1D[T](decoded_re, "/result.csv")
   }
 }
 
 
 object ActivationTests extends Activations {
   // TODO: In the real application, the integer bits shouldn't be more than 1.
-  type T = FixPt[TRUE, _32, _32]
+  type T = FixPt[TRUE, _16, _16]
   @virtualize
   def main() {
     val x = ArgIn[T]
@@ -175,8 +273,8 @@ object ActivationTests extends Activations {
 }
 
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
-object CharRNNLarge extends SpatialApp with CharRNNParams with Activations {
-  type T = FixPt[TRUE, _32, _32]
+object CharRNNLarge extends SpatialApp with CharRNNTestParams with Activations {
+  type T = FixPt[TRUE, _16, _16]
 
   @virtualize
   def main() {
@@ -286,33 +384,6 @@ object CharRNNLarge extends SpatialApp with CharRNNParams with Activations {
 }
 
 
-// object CharRNN extends SpatialApp with CharRNNTestParams with Activations {
-//   type T = FixPt[TRUE, _16, _16]
-
-//   @virtualize
-//   def main() {
-//     // TODO: seems that size need to be determined? 
-//     val (inputs, outputs, i2h, h2h) = (DRAM[T](2*n+1, rnn_size), 
-//                                         DRAM[T](2*n+1, rnn_size),
-//                                         DRAM[T](rnn_size, 4*rnn_size),
-//                                         DRAM[T](rnn_size, 4*rnn_size))
-
-//     // TODO: set memory vals
-//     // TODO: for now assuming that input size is equal to rnn size
-//     Accel {
-//       // Sequential: for 1,n do 
-//       val prev_h = SRAM[rnn_size]
-//       val prev_c = SRAM[rnn_size]
-//       Sequential.Foreach(n by 1) { L =>
-//         prev_h load inputs(2*L+1, 0::rnn_size)
-//         prev_c load inputs(2*L, 0::rnn_size)
-//         x load inputs(L, 0::rnn_size) // TODO: determine what to load
-
-//       }
-//     }
-//   }
-// }
-
 
 // At each data point in the batch:
 // This app does np.concatenate([a, hidden], axis=1).dot(kernel) + bias(broadcasted)
@@ -336,7 +407,7 @@ object CharRNNLarge extends SpatialApp with CharRNNParams with Activations {
 
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
 object BasicLSTMCell extends SpatialApp with TestParams with Activations {
-  type T = FixPt[TRUE, _32, _32]
+  type T = FixPt[TRUE, _16, _16]
 
   @virtualize
   def main() {
