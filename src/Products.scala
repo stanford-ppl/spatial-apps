@@ -6,7 +6,7 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
   type X = FixPt[TRUE,_32,_0]
 
   val ip = 16
-  val op = 10
+  val op = 2
 
   val tileSize1 = 16
   val tileSize2 = 16
@@ -85,7 +85,7 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
   type X = FixPt[TRUE,_32,_0]
 
   val innerPar = 16
-  val outerPar = 2
+  val outerPar = 1
 
   val tileSize = 16
 
