@@ -2256,7 +2256,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
     val row_stride = 10 (100 -> 100 -> 500)
-    val row_par = 2 (1 -> 1 -> 16)
+    val row_par = 6 (1 -> 1 -> 16)
     val par_Kh = 3 (1 -> 1 -> 3)
     val par_Kw = 3 (1 -> 1 -> 3)
 
