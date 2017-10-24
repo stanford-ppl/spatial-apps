@@ -376,7 +376,7 @@ object Regression {
 
     var testBackends = backends.filter{b => args.contains(b.name) }
     if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
-    else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT9000
+    else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
     if (testBackends.isEmpty) testBackends = backends
     var testDomains = tests.filter{t => args.contains(t._1) }
     if (testDomains.isEmpty) testDomains = tests
