@@ -15,7 +15,7 @@ object Regression {
   // Times to wait for compilation and running, in seconds
   var MAKE_TIMEOUT = 1800
   var RUN_TIMEOUT = 1800
-  var ZYNQ_TIMEOUT = 9000
+  var ZYNQ_TIMEOUT = 10000
   var AWS_TIMEOUT = 32400
 
   private final val NoArgs = Array[Any]()
@@ -204,7 +204,12 @@ object Regression {
       val name = app.name
       val makeLog = new PrintStream(app.IR.config.logDir + "/" + "make.log")
       val cmd = backend.make(app.IR.config.genDir)
-      def log(line: String): Unit = makeLog.println(line)
+      var cause = ""
+      def log(line: String): Unit = {
+        // Couple of really dumb heuristics for finding reported errors at runtime
+        if (line.contains("Placer could not place all instances") && cause == "") cause = line
+        makeLog.println(line)
+      }
       val logger = ProcessLogger(log,log)
       val p = cmd.run(logger)
 
@@ -212,9 +217,11 @@ object Regression {
         val f = Future(blocking(p.exitValue()))
         val code = Await.result(f, duration.Duration(MAKE_TIMEOUT, "sec"))
 
-        if (code != 0) {
-          results.put(s"$backend.$cat.$name: Fail [Backend Compile][newline]&nbsp;&nbsp;Cause: Non-zero exit code[newline]&nbsp;&nbsp;&nbsp;&nbsp;See ${app.IR.config.logDir}make.log")
+        if (code != 0)   {
+          val expl = if (cause == "") s"Non-zero exit code[newline]&nbsp;&nbsp;&nbsp;&nbsp;See ${app.IR.config.logDir}make.log" else cause
+          results.put(s"$backend.$cat.$name: Fail [Execution][newline]&nbsp;&nbsp;Cause: $expl")
         }
+
         code == 0
       }
       catch {
@@ -369,7 +376,7 @@ object Regression {
 
     var testBackends = backends.filter{b => args.contains(b.name) }
     if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
-    else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
+    else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT9000
     if (testBackends.isEmpty) testBackends = backends
     var testDomains = tests.filter{t => args.contains(t._1) }
     if (testDomains.isEmpty) testDomains = tests
