@@ -39,8 +39,8 @@ trait Params extends SpatialApp {
 
 // TODO: where to put these activation functions seem to be a big pain too...
 trait Activations extends SpatialApp {
-  type aT = FixPt[TRUE, _8, _8]
-  type iT = FixPt[TRUE, _8, _8]
+  type aT = FixPt[TRUE, _5, _8]
+  type iT = FixPt[TRUE, _5, _8]
   val projectDir = "/home/tianzhao/spatial-lang/apps/src/"
   val loSig = 16
   val loTanh = 4
@@ -129,7 +129,7 @@ trait CharRNNParams extends SpatialApp {
 
 
 object CharRNNStandard_Zynq extends SpatialApp with CharRNNParams with Activations {
-  type T = FixPt[TRUE, _8, _8] 
+  type T = FixPt[TRUE, _5, _8] 
 
   @virtualize
   def main() {
@@ -310,7 +310,7 @@ object ReadCSV3DTest extends SpatialApp {
 
 object ActivationTests extends Activations {
   // TODO: In the real application, the integer bits shouldn't be more than 1.
-  type T = FixPt[TRUE, _8, _8]
+  type T = FixPt[TRUE, _5, _8]
   @virtualize
   def main() {
     val x = ArgIn[T]
@@ -338,7 +338,7 @@ object ActivationTests extends Activations {
 
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
 object CharRNNLarge extends SpatialApp with CharRNNTestParams with Activations {
-  type T = FixPt[TRUE, _8, _8]
+  type T = FixPt[TRUE, _5, _8]
 
   @virtualize
   def main() {
@@ -471,7 +471,7 @@ object CharRNNLarge extends SpatialApp with CharRNNTestParams with Activations {
 
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
 object BasicLSTMCell extends SpatialApp with TestParams with Activations {
-  type T = FixPt[TRUE, _8, _8]
+  type T = FixPt[TRUE, _5, _8]
 
   @virtualize
   def main() {
@@ -587,7 +587,7 @@ object BasicLSTMCell extends SpatialApp with TestParams with Activations {
 
 // This test multiply each element in a high-dim DRAM with a constant
 object DRAM3ConcatTestAugKernel extends SpatialApp with Params {
-  type T = FixPt[TRUE, _8, _8] 
+  type T = FixPt[TRUE, _5, _8] 
 
   @virtualize
   def main() {
