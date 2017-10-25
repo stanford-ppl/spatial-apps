@@ -10,7 +10,7 @@ def get_csv(fn):
     return np.genfromtxt(fn, delimiter=',')
 
 def save_mat(mat, fn):
-    tmp_pkl = open(fn+'.pkl', 'wb')    
+    tmp_pkl = open(fn+'.pkl', 'wb')
     pickle.dump(mat, tmp_pkl)
 
 def save_csv(mat, fn):
