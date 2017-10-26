@@ -826,7 +826,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 }
 
 
-object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 25 0.3 2
+object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 25 0.3 1
   /*
   Implementation based on http://cs.stanford.edu/people/karpathy/visml/ising_example.html
    pi(x) = exp(J* 𝚺x_j*x_i + J_b * 𝚺b_i*x_i)        
@@ -853,8 +853,8 @@ x_par=4  |       --->       X                XX    |
          |_________________________________________|
 
   */
-  type T = FixPt[TRUE,_32,_32]
-  type PROB = FixPt[FALSE, _0, _16]
+  type T = FixPt[TRUE,_16,_16] // FixPt[TRUE,_32,_32]
+  type PROB = FixPt[FALSE, _0, _8]
   @virtualize
   def main() = {
 
@@ -984,8 +984,8 @@ x_par=4  |       --->       X                XX    |
             val p_flip = exp_sram(-sum+lut_size/2)
             val pi_x = exp_sram(sum+4) * mux((bias_sram(i,j) * self) < 0, exp_posbias, exp_negbias)
             val threshold = min(1.to[T], pi_x)
-            val rng = unif[_16]()
-            val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(31::16).as[PROB], 1.to[T], 0.to[T]))
+            val rng = unif[_8]()
+            val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(15::8).as[PROB], 1.to[T], 0.to[T]))
             if (j >= 0 && j < COLS) {
               grid_sram(i,j) = mux(flip == 1.to[T], -self, self)
             }
