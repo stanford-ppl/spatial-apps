@@ -699,7 +699,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   val margin = 1
 
   val innerPar = 16
-  val outerPar = 2
+  val outerPar = 1
 
   val tileSize = 20
 
