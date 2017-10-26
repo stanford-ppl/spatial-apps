@@ -37,10 +37,42 @@ trait Params extends SpatialApp {
 }
 
 
-// TODO: where to put these activation functions seem to be a big pain too...
-trait Activations extends SpatialApp {
-  type aT = FixPt[TRUE, _5, _8]
-  type iT = FixPt[TRUE, _5, _8]
+trait CharRNNTestParams extends SpatialApp {
+  val N = 50
+  val JX = 2
+  val dco = 100 // TODO: need to determine on the actual size
+  val d = 100
+  val dn = 10
+  val ddco = 100
+  val dd = 10
+  // TODO: Need to port the data here
+  val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
+  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
+                       simFileDir + "/memory.csv", simFileDir + "/kernel.csv", 
+                       simFileDir + "/bias.csv")
+}
+
+
+trait CharRNNParams extends SpatialApp {
+  type aT = FixPt[TRUE, _8, _8]
+  type iT = FixPt[TRUE, _8, _8]
+  val input_size = 65
+  val rnn_size = 128
+  val batch_size = 1 // In forward there's no batching
+  val seq_length = 3 // This should be 2000
+
+  val charRNNDir = "./weights"
+  val dataPaths_2D = List(charRNNDir + "/i2h_1-weights.csv", charRNNDir + "/i2h_2-weights.csv", 
+                          charRNNDir + "/h2h_1-weights.csv", charRNNDir + "/h2h_2-weights.csv",
+                          charRNNDir + "/decoder-weights.csv", charRNNDir + "/c.csv", 
+                          charRNNDir + "/h.csv", charRNNDir + "/input.csv")
+  val dataPaths_1D = List(charRNNDir + "/i2h_1-bias.csv", charRNNDir + "/i2h_2-bias.csv",
+                          charRNNDir + "/h2h_1-bias.csv", charRNNDir + "/h2h_2-bias.csv",
+                          charRNNDir + "/decoder-bias.csv")
+}
+
+
+trait Activations extends SpatialApp with CharRNNParams {
   val projectDir = "/home/tianzhao/spatial-lang/apps/src/"
   val loSig = 16
   val loTanh = 4
@@ -52,7 +84,6 @@ trait Activations extends SpatialApp {
   val tanhF = projectDir + "tanh_512_4_-7.0.csv"
 
 
-  // TODO: we may not need that many bits for sigmoid and tanh. Need to reduce these.
   def sigmoid_(p: aT) = {
     val halfSigLUT = LUT.fromFile[aT](lutNSig)(sigF)
     val index = (abs(p).to[iT] << spacingShiftBitsSig).to[Index] + 1.to[Index]
@@ -95,41 +126,8 @@ trait Activations extends SpatialApp {
 }
 
 
-trait CharRNNTestParams extends SpatialApp {
-  val N = 50
-  val JX = 2
-  val dco = 100 // TODO: need to determine on the actual size
-  val d = 100
-  val dn = 10
-  val ddco = 100
-  val dd = 10
-  // TODO: Need to port the data here
-  val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
-  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
-                       simFileDir + "/memory.csv", simFileDir + "/kernel.csv", 
-                       simFileDir + "/bias.csv")
-}
-
-
-trait CharRNNParams extends SpatialApp {
-  val input_size = 65
-  val rnn_size = 128
-  val batch_size = 1 // In forward there's no batching
-  val seq_length = 3 // This should be 2000
-
-  val charRNNDir = "./weights"
-  val dataPaths_2D = List(charRNNDir + "/i2h_1-weights.csv", charRNNDir + "/i2h_2-weights.csv", 
-                          charRNNDir + "/h2h_1-weights.csv", charRNNDir + "/h2h_2-weights.csv",
-                          charRNNDir + "/decoder-weights.csv", charRNNDir + "/c.csv", 
-                          charRNNDir + "/h.csv", charRNNDir + "/input.csv")
-  val dataPaths_1D = List(charRNNDir + "/i2h_1-bias.csv", charRNNDir + "/i2h_2-bias.csv",
-                          charRNNDir + "/h2h_1-bias.csv", charRNNDir + "/h2h_2-bias.csv",
-                          charRNNDir + "/decoder-bias.csv")
-}
-
-
 object CharRNNStandard_Zynq extends SpatialApp with CharRNNParams with Activations {
-  type T = FixPt[TRUE, _5, _8] 
+  type T = FixPt[TRUE, _8, _8] 
 
   @virtualize
   def main() {
@@ -310,7 +308,7 @@ object ReadCSV3DTest extends SpatialApp {
 
 object ActivationTests extends Activations {
   // TODO: In the real application, the integer bits shouldn't be more than 1.
-  type T = FixPt[TRUE, _5, _8]
+  type T = FixPt[TRUE, _8, _8]
   @virtualize
   def main() {
     val x = ArgIn[T]
@@ -338,7 +336,7 @@ object ActivationTests extends Activations {
 
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
 object CharRNNLarge extends SpatialApp with CharRNNTestParams with Activations {
-  type T = FixPt[TRUE, _5, _8]
+  type T = FixPt[TRUE, _8, _8]
 
   @virtualize
   def main() {
@@ -471,7 +469,7 @@ object CharRNNLarge extends SpatialApp with CharRNNTestParams with Activations {
 
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
 object BasicLSTMCell extends SpatialApp with TestParams with Activations {
-  type T = FixPt[TRUE, _5, _8]
+  type T = FixPt[TRUE, _8, _8]
 
   @virtualize
   def main() {
@@ -587,7 +585,7 @@ object BasicLSTMCell extends SpatialApp with TestParams with Activations {
 
 // This test multiply each element in a high-dim DRAM with a constant
 object DRAM3ConcatTestAugKernel extends SpatialApp with Params {
-  type T = FixPt[TRUE, _5, _8] 
+  type T = FixPt[TRUE, _8, _8] 
 
   @virtualize
   def main() {
