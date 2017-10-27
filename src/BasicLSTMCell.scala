@@ -37,6 +37,8 @@ trait Params extends SpatialApp {
 }
 
 
+trait BasicLSTMCell extends SpatialApp
+
 // At each data point in the batch:
 // This app does np.concatenate([a, hidden], axis=1).dot(kernel) + bias(broadcasted)
 // bias needs to broadcast N
@@ -58,7 +60,7 @@ trait Params extends SpatialApp {
 //                                +-----------------+
 
 // For split: i, j, f, o = np.split(linear, 4, axis=1)
-object BasicLSTMCell extends SpatialApp with TestParams with Activations {
+object BasicLSTMCell_bidaf extends SpatialApp with TestParams with Activations {
   type T = FixPt[TRUE, _8, _8]
 
   @virtualize
@@ -79,14 +81,7 @@ object BasicLSTMCell extends SpatialApp with TestParams with Activations {
     val NN = 4 * d
 
     Accel {
-      // TODO: Later this JX needs to be replaced by a different val...
-      // TODO: currently it's all set to 0
       // TODO: for higher dimension matrices, would the alignment matter? 
-      // TODO: I use a fused matrix to follow implementation in tf and pt. 
-      // however would this be faster than having four separate ones? 
-      // Or was this only for training time speed-up concerns?
-      //       need to test on this matter. 
-
       val tileBias = SRAM[T](NN)
       tileBias load bias(0::NN)
       Foreach(MM by dn, NN by dd) { (i, j) =>
