@@ -13,7 +13,7 @@ dco = 1400
 d = 100
 
 
-fileDir = '/home/tianzhao/spatial-lang/apps/LSTM-internals/'
+fileDir = '/home/tianzhao/spatial-lang/apps/parameters/'
 IOs = fileDir + 'IOs/'
 weights = fileDir + 'weights/'
 
