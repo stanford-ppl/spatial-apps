@@ -28,9 +28,9 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
     val par_load = 16
     val par_store = 16
     val PX = 1 (1 -> 1)
-    val P0 = 4 (1 -> 2 -> dim)
+    val P0 = 6 (1 -> 2 -> dim)
     val P1 = 4 (1 -> 2 -> dim)
-    val P2 = 4 (1 -> 2 -> dim)
+    val P2 = 6 (1 -> 2 -> dim)
     val P3 = 16 (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
@@ -1707,7 +1707,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   val margin = 1
 
   val innerPar = 16
-  val outerPar = 2
+  val outerPar = 6
 
   val tileSize = 384
 
@@ -2256,7 +2256,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
     val row_stride = 10 (100 -> 100 -> 500)
-    val row_par = 2 (1 -> 1 -> 16)
+    val row_par = 6 (1 -> 1 -> 16)
     val par_Kh = 3 (1 -> 1 -> 3)
     val par_Kw = 3 (1 -> 1 -> 3)
 
