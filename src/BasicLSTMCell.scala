@@ -139,7 +139,6 @@ object BasicLSTMCell extends SpatialApp with TestParams with Activations {
       // N   |         |         |         |          |
       //     +---------v---------v---------v----------+
 
-      // TODO: change it to list tabulate?
       val (tileI, tileJ, tileF, tileO, tileH, tileM) = (SRAM[T](dn, dd), SRAM[T](dn, dd), 
                                                         SRAM[T](dn, dd), SRAM[T](dn, dd),
                                                         SRAM[T](dn, dd), SRAM[T](dn, dd))

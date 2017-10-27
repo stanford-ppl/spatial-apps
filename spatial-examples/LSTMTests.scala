@@ -65,7 +65,7 @@ trait LSTMParams_dcell4_fw extends SpatialApp {
   val nrKernel = idco + d
   val ncKernel = 4*d
   val nrBias = 4*d
-  val internalPath = "/home/tianzhao/spatial-lang/apps/LSTM-internals/"
+  val internalPath = "/home/tianzhao/spatial-lang/apps/parameters/"
   val inputPath = internalPath + "IOs/input-0.csv"
   val outputPath = internalPath + "IOs/output-0.csv"
   val kernelPath = internalPath + "weights/kernel-d_cell4_fw-1500-400.csv"
