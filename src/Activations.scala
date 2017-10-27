@@ -2,25 +2,23 @@ import spatial.dsl._
 import org.virtualized._
 
 
-
-
 trait CharRNNTestParams extends SpatialApp {
   val N = 50
   val JX = 2
-  val dco = 100 
+  val dco = 100
   val d = 100
   val dn = 10
   val ddco = 100
   val dd = 10
   val simFileDir = "/home/tianzhao/spatial-lang/apps/np-sims/"
-  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv", 
-                       simFileDir + "/memory.csv", simFileDir + "/kernel.csv", 
+  val dataPaths = List(simFileDir + "/a.csv", simFileDir + "/hidden.csv",
+                       simFileDir + "/memory.csv", simFileDir + "/kernel.csv",
                        simFileDir + "/bias.csv")
 }
 
 
-trait Activations extends SpatialApp with CharRNNParams {
-  val projectDir = "/home/tianzhao/spatial-lang/apps/src/"
+trait Activations extends SpatialApp with CharRNNParams 
+  val projectDir = "/home/tianzhao/spatial-lang/apps/src/activation-luts/"
   val loSig = 16
   val loTanh = 4
   val spacingShiftBitsSig = 5 // shift down for sig
@@ -61,7 +59,7 @@ trait Activations extends SpatialApp with CharRNNParams {
   }
 
 
-  // A few ideas about implementing tanh: 
+  // A few ideas about implementing tanh:
   // range doesn't need to go that much. -8 to 8 would be fine.
   // However more precisions need to be provided within 0 to 8.
 

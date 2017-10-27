@@ -2,7 +2,7 @@ import spatial.dsl._
 import org.virtualized._
 
 
-object nmt extends SpatialApp with Activations {
+object NMT extends SpatialApp with Activations {
   type T = FixPt[TRUE, _8, _8]
 
   @virtualize
