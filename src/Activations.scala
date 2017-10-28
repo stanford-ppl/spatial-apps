@@ -17,7 +17,7 @@ trait CharRNNTestParams extends SpatialApp {
 }
 
 
-trait Activations extends SpatialApp with CharRNNParams 
+trait Activations extends SpatialApp with CharRNNParams { 
   val projectDir = "/home/tianzhao/spatial-lang/apps/src/activation-luts/"
   val loSig = 16
   val loTanh = 4

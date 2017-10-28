@@ -2,6 +2,87 @@ import spatial.dsl._
 import org.virtualized._
 
 
+trait BaseDesign extends SpatialApp {
+  println("==========")
+  println(mm)
+  println(nn)
+  println("==========")
+  var mm: Int
+  var nn: Int
+  var M: Int
+  var N: Int
+
+  def elementwise_matmul[T:Type:Num](a: DRAM2[T], b: DRAM2[T], c: DRAM2[T]) {
+    val sram0 = SRAM[T](mm, nn)
+    val sram1 = SRAM[T](mm, nn)
+    val resram = SRAM[T](mm, nn)
+    Foreach (M by mm, N by nn) { (i, j) =>
+      sram0 load a(i::i+mm, j::j+nn)
+      sram1 load b(i::i+mm, j::j+nn)
+      Foreach(mm by 1, nn by 1) { (ii, jj) =>
+        resram(ii, jj) = sram0(ii, jj) * sram1(ii, jj)
+      }
+
+      c(i::i+mm, j::j+nn) store resram
+    }
+  }
+}
+
+
+trait RealDesign0 extends BaseDesign {
+  var mm = 3
+  var nn = 4
+  var M = 6
+  var N = 12
+}
+
+
+trait RealDesign1 extends BaseDesign {
+  var mm = 2
+  var nn = 6
+  var M = 6
+  var N = 12 
+}
+
+
+object RealDesign0Test extends SpatialApp with RealDesign0 {
+  @virtualize
+  def main() {
+    val paramPath = "/home/tianzhao/spatial-lang/apps/parameters/test-params/"
+    val aDRAM = DRAM[Int](M, N)
+    val bDRAM = DRAM[Int](M, N)
+    val reDRAM = DRAM[Int](M, N)
+    setMem(aDRAM, loadCSV2D[Int](paramPath+"param0.csv", ",", "\n"))
+    setMem(bDRAM, loadCSV2D[Int](paramPath+"param1.csv", ",", "\n"))
+
+    Accel {
+      elementwise_matmul[Int](aDRAM, bDRAM, reDRAM)
+    }
+
+    writeCSV1D[Int](getMem(reDRAM), "RealDesign0Test.csv")
+  }
+}
+
+
+object RealDesign1Test extends SpatialApp with RealDesign1 {
+  @virtualize
+  def main() {
+    val paramPath = "/home/tianzhao/spatial-lang/apps/parameters/test-params/"
+    val aDRAM = DRAM[Int](M, N)
+    val bDRAM = DRAM[Int](M, N)
+    val reDRAM = DRAM[Int](M, N)
+    setMem(aDRAM, loadCSV2D[Int](paramPath+"param0.csv", ",", "\n"))
+    setMem(bDRAM, loadCSV2D[Int](paramPath+"param1.csv", ",", "\n"))
+
+    Accel {
+      elementwise_matmul[Int](aDRAM, bDRAM, reDRAM)
+    }
+
+    writeCSV1D[Int](getMem(reDRAM), "RealDesign1Test.csv")
+  }    
+}
+
+
 object WriteCSV3DTest extends SpatialApp {
   @virtualize
   def main() {
