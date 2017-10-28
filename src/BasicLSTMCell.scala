@@ -37,7 +37,7 @@ trait Params extends SpatialApp {
 }
 
 
-trait BasicLSTMCell extends SpatialApp
+trait BasicLSTMCell extends SpatialApp with Activations
 
 // At each data point in the batch:
 // This app does np.concatenate([a, hidden], axis=1).dot(kernel) + bias(broadcasted)

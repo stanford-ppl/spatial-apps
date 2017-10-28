@@ -11,7 +11,7 @@ trait BaseDesign extends SpatialApp {
   var nn: Int
   var M: Int
   var N: Int
-  var factor: Float
+  val factor = 3
 
   def elementwise_matmul[T:Type:Num](a: DRAM2[T], b: DRAM2[T], c: DRAM2[T]) {
     val sram0 = SRAM[T](mm, nn)
@@ -35,7 +35,7 @@ trait RealDesign0 extends BaseDesign {
   var nn = 4
   var M = 6
   var N = 12
-  var factor = 10
+  override val factor = 10
 }
 
 
@@ -44,7 +44,7 @@ trait RealDesign1 extends BaseDesign {
   var nn = 6
   var M = 6
   var N = 12 
-  var factor = 100
+  override val factor = 100
 }
 
 
