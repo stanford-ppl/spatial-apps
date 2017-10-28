@@ -3,14 +3,15 @@ import org.virtualized._
 
 
 trait BaseDesign extends SpatialApp {
-  println("==========")
-  println(mm)
-  println(nn)
-  println("==========")
+  // println("==========")
+  // println(mm)
+  // println(nn)
+  // println("==========")
   var mm: Int
   var nn: Int
   var M: Int
   var N: Int
+  var factor: Float
 
   def elementwise_matmul[T:Type:Num](a: DRAM2[T], b: DRAM2[T], c: DRAM2[T]) {
     val sram0 = SRAM[T](mm, nn)
@@ -20,7 +21,7 @@ trait BaseDesign extends SpatialApp {
       sram0 load a(i::i+mm, j::j+nn)
       sram1 load b(i::i+mm, j::j+nn)
       Foreach(mm by 1, nn by 1) { (ii, jj) =>
-        resram(ii, jj) = sram0(ii, jj) * sram1(ii, jj)
+        resram(ii, jj) = sram0(ii, jj) * sram1(ii, jj) * factor.to[T]
       }
 
       c(i::i+mm, j::j+nn) store resram
@@ -34,6 +35,7 @@ trait RealDesign0 extends BaseDesign {
   var nn = 4
   var M = 6
   var N = 12
+  var factor = 10
 }
 
 
@@ -42,6 +44,7 @@ trait RealDesign1 extends BaseDesign {
   var nn = 6
   var M = 6
   var N = 12 
+  var factor = 100
 }
 
 
@@ -49,17 +52,17 @@ object RealDesign0Test extends SpatialApp with RealDesign0 {
   @virtualize
   def main() {
     val paramPath = "/home/tianzhao/spatial-lang/apps/parameters/test-params/"
-    val aDRAM = DRAM[Int](M, N)
-    val bDRAM = DRAM[Int](M, N)
-    val reDRAM = DRAM[Int](M, N)
-    setMem(aDRAM, loadCSV2D[Int](paramPath+"param0.csv", ",", "\n"))
-    setMem(bDRAM, loadCSV2D[Int](paramPath+"param1.csv", ",", "\n"))
+    val aDRAM = DRAM[Float](M, N)
+    val bDRAM = DRAM[Float](M, N)
+    val reDRAM = DRAM[Float](M, N)
+    setMem(aDRAM, loadCSV2D[Float](paramPath+"param0.csv", ",", "\n"))
+    setMem(bDRAM, loadCSV2D[Float](paramPath+"param1.csv", ",", "\n"))
 
     Accel {
-      elementwise_matmul[Int](aDRAM, bDRAM, reDRAM)
+      elementwise_matmul[Float](aDRAM, bDRAM, reDRAM)
     }
 
-    writeCSV1D[Int](getMem(reDRAM), "RealDesign0Test.csv")
+    writeCSV1D[Float](getMem(reDRAM), "RealDesign0Test.csv")
   }
 }
 
@@ -68,17 +71,17 @@ object RealDesign1Test extends SpatialApp with RealDesign1 {
   @virtualize
   def main() {
     val paramPath = "/home/tianzhao/spatial-lang/apps/parameters/test-params/"
-    val aDRAM = DRAM[Int](M, N)
-    val bDRAM = DRAM[Int](M, N)
-    val reDRAM = DRAM[Int](M, N)
-    setMem(aDRAM, loadCSV2D[Int](paramPath+"param0.csv", ",", "\n"))
-    setMem(bDRAM, loadCSV2D[Int](paramPath+"param1.csv", ",", "\n"))
+    val aDRAM = DRAM[Float](M, N)
+    val bDRAM = DRAM[Float](M, N)
+    val reDRAM = DRAM[Float](M, N)
+    setMem(aDRAM, loadCSV2D[Float](paramPath+"param0.csv", ",", "\n"))
+    setMem(bDRAM, loadCSV2D[Float](paramPath+"param1.csv", ",", "\n"))
 
     Accel {
-      elementwise_matmul[Int](aDRAM, bDRAM, reDRAM)
+      elementwise_matmul[Float](aDRAM, bDRAM, reDRAM)
     }
 
-    writeCSV1D[Int](getMem(reDRAM), "RealDesign1Test.csv")
+    writeCSV1D[Float](getMem(reDRAM), "RealDesign1Test.csv")
   }    
 }
 
