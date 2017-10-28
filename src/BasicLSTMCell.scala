@@ -37,7 +37,21 @@ trait Params extends SpatialApp {
 }
 
 
-trait BasicLSTMCell extends SpatialApp with Activations
+// mem and hidden states are always in SRAMs. 
+trait BasicLSTMCellTrait extends SpatialApp with Activations {
+  val forgetBias = 1
+  def BasicLSTMCell_DRAMIn[T:Type:Num](input: DRAM2[T]) {
+
+  }
+
+  def BasicLSTCell_DRAMOut[T:Type:Num]() {
+
+  }
+
+  def BasicLSTMCell_Intermediate[T:Type:Num] () {
+
+  }
+}
 
 // At each data point in the batch:
 // This app does np.concatenate([a, hidden], axis=1).dot(kernel) + bias(broadcasted)
