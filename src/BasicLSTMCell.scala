@@ -62,37 +62,54 @@ trait BasicLSTMCellTrait extends SpatialApp with Activations {
   var batch_size: Int
   var feature_size: Int
   var hidden_size: Int
-  var dn: Int
-  var dm: Int
   var dp: Int
+  var dm: Int
 
   // Result stores in h and c
   // This version assumes that we won't be able to fit kernel on SRAM
-  def BasicLSTMCell[T:Type:Num](x: SRAM[T], h: SRAM2[T], c: SRAM2[T], 
+  // xh: x and hidden aligned on the second dimension
+
+  def BasicLSTMCell[T:Type:Num](x: SRAM2[T], h: SRAM2[T], c: SRAM2[T], 
     sigI: SRAM2[T], tanhJ: SRAM2[T], sigF: SRAM2[T], sigO: SRAM2[T],
     kernel: DRAM2[T], bias: SRAM2[T]) {
     val linear_output_size = hidden_size * 4
+    val reduce_size = feature_size + hidden_size
+    val tileKernel = SRAM[T](dp, dm)
     // TODO: Par-able...
     // Linear Layer: linear([x,h], linear_output_size)
-    Foreach (batch_size by dn, linear_output_size by dm) { (i,j) =>
-      val tileC = SRAM[T](dn, dm)
-      Foreach (feature_size by dp) { k =>
+    Foreach (reduce_size by dp, linear_output_size by dm) { (i,j) =>
+      tileKernel load kernel(i::i+dp, j::j+dm)
+      Foreach (dp by 1, dm by 1) { (ii, jj) =>
+        val rowOffset = i + ii
+        val colOffset = j + jj
+        val prod = Reduce(Reg[T]) (dp by 1) { k =>
+          if (offset < feature_size) {
+            x(rowOffset, k) * tileKernel(k, jj)
+          } else {
+            h(rowOffset - feature_size, k) * tileKernel(k, jj)
+          }
+        } {_+_}
+        
+      }
         Foreach (dn by 1, dd by 1) { (ii,jj) =>
-          val col_offset = j + jj
           val prod = Reduce(Reg[T])(dp by 1) {
-            tileA(ii,kk) * tileB(kk,jj)  
+            tileA(ii,kk) * tileB(kk,jj)
           } {_+_}
 
           val prev = mux(k == 0, tileBias(col_offset), tileC(ii,jj))
           val ele = prev + prod.value
-          if (col_offset < hidden_size)
+          if (col_offset < hidden_size) {
             sigI(ii, col_offset) = sigmoid_[T](ele)
-          else if (hidden_size <= col_offset < hidden_size * 2)
+          }
+          else if (hidden_size <= col_offset < hidden_size * 2) {
             tanhJ(ii, col_offset - hidden_size) = tanh_[T](ele)
-          else if (2 * hidden_size <= col_offset < 3 * hidden_size)
+          }
+          else if (2 * hidden_size <= col_offset < 3 * hidden_size) {
             sigF(ii, col_offset - hidden_size * 2) = sigmoid_[T](ele + forgetBias.to[T])
-          else 
+          }
+          else {
             sigO(ii, col_offset - hidden_size * 3) = sigmoid_[T](ele)
+          }
         }
       }
     }
