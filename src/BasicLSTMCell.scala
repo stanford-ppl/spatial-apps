@@ -57,18 +57,18 @@ trait Params extends SpatialApp {
 //                                           +-----------------+
 
 // mem and hidden states are always in SRAMs. 
-trait BasicLSTMCellTrait extends SpatialApp with Activations {
+trait BasicLSTMCell_NMT extends SpatialApp with Activations {
   var forgetBias: Int
   var batch_size: Int
   var feature_size: Int
   var hidden_size: Int
+  var dn: Int // by default this is set to 1
   var dp: Int
   var dm: Int
 
   // Result stores in h and c
   // This version assumes that we won't be able to fit kernel on SRAM
   // xh: x and hidden aligned on the second dimension
-
   def BasicLSTMCell[T:Type:Num](x: SRAM2[T], h: SRAM2[T], c: SRAM2[T], 
     sigI: SRAM2[T], tanhJ: SRAM2[T], sigF: SRAM2[T], sigO: SRAM2[T],
     kernel: DRAM2[T], bias: SRAM2[T]) {
@@ -77,38 +77,34 @@ trait BasicLSTMCellTrait extends SpatialApp with Activations {
     val tileKernel = SRAM[T](dp, dm)
     // TODO: Par-able...
     // Linear Layer: linear([x,h], linear_output_size)
-    Foreach (reduce_size by dp, linear_output_size by dm) { (i,j) =>
-      tileKernel load kernel(i::i+dp, j::j+dm)
-      Foreach (dp by 1, dm by 1) { (ii, jj) =>
-        val rowOffset = i + ii
-        val colOffset = j + jj
-        val prod = Reduce(Reg[T]) (dp by 1) { k =>
-          if (offset < feature_size) {
-            x(rowOffset, k) * tileKernel(k, jj)
-          } else {
-            h(rowOffset - feature_size, k) * tileKernel(k, jj)
-          }
-        } {_+_}
-        
-      }
-        Foreach (dn by 1, dd by 1) { (ii,jj) =>
-          val prod = Reduce(Reg[T])(dp by 1) {
-            tileA(ii,kk) * tileB(kk,jj)
+    Foreach (batch_size by 1) { rowOffset =>
+      Foreach (reduce_size by dp, linear_output_size by dm) { (k,j) =>
+        tileKernel load kernel(k::k+dp, j::j+dm)
+        Foreach (dp by 1, dm by 1) { (kk, jj) =>
+          val prod = Reduce(Reg[T]) (dp by 1) { p =>
+            if (offset < feature_size) {
+              x(rowOffset, p) * tileKernel(p, jj)
+            } else {
+              h(rowOffset - feature_size, p) * tileKernel(p, jj)
+            }
           } {_+_}
 
-          val prev = mux(k == 0, tileBias(col_offset), tileC(ii,jj))
-          val ele = prev + prod.value
-          if (col_offset < hidden_size) {
-            sigI(ii, col_offset) = sigmoid_[T](ele)
+          val colOffset = j + jj
+          if (colOffset < hidden_size) {
+            val ele = prod.value + mux(k == 0, bias(colOffset), sigI(rowOffset, colOffset))
+            sigI(rowOffset, colOffset) = sigmoid_[T](ele)
           }
           else if (hidden_size <= col_offset < hidden_size * 2) {
-            tanhJ(ii, col_offset - hidden_size) = tanh_[T](ele)
+            val ele = prod.value + mux(k == 0, bias(colOffset), tanhJ(rowOffset, colOffset - hidden_size))
+            tanhJ(rowOffset, colOffset - hidden_size) = tanh_[T](ele)
           }
           else if (2 * hidden_size <= col_offset < 3 * hidden_size) {
-            sigF(ii, col_offset - hidden_size * 2) = sigmoid_[T](ele + forgetBias.to[T])
+            val ele = prod.value + mux(k == 0, bias(colOffset), sigF(rowOffset, colOffset - 2 * hidden_size))
+            sigF(ii, colOffset - hidden_size * 2) = sigmoid_[T](ele + forgetBias.to[T])
           }
           else {
-            sigO(ii, col_offset - hidden_size * 3) = sigmoid_[T](ele)
+            val ele = prod.value + mux(k == 0, bias(colOffset), sigO(rowOffset, colOffset - 3 * hidden_size))
+            sigO(ii, colOffset - hidden_size * 3) = sigmoid_[T](ele)
           }
         }
       }
@@ -125,7 +121,7 @@ trait BasicLSTMCellTrait extends SpatialApp with Activations {
 }
 
 
-object BasicLSTMCell_TestTrait extends SpatialApp with BasicLSTMCellTrait {
+object BasicLSTMCellNMT_TestTrait extends SpatialApp with BasicLSTMCell_NMT {
   var forgetBias = 1
   var batch_size = 2
   var feature_size = 32
@@ -133,6 +129,8 @@ object BasicLSTMCell_TestTrait extends SpatialApp with BasicLSTMCellTrait {
   var dn = 1
   var dm = 2
   var dp = 4
+
+  val linear_output_size = hidden_size * 4
 
   type T = FixPt[TRUE, _8, _8]
 
@@ -144,8 +142,39 @@ object BasicLSTMCell_TestTrait extends SpatialApp with BasicLSTMCellTrait {
     val sigO = SRAM[T](batch_size, hidden_size)
     val bias = SRAM[T](linear_output_size)
     val paramPath = "/home/tianzhao/spatial-lang/apps/parameters/test-params/"
-    val (cDRAM, kDRAM, bDRAM, hDRAM, xDRAM) = (DRAM[T](batch_size, hidden_size), 
-                                                DRAM[T](feature_size, ))
+    val (cDRAM, kernel, bDRAM, hDRAM, xDRAM) = (DRAM[T](batch_size, hidden_size), 
+                                                DRAM[T](hidden_size + feature_size, hidden_size),
+                                                DRAM[T](linear_output_size),
+                                                DRAM[T](batch_size, hidden_size),
+                                                DRAM[T](batch_size, feature_size))
+    setMem(cDRAM, loadCSV2D(paramPath+"c.csv", ",", "\n"))
+    setMem(kernel, loadCSV2D(paramPath+"kernel.csv", ",", "\n"))
+    setMem(hDRAM, loadCSV2D(paramPath+"h.csv", ",", "\n"))
+    setMem(xDRAM, loadCSV2D(paramPath+"x.csv", ",", "\n"))
+    setMem(bDRAM, loadCSV1D(paramPath+"bias.csv", ",", "\n"))
+
+    Accel {
+      val x = SRAM[T](batch_size, feature_size)
+      val h = SRAM[T](batch_size, hidden_size)
+      val c = SRAM[T](batch_size, hidden_size)
+      val sigI = SRAM[T](batch_size, hidden_size)
+      val sigF = SRAM[T](batch_size, hidden_size)
+      val sigO = SRAM[T](batch_size, hidden_size)
+      val tanhJ = SRAM[T](batch_size, hidden_size)
+      val bias = SRAM[T](linear_output_size)
+
+      x load xDRAM(0::batch_size, 0::feature_size)
+      h load hDRAM(0::batch_size, 0::hidden_size)
+      c load cDRAM(0::batch_size, 0::hidden_size)
+      bias load bDRAM(0::linear_output_size)
+      BasicLSTMCell[T:](x, h, c, sigI, tanhJ, sigF, sigO, kernel, bias)
+
+      hDRAM(0::batch_size, 0::hidden_size) store h
+      cDRAM(0::batch_size, 0::hidden_size) store c
+    }
+
+    writeCSV2D(getMatrix(hDRAM), "./h_re.csv", ",", "\n")
+    writeCSV2D(getMatrix(cDRAM), "./c_re.csv", ",", "\n")
   }
 }
 
