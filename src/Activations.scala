@@ -18,6 +18,7 @@ trait CharRNNTestParams extends SpatialApp {
 
 // TODO: Lookup tables doesn't need that many bits. Precision should be put differently.
 trait Activations extends SpatialApp { 
+  type T = FixPt[TRUE, _8, _8]
   val projectDir = "/home/tianzhao/spatial-lang/apps/src/activation-luts/"
   val loSig = 16
   val loTanh = 4
@@ -29,9 +30,9 @@ trait Activations extends SpatialApp {
   val tanhF = projectDir + "tanh_512_4_-7.0.csv"
 
 
-  def sigmoid_[T:Type:Num](p: T) = {
+  def sigmoid_[aT:Type:Num](p: T) = {
     val halfSigLUT = LUT.fromFile[T](lutNSig)(sigF)
-    val index = (abs(p) << spacingShiftBitsSig).to[Index] + 1.to[Index]
+    val index = (abs(p).to[T] << spacingShiftBitsSig).to[Index] + 1.to[Index]
     val valueMux = mux(p < 0.to[T], 1.to[T] - halfSigLUT(index), halfSigLUT(index))
     val lowerMux = mux(p <= -loSig.to[T], 0.to[T], valueMux)
     val upperMux = mux(p >= loSig.to[T], 1.to[T], lowerMux)
@@ -49,9 +50,9 @@ trait Activations extends SpatialApp {
   // }
 
 
-  def tanh_[T:Type:Num](p: T) = {
+  def tanh_[aT:Type:Num](p: T) = {
     val halfTanhLUT = LUT.fromFile[T](lutNTanh)(tanhF)
-    val index = (abs(p) << spacingShiftBitsTanh).to[Index] // + 1.to[Index]
+    val index = (abs(p).to[T] << spacingShiftBitsTanh).to[Index] // + 1.to[Index]
     val valueMux = mux(p < 0.to[T], 0.to[T] - halfTanhLUT(index), halfTanhLUT(index))
     val lowerMux = mux(p <= -loTanh.to[T], -1.to[T], valueMux)
     val upperMux = mux(p >= loTanh.to[T], 1.to[T], lowerMux)
