@@ -125,7 +125,7 @@ trait BasicLSTMCell_NMT extends SpatialApp {
           } {_+_}
 
           val colOffset = j + jj
-          if (colOffset < hidden_size) { // TODO: how's this line different than the others? 
+          if (colOffset < hidden_size) { // TODO: how's this line different than the others? ,
             val ele = prod.value + mux(k == 0, bias(colOffset), sigI(rowOffset, colOffset))
             sigI(rowOffset, colOffset) = sigmoid_(ele)
           }
