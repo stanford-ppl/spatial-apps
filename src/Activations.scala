@@ -16,8 +16,8 @@ trait CharRNNTestParams extends SpatialApp {
                        simFileDir + "/bias.csv")
 }
 
-
-trait Activations extends SpatialApp with CharRNNParams { 
+// TODO: Lookup tables doesn't need that many bits. Precision should be put differently.
+trait Activations extends SpatialApp { 
   val projectDir = "/home/tianzhao/spatial-lang/apps/src/activation-luts/"
   val loSig = 16
   val loTanh = 4
@@ -29,32 +29,32 @@ trait Activations extends SpatialApp with CharRNNParams {
   val tanhF = projectDir + "tanh_512_4_-7.0.csv"
 
 
-  def sigmoid_(p: aT) = {
-    val halfSigLUT = LUT.fromFile[aT](lutNSig)(sigF)
-    val index = (abs(p).to[iT] << spacingShiftBitsSig).to[Index] + 1.to[Index]
-    val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
-    val lowerMux = mux(p <= -loSig.to[aT], 0.to[aT], valueMux)
-    val upperMux = mux(p >= loSig.to[aT], 1.to[aT], lowerMux)
+  def sigmoid_[T:Type:Num](p: T) = {
+    val halfSigLUT = LUT.fromFile[T](lutNSig)(sigF)
+    val index = (abs(p) << spacingShiftBitsSig).to[Index] + 1.to[Index]
+    val valueMux = mux(p < 0.to[T], 1.to[T] - halfSigLUT(index), halfSigLUT(index))
+    val lowerMux = mux(p <= -loSig.to[T], 0.to[T], valueMux)
+    val upperMux = mux(p >= loSig.to[T], 1.to[T], lowerMux)
     upperMux
   }
 
 
-  def sigmoid_old(p: aT) = {
-    val halfSigLUT = LUT.fromFile[aT](lutNSig)(sigF)
-    val index = (abs(p).to[iT] << spacingShiftBitsSig).to[Index]
-    val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
-    val lowerMux = mux(p <= -loSig.to[aT], 0.to[aT], valueMux)
-    val upperMux = mux(p >= loSig.to[aT], 1.to[aT], lowerMux)
-    upperMux
-  }
+  // def sigmoid_old(p: aT) = {
+  //   val halfSigLUT = LUT.fromFile[aT](lutNSig)(sigF)
+  //   val index = (abs(p).to[iT] << spacingShiftBitsSig).to[Index]
+  //   val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
+  //   val lowerMux = mux(p <= -loSig.to[aT], 0.to[aT], valueMux)
+  //   val upperMux = mux(p >= loSig.to[aT], 1.to[aT], lowerMux)
+  //   upperMux
+  // }
 
 
-  def tanh_(p: aT) = {
-    val halfTanhLUT = LUT.fromFile[aT](lutNTanh)(tanhF)
-    val index = (abs(p).to[iT] << spacingShiftBitsTanh).to[Index] // + 1.to[Index]
-    val valueMux = mux(p < 0.to[aT], 0.to[aT] - halfTanhLUT(index), halfTanhLUT(index))
-    val lowerMux = mux(p <= -loTanh.to[aT], -1.to[aT], valueMux)
-    val upperMux = mux(p >= loTanh.to[aT], 1.to[aT], lowerMux)
+  def tanh_[T:Type:Num](p: T) = {
+    val halfTanhLUT = LUT.fromFile[T](lutNTanh)(tanhF)
+    val index = (abs(p) << spacingShiftBitsTanh).to[Index] // + 1.to[Index]
+    val valueMux = mux(p < 0.to[T], 0.to[T] - halfTanhLUT(index), halfTanhLUT(index))
+    val lowerMux = mux(p <= -loTanh.to[T], -1.to[T], valueMux)
+    val upperMux = mux(p >= loTanh.to[T], 1.to[T], lowerMux)
     upperMux
   }
 
@@ -64,7 +64,7 @@ trait Activations extends SpatialApp with CharRNNParams {
   // However more precisions need to be provided within 0 to 8.
 
   // Implement a tanh using: tanh(x) = 2 * sigmoid(2*x) - 1
-  def tanh_approx(p: aT) = {
-    (sigmoid_(p << 1) << 1) - 1
-  }
+  // def tanh_approx(p: aT) = {
+  //   (sigmoid_(p << 1) << 1) - 1
+  // }
 }

@@ -37,21 +37,102 @@ trait Params extends SpatialApp {
 }
 
 
+// The linear layer does np.concatenate([a, hidden], axis=1).dot(kernel) + bias(broadcasted)
+// bias needs to broadcast over each batch
+//               feature_size   hidden_size     4*hidden_size         1
+//              +--------------+-----+       +-----------------+    +--+
+//              |              |     |       |                 |    |  |
+//              |              |     |       |                 |    |  |
+//              |              |     |       |                 |    |  |
+//  batch_size  |      x       |hidden   *   |     kernel      | +  |  | 4 * hidden_size
+//              |              |     |       |                 |    |  |
+//              |              |     |       |feature_size     |    |  |
+//              |              |     |       | + hidden_size   |    |  |
+//              +--------------+-----+       |                 |    |  |
+//                                           |                 |    +--+
+//                                           |                 |
+//                                           |                 |
+//                                           |                 |
+//                                           |                 |
+//                                           +-----------------+
+
 // mem and hidden states are always in SRAMs. 
 trait BasicLSTMCellTrait extends SpatialApp with Activations {
-  val forgetBias = 1
-  def BasicLSTMCell_DRAMIn[T:Type:Num](input: DRAM2[T]) {
+  var forgetBias: Int
+  var batch_size: Int
+  var feature_size: Int
+  var hidden_size: Int
+  var dn: Int
+  var dm: Int
+  var dp: Int
 
-  }
+  // Result stores in h and c
+  // This version assumes that we won't be able to fit kernel on SRAM
+  def BasicLSTMCell[T:Type:Num](x: SRAM[T], h: SRAM2[T], c: SRAM2[T], 
+    sigI: SRAM2[T], tanhJ: SRAM2[T], sigF: SRAM2[T], sigO: SRAM2[T],
+    kernel: DRAM2[T], bias: SRAM2[T]) {
+    val linear_output_size = hidden_size * 4
+    // TODO: Par-able...
+    // Linear Layer: linear([x,h], linear_output_size)
+    Foreach (batch_size by dn, linear_output_size by dm) { (i,j) =>
+      val tileC = SRAM[T](dn, dm)
+      Foreach (feature_size by dp) { k =>
+        Foreach (dn by 1, dd by 1) { (ii,jj) =>
+          val col_offset = j + jj
+          val prod = Reduce(Reg[T])(dp by 1) {
+            tileA(ii,kk) * tileB(kk,jj)  
+          } {_+_}
 
-  def BasicLSTCell_DRAMOut[T:Type:Num]() {
+          val prev = mux(k == 0, tileBias(col_offset), tileC(ii,jj))
+          val ele = prev + prod.value
+          if (col_offset < hidden_size)
+            sigI(ii, col_offset) = sigmoid_[T](ele)
+          else if (hidden_size <= col_offset < hidden_size * 2)
+            tanhJ(ii, col_offset - hidden_size) = tanh_[T](ele)
+          else if (2 * hidden_size <= col_offset < 3 * hidden_size)
+            sigF(ii, col_offset - hidden_size * 2) = sigmoid_[T](ele + forgetBias.to[T])
+          else 
+            sigO(ii, col_offset - hidden_size * 3) = sigmoid_[T](ele)
+        }
+      }
+    }
 
-  }
-
-  def BasicLSTMCell_Intermediate[T:Type:Num] () {
-
+    // Reduce layer
+    // TODO: Par-able...
+    Foreach (batch_size by 1, hidden_size by 1) { (i,j) =>
+      val new_c = c(i,j) * sigF(i,j) + sigI(i,j) * tanhJ(i,j)
+      h(i,j) = sigmoid_[T](new_c) * sigO(i,j)
+      c(i,j) = new_c
+    }
   }
 }
+
+
+object BasicLSTMCell_TestTrait extends SpatialApp with BasicLSTMCellTrait {
+  var forgetBias = 1
+  var batch_size = 2
+  var feature_size = 32
+  var hidden_size = 16
+  var dn = 1
+  var dm = 2
+  var dp = 4
+
+  type T = FixPt[TRUE, _8, _8]
+
+  @virtualize
+  def main() {
+    val sigI = SRAM[T](batch_size, hidden_size)
+    val tanhJ = SRAM[T](batch_size, hidden_size)
+    val sigF = SRAM[T](batch_size, hidden_size)
+    val sigO = SRAM[T](batch_size, hidden_size)
+    val bias = SRAM[T](linear_output_size)
+    val paramPath = "/home/tianzhao/spatial-lang/apps/parameters/test-params/"
+    val (cDRAM, kDRAM, bDRAM, hDRAM, xDRAM) = (DRAM[T](batch_size, hidden_size), 
+                                                DRAM[T](feature_size, ))
+  }
+}
+
+
 
 // At each data point in the batch:
 // This app does np.concatenate([a, hidden], axis=1).dot(kernel) + bias(broadcasted)
