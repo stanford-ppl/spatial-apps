@@ -139,6 +139,8 @@ object ReadCSV3DTest extends SpatialApp {
 
 object ActivationTests extends Activations {
   type T = FixPt[TRUE, _8, _8]
+  override type targetT = FixPt[TRUE, _8, _8]
+  override type LUTInT = FixPt[TRUE, _8, _8]
   @virtualize
   def main() {
     val x = ArgIn[T]

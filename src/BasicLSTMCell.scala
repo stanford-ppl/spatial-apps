@@ -57,39 +57,10 @@ trait Params extends SpatialApp {
 //                                           +-----------------+
 
 // mem and hidden states are always in SRAMs. 
-trait BasicLSTMCell_NMT extends SpatialApp {
-  type lT = FixPt[TRUE, _8, _8] // for LUTs
-  type cT = FixPt[TRUE, _8, _8] // for compute precision
+trait BasicLSTMCell_NMT extends SpatialApp with Activations {
+  override type lutInT = FixPt[TRUE, _8, _8]
+  override type targetT = FixPt[TRUE, _8, _8]
   type T = FixPt[TRUE, _8, _8] // for general precision
-
-  val projectDir = "/home/tianzhao/spatial-lang/apps/src/activation-luts/"
-  val loSig = 16.to[lT]
-  val loTanh = 4.to[lT]
-  val spacingShiftBitsSig = 5 // shift down for sig
-  val spacingShiftBitsTanh = 7 // shift down for tanh
-  val lutNSig = 512
-  val lutNTanh = 512
-  val sigF = projectDir + "sigmoid_512_16_-5.0.csv"
-  val tanhF = projectDir + "tanh_512_4_-7.0.csv"
-
-  def sigmoid_(p: lT) = {
-    val halfSigLUT = LUT.fromFile[lT](lutNSig)(sigF)
-    val index = (abs(p).to[lT] << spacingShiftBitsSig).to[Index] + 1.to[Index]
-    val valueMux = mux(p < 0.to[lT], 1.to[lT] - halfSigLUT(index), halfSigLUT(index))
-    val lowerMux = mux(p <= -loSig, 0.to[lT], valueMux)
-    val upperMux = mux(p >= loSig, 1.to[lT], lowerMux)
-    upperMux
-  }
-
-
-  def tanh_(p: lT) = {
-    val halfTanhLUT = LUT.fromFile[lT](lutNTanh)(tanhF)
-    val index = (abs(p).to[lT] << spacingShiftBitsTanh).to[Index] // + 1.to[Index]
-    val valueMux = mux(p < 0.to[T], 0.to[T] - halfTanhLUT(index), halfTanhLUT(index))
-    val lowerMux = mux(p <= -loTanh, -1.to[T], valueMux)
-    val upperMux = mux(p >= loTanh, 1.to[T], lowerMux)
-    upperMux
-  }
 
 
   // Result stores in h and c
@@ -116,8 +87,8 @@ trait BasicLSTMCell_NMT extends SpatialApp {
         tileKernel load kernel(k::k+dp, j::j+dm)
         Foreach (dp by 1, dm by 1) { (kk, jj) =>
           val prod = Reduce(Reg[T]) (dp by 1) { p =>
-            val offset = p // TODO: just put it here to bypass compiler error
-            if (offset < feature_size) {
+            // val offset = p // TODO: just put it here to bypass compiler error
+            if (p < feature_size) {
               x(rowOffset, p) * tileKernel(p, jj)
             } else {
               h(rowOffset - feature_size, p) * tileKernel(p, jj)
@@ -125,7 +96,7 @@ trait BasicLSTMCell_NMT extends SpatialApp {
           } {_+_}
 
           val colOffset = j + jj
-          if (colOffset < hidden_size) { // TODO: how's this line different than the others? ,
+          if (colOffset < hidden_size) { // TODO: how's this line different than the others? 
             val ele = prod.value + mux(k == 0, bias(colOffset), sigI(rowOffset, colOffset))
             sigI(rowOffset, colOffset) = sigmoid_(ele)
           }

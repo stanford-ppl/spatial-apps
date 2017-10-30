@@ -16,9 +16,9 @@ trait CharRNNTestParams extends SpatialApp {
                        simFileDir + "/bias.csv")
 }
 
-// TODO: Lookup tables doesn't need that many bits. Precision should be put differently.
 trait Activations extends SpatialApp { 
-  type T = FixPt[TRUE, _8, _8]
+  type targetT = FixPt[TRUE, _8, _8]
+  type LUTInT = FixPt[TRUE, _8, _8]
   val projectDir = "/home/tianzhao/spatial-lang/apps/src/activation-luts/"
   val loSig = 16
   val loTanh = 4
@@ -30,39 +30,31 @@ trait Activations extends SpatialApp {
   val tanhF = projectDir + "tanh_512_4_-7.0.csv"
 
 
-  def sigmoid_[aT:Type:Num](p: T) = {
-    val halfSigLUT = LUT.fromFile[T](lutNSig)(sigF)
-    val index = (abs(p).to[T] << spacingShiftBitsSig).to[Index] + 1.to[Index]
-    val valueMux = mux(p < 0.to[T], 1.to[T] - halfSigLUT(index), halfSigLUT(index))
-    val lowerMux = mux(p <= -loSig.to[T], 0.to[T], valueMux)
-    val upperMux = mux(p >= loSig.to[T], 1.to[T], lowerMux)
+  // targetT defines the precison we want for this LUT
+  def sigmoid_(p: LUTInT) = {
+    val zero = 0.to[targetT]
+    val one = 1.to[targetT]
+    val loSigT = loSig.to[targetT]
+    val halfSigLUT = LUT.fromFile[targetT](lutNSig)(sigF)
+    val index = (abs(p).to[targetT] << spacingShiftBitsSig).to[Index] + 1.to[Index]
+    val valueMux = mux(p < zero, one - halfSigLUT(index), halfSigLUT(index))
+    val lowerMux = mux(p <= -loSigT, zero, valueMux)
+    val upperMux = mux(p >= loSigT, one, lowerMux)
     upperMux
   }
 
 
-  // def sigmoid_old(p: aT) = {
-  //   val halfSigLUT = LUT.fromFile[aT](lutNSig)(sigF)
-  //   val index = (abs(p).to[iT] << spacingShiftBitsSig).to[Index]
-  //   val valueMux = mux(p < 0.to[aT], 1.to[aT] - halfSigLUT(index), halfSigLUT(index))
-  //   val lowerMux = mux(p <= -loSig.to[aT], 0.to[aT], valueMux)
-  //   val upperMux = mux(p >= loSig.to[aT], 1.to[aT], lowerMux)
-  //   upperMux
-  // }
-
-
-  def tanh_[aT:Type:Num](p: T) = {
-    val halfTanhLUT = LUT.fromFile[T](lutNTanh)(tanhF)
-    val index = (abs(p).to[T] << spacingShiftBitsTanh).to[Index] // + 1.to[Index]
-    val valueMux = mux(p < 0.to[T], 0.to[T] - halfTanhLUT(index), halfTanhLUT(index))
-    val lowerMux = mux(p <= -loTanh.to[T], -1.to[T], valueMux)
-    val upperMux = mux(p >= loTanh.to[T], 1.to[T], lowerMux)
+  def tanh_(p: LUTInT) = {
+    val zero = 0.to[targetT]
+    val one = 1.to[targetT]
+    val loTanhT = loTanh.to[targetT]
+    val halfTanhLUT = LUT.fromFile[targetT](lutNTanh)(tanhF)
+    val index = (abs(p).to[targetT] << spacingShiftBitsTanh).to[Index] // + 1.to[Index]
+    val valueMux = mux(p < zero, zero - halfTanhLUT(index), halfTanhLUT(index))
+    val lowerMux = mux(p <= -loTanhT, -one, valueMux)
+    val upperMux = mux(p >= loTanhT, one, lowerMux)
     upperMux
   }
-
-
-  // A few ideas about implementing tanh:
-  // range doesn't need to go that much. -8 to 8 would be fine.
-  // However more precisions need to be provided within 0 to 8.
 
   // Implement a tanh using: tanh(x) = 2 * sigmoid(2*x) - 1
   // def tanh_approx(p: aT) = {
