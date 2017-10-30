@@ -31,6 +31,7 @@ trait Activations extends SpatialApp {
 
 
   // targetT defines the precison we want for this LUT
+  @virtualize
   def sigmoid_(p: LUTInT) = {
     val zero = 0.to[targetT]
     val one = 1.to[targetT]
@@ -44,6 +45,7 @@ trait Activations extends SpatialApp {
   }
 
 
+  @virtualize
   def tanh_(p: LUTInT) = {
     val zero = 0.to[targetT]
     val one = 1.to[targetT]

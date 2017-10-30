@@ -58,24 +58,25 @@ trait Params extends SpatialApp {
 
 // mem and hidden states are always in SRAMs. 
 trait BasicLSTMCell_NMT extends SpatialApp with Activations {
-  override type lutInT = FixPt[TRUE, _8, _8]
-  override type targetT = FixPt[TRUE, _8, _8]
+  // override type lutInT = FixPt[TRUE, _8, _8]
+  // override type targetT = FixPt[TRUE, _8, _8]
   type T = FixPt[TRUE, _8, _8] // for general precision
 
+  var forgetBias: Int
+  var batch_size: Int
+  var feature_size: Int
+  var hidden_size: Int
+  var dn: Int
+  var dp: Int
+  var dm: Int
 
   // Result stores in h and c
   // This version assumes that we won't be able to fit kernel on SRAM
   // xh: x and hidden aligned on the second dimension
+  @virtualize
   def BasicLSTMCell(x: SRAM2[T], h: SRAM2[T], c: SRAM2[T], 
     sigI: SRAM2[T], tanhJ: SRAM2[T], sigF: SRAM2[T], sigO: SRAM2[T],
-    kernel: DRAM2[T], bias: SRAM[T]) {
-    val forgetBias = 1
-    val batch_size = 1
-    val feature_size = 32
-    val hidden_size = 16
-    val dn = 1
-    val dp = 4
-    val dm = 2
+    kernel: DRAM2[T], bias: SRAM2[T]) {
 
     val linear_output_size = hidden_size * 4
     val reduce_size = feature_size + hidden_size
@@ -97,19 +98,19 @@ trait BasicLSTMCell_NMT extends SpatialApp with Activations {
 
           val colOffset = j + jj
           if (colOffset < hidden_size) { // TODO: how's this line different than the others? 
-            val ele = prod.value + mux(k == 0, bias(colOffset), sigI(rowOffset, colOffset))
+            val ele = prod.value + mux(k == 0, bias(0, colOffset), sigI(rowOffset, colOffset))
             sigI(rowOffset, colOffset) = sigmoid_(ele)
           }
           else if (hidden_size <= colOffset && colOffset < hidden_size * 2) {
-            val ele = prod.value + mux(k == 0, bias(colOffset), tanhJ(rowOffset, colOffset - hidden_size))
+            val ele = prod.value + mux(k == 0, bias(0, colOffset), tanhJ(rowOffset, colOffset - hidden_size))
             tanhJ(rowOffset, colOffset - hidden_size) = tanh_(ele)
           }
           else if (2 * hidden_size <= colOffset && colOffset < 3 * hidden_size) {
-            val ele = prod.value + mux(k == 0, bias(colOffset), sigF(rowOffset, colOffset - 2 * hidden_size))
+            val ele = prod.value + mux(k == 0, bias(0, colOffset), sigF(rowOffset, colOffset - 2 * hidden_size))
             sigF(rowOffset, colOffset - hidden_size * 2) = sigmoid_(ele + forgetBias.to[T])
           }
           else {
-            val ele = prod.value + mux(k == 0, bias(colOffset), sigO(rowOffset, colOffset - 3 * hidden_size))
+            val ele = prod.value + mux(k == 0, bias(0, colOffset), sigO(rowOffset, colOffset - 3 * hidden_size))
             sigO(rowOffset, colOffset - hidden_size * 3) = sigmoid_(ele)
           }
         }
@@ -127,35 +128,30 @@ trait BasicLSTMCell_NMT extends SpatialApp with Activations {
 }
 
 
-object BasicLSTMCellNMT_TestTrait extends SpatialApp with BasicLSTMCell_NMT {
-  override val forgetBias = 1
-  override val batch_size = 2
-  override val feature_size = 32
-  override val hidden_size = 16
-  override val dn = 1
-  override val dm = 2
-  override val dp = 4
+object BasicLSTMCellNMT_TestTrait extends BasicLSTMCell_NMT {
+  var forgetBias = 1
+  var batch_size = 2
+  var feature_size = 32
+  var hidden_size = 16
+  var dn = 1
+  var dm = 2
+  var dp = 4
 
   val linear_output_size = hidden_size * 4
 
   @virtualize
   def main() {
-    val sigI = SRAM[T](batch_size, hidden_size)
-    val tanhJ = SRAM[T](batch_size, hidden_size)
-    val sigF = SRAM[T](batch_size, hidden_size)
-    val sigO = SRAM[T](batch_size, hidden_size)
-    val bias = SRAM[T](linear_output_size)
     val paramPath = "/home/tianzhao/spatial-lang/apps/parameters/test-params/"
     val (cDRAM, kernel, bDRAM, hDRAM, xDRAM) = (DRAM[T](batch_size, hidden_size), 
                                                 DRAM[T](hidden_size + feature_size, hidden_size),
-                                                DRAM[T](linear_output_size),
+                                                DRAM[T](1, linear_output_size),
                                                 DRAM[T](batch_size, hidden_size),
                                                 DRAM[T](batch_size, feature_size))
     setMem(cDRAM, loadCSV2D[T](paramPath+"c.csv", ",", "\n"))
     setMem(kernel, loadCSV2D[T](paramPath+"kernel.csv", ",", "\n"))
     setMem(hDRAM, loadCSV2D[T](paramPath+"h.csv", ",", "\n"))
     setMem(xDRAM, loadCSV2D[T](paramPath+"x.csv", ",", "\n"))
-    setMem(bDRAM, loadCSV1D[T](paramPath+"bias.csv", ","))
+    setMem(bDRAM, loadCSV2D[T](paramPath+"bias.csv", ","))
 
     Accel {
       val x = SRAM[T](batch_size, feature_size)
@@ -165,12 +161,12 @@ object BasicLSTMCellNMT_TestTrait extends SpatialApp with BasicLSTMCell_NMT {
       val sigF = SRAM[T](batch_size, hidden_size)
       val sigO = SRAM[T](batch_size, hidden_size)
       val tanhJ = SRAM[T](batch_size, hidden_size)
-      val bias = SRAM[T](linear_output_size)
+      val bias = SRAM[T](1, linear_output_size)
 
       x load xDRAM(0::batch_size, 0::feature_size)
       h load hDRAM(0::batch_size, 0::hidden_size)
       c load cDRAM(0::batch_size, 0::hidden_size)
-      bias load bDRAM(0::linear_output_size)
+      bias load bDRAM(0::1, 0::linear_output_size)
       BasicLSTMCell(x, h, c, sigI, tanhJ, sigF, sigO, kernel, bias)
 
       hDRAM(0::batch_size, 0::hidden_size) store h
