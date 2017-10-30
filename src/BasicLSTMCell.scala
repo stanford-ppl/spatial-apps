@@ -60,6 +60,7 @@ trait Params extends SpatialApp {
 trait BasicLSTMCell_NMT extends SpatialApp with Activations {
   // override type lutInT = FixPt[TRUE, _8, _8]
   // override type targetT = FixPt[TRUE, _8, _8]
+  type T = FixPt[TRUE, _8, _8] // for general precision
 
   var forgetBias: Int
   var batch_size: Int
@@ -73,7 +74,7 @@ trait BasicLSTMCell_NMT extends SpatialApp with Activations {
   // This version assumes that we won't be able to fit kernel on SRAM
   // xh: x and hidden aligned on the second dimension
   @virtualize
-  def BasicLSTMCell[T:Type:Num](x: SRAM2[T], h: SRAM2[T], c: SRAM2[T], 
+  def BasicLSTMCell(x: SRAM2[T], h: SRAM2[T], c: SRAM2[T], 
     sigI: SRAM2[T], tanhJ: SRAM2[T], sigF: SRAM2[T], sigO: SRAM2[T],
     kernel: DRAM2[T], bias: SRAM2[T]) {
 
@@ -88,10 +89,11 @@ trait BasicLSTMCell_NMT extends SpatialApp with Activations {
         Foreach (dp by 1, dm by 1) { (kk, jj) =>
           val prod = Reduce(Reg[T]) (dp by 1) { p =>
             // val offset = p // TODO: just put it here to bypass compiler error
+            val xhOffset = k + kk
             if (p < feature_size) {
-              x(rowOffset, p) * tileKernel(p, jj)
+              x(xhOffset, p) * tileKernel(p, jj)
             } else {
-              h(rowOffset - feature_size, p) * tileKernel(p, jj)
+              h(xhOffset - feature_size, p) * tileKernel(p, jj)
             }
           } {_+_}
 
@@ -128,7 +130,6 @@ trait BasicLSTMCell_NMT extends SpatialApp with Activations {
 
 
 object BasicLSTMCellNMT_TestTrait extends BasicLSTMCell_NMT {
-  type T = FixPt[TRUE, _8, _8]
   var forgetBias = 1
   var batch_size = 2
   var feature_size = 32
@@ -141,7 +142,7 @@ object BasicLSTMCellNMT_TestTrait extends BasicLSTMCell_NMT {
 
   @virtualize
   def main() {
-    val paramPath = "/home/tianzhao/spatial-lang/apps/parameters/test-params/"
+    val paramPath = "/home/tianzhao/spatial-lang/apps/models/nmt/test_param_weights/"
     val (cDRAM, kernel, bDRAM, hDRAM, xDRAM) = (DRAM[T](batch_size, hidden_size), 
                                                 DRAM[T](hidden_size + feature_size, hidden_size),
                                                 DRAM[T](1, linear_output_size),
@@ -167,7 +168,7 @@ object BasicLSTMCellNMT_TestTrait extends BasicLSTMCell_NMT {
       h load hDRAM(0::batch_size, 0::hidden_size)
       c load cDRAM(0::batch_size, 0::hidden_size)
       bias load bDRAM(0::1, 0::linear_output_size)
-      BasicLSTMCell[T](x, h, c, sigI, tanhJ, sigF, sigO, kernel, bias)
+      BasicLSTMCell(x, h, c, sigI, tanhJ, sigF, sigO, kernel, bias)
 
       hDRAM(0::batch_size, 0::hidden_size) store h
       cDRAM(0::batch_size, 0::hidden_size) store c
