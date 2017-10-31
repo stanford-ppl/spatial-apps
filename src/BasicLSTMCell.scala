@@ -100,19 +100,23 @@ trait BasicLSTMCell_NMT extends SpatialApp with Activations {
           val colOffset = j + jj
           if (colOffset < hidden_size) { // TODO: how's this line different than the others? 
             val ele = prod.value + mux(k == 0, bias(0, colOffset), sigI(rowOffset, colOffset))
-            sigI(rowOffset, colOffset) = sigmoid_(ele)
+            // sigI(rowOffset, colOffset) = sigmoid_(ele)
+            sigI(rowOffset, colOffset) = ele
           }
           else if (hidden_size <= colOffset && colOffset < hidden_size * 2) {
             val ele = prod.value + mux(k == 0, bias(0, colOffset), tanhJ(rowOffset, colOffset - hidden_size))
-            tanhJ(rowOffset, colOffset - hidden_size) = tanh_(ele)
+            // tanhJ(rowOffset, colOffset - hidden_size) = tanh_(ele)
+            tanhJ(rowOffset, colOffset - hidden_size) = ele
           }
           else if (2 * hidden_size <= colOffset && colOffset < 3 * hidden_size) {
             val ele = prod.value + mux(k == 0, bias(0, colOffset), sigF(rowOffset, colOffset - 2 * hidden_size))
-            sigF(rowOffset, colOffset - hidden_size * 2) = sigmoid_(ele + forgetBias.to[T])
+            // sigF(rowOffset, colOffset - hidden_size * 2) = sigmoid_(ele + forgetBias.to[T])
+            sigF(rowOffset, colOffset - hidden_size * 2) = ele + forgetBias.to[T]
           }
           else {
             val ele = prod.value + mux(k == 0, bias(0, colOffset), sigO(rowOffset, colOffset - 3 * hidden_size))
-            sigO(rowOffset, colOffset - hidden_size * 3) = sigmoid_(ele)
+            // sigO(rowOffset, colOffset - hidden_size * 3) = sigmoid_(ele)
+            sigO(rowOffset, colOffset - hidden_size * 3) = ele
           }
         }
       }
