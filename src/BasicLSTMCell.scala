@@ -168,6 +168,7 @@ object BasicLSTMCellNMT_TestTrait extends BasicLSTMCell_NMT {
       h load hDRAM(0::batch_size, 0::hidden_size)
       c load cDRAM(0::batch_size, 0::hidden_size)
       bias load bDRAM(0::1, 0::linear_output_size)
+      
       BasicLSTMCell(x, h, c, sigI, tanhJ, sigF, sigO, kernel, bias)
 
       hDRAM(0::batch_size, 0::hidden_size) store h
