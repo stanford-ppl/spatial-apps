@@ -1961,7 +1961,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
 
     }
 
-    val sorted_gold = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/sort/sort_data.csv", "\n")
+    val sorted_gold = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/sort/sort_gold.csv", "\n")
     val sorted_result = getMem(data_dram)
 
     printArray(sorted_gold, "Sorted Gold: ")
