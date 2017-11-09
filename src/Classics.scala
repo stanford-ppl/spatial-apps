@@ -699,7 +699,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   val margin = 1
 
   val innerPar = 16
-  val outerPar = 4
+  val outerPar = 2
 
   val tileSize = 20
 
@@ -826,7 +826,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 }
 
 
-object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 25 0.3 2
+object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 25 0.3 1
   /*
   Implementation based on http://cs.stanford.edu/people/karpathy/visml/ising_example.html
    pi(x) = exp(J* 𝚺x_j*x_i + J_b * 𝚺b_i*x_i)        
@@ -853,8 +853,8 @@ x_par=4  |       --->       X                XX    |
          |_________________________________________|
 
   */
-  type T = FixPt[TRUE,_32,_32]
-  type PROB = FixPt[FALSE, _0, _16]
+  type T = FixPt[TRUE,_16,_16] // FixPt[TRUE,_32,_32]
+  type PROB = FixPt[FALSE, _0, _8]
   @virtualize
   def main() = {
 
@@ -984,8 +984,8 @@ x_par=4  |       --->       X                XX    |
             val p_flip = exp_sram(-sum+lut_size/2)
             val pi_x = exp_sram(sum+4) * mux((bias_sram(i,j) * self) < 0, exp_posbias, exp_negbias)
             val threshold = min(1.to[T], pi_x)
-            val rng = unif[_16]()
-            val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(31::16).as[PROB], 1.to[T], 0.to[T]))
+            val rng = unif[_8]()
+            val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(15::8).as[PROB], 1.to[T], 0.to[T]))
             if (j >= 0 && j < COLS) {
               grid_sram(i,j) = mux(flip == 1.to[T], -self, self)
             }
@@ -1267,7 +1267,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
             local_farEdgeLens gather OCedgeLens(farPages2)
 
             // Do math to find new rank
-            val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+            val pagerank = Pipe.Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
                 println("page: " + page + ", local_page: " + local_page + " deq from far")
                 local_farPages.deq() / local_farEdgeLens.deq().to[X]
@@ -2354,12 +2354,12 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
         val px00 = image(i,j)
         val px01 = image(i,j-1)
         val px02 = image(i,j-2)
-        val px10 = image(i+1,j)
-        val px11 = image(i+1,j-1)
-        val px12 = image(i+1,j-2)
-        val px20 = image(i+2,j)
-        val px21 = image(i+2,j-1)
-        val px22 = image(i+2,j-2)
+        val px10 = image(i-1,j)
+        val px11 = image(i-1,j-1)
+        val px12 = image(i-1,j-2)
+        val px20 = image(i-2,j)
+        val px21 = image(i-2,j-1)
+        val px22 = image(i-2,j-2)
         abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)        
       } else {
         0
@@ -2492,7 +2492,8 @@ object PageRank_Bulk extends SpatialApp { // Regression (Sparse) // Args: 50 0.1
             }
 
             // Do math to find new rank
-            val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+            // val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+            val pagerank = Pipe.Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
                 println("page: " + page + ", local_page: " + local_page + " deq from far")
                 local_farPages.deq() / local_farEdgeLens.deq().to[X]
