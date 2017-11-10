@@ -1655,27 +1655,6 @@ object BlockReduce2D extends SpatialApp { // Regression (Unit) // Args: 192 384
   val N = 1920
   val tileSize = 16
 
-  @virtualize
-  def blockreduce_2d[T:Type:Num](src: Array[T], rows: Int, cols: Int) = {
-    val rowsIn = ArgIn[Int]; setArg(rowsIn, rows)
-    val colsIn = ArgIn[Int]; setArg(colsIn, cols)
-
-    val srcFPGA = DRAM[T](rowsIn, colsIn)
-    val dstFPGA = DRAM[T](tileSize, tileSize)
-
-    setMem(srcFPGA, src)
-
-    Accel {
-      val accum = SRAM[T](tileSize,tileSize)
-      MemReduce(accum)(rowsIn by tileSize, colsIn by tileSize par 2){ (i,j)  =>
-        val tile = SRAM[T](tileSize,tileSize)
-        tile load srcFPGA(i::i+tileSize, j::j+tileSize  par 1)
-        tile
-      }{_+_}
-      dstFPGA(0::tileSize, 0::tileSize par 1) store accum
-    }
-    getMem(dstFPGA)
-  }
 
   @virtualize
   def main() = {
@@ -1684,7 +1663,27 @@ object BlockReduce2D extends SpatialApp { // Regression (Unit) // Args: 192 384
     val src = Array.tabulate(numRows) { i => Array.tabulate(numCols) { j => (i*numCols + j)%256 } } // Standard array
     val flatsrc = src.flatten
 
-    val dst = blockreduce_2d(src.flatten, numRows, numCols)
+    val rowsIn = ArgIn[Int]; setArg(rowsIn, numRows)
+    val colsIn = ArgIn[Int]; setArg(colsIn, numCols)
+
+    val srcFPGA = DRAM[Int](rowsIn, colsIn)
+    val dstFPGA = DRAM[Int](tileSize, tileSize)
+    val probe = ArgOut[Int]
+
+    setMem(srcFPGA, src.flatten)
+
+    Accel {
+      val accum = SRAM[Int](tileSize,tileSize)
+      MemReduce(accum)(rowsIn by tileSize, colsIn by tileSize par 2){ (i,j)  =>
+        val tile = SRAM[Int](tileSize,tileSize)
+        tile load srcFPGA(i::i+tileSize, j::j+tileSize  par 1)
+        tile
+      }{_+_}
+      probe := accum(tileSize-1, tileSize-1)
+      dstFPGA(0::tileSize, 0::tileSize par 1) store accum
+    }
+    val dst = getMem(dstFPGA)
+
 
     val numHorizontal = numRows/tileSize
     val numVertical = numCols/tileSize
@@ -1711,8 +1710,9 @@ object BlockReduce2D extends SpatialApp { // Regression (Unit) // Args: 192 384
 
     printArray(gold, "src:")
     printArray(dst, "dst:")
+    println("Probe is " + getArg(probe) + ".  Should equal " + gold(tileSize * tileSize - 1))
     // dst.zip(gold){_==_} foreach {println(_)}
-    val cksum = dst.zip(gold){_ == _}.reduce{_&&_}
+    val cksum = dst.zip(gold){_ == _}.reduce{_&&_} && getArg(probe) == gold(tileSize * tileSize - 1)
     println("PASS: " + cksum + " (BlockReduce2D)")
 
     //    (0 until tileSize) foreach { i => assert(dst(i) == gold(i)) }
