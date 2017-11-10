@@ -819,8 +819,8 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     setArg(dash,d)
     val underscore = argon.lang.String.char2num("_")
 
-    val par_load = 16
-    val par_store = 16
+    val par_load = 1
+    val par_store = 1
     val row_par = 1 (1 -> 1 -> 8)
 
     val SKIPB = 0
