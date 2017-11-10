@@ -895,7 +895,7 @@ x_par=4  |       --->       X                XX    |
 
     val par_load = 16
     val par_store = 16
-    val x_par = 4 (1 -> 1 -> 16)
+    val x_par = 2 (1 -> 1 -> 16)
 
     // Square
     val bias_matrix = (0::ROWS, 0::COLS){(i,j) => if (i > ROWS/4 && i < 3*ROWS/4 && j > COLS/4 && j < 3*COLS/4) -1.to[Int] else 1.to[Int]}
@@ -2066,9 +2066,9 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     setArg(dash,d)
     val underscore = argon.lang.String.char2num("_")
 
-    val par_load = 16
-    val par_store = 16
-    val row_par = 2 (1 -> 1 -> 8)
+    val par_load = 4
+    val par_store = 4
+    val row_par = 1 (1 -> 1 -> 8)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -2085,7 +2085,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 512
+    val max_length = 256
     assert(max_length >= length, "Cannot have string longer than 512 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
