@@ -3659,12 +3659,12 @@ object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
       val filter7 = LUT[T](3,3,3)(filter5_data.map{_+1}:_*)
 
       // Use stdlib defs
-      Pipe{Convolution.ConvolutionSlideFast[T](dram1, image, filter, col_stride1, row_stride1, 16, 16)}
-      Pipe{Convolution.ConvolutionSlideFast[T](dram2, image, filter, col_stride2, row_stride2, 16, 16)}
+      Pipe{Convolution.ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1, 16, 16)}
+      Pipe{Convolution.ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2, 16, 16)}
       Pipe{Convolution.ConvolutionGEMM[T](dram3, flatimg, filter3)}
       Pipe{Convolution.ConvolutionGEMM[T](dram4, flatimg4, filter4)}
       Pipe{Convolution.MCConvolutionSlide(dram5, image3d, filter5, col_stride5, row_stride5, 16, 16, 3)}
-      Pipe{Convolution.MFConvolutionSlideFast[T](dram6, image, List(filter, filter6), col_stride6, row_stride6, 16, 16)}
+      Pipe{Convolution.MFConvolutionSlide[T](dram6, image, List(filter, filter6), col_stride6, row_stride6, 16, 16)}
       Pipe{Convolution.MCMFConvolutionSlide[T](dram7, image3d, List(filter5, filter7), col_stride7, row_stride7, 16, 16, 3)}
 
       // // Use defs in this app
