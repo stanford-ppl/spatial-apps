@@ -282,10 +282,10 @@ object TRSM extends SpatialApp { // Regression (Dense) // Args: none
       }
       // fixme: do normal DRAM matrices when https://github.com/stanford-ppl/spatial-lang/issues/68 is resolved
       Foreach(full_N by 1, full_K by 1) { (i,j) => 
-        B(i,j) = B_flat(i*full_K + j)
+        B(i,j) = B_flat(i.to[Index]*full_K + j.to[Index])
       }
       Foreach(full_N by 1, full_N by 1) { (i,j) => 
-        L(i,j) = L_flat(i*full_N + j)
+        L(i,j) = L_flat(i.to[Index]*full_N + j.to[Index])
       }
       Sequential.Foreach(full_N by inner_N) { diag_tile =>
         // // Vertical Blocking
@@ -296,14 +296,14 @@ object TRSM extends SpatialApp { // Regression (Dense) // Args: none
         // Horizontal Blocking
         Sequential.Foreach(diag_tile by 1) { k =>
           Sequential.Foreach(inner_N by 1, full_K by 1) { (i, j) =>
-            val Laddr0 = diag_tile + i
+            val Laddr0 = diag_tile + i.to[Index]
             val data = mux(diag_tile.to[Int] == 0.to[Int], B(Laddr0, j), B(Laddr0, j) - L(Laddr0, k) * B(k, j))
             B(Laddr0, j) = data
           }
         }
 
         Sequential(inner_N by 1) { diag_index =>
-          val diag_addr = diag_index + diag_tile
+          val diag_addr = diag_index.to[Index] + diag_tile
           val lambda = L(diag_addr, diag_addr)
           Sequential.Foreach(full_K by 1) { k => B(diag_addr, k) = B(diag_addr, k) / lambda }
           // Rank 1 update (outer product, subtraction accumulator)
@@ -313,7 +313,7 @@ object TRSM extends SpatialApp { // Regression (Dense) // Args: none
           }
           Sequential.Foreach(len.value by 1) { i =>
             Sequential.Foreach(full_K by 1) { j =>
-              val update_row = diag_addr + 1 + i
+              val update_row = diag_addr.to[Index] + 1 + i.to[Index]
               val data = mux(len.value == 0.to[Int], B(update_row, j), B(update_row, j) - L(update_row, diag_index) * B(diag_index, j))
               B(update_row, j) = data
             }
@@ -322,54 +322,41 @@ object TRSM extends SpatialApp { // Regression (Dense) // Args: none
 
       }
       // Pack result to 1D, to avoid burst alignment issues
-      Pipe(full_N by 1) { i => Pipe(full_K by 1) { j => X(i * full_K + j) = B(i, j) } }
+      Pipe(full_N by 1) { i => Pipe(full_K by 1) { j => X(i.to[Index] * full_K + j.to[Index]) = B(i, j) } }
       OCX(0 :: full_N * full_K) store X
     }
     getMem(OCX)
   }
 
-  def printArr(a: Array[T], numel: Int, str: String = "") {
-    println(str)
-    (0 until numel) foreach { i => print(a(i) + " ") }
-    println("")
-  }
-
   @virtualize
   def main() = {
-
-    // val image = (0::R, 0::C){(i,j) => if (j > border && j < C-border && i > border && i < C - border) i*16 else 0}
-
-    val B = Array.fill(full_N) {
-      Array.fill(full_K) { abs(random[T](2)) }
+    val B = (0::full_N, 0::full_K){(i,j) => 
+      abs(random[T](2))
     }
-    val L = Array.tabulate(full_N) { i =>
-      Array.tabulate(full_N) { j =>
-        if (j > i) 0.to[T]
-        else if (j == i) abs(random[T](5)) + 1
-        else if (i - j == 4) 1.to[T] // Just a courtesy to make the validation easier
-        // else if (i - j == 4) 1.to[T]
-        else 0.to[T]
-        // else abs(random[T](2))
-      }
+    val L = (0::full_N, 0::full_N){(i,j) =>
+      if (j > i) 0.to[T]
+      else if (j == i) abs(random[T](5)) + 1
+      else if (i - j == 4) 1.to[T] // Just a courtesy to make the validation easier
+      // else if (i - j == 4) 1.to[T]
+      else 0.to[T]
+      // else abs(random[T](2))
     }
 
     val result = trsm(B.flatten, L.flatten)
 
-    printArr(B.flatten, full_N * full_K, "B: ")
-    printArr(L.flatten, full_N * full_N, "L: ")
-    printArr(result, full_N * full_K, "X: ")
+    printMatrix(B, "B: ")
+    printMatrix(L, "L: ")
+    printMatrix(result.reshape(full_N, full_K), "X: ")
 
     val X_check = Array.tabulate(full_N) { i => Array.tabulate(full_K) { j => result(i * full_K + j) } }
     val L_check = Array.tabulate(full_N) { i =>
       Array.tabulate(full_N) { j =>
-        val row = L(i)
-        row(j)
+        L(i,j)
       }
     }
     val B_check = Array.tabulate(full_N) { i =>
       Array.tabulate(full_K) { j =>
-        val row = B(i)
-        row(j)
+        B(i,j)
       }
     }.flatten
     val B_computed = Array.tabulate(full_N) { i =>
@@ -380,8 +367,8 @@ object TRSM extends SpatialApp { // Regression (Dense) // Args: none
       }
     }.flatten
 
-    printArray(B_check, "Wanted: ")
-    printArray(B_computed, "Computed: ")
+    printMatrix(B_check.reshape(full_N, full_K), "Wanted: ")
+    printMatrix(B_computed.reshape(full_N, full_K), "Computed: ")
     val cksum = B_check.zip(B_computed){ (a,b) => a > b - margin && a < b + margin}.reduce{_&&_}
     println("PASS: " + cksum + " (TRSM)")
   }

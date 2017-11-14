@@ -80,8 +80,6 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
 }
 
 object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
-
-
   type X = FixPt[TRUE,_32,_0]
 
   val innerPar = 4
