@@ -4,7 +4,7 @@ import org.virtualized._
 object MatMult_outer extends SpatialApp { // Regression (Dense) // Args: 32 128 128
   type X = FixPt[TRUE,_16,_16]
 
-  val innerPar = 16
+  val innerPar = 4
   val midPar = 2
   val outerPar = 2
 
