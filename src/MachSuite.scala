@@ -879,15 +879,10 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
       val score_matrix = SRAM[nw_tuple](max_length+1,max_length+1)
 
       // Build score matrix
-<<<<<<< HEAD
-      Foreach(length+1 by 1){ r =>
-        Foreach(length+1 by 1) { c => 
-=======
       Foreach(length+1 by 1 par row_par){ r =>
         val this_body = r % row_par
         Sequential.Foreach(-this_body until length+1 by 1) { c => // Bug #151, should be able to remove previous_result reg when fixed
           val previous_result = Reg[nw_tuple]
->>>>>>> origin/regression
           val update = if (r == 0) (nw_tuple(-c.as[Int16], 0)) else if (c == 0) (nw_tuple(-r.as[Int16], 1)) else {
             val match_score = mux(seqa_sram_raw(c-1) == seqb_sram_raw(r-1), MATCH_SCORE.to[Int16], MISMATCH_SCORE.to[Int16])
             val from_top = score_matrix(r-1, c).score + GAP_SCORE
@@ -979,24 +974,12 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     println("Result A: " + seqa_aligned_string)
     // println("Gold A:   " + seqa_gold_string)
     println("Result B: " + seqb_aligned_string)
-<<<<<<< HEAD
-    println("Gold B:   " + seqb_gold_string)
-
-    val cksumA = seqa_aligned_string == seqa_gold_string //seqa_aligned_result.zip(seqa_gold_bin){_==_}.reduce{_&&_}
-    val cksumB = seqb_aligned_string == seqb_gold_string //seqb_aligned_result.zip(seqb_gold_bin){_==_}.reduce{_&&_}
-    val cksum = cksumA && cksumB
-    println("PASS: " + cksum + " (NW) * Implement nodes for text operations in Scala once refactoring is done")
-=======
     // println("Gold B:   " + seqb_gold_string)
     println("Found " + matches + " matches out of " + measured_length*2 + " elements")
     // val cksumA = seqa_aligned_string == seqa_gold_string //seqa_aligned_result.zip(seqa_gold_bin){_==_}.reduce{_&&_}
     // val cksumB = seqb_aligned_string == seqb_gold_string //seqb_aligned_result.zip(seqb_gold_bin){_==_}.reduce{_&&_}
     // val cksum = cksumA && cksumB
     println("PASS: " + cksum + " (NW)")
->>>>>>> origin/regression
-
-
-
   }
 }
 
@@ -1901,16 +1884,10 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
 
       def sum_scan(): Unit = {
         sum_sram(0) = 0
-<<<<<<< HEAD
-        Foreach(1 until SCAN_RADIX by 1) { radixID => 
-          val bucket_indx = radixID*SCAN_BLOCK - 1
-          sum_sram(radixID) = sum_sram(radixID-1) + bucket_sram(bucket_indx)
-=======
         Pipe(ii=3).Foreach(1 until SCAN_RADIX by 1) { radixID => // Remove manual II when bug #207 (or #151?) is fixed
         // Pipe.Foreach(1 until SCAN_RADIX by 1) { radixID => 
           val bucket_indx = radixID.to[Index]*SCAN_BLOCK - 1
           sum_sram(radixID) = sum_sram(radixID.to[Index]-1) + bucket_sram(bucket_indx)
->>>>>>> origin/regression
         }
       }
 

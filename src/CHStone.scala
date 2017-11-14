@@ -738,10 +738,6 @@ object JPEG_Decompress extends SpatialApp { // Regression (Dense) // Args: none
         Pipe{p_dhtbl_ml_mem(idx) = p_dhtbl_ml.value.as[UInt16]}
       }
 
-
-<<<<<<< HEAD
-      decode_start()
-=======
       // START DESIGN
 
       // Init structures
@@ -757,7 +753,6 @@ object JPEG_Decompress extends SpatialApp { // Regression (Dense) // Args: none
         p_jinfo_ac_dhuff_tbl_mincode(i,j) = 0
         p_jinfo_ac_dhuff_tbl_valptr(i,j) = 0
       }
->>>>>>> origin/regression
 
       Foreach(0 until 2, 0 until 36){(i,j) => println("mem at " + i + "," + j + " = " + p_jinfo_dc_xhuff_tbl_bits(i,j))}
       // // Load values

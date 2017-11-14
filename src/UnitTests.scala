@@ -1320,8 +1320,6 @@ object StackLoadStore extends SpatialApp { // Regression (Unit) // Args: none
 
 
 object SimpleReduce extends SpatialApp { // Regression (Unit) // Args: 7
-
-
   val N = 16.to[Int]
 
   def simpleReduce[T:Type:Num](xin: T) = {
