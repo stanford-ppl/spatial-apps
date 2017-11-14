@@ -3,8 +3,7 @@ import spatial.targets._
 import org.virtualized._
 
 object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
-  override val target = AWS_F1
-
+  override val target = targets.Default
   type X = Int
 
   val numcents = 16
@@ -297,7 +296,7 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
 
 
 object BlackScholes extends SpatialApp {
-
+  override val target = targets.Default
 
   val margin = 0.5f // Validates true if within +/- margin
   val innerPar = 16
@@ -1163,7 +1162,7 @@ object LogReg extends SpatialApp {
 }
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
-
+  override val target = targets.Default
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
 
@@ -1696,8 +1695,7 @@ WHERE
 */
 
 object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
-
-
+  override val target = targets.Default
   type FT = Int
 
   val MIN_DATE = 0
@@ -2012,9 +2010,7 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
 }
 
 object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
-  override val target = AWS_F1
-
-
+  override val target = targets.Default
  /*
   
   Smith-Waterman Genetic Alignment algorithm                                                  
@@ -2066,9 +2062,9 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     setArg(dash,d)
     val underscore = argon.lang.String.char2num("_")
 
-    val par_load = 16
-    val par_store = 16
-    val row_par = 2 (1 -> 1 -> 8)
+    val par_load = 16 (1 -> 1 -> 64)
+    val par_store = 16 (1 -> 1 -> 64)
+    val row_par = 2 (1 -> 1 -> 256)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -2237,8 +2233,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 }
 
 object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
-
-
+  override val target = targets.Default
   val Kh = 3
   val Kw = 3
   val Cmax = 160
@@ -2255,7 +2250,7 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
 
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
-    val row_stride = 10 (100 -> 100 -> 500)
+    val row_stride = 10 (3 -> 3 -> 500)
     val row_par = 2 (1 -> 1 -> 16)
     val par_Kh = 3 (1 -> 1 -> 3)
     val par_Kw = 3 (1 -> 1 -> 3)
