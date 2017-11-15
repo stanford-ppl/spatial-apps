@@ -37,6 +37,8 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
     val K     = numCents //ArgIn[Int]
     val D     = numDims //ArgIn[Int]
 
+    bound(iters) = 9
+
     setArg(iters, it)
     setArg(N, numPoints)
     // setArg(K, numCents)
@@ -709,7 +711,8 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
     val ip = innerPar(1 -> 12)
     val subLoopPar = innerPar(1 -> 16)
     val prodLoopPar = innerPar(1 -> 96)
-    val outerAccumPar = innerPar(1 -> 1)
+    val outerAccumPar = innerPar(1 -> 16)
+    val innerAccumPar = innerPar(1 -> 16)
 
     val rows = yCPU.length;
     bound(rows) = 360000
@@ -742,7 +745,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
       val sigmaOut = SRAM[T](MAXC, MAXC)
 
-      MemReduce(sigmaOut)(R by rTileSize par op){ r =>
+      MemReduce(sigmaOut par outerAccumPar)(R by rTileSize par op){ r =>
         val gdaYtile = SRAM[Int](rTileSize)
         val gdaXtile = SRAM[T](rTileSize, MAXC)
         val blk = Reg[Int]
@@ -756,7 +759,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
         val sigmaBlk = SRAM[T](MAXC, MAXC)
 
-        MemReduce(sigmaBlk)(blk par param(1)) { rr =>
+        MemReduce(sigmaBlk par innerAccumPar)(blk par param(1)) { rr =>
           val subTile = SRAM[T](MAXC)
           val sigmaTile = SRAM[T](MAXC, MAXC)
           Foreach(C par subLoopPar) { cc =>
@@ -1713,6 +1716,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   def tpchq6[T:Type:Num](datesIn: Array[Int], quantsIn: Array[Int], disctsIn: Array[T], pricesIn: Array[T]): T = {
     val dataSize = ArgIn[Int]
     setArg(dataSize, datesIn.length)
+    bound(dataSize) = 64000000
 
     val dates  = DRAM[Int](dataSize)
     val quants = DRAM[Int](dataSize)
@@ -2077,6 +2081,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     val seqa_string = args(0).to[MString] //"tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc"
     val seqb_string = args(1).to[MString] //"ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"
     val measured_length = seqa_string.length
+    bound(measured_length) = 160
     val length = ArgIn[Int]
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
@@ -2246,7 +2251,8 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
     val C = ArgIn[Int]
     setArg(R, image.rows)
     setArg(C, image.cols)
-
+    bound(R) = 256
+    bound(C) = 160
 
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
