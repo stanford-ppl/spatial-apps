@@ -1716,7 +1716,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   def tpchq6[T:Type:Num](datesIn: Array[Int], quantsIn: Array[Int], disctsIn: Array[T], pricesIn: Array[T]): T = {
     val dataSize = ArgIn[Int]
     setArg(dataSize, datesIn.length)
-    bound(dataSize) = 64000000
+    bound(dataSize) = 96000000
 
     val dates  = DRAM[Int](dataSize)
     val quants = DRAM[Int](dataSize)

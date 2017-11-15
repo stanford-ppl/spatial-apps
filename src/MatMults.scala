@@ -18,9 +18,9 @@ object MatMult_outer extends SpatialApp { // Regression (Dense) // Args: 32 128 
     val M = ArgIn[Int]
     val N = ArgIn[Int]
     val P = ArgIn[Int]
-    bound(M) = 1024
-    bound(N) = 1024
-    bound(P) = 1024
+    bound(M) = 1152
+    bound(N) = 1152
+    bound(P) = 1152
     setArg(M,mm)
     setArg(N,nn)
     setArg(P,pp)
