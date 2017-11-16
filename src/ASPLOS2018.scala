@@ -2,6 +2,401 @@ import spatial.dsl._
 import org.virtualized._
 import spatial.targets._
 
+object MatMult_inner1 extends SpatialApp { // Regression (Dense) // Args: 32 128 128
+  override val target = AWS_F1
+
+
+  type X = FixPt[TRUE,_16,_16]
+
+  val innerPar = 16
+  val midPar = 2
+  val outerPar = 2
+
+  val tsm = 64
+  val tsn = 64
+  val tsp = 64
+
+  @virtualize
+  def MatMult_inner[T:Type:Num](A: Array[T], B: Array[T], mm: Int, nn: Int, pp: Int) = {
+    val M = ArgIn[Int]
+    val N = ArgIn[Int]
+    val P = ArgIn[Int]
+    setArg(M,mm)
+    setArg(N,nn)
+    setArg(P,pp)
+
+    val a = DRAM[T](M, P)
+    val b = DRAM[T](P, N)
+    val c = DRAM[T](M, N)
+
+    val bm = tsm (1 -> 1536)
+    val bn = tsn (64 -> 64 -> 1536)
+    val bp = tsp (64 -> 64 -> 1536)
+
+    val op = outerPar (1 -> 6)
+    val mp = midPar   (1 -> 64)
+    val ip = innerPar (1 -> 64)
+    val px = 1 (1 -> 1) // Cannot parallelize accum across k blocks
+
+    setMem(a, A)
+    setMem(b, B)
+
+    Accel {
+      Foreach(M by bm, N by bn par op){(i,j) =>
+        val tileC = SRAM[T](bm, bn)
+
+        Foreach(P by bp par px){k =>
+          val tileA = SRAM[T](bm, bp)
+          val tileB = SRAM[T](bp, bn)
+          Parallel {
+            tileA load a(i::i+bm, k::k+bp par 1) // Reads M*N*P times
+            tileB load b(k::k+bp, j::j+bn par 1)
+          }
+          Foreach(bm by 1, bn by 1 par mp){ (ii,jj) =>    // MetaPipe?
+            val prod = Reduce(Reg[T])(bp by 1 par ip){kk => tileA(ii, kk) * tileB(kk, jj) }{_+_}
+            val prev = mux(k == 0, 0.to[T], tileC(ii,jj))
+            tileC(ii,jj) = prev + prod.value // Is a unit pipe that should be recognized as accum
+          }
+        }
+        c(i::i+bm, j::j+bn) store tileC // Writes M*N times
+      }
+    }
+    getMem(c)
+  }
+
+  @virtualize
+  def main() = {
+    val M = args(0).to[Int]
+    val N = args(1).to[Int]
+    val P = args(2).to[Int]
+
+    val a = Array.tabulate(M){ i => Array.tabulate(P){ j => ((i*P + j)%8).to[X] } }
+    val b = Array.tabulate(P){ i => Array.tabulate(N){ j => ((i*N + j)%8).to[X] } }
+    // val a = Array.fill(M){ Array.fill(P){random[T](100)} }
+    // val b = Array.fill(P){ Array.fill(N){random[T](100)} }
+
+    val result = MatMult_inner(a.flatten, b.flatten, M, N, P)
+
+    val gold = Array.tabulate(M){i =>
+      val aRow = a(i)
+      Array.tabulate(N){j =>
+        val bCol = b.map{row => row(j)}
+        aRow.zip(bCol){_*_}.reduce{_+_}
+      }
+    }.flatten
+
+    val gold_cksum = gold.map(a => a).reduce{_+_}
+    val result_cksum = result.map(a => a).reduce{_+_}
+    printArray(gold, "Gold: ")
+    printArray(result, "Result: ")
+    println("expected cksum: " + gold_cksum)
+    println("result cksum:   " + result_cksum)
+
+    // (0 until M*N) foreach { i => assert(result(i) == gold(i)) }
+
+    val cksum = result_cksum == gold_cksum
+    println("PASS: " + cksum + " (MatMult_inner) * Remember to fix GEMM_MemoryHierarchy once issue #159 is fixed!")
+
+  }
+
+}
+
+object MatMult_inner2 extends SpatialApp { // Regression (Dense) // Args: 32 128 128
+  override val target = AWS_F1
+
+
+  type X = FixPt[TRUE,_16,_16]
+
+  val innerPar = 16
+  val midPar = 4
+  val outerPar = 1
+
+  val tsm = 32
+  val tsn = 128
+  val tsp = 128
+
+  @virtualize
+  def MatMult_inner[T:Type:Num](A: Array[T], B: Array[T], mm: Int, nn: Int, pp: Int) = {
+    val M = ArgIn[Int]
+    val N = ArgIn[Int]
+    val P = ArgIn[Int]
+    setArg(M,mm)
+    setArg(N,nn)
+    setArg(P,pp)
+
+    val a = DRAM[T](M, P)
+    val b = DRAM[T](P, N)
+    val c = DRAM[T](M, N)
+
+    val bm = tsm (1 -> 1536)
+    val bn = tsn (64 -> 64 -> 1536)
+    val bp = tsp (64 -> 64 -> 1536)
+
+    val op = outerPar (1 -> 6)
+    val mp = midPar   (1 -> 64)
+    val ip = innerPar (1 -> 64)
+    val px = 1 (1 -> 1) // Cannot parallelize accum across k blocks
+
+    setMem(a, A)
+    setMem(b, B)
+
+    Accel {
+      Foreach(M by bm, N by bn par op){(i,j) =>
+        val tileC = SRAM[T](bm, bn)
+
+        Foreach(P by bp par px){k =>
+          val tileA = SRAM[T](bm, bp)
+          val tileB = SRAM[T](bp, bn)
+          Parallel {
+            tileA load a(i::i+bm, k::k+bp par 1) // Reads M*N*P times
+            tileB load b(k::k+bp, j::j+bn par 1)
+          }
+          Foreach(bm by 1, bn by 1 par mp){ (ii,jj) =>    // MetaPipe?
+            val prod = Reduce(Reg[T])(bp by 1 par ip){kk => tileA(ii, kk) * tileB(kk, jj) }{_+_}
+            val prev = mux(k == 0, 0.to[T], tileC(ii,jj))
+            tileC(ii,jj) = prev + prod.value // Is a unit pipe that should be recognized as accum
+          }
+        }
+        c(i::i+bm, j::j+bn) store tileC // Writes M*N times
+      }
+    }
+    getMem(c)
+  }
+
+  @virtualize
+  def main() = {
+    val M = args(0).to[Int]
+    val N = args(1).to[Int]
+    val P = args(2).to[Int]
+
+    val a = Array.tabulate(M){ i => Array.tabulate(P){ j => ((i*P + j)%8).to[X] } }
+    val b = Array.tabulate(P){ i => Array.tabulate(N){ j => ((i*N + j)%8).to[X] } }
+    // val a = Array.fill(M){ Array.fill(P){random[T](100)} }
+    // val b = Array.fill(P){ Array.fill(N){random[T](100)} }
+
+    val result = MatMult_inner(a.flatten, b.flatten, M, N, P)
+
+    val gold = Array.tabulate(M){i =>
+      val aRow = a(i)
+      Array.tabulate(N){j =>
+        val bCol = b.map{row => row(j)}
+        aRow.zip(bCol){_*_}.reduce{_+_}
+      }
+    }.flatten
+
+    val gold_cksum = gold.map(a => a).reduce{_+_}
+    val result_cksum = result.map(a => a).reduce{_+_}
+    printArray(gold, "Gold: ")
+    printArray(result, "Result: ")
+    println("expected cksum: " + gold_cksum)
+    println("result cksum:   " + result_cksum)
+
+    // (0 until M*N) foreach { i => assert(result(i) == gold(i)) }
+
+    val cksum = result_cksum == gold_cksum
+    println("PASS: " + cksum + " (MatMult_inner) * Remember to fix GEMM_MemoryHierarchy once issue #159 is fixed!")
+
+  }
+
+}
+
+
+object MatMult_outer1 extends SpatialApp { // Regression (Dense) // Args: 32 128 128
+  override val target = AWS_F1
+  type X = FixPt[TRUE,_16,_16]
+
+  val innerPar = 16
+  val midPar = 1
+  val outerPar = 2
+
+  val tsm = 64
+  val tsn = 64
+  val tsp = 64
+
+  @virtualize
+  def MatMult_outer[T:Type:Num](A: Array[T], B: Array[T], C_init: Array[T], mm: Int, nn: Int, pp: Int) = {
+    val M = ArgIn[Int]
+    val N = ArgIn[Int]
+    val P = ArgIn[Int]
+    setArg(M,mm)
+    setArg(N,nn)
+    setArg(P,pp)
+
+    val a = DRAM[T](M, P)
+    val b = DRAM[T](P, N)
+    // val c_init = DRAM[T](M, N)
+    val c = DRAM[T](M, N)
+
+    val op = outerPar (1 -> 1)
+    val mp = midPar (1 -> 16)
+    val ip = innerPar (1 -> 64)
+    val px = 1 (1 -> 1) // Cannot parallelize accum across k blocks
+
+    val bm = tsm (48 -> 48 -> 1920)
+    val bn = tsn (48 -> 48 -> 1920)
+    val bp = tsp (48 -> 48 -> 1920)
+
+    setMem(a, A)
+    setMem(b, B)
+    setMem(c, C_init)
+
+    Accel {
+      Sequential.Foreach(M by bm, N by bn par op) { (i,j) =>
+        val tileC = SRAM[T](bm, bn)
+        tileC load c(i::i+bm, j::j+bn par ip)
+        MemFold(tileC)(P by bp) { k =>
+          val tileA = SRAM[T](bm, bp) 
+          val tileB = SRAM[T](bp, bn)
+          val accum = SRAM[T](bm, bn)
+          Parallel {
+            tileA load a(i::i+bm, k::k+bp par ip)
+            tileB load b(k::k+bp, j::j+bn par ip)
+          }
+          MemReduce(accum)(bp by 1 par mp){ kk =>
+            val tileC_partial = SRAM[T](bm,bn)
+            Foreach(bm by 1, bn by 1 par ip){ (ii,jj) =>
+              tileC_partial(ii,jj) = tileA(ii,kk) * tileB(kk,jj)
+            }
+            tileC_partial
+          }{_+_}
+        }{_+_}
+        c(i::i+bm, j::j+bn par ip) store tileC
+      }
+    }
+    getMem(c)
+  }
+
+  @virtualize
+  def main() = {
+    val M = args(0).to[Int]
+    val N = args(1).to[Int]
+    val P = args(2).to[Int]
+
+    val a = Array.tabulate(M){ j => Array.tabulate(P){ i => ((i + j * P) % 8).to[X] } } // Standard array
+    val b = Array.tabulate(P){ j => Array.tabulate(N){ i => ((i + j * N) % 8).to[X] } } // Standard array
+    val c_init = Array.fill(M){ Array.fill(N){ 0.to[X] } }
+    // val a = Array.fill(M){ Array.fill(P){random[T](100)} }
+    // val b = Array.fill(P){ Array.fill(N){random[T](100)} }
+
+    val result = MatMult_outer(a.flatten, b.flatten, c_init.flatten, M, N, P)
+
+    val gold = Array.tabulate(M){i =>
+      val aRow = a(i)
+      Array.tabulate(N){j =>
+        val bCol = b.map{row => row(j)}
+        aRow.zip(bCol){_*_}.reduce{_+_}
+      }
+    }.flatten
+
+    println("expected cksum: " + gold.map(a => a).reduce{_+_})
+    println("result cksum: " + result.map(a => a).reduce{_+_})
+    printArray(gold, "Gold: ")
+    printArray(result, "Result: ")
+
+    val cksum = result.zip(gold){_ == _}.reduce{_&&_}
+    println("PASS: " + cksum + " (MatMult_outer)")
+  }
+
+}
+
+object MatMult_outer2 extends SpatialApp { // Regression (Dense) // Args: 32 128 128
+  override val target = AWS_F1
+  type X = FixPt[TRUE,_16,_16]
+
+  val innerPar = 16
+  val midPar = 4
+  val outerPar = 1
+
+  val tsm = 32
+  val tsn = 128
+  val tsp = 128
+
+  @virtualize
+  def MatMult_outer[T:Type:Num](A: Array[T], B: Array[T], C_init: Array[T], mm: Int, nn: Int, pp: Int) = {
+    val M = ArgIn[Int]
+    val N = ArgIn[Int]
+    val P = ArgIn[Int]
+    setArg(M,mm)
+    setArg(N,nn)
+    setArg(P,pp)
+
+    val a = DRAM[T](M, P)
+    val b = DRAM[T](P, N)
+    // val c_init = DRAM[T](M, N)
+    val c = DRAM[T](M, N)
+
+    val op = outerPar (1 -> 1)
+    val mp = midPar (1 -> 16)
+    val ip = innerPar (1 -> 64)
+    val px = 1 (1 -> 1) // Cannot parallelize accum across k blocks
+
+    val bm = tsm (48 -> 48 -> 1920)
+    val bn = tsn (48 -> 48 -> 1920)
+    val bp = tsp (48 -> 48 -> 1920)
+
+    setMem(a, A)
+    setMem(b, B)
+    setMem(c, C_init)
+
+    Accel {
+      Sequential.Foreach(M by bm, N by bn par op) { (i,j) =>
+        val tileC = SRAM[T](bm, bn)
+        tileC load c(i::i+bm, j::j+bn par ip)
+        MemFold(tileC)(P by bp) { k =>
+          val tileA = SRAM[T](bm, bp) 
+          val tileB = SRAM[T](bp, bn)
+          val accum = SRAM[T](bm, bn)
+          Parallel {
+            tileA load a(i::i+bm, k::k+bp par ip)
+            tileB load b(k::k+bp, j::j+bn par ip)
+          }
+          MemReduce(accum)(bp by 1 par mp){ kk =>
+            val tileC_partial = SRAM[T](bm,bn)
+            Foreach(bm by 1, bn by 1 par ip){ (ii,jj) =>
+              tileC_partial(ii,jj) = tileA(ii,kk) * tileB(kk,jj)
+            }
+            tileC_partial
+          }{_+_}
+        }{_+_}
+        c(i::i+bm, j::j+bn par ip) store tileC
+      }
+    }
+    getMem(c)
+  }
+
+  @virtualize
+  def main() = {
+    val M = args(0).to[Int]
+    val N = args(1).to[Int]
+    val P = args(2).to[Int]
+
+    val a = Array.tabulate(M){ j => Array.tabulate(P){ i => ((i + j * P) % 8).to[X] } } // Standard array
+    val b = Array.tabulate(P){ j => Array.tabulate(N){ i => ((i + j * N) % 8).to[X] } } // Standard array
+    val c_init = Array.fill(M){ Array.fill(N){ 0.to[X] } }
+    // val a = Array.fill(M){ Array.fill(P){random[T](100)} }
+    // val b = Array.fill(P){ Array.fill(N){random[T](100)} }
+
+    val result = MatMult_outer(a.flatten, b.flatten, c_init.flatten, M, N, P)
+
+    val gold = Array.tabulate(M){i =>
+      val aRow = a(i)
+      Array.tabulate(N){j =>
+        val bCol = b.map{row => row(j)}
+        aRow.zip(bCol){_*_}.reduce{_+_}
+      }
+    }.flatten
+
+    println("expected cksum: " + gold.map(a => a).reduce{_+_})
+    println("result cksum: " + result.map(a => a).reduce{_+_})
+    printArray(gold, "Gold: ")
+    printArray(result, "Result: ")
+
+    val cksum = result.zip(gold){_ == _}.reduce{_&&_}
+    println("PASS: " + cksum + " (MatMult_outer)")
+  }
+
+}
+
 // No opportunities for par
 object SW1 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
   override val target = Zynq
@@ -58,9 +453,9 @@ object SW1 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     setArg(dash,d)
     val underscore = argon.lang.String.char2num("_")
 
-    val par_load = 16
-    val par_store = 16
-    val row_par = 3 (1 -> 1 -> 8)
+    val par_load = 4
+    val par_store = 4
+    val row_par = 1 (1 -> 1 -> 8)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -77,7 +472,7 @@ object SW1 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 320 
+    val max_length = 160
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -283,8 +678,8 @@ object SW2 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     setArg(dash,d)
     val underscore = argon.lang.String.char2num("_")
 
-    val par_load = 16
-    val par_store = 16
+    val par_load = 4
+    val par_store = 4
     val row_par = 3 (1 -> 1 -> 8)
 
     val SKIPB = 0
@@ -302,7 +697,7 @@ object SW2 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 336
+    val max_length = 160
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -678,6 +1073,455 @@ object SW3 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
   }
 }
 
+object SW4 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
+  override val target = Zynq
+
+
+ /*
+  
+  Smith-Waterman Genetic Alignment algorithm                                                  
+  
+  This is just like NW algorithm, except negative scores are capped at 0, backwards traversal starts at highest score from any 
+     element on the perimeter, and end when score is 0
+
+
+    [SIC] NW diagram
+    LETTER KEY:         Scores                   Ptrs                                                                                                  
+      a = 0                   T  T  C  G                T  T  C  G                                                                                                                          
+      c = 1                0 -1 -2 -3 -4 ...         0  ←  ←  ←  ← ...                                                                                                        
+      g = 2             T -1  1  0 -1 -2          T  ↑  ↖  ←  ←  ←                                                                                                                          
+      t = 3             C -2  0 -1  1  0          C  ↑  ↑  ↑  ↖  ←                                                                                                                         
+      - = 4             G -3 -2 -2  0  2          G  ↑  ↑  ↑  ↑  ↖                                                                                                                                  
+      _ = 5             A -4 -3 -3 -1  1          A  ↑  ↑  ↑  ↑  ↖                                                                                                                                 
+                           .                         .                                                                                                                        
+                           .                         .                       
+                           .                         .                       
+                                                                                                           
+    PTR KEY:                                                                                                                                                                                                      
+      ← = 0 = skipB
+      ↑ = 1 = skipA
+      ↖ = 2 = align                                                                                      
+                                    
+
+                                                                                                           
+
+                                                                                                           
+ */
+
+  @struct case class sw_tuple(score: Int16, ptr: Int16)
+  @struct case class entry_tuple(row: Index, col: Index, score: Int16)
+
+  @virtualize
+  def main() = {
+
+    // FSM setup
+    val traverseState = 0
+    val padBothState = 1
+    val doneState = 2
+
+    val a = argon.lang.String.char2num("a")
+    val c = argon.lang.String.char2num("c")
+    val g = argon.lang.String.char2num("g")
+    val t = argon.lang.String.char2num("t")
+    val d = argon.lang.String.char2num("-")
+    val dash = ArgIn[Int8]
+    setArg(dash,d)
+    val underscore = argon.lang.String.char2num("_")
+
+    val par_load = 4
+    val par_store = 4
+    val row_par = 1 (1 -> 1 -> 8)
+
+    val SKIPB = 0
+    val SKIPA = 1
+    val ALIGN = 2
+    val MATCH_SCORE = 2
+    val MISMATCH_SCORE = -1
+    val GAP_SCORE = -1 
+    // val seqa_string = "tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc".toText
+    // val seqb_string = "ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat".toText
+    val seqa_string = args(0).to[MString] //"tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc"
+    val seqb_string = args(1).to[MString] //"ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"
+    val measured_length = seqa_string.length
+    val length = ArgIn[Int]
+    val lengthx2 = ArgIn[Int]
+    setArg(length, measured_length)
+    setArg(lengthx2, 2*measured_length)
+    val max_length = 256
+    assert(max_length >= length, "Cannot have string longer than 256 elements")
+
+    val seqa_bin = argon.lang.String.string2num(seqa_string)
+    // Array.tabulate[Int](seqa_string.length){i => 
+    //   val char = seqa_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else {6.to[Int]}
+    // } // TODO: Support c++ types with 2 bits in dram
+    val seqb_bin = argon.lang.String.string2num(seqb_string)
+    // Array.tabulate[Int](seqb_string.length){i => 
+    //   val char = seqb_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else {6.to[Int]}
+    // } // TODO: Support c++ types with 2 bits in dram
+
+    val seqa_dram_raw = DRAM[Int8](length)
+    val seqb_dram_raw = DRAM[Int8](length)
+    val seqa_dram_aligned = DRAM[Int8](lengthx2)
+    val seqb_dram_aligned = DRAM[Int8](lengthx2)
+    setMem(seqa_dram_raw, seqa_bin)
+    setMem(seqb_dram_raw, seqb_bin)
+
+    Accel{
+      val seqa_sram_raw = SRAM[Int8](max_length)
+      val seqb_sram_raw = SRAM[Int8](max_length)
+      val seqa_fifo_aligned = FIFO[Int8](max_length*2)
+      val seqb_fifo_aligned = FIFO[Int8](max_length*2)
+
+      seqa_sram_raw load seqa_dram_raw(0::length par par_load)
+      seqb_sram_raw load seqb_dram_raw(0::length par par_load)
+
+      val score_matrix = SRAM[sw_tuple](max_length+1,max_length+1)
+
+      val entry_point = Reg[entry_tuple]
+      // Build score matrix
+      Reduce(entry_point)(length+1 by 1 par row_par){ r =>
+        val possible_entry_point = Reg[entry_tuple]
+        val this_body = r % row_par
+        Sequential.Foreach(-this_body until length+1 by 1) { c => // Bug #151, should be able to remove previous_result reg when fixed
+          val previous_result = Reg[sw_tuple]
+          val update = if (r == 0) (sw_tuple(0, 0)) else if (c == 0) (sw_tuple(0, 1)) else {
+            val match_score = mux(seqa_sram_raw(c-1) == seqb_sram_raw(r-1), MATCH_SCORE.to[Int16], MISMATCH_SCORE.to[Int16])
+            val from_top = score_matrix(r-1, c).score + GAP_SCORE
+            val from_left = previous_result.score + GAP_SCORE
+            val from_diag = score_matrix(r-1, c-1).score + match_score
+            mux(from_left >= from_top && from_left >= from_diag, sw_tuple(from_left, SKIPB), mux(from_top >= from_diag, sw_tuple(from_top,SKIPA), sw_tuple(from_diag, ALIGN)))
+          }
+          previous_result := update
+          if ((c == length || r == length) && possible_entry_point.score < update.score) possible_entry_point := entry_tuple(r, c, update.score)
+          if (c >= 0) {score_matrix(r,c) = sw_tuple(max(0, update.score),update.ptr)}
+          // score_matrix(r,c) = update
+        }
+        possible_entry_point
+      }{(a,b) => mux(a.score > b.score, a, b)}
+
+      // Read score matrix
+      val b_addr = Reg[Int](0)
+      val a_addr = Reg[Int](0)
+      Parallel{b_addr := entry_point.row; a_addr := entry_point.col}
+      val done_backtrack = Reg[Bit](false)
+      FSM[Int](state => state != doneState) { state =>
+        if (state == traverseState) {
+          if (score_matrix(b_addr,a_addr).ptr == ALIGN.to[Int16]) {
+            seqa_fifo_aligned.enq(seqa_sram_raw(a_addr-1), !done_backtrack)
+            seqb_fifo_aligned.enq(seqb_sram_raw(b_addr-1), !done_backtrack)
+            done_backtrack := b_addr == 1.to[Int] || a_addr == 1.to[Int]
+            b_addr :-= 1
+            a_addr :-= 1
+          } else if (score_matrix(b_addr,a_addr).ptr == SKIPA.to[Int16]) {
+            seqb_fifo_aligned.enq(seqb_sram_raw(b_addr-1), !done_backtrack)  
+            seqa_fifo_aligned.enq(dash, !done_backtrack)          
+            done_backtrack := b_addr == 1.to[Int]
+            b_addr :-= 1
+          } else {
+            seqa_fifo_aligned.enq(seqa_sram_raw(a_addr-1), !done_backtrack)
+            seqb_fifo_aligned.enq(dash, !done_backtrack)          
+            done_backtrack := a_addr == 1.to[Int]
+            a_addr :-= 1
+          }
+        } else if (state == padBothState) {
+          seqa_fifo_aligned.enq(underscore, !seqa_fifo_aligned.full) // I think this FSM body either needs to be wrapped in a body or last enq needs to be masked or else we are full before FSM sees full
+          seqb_fifo_aligned.enq(underscore, !seqb_fifo_aligned.full)
+        } else {}
+      } { state => 
+        mux(state == traverseState && (score_matrix(b_addr,a_addr).score == 0.to[Int16]), doneState, state) 
+      }
+
+      Parallel{
+        seqa_dram_aligned(0::seqa_fifo_aligned.numel par par_store) store seqa_fifo_aligned
+        seqb_dram_aligned(0::seqb_fifo_aligned.numel par par_store) store seqb_fifo_aligned
+      }
+
+    }
+
+    val seqa_aligned_result = getMem(seqa_dram_aligned)
+    val seqb_aligned_result = getMem(seqb_dram_aligned)
+    val seqa_aligned_string = argon.lang.String.num2string(seqa_aligned_result)
+    val seqb_aligned_string = argon.lang.String.num2string(seqb_aligned_result)
+
+    // val seqa_gold_string = "cggccgcttag-tgggtgcggtgctaagggggctagagggcttg-tc-gcggggcacgggacatgcg--gcg-t--cgtaaaccaaacat-g-gcgccgggag-attatgctcttgcacg-acag-ta----g-gat-aaagc---agc-t_________________________________________________________________________________________________________".toText
+    // val seqb_gold_string = "--------tagct-ggtaccgt-ctaa-gtggc--ccggg-ttgagcggctgggca--gg-c-tg-gaag-gttagcgt-aaggagatatagtccg-cgggtgcagggtg-gctggcccgtacagctacctggcgctgtgcgcgggagctt_________________________________________________________________________________________________________".toText
+
+    // val seqa_gold_bin = argon.lang.String.string2num(seqa_gold_string)
+    // Array.tabulate[Int](seqa_gold_string.length){i => 
+    //   val char = seqa_gold_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else if (char == "-") {4.to[Int]}
+    //   else if (char == "_") {5.to[Int]}
+    //   else {6.to[Int]}
+    // }
+    // val seqb_gold_bin = argon.lang.String.string2num(seqb_gold_string)
+    // Array.tabulate[Int](seqb_gold_string.length){i => 
+    //   val char = seqb_gold_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else if (char == "-") {4.to[Int]}
+    //   else if (char == "_") {5.to[Int]}
+    //   else {6.to[Int]}
+    // }
+
+    // Pass if >75% match
+    val matches = seqa_aligned_result.zip(seqb_aligned_result){(a,b) => if ((a == b) || (a == dash) || (b == dash)) 1 else 0}.reduce{_+_}
+    val cksum = matches.to[Float] > 0.75.to[Float]*measured_length.to[Float]*2
+
+    println("Result A: " + seqa_aligned_string)
+    // println("Gold A:   " + seqa_gold_string)
+    println("Result B: " + seqb_aligned_string)
+    // println("Gold B:   " + seqb_gold_string)
+    println("Found " + matches + " matches out of " + measured_length*2 + " elements")
+    // val cksumA = seqa_aligned_string == seqa_gold_string //seqa_aligned_result.zip(seqa_gold_bin){_==_}.reduce{_&&_}
+    // val cksumB = seqb_aligned_string == seqb_gold_string //seqb_aligned_result.zip(seqb_gold_bin){_==_}.reduce{_&&_}
+    // val cksum = cksumA && cksumB
+    println("PASS: " + cksum + " (SW)")
+
+
+
+  }
+}
+
+object SW5 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
+  override val target = Zynq
+
+
+ /*
+  
+  Smith-Waterman Genetic Alignment algorithm                                                  
+  
+  This is just like NW algorithm, except negative scores are capped at 0, backwards traversal starts at highest score from any 
+     element on the perimeter, and end when score is 0
+
+
+    [SIC] NW diagram
+    LETTER KEY:         Scores                   Ptrs                                                                                                  
+      a = 0                   T  T  C  G                T  T  C  G                                                                                                                          
+      c = 1                0 -1 -2 -3 -4 ...         0  ←  ←  ←  ← ...                                                                                                        
+      g = 2             T -1  1  0 -1 -2          T  ↑  ↖  ←  ←  ←                                                                                                                          
+      t = 3             C -2  0 -1  1  0          C  ↑  ↑  ↑  ↖  ←                                                                                                                         
+      - = 4             G -3 -2 -2  0  2          G  ↑  ↑  ↑  ↑  ↖                                                                                                                                  
+      _ = 5             A -4 -3 -3 -1  1          A  ↑  ↑  ↑  ↑  ↖                                                                                                                                 
+                           .                         .                                                                                                                        
+                           .                         .                       
+                           .                         .                       
+                                                                                                           
+    PTR KEY:                                                                                                                                                                                                      
+      ← = 0 = skipB
+      ↑ = 1 = skipA
+      ↖ = 2 = align                                                                                      
+                                    
+
+                                                                                                           
+
+                                                                                                           
+ */
+
+  @struct case class sw_tuple(score: Int16, ptr: Int16)
+  @struct case class entry_tuple(row: Index, col: Index, score: Int16)
+
+  @virtualize
+  def main() = {
+
+    // FSM setup
+    val traverseState = 0
+    val padBothState = 1
+    val doneState = 2
+
+    val a = argon.lang.String.char2num("a")
+    val c = argon.lang.String.char2num("c")
+    val g = argon.lang.String.char2num("g")
+    val t = argon.lang.String.char2num("t")
+    val d = argon.lang.String.char2num("-")
+    val dash = ArgIn[Int8]
+    setArg(dash,d)
+    val underscore = argon.lang.String.char2num("_")
+
+    val par_load = 4
+    val par_store = 4
+    val row_par = 1 (1 -> 1 -> 8)
+
+    val SKIPB = 0
+    val SKIPA = 1
+    val ALIGN = 2
+    val MATCH_SCORE = 2
+    val MISMATCH_SCORE = -1
+    val GAP_SCORE = -1 
+    // val seqa_string = "tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc".toText
+    // val seqb_string = "ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat".toText
+    val seqa_string = args(0).to[MString] //"tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc"
+    val seqb_string = args(1).to[MString] //"ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"
+    val measured_length = seqa_string.length
+    val length = ArgIn[Int]
+    val lengthx2 = ArgIn[Int]
+    setArg(length, measured_length)
+    setArg(lengthx2, 2*measured_length)
+    val max_length = 256
+    assert(max_length >= length, "Cannot have string longer than 256 elements")
+
+    val seqa_bin = argon.lang.String.string2num(seqa_string)
+    // Array.tabulate[Int](seqa_string.length){i => 
+    //   val char = seqa_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else {6.to[Int]}
+    // } // TODO: Support c++ types with 2 bits in dram
+    val seqb_bin = argon.lang.String.string2num(seqb_string)
+    // Array.tabulate[Int](seqb_string.length){i => 
+    //   val char = seqb_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else {6.to[Int]}
+    // } // TODO: Support c++ types with 2 bits in dram
+
+    val seqa_dram_raw = DRAM[Int8](length)
+    val seqb_dram_raw = DRAM[Int8](length)
+    val seqa_dram_aligned = DRAM[Int8](lengthx2)
+    val seqb_dram_aligned = DRAM[Int8](lengthx2)
+    setMem(seqa_dram_raw, seqa_bin)
+    setMem(seqb_dram_raw, seqb_bin)
+
+    Accel{
+      val seqa_sram_raw = SRAM[Int8](max_length)
+      val seqb_sram_raw = SRAM[Int8](max_length)
+      val seqa_fifo_aligned = FIFO[Int8](max_length*2)
+      val seqb_fifo_aligned = FIFO[Int8](max_length*2)
+
+      seqa_sram_raw load seqa_dram_raw(0::length par par_load)
+      seqb_sram_raw load seqb_dram_raw(0::length par par_load)
+
+      val score_matrix = SRAM[sw_tuple](max_length+1,max_length+1)
+
+      val entry_point = Reg[entry_tuple]
+      // Build score matrix
+      Reduce(entry_point)(length+1 by 1 par row_par){ r =>
+        val possible_entry_point = Reg[entry_tuple]
+        val this_body = r % row_par
+        Sequential.Foreach(-this_body until length+1 by 1) { c => // Bug #151, should be able to remove previous_result reg when fixed
+          val previous_result = Reg[sw_tuple]
+          val update = if (r == 0) (sw_tuple(0, 0)) else if (c == 0) (sw_tuple(0, 1)) else {
+            val match_score = mux(seqa_sram_raw(c-1) == seqb_sram_raw(r-1), MATCH_SCORE.to[Int16], MISMATCH_SCORE.to[Int16])
+            val from_top = score_matrix(r-1, c).score + GAP_SCORE
+            val from_left = previous_result.score + GAP_SCORE
+            val from_diag = score_matrix(r-1, c-1).score + match_score
+            mux(from_left >= from_top && from_left >= from_diag, sw_tuple(from_left, SKIPB), mux(from_top >= from_diag, sw_tuple(from_top,SKIPA), sw_tuple(from_diag, ALIGN)))
+          }
+          previous_result := update
+          if ((c == length || r == length) && possible_entry_point.score < update.score) possible_entry_point := entry_tuple(r, c, update.score)
+          if (c >= 0) {score_matrix(r,c) = sw_tuple(max(0, update.score),update.ptr)}
+          // score_matrix(r,c) = update
+        }
+        possible_entry_point
+      }{(a,b) => mux(a.score > b.score, a, b)}
+
+      // Read score matrix
+      val b_addr = Reg[Int](0)
+      val a_addr = Reg[Int](0)
+      Parallel{b_addr := entry_point.row; a_addr := entry_point.col}
+      val done_backtrack = Reg[Bit](false)
+      FSM[Int](state => state != doneState) { state =>
+        if (state == traverseState) {
+          if (score_matrix(b_addr,a_addr).ptr == ALIGN.to[Int16]) {
+            seqa_fifo_aligned.enq(seqa_sram_raw(a_addr-1), !done_backtrack)
+            seqb_fifo_aligned.enq(seqb_sram_raw(b_addr-1), !done_backtrack)
+            done_backtrack := b_addr == 1.to[Int] || a_addr == 1.to[Int]
+            b_addr :-= 1
+            a_addr :-= 1
+          } else if (score_matrix(b_addr,a_addr).ptr == SKIPA.to[Int16]) {
+            seqb_fifo_aligned.enq(seqb_sram_raw(b_addr-1), !done_backtrack)  
+            seqa_fifo_aligned.enq(dash, !done_backtrack)          
+            done_backtrack := b_addr == 1.to[Int]
+            b_addr :-= 1
+          } else {
+            seqa_fifo_aligned.enq(seqa_sram_raw(a_addr-1), !done_backtrack)
+            seqb_fifo_aligned.enq(dash, !done_backtrack)          
+            done_backtrack := a_addr == 1.to[Int]
+            a_addr :-= 1
+          }
+        } else if (state == padBothState) {
+          seqa_fifo_aligned.enq(underscore, !seqa_fifo_aligned.full) // I think this FSM body either needs to be wrapped in a body or last enq needs to be masked or else we are full before FSM sees full
+          seqb_fifo_aligned.enq(underscore, !seqb_fifo_aligned.full)
+        } else {}
+      } { state => 
+        mux(state == traverseState && (score_matrix(b_addr,a_addr).score == 0.to[Int16]), doneState, state) 
+      }
+
+      Parallel{
+        seqa_dram_aligned(0::seqa_fifo_aligned.numel par par_store) store seqa_fifo_aligned
+        seqb_dram_aligned(0::seqb_fifo_aligned.numel par par_store) store seqb_fifo_aligned
+      }
+
+    }
+
+    val seqa_aligned_result = getMem(seqa_dram_aligned)
+    val seqb_aligned_result = getMem(seqb_dram_aligned)
+    val seqa_aligned_string = argon.lang.String.num2string(seqa_aligned_result)
+    val seqb_aligned_string = argon.lang.String.num2string(seqb_aligned_result)
+
+    // val seqa_gold_string = "cggccgcttag-tgggtgcggtgctaagggggctagagggcttg-tc-gcggggcacgggacatgcg--gcg-t--cgtaaaccaaacat-g-gcgccgggag-attatgctcttgcacg-acag-ta----g-gat-aaagc---agc-t_________________________________________________________________________________________________________".toText
+    // val seqb_gold_string = "--------tagct-ggtaccgt-ctaa-gtggc--ccggg-ttgagcggctgggca--gg-c-tg-gaag-gttagcgt-aaggagatatagtccg-cgggtgcagggtg-gctggcccgtacagctacctggcgctgtgcgcgggagctt_________________________________________________________________________________________________________".toText
+
+    // val seqa_gold_bin = argon.lang.String.string2num(seqa_gold_string)
+    // Array.tabulate[Int](seqa_gold_string.length){i => 
+    //   val char = seqa_gold_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else if (char == "-") {4.to[Int]}
+    //   else if (char == "_") {5.to[Int]}
+    //   else {6.to[Int]}
+    // }
+    // val seqb_gold_bin = argon.lang.String.string2num(seqb_gold_string)
+    // Array.tabulate[Int](seqb_gold_string.length){i => 
+    //   val char = seqb_gold_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else if (char == "-") {4.to[Int]}
+    //   else if (char == "_") {5.to[Int]}
+    //   else {6.to[Int]}
+    // }
+
+    // Pass if >75% match
+    val matches = seqa_aligned_result.zip(seqb_aligned_result){(a,b) => if ((a == b) || (a == dash) || (b == dash)) 1 else 0}.reduce{_+_}
+    val cksum = matches.to[Float] > 0.75.to[Float]*measured_length.to[Float]*2
+
+    println("Result A: " + seqa_aligned_string)
+    // println("Gold A:   " + seqa_gold_string)
+    println("Result B: " + seqb_aligned_string)
+    // println("Gold B:   " + seqb_gold_string)
+    println("Found " + matches + " matches out of " + measured_length*2 + " elements")
+    // val cksumA = seqa_aligned_string == seqa_gold_string //seqa_aligned_result.zip(seqa_gold_bin){_==_}.reduce{_&&_}
+    // val cksumB = seqb_aligned_string == seqb_gold_string //seqb_aligned_result.zip(seqb_gold_bin){_==_}.reduce{_&&_}
+    // val cksum = cksumA && cksumB
+    println("PASS: " + cksum + " (SW)")
+
+
+
+  }
+}
 
 // good
 object MD_Grid1 extends SpatialApp { // Regression (Dense) // Args: none
@@ -743,7 +1587,7 @@ object MD_Grid1 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_grid0_y = 1 (1 -> 1 -> 16) 
     val loop_grid0_z = 1 (1 -> 1 -> 16)
     val loop_grid1_x = 1 (1 -> 1 -> 16)
-    val loop_grid1_y = 1 (1 -> 1 -> 16)
+    val loop_grid1_y = 2 (1 -> 1 -> 16)
     val loop_grid1_z = 4 (1 -> 1 -> 16)
     val loop_p =       2 (1 -> 1 -> 16)
     val loop_q =       2 (1 -> 1 -> 16)
@@ -1258,187 +2102,7 @@ object GEMM_Blocked1 extends SpatialApp { // Regression (Dense) // Args: none
                                                                                                   
                                                                                                   
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-
-
-         # Loops jj and kk
-
-                                                                                jj                                       
-                                                                  ...............↓............................. 
-                                                                 .               .          .                 . 
-                                                                 .               . ← tile → .                 . 
-                                                                 .               .          .                 . 
-                                                                 .      B        .          .                 . 
-                                                                 .               .          .                 . 
-                                                              kk .               .          .                 . 
-                                                               ↳ .................__________................... 
-                                                                 .               |          |                 . 
-                                                                 .               | b_sram   |      ↑          . 
-                                                                 .               |          |      tile       . 
-                                                                 .               |          |      ↓          . 
-                                                                 ................|__________|.................. 
-                                                                 .               .          .                 . 
-                                                                 .               .    |     .                 . 
-                                                                 .               .    |     .                 . 
-                                                                 .               .    ↓     .                 . 
-                                                                 .               .          .                 . 
-                                                                 ..............................................
-                    kk ---→                                                                                           
-      _______________↓____________________________                ................__________...................          
-     |               |          |                 |              .               |          |                  .      ↑   
-     |               |          |                 |              .               |          |                  .      |   
-     |               | ← tile → |                 |              .               |          |                  .      |   
-     |      A        |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .           C   |          |                  .      |   
-     |               |          |                 |              .               |  c_col   |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |    
-     |               |          |                 |              .               |          |                  .
-     |               |          |                 |              .               |          |                  .     dim  
-     |               |          |                 |              .               |          |                  .         
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |_______________|__________|_________________|              ................|__________|...................      ↓   
-                                                                                             
-                                                                  ←----------------- dim -------------------→
-
-        # Loop i                                                          
-                                          
-                                                                               jj                                       
-                                                                 ...............↓............................. 
-                                                                .               .          .                 . 
-                                                                .               . ← tile → .                 . 
-                                                                .               .          .                 . 
-                                                                .      B        .          .                 . 
-                                                                .               .          .                 . 
-                                                             kk .               .          .                 . 
-                                                              ↳ .................__________................... 
-                                                                .               |          |                 . 
-                                                                .               | b_sram   |      ↑          . 
-                                                                .               |          |      tile       . 
-                                                                .               |          |      ↓          . 
-                                                                ................|__________|.................. 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                ..............................................
-                      kk                                                                                               
-        ...............↓.............................           ..............................................          
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               . ← tile → .                 .          .               .          .                  .     
-       .      A        .          .                 .          .               .          .                  .     
-       .               .          .                 .          .           C   .          .                  .     
-     i .               .          .                 .          .               .          .                  .     
-     ↳ .................__________...................          .................__________....................     
-       .               |_a_sram___|                 .          .               |__c_tmp___|                  .     
-       .```````````````.          .`````````````````.          .```````````````.          .``````````````````.
-       .               .    |     .                 .          .               .          .                  .     
-       .               .    |     .                 .          .               .          .                  .     
-       .               .    ↓     .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       ..............................................          ...............................................     
-                                                                                           
-                                                                
-
-        
-        # Loop k
-                                                                               jj                                       
-                                                                 ...............↓............................. 
-                                                                .               .          .                 . 
-                                                                .               . ← tile → .                 . 
-                                                                .               .          .                 . 
-                                                                .      B        .          .                 . 
-                                                                .               .          .                 . 
-                                                             kk .               .          .                 . 
-                                                              ↳ .................__________................... 
-                                                                .             k |          |                 . 
-                                                                .             ↳ | b_sram   |      ↑          . 
-                                                                .               |          |      tile       . 
-                                                                .               |          |      ↓          . 
-                                                                ................|__________|.................. 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                ..............................................
-                      kk                                                                                               
-        ...............↓.............................            ..............................................         
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               . ← tile → .                 .           .               .          .                  .   
-       .      A        .          .                 .           .               .          .                  .   
-       .               .          .                 .           .           C   .          .                  .   
-     i .               .          .                 .           .               .          .                  .   
-     ↳ .................__________...............raw_values....           .................__________....................   
-       .               |_O________|                 .           .               |__c_tmp___|                  .   
-       .```````````````. ↑        .`````````````````.           .```````````````.          .``````````````````.
-       .               . k  -->   .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       ..............................................           ...............................................   
-                                                                                           
-                                                              
-
-
-            # Loop j
-                                                                              jj                                       
-                                                                ...............↓............................. 
-                                                               .               .          .                 . 
-                                                               .               . ← tile → .                 . 
-                                                               .               .          .                 . 
-                                                               .      B        .          .                 . 
-                                                               .               .          .                 . 
-                                                            kk .               .  j -->   .                 . 
-                                                             ↳ .................__↓_______................... 
-                                                               .             k |          |                 . 
-                                                               .             ↳ |  O       |      ↑          . 
-                                                               .               |          |      tile       . 
-                                                               .               |  b_sram  |      ↓          . 
-                                                               ................|__________|.................. 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               ..............................................
-                     kk                                                                                               
-       ...............↓.............................           ..............................................         
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               . ← tile → .                 .          .               .          .                  .     
-      .      A        .          .                 .          .               .          .                  .     
-      .               .          .                 .          .           C   .          .                  .     
-    i .               .          .                 .          .               .          .                  .     
-    ↳ .................__________...................          .................__________....................     
-      .               |_O________|                 .          .               |__O_-->___|                  .     
-      .```````````````. ↑        .`````````````````.          .```````````````.          .``````````````````.
-      .               . k        .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      ..............................................          ...............................................     
-                                                                                          
-                                                                
+               
     CONCERNS: We need to figure out how HLS is actually managing the srams, or make our management better  
               We cannot do unaligned stores yet, so tilesize of 8 won't work unless we keep ts 16 of c_sram onchip                                                                                          
  */
@@ -1458,7 +2122,7 @@ object GEMM_Blocked1 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_ii    = 1 // not sure if this one works
     val loop_kk    = 1 (1 -> 1 -> 8)
     val loop_i     = 2 (1 -> 1 -> 32)
-    val loop_k     = 1 (1 -> 1 -> 16)
+    val loop_k     = 2 (1 -> 1 -> 16)
     val loop_j     = 3 (1 -> 1 -> 16)
     val reduce_col = 4 (1 -> 1 -> 16)
     val reduce_tmp = 4 (1 -> 1 -> 16)
@@ -1526,186 +2190,6 @@ object GEMM_Blocked2 extends SpatialApp { // Regression (Dense) // Args: none
                                                                                                   
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 
-
-         # Loops jj and kk
-
-                                                                                jj                                       
-                                                                  ...............↓............................. 
-                                                                 .               .          .                 . 
-                                                                 .               . ← tile → .                 . 
-                                                                 .               .          .                 . 
-                                                                 .      B        .          .                 . 
-                                                                 .               .          .                 . 
-                                                              kk .               .          .                 . 
-                                                               ↳ .................__________................... 
-                                                                 .               |          |                 . 
-                                                                 .               | b_sram   |      ↑          . 
-                                                                 .               |          |      tile       . 
-                                                                 .               |          |      ↓          . 
-                                                                 ................|__________|.................. 
-                                                                 .               .          .                 . 
-                                                                 .               .    |     .                 . 
-                                                                 .               .    |     .                 . 
-                                                                 .               .    ↓     .                 . 
-                                                                 .               .          .                 . 
-                                                                 ..............................................
-                    kk ---→                                                                                           
-      _______________↓____________________________                ................__________...................          
-     |               |          |                 |              .               |          |                  .      ↑   
-     |               |          |                 |              .               |          |                  .      |   
-     |               | ← tile → |                 |              .               |          |                  .      |   
-     |      A        |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .           C   |          |                  .      |   
-     |               |          |                 |              .               |  c_col   |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |    
-     |               |          |                 |              .               |          |                  .
-     |               |          |                 |              .               |          |                  .     dim  
-     |               |          |                 |              .               |          |                  .         
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |_______________|__________|_________________|              ................|__________|...................      ↓   
-                                                                                             
-                                                                  ←----------------- dim -------------------→
-
-        # Loop i                                                          
-                                          
-                                                                               jj                                       
-                                                                 ...............↓............................. 
-                                                                .               .          .                 . 
-                                                                .               . ← tile → .                 . 
-                                                                .               .          .                 . 
-                                                                .      B        .          .                 . 
-                                                                .               .          .                 . 
-                                                             kk .               .          .                 . 
-                                                              ↳ .................__________................... 
-                                                                .               |          |                 . 
-                                                                .               | b_sram   |      ↑          . 
-                                                                .               |          |      tile       . 
-                                                                .               |          |      ↓          . 
-                                                                ................|__________|.................. 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                ..............................................
-                      kk                                                                                               
-        ...............↓.............................           ..............................................          
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               . ← tile → .                 .          .               .          .                  .     
-       .      A        .          .                 .          .               .          .                  .     
-       .               .          .                 .          .           C   .          .                  .     
-     i .               .          .                 .          .               .          .                  .     
-     ↳ .................__________...................          .................__________....................     
-       .               |_a_sram___|                 .          .               |__c_tmp___|                  .     
-       .```````````````.          .`````````````````.          .```````````````.          .``````````````````.
-       .               .    |     .                 .          .               .          .                  .     
-       .               .    |     .                 .          .               .          .                  .     
-       .               .    ↓     .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       ..............................................          ...............................................     
-                                                                                           
-                                                                
-
-        
-        # Loop k
-                                                                               jj                                       
-                                                                 ...............↓............................. 
-                                                                .               .          .                 . 
-                                                                .               . ← tile → .                 . 
-                                                                .               .          .                 . 
-                                                                .      B        .          .                 . 
-                                                                .               .          .                 . 
-                                                             kk .               .          .                 . 
-                                                              ↳ .................__________................... 
-                                                                .             k |          |                 . 
-                                                                .             ↳ | b_sram   |      ↑          . 
-                                                                .               |          |      tile       . 
-                                                                .               |          |      ↓          . 
-                                                                ................|__________|.................. 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                ..............................................
-                      kk                                                                                               
-        ...............↓.............................            ..............................................         
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               . ← tile → .                 .           .               .          .                  .   
-       .      A        .          .                 .           .               .          .                  .   
-       .               .          .                 .           .           C   .          .                  .   
-     i .               .          .                 .           .               .          .                  .   
-     ↳ .................__________...............raw_values....           .................__________....................   
-       .               |_O________|                 .           .               |__c_tmp___|                  .   
-       .```````````````. ↑        .`````````````````.           .```````````````.          .``````````````````.
-       .               . k  -->   .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       ..............................................           ...............................................   
-                                                                                           
-                                                              
-
-
-            # Loop j
-                                                                              jj                                       
-                                                                ...............↓............................. 
-                                                               .               .          .                 . 
-                                                               .               . ← tile → .                 . 
-                                                               .               .          .                 . 
-                                                               .      B        .          .                 . 
-                                                               .               .          .                 . 
-                                                            kk .               .  j -->   .                 . 
-                                                             ↳ .................__↓_______................... 
-                                                               .             k |          |                 . 
-                                                               .             ↳ |  O       |      ↑          . 
-                                                               .               |          |      tile       . 
-                                                               .               |  b_sram  |      ↓          . 
-                                                               ................|__________|.................. 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               ..............................................
-                     kk                                                                                               
-       ...............↓.............................           ..............................................         
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               . ← tile → .                 .          .               .          .                  .     
-      .      A        .          .                 .          .               .          .                  .     
-      .               .          .                 .          .           C   .          .                  .     
-    i .               .          .                 .          .               .          .                  .     
-    ↳ .................__________...................          .................__________....................     
-      .               |_O________|                 .          .               |__O_-->___|                  .     
-      .```````````````. ↑        .`````````````````.          .```````````````.          .``````````````````.
-      .               . k        .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      ..............................................          ...............................................     
-                                                                                          
-                                                                
     CONCERNS: We need to figure out how HLS is actually managing the srams, or make our management better  
               We cannot do unaligned stores yet, so tilesize of 8 won't work unless we keep ts 16 of c_sram onchip                                                                                          
  */
@@ -1724,10 +2208,10 @@ object GEMM_Blocked2 extends SpatialApp { // Regression (Dense) // Args: none
     val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
     val loop_ii    = 1 // not sure if this one works
     val loop_kk    = 1 (1 -> 1 -> 8)
-    val loop_i     = 1 (1 -> 1 -> 32)
-    val loop_k     = 4 (1 -> 1 -> 16)
-    val loop_j     = 2 (1 -> 1 -> 16)
-    val reduce_col = 2 (1 -> 1 -> 16)
+    val loop_i     = 2 (1 -> 1 -> 32)
+    val loop_k     = 2 (1 -> 1 -> 16)
+    val loop_j     = 4 (1 -> 1 -> 16)
+    val reduce_col = 4 (1 -> 1 -> 16)
     val reduce_tmp = 4 (1 -> 1 -> 16)
 
     // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
@@ -1793,186 +2277,7 @@ object GEMM_Blocked3 extends SpatialApp { // Regression (Dense) // Args: none
                                                                                                   
                                                                                                   
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-
-
-         # Loops jj and kk
-
-                                                                                jj                                       
-                                                                  ...............↓............................. 
-                                                                 .               .          .                 . 
-                                                                 .               . ← tile → .                 . 
-                                                                 .               .          .                 . 
-                                                                 .      B        .          .                 . 
-                                                                 .               .          .                 . 
-                                                              kk .               .          .                 . 
-                                                               ↳ .................__________................... 
-                                                                 .               |          |                 . 
-                                                                 .               | b_sram   |      ↑          . 
-                                                                 .               |          |      tile       . 
-                                                                 .               |          |      ↓          . 
-                                                                 ................|__________|.................. 
-                                                                 .               .          .                 . 
-                                                                 .               .    |     .                 . 
-                                                                 .               .    |     .                 . 
-                                                                 .               .    ↓     .                 . 
-                                                                 .               .          .                 . 
-                                                                 ..............................................
-                    kk ---→                                                                                           
-      _______________↓____________________________                ................__________...................          
-     |               |          |                 |              .               |          |                  .      ↑   
-     |               |          |                 |              .               |          |                  .      |   
-     |               | ← tile → |                 |              .               |          |                  .      |   
-     |      A        |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .           C   |          |                  .      |   
-     |               |          |                 |              .               |  c_col   |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |    
-     |               |          |                 |              .               |          |                  .
-     |               |          |                 |              .               |          |                  .     dim  
-     |               |          |                 |              .               |          |                  .         
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |               |          |                 |              .               |          |                  .      |   
-     |_______________|__________|_________________|              ................|__________|...................      ↓   
-                                                                                             
-                                                                  ←----------------- dim -------------------→
-
-        # Loop i                                                          
-                                          
-                                                                               jj                                       
-                                                                 ...............↓............................. 
-                                                                .               .          .                 . 
-                                                                .               . ← tile → .                 . 
-                                                                .               .          .                 . 
-                                                                .      B        .          .                 . 
-                                                                .               .          .                 . 
-                                                             kk .               .          .                 . 
-                                                              ↳ .................__________................... 
-                                                                .               |          |                 . 
-                                                                .               | b_sram   |      ↑          . 
-                                                                .               |          |      tile       . 
-                                                                .               |          |      ↓          . 
-                                                                ................|__________|.................. 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                ..............................................
-                      kk                                                                                               
-        ...............↓.............................           ..............................................          
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               . ← tile → .                 .          .               .          .                  .     
-       .      A        .          .                 .          .               .          .                  .     
-       .               .          .                 .          .           C   .          .                  .     
-     i .               .          .                 .          .               .          .                  .     
-     ↳ .................__________...................          .................__________....................     
-       .               |_a_sram___|                 .          .               |__c_tmp___|                  .     
-       .```````````````.          .`````````````````.          .```````````````.          .``````````````````.
-       .               .    |     .                 .          .               .          .                  .     
-       .               .    |     .                 .          .               .          .                  .     
-       .               .    ↓     .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       .               .          .                 .          .               .          .                  .     
-       ..............................................          ...............................................     
-                                                                                           
-                                                                
-
-        
-        # Loop k
-                                                                               jj                                       
-                                                                 ...............↓............................. 
-                                                                .               .          .                 . 
-                                                                .               . ← tile → .                 . 
-                                                                .               .          .                 . 
-                                                                .      B        .          .                 . 
-                                                                .               .          .                 . 
-                                                             kk .               .          .                 . 
-                                                              ↳ .................__________................... 
-                                                                .             k |          |                 . 
-                                                                .             ↳ | b_sram   |      ↑          . 
-                                                                .               |          |      tile       . 
-                                                                .               |          |      ↓          . 
-                                                                ................|__________|.................. 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                .               .          .                 . 
-                                                                ..............................................
-                      kk                                                                                               
-        ...............↓.............................            ..............................................         
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               . ← tile → .                 .           .               .          .                  .   
-       .      A        .          .                 .           .               .          .                  .   
-       .               .          .                 .           .           C   .          .                  .   
-     i .               .          .                 .           .               .          .                  .   
-     ↳ .................__________...............raw_values....           .................__________....................   
-       .               |_O________|                 .           .               |__c_tmp___|                  .   
-       .```````````````. ↑        .`````````````````.           .```````````````.          .``````````````````.
-       .               . k  -->   .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       .               .          .                 .           .               .          .                  .   
-       ..............................................           ...............................................   
-                                                                                           
-                                                              
-
-
-            # Loop j
-                                                                              jj                                       
-                                                                ...............↓............................. 
-                                                               .               .          .                 . 
-                                                               .               . ← tile → .                 . 
-                                                               .               .          .                 . 
-                                                               .      B        .          .                 . 
-                                                               .               .          .                 . 
-                                                            kk .               .  j -->   .                 . 
-                                                             ↳ .................__↓_______................... 
-                                                               .             k |          |                 . 
-                                                               .             ↳ |  O       |      ↑          . 
-                                                               .               |          |      tile       . 
-                                                               .               |  b_sram  |      ↓          . 
-                                                               ................|__________|.................. 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               .               .          .                 . 
-                                                               ..............................................
-                     kk                                                                                               
-       ...............↓.............................           ..............................................         
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               . ← tile → .                 .          .               .          .                  .     
-      .      A        .          .                 .          .               .          .                  .     
-      .               .          .                 .          .           C   .          .                  .     
-    i .               .          .                 .          .               .          .                  .     
-    ↳ .................__________...................          .................__________....................     
-      .               |_O________|                 .          .               |__O_-->___|                  .     
-      .```````````````. ↑        .`````````````````.          .```````````````.          .``````````````````.
-      .               . k        .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      .               .          .                 .          .               .          .                  .     
-      ..............................................          ...............................................     
-                                                                                          
+                
                                                                 
     CONCERNS: We need to figure out how HLS is actually managing the srams, or make our management better  
               We cannot do unaligned stores yet, so tilesize of 8 won't work unless we keep ts 16 of c_sram onchip                                                                                          
@@ -1991,10 +2296,10 @@ object GEMM_Blocked3 extends SpatialApp { // Regression (Dense) // Args: none
     val par_store = 16
     val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
     val loop_ii    = 1 // not sure if this one works
-    val loop_kk    = 1 (1 -> 1 -> 8)
-    val loop_i     = 1 (1 -> 1 -> 32)
-    val loop_k     = 1 (1 -> 1 -> 16)
-    val loop_j     = 6 (1 -> 1 -> 16)
+    val loop_kk    = 2 (1 -> 1 -> 8)
+    val loop_i     = 2 (1 -> 1 -> 32)
+    val loop_k     = 2 (1 -> 1 -> 16)
+    val loop_j     = 4 (1 -> 1 -> 16)
     val reduce_col = 4 (1 -> 1 -> 16)
     val reduce_tmp = 4 (1 -> 1 -> 16)
 
@@ -2396,11 +2701,11 @@ object BlackScholes1 extends SpatialApp {
     svolatility: Array[T],
     stimes:      Array[T]
   ): Array[T] = {
-    val B  = 320 (32 -> 96 -> 19200)
+    val B  = 96 (32 -> 96 -> 19200)
     val OP = 1 (1 -> 2)
-    val IP = 8 (1 -> 96)
-    val par_load = 8
-    val par_store = 8
+    val IP = 1 (1 -> 96)
+    val par_load = 16
+    val par_store = 16
 
     val size = stypes.length; bound(size) = 9995328
 
@@ -2548,7 +2853,7 @@ object BlackScholes2 extends SpatialApp {
   ): Array[T] = {
     val B  = 768 (32 -> 96 -> 19200)
     val OP = 1 (1 -> 2)
-    val IP = 8 (1 -> 96)
+    val IP = 3 (1 -> 96)
     val par_load = 16
     val par_store = 16
 
@@ -2699,6 +3004,155 @@ object BlackScholes3 extends SpatialApp {
     val B  = 192 (32 -> 96 -> 19200)
     val OP = 1 (1 -> 2)
     val IP = 16 (1 -> 96)
+    val par_load = 16
+    val par_store = 16
+
+    val size = stypes.length; bound(size) = 9995328
+
+    val N = ArgIn[Int]
+    setArg(N, size)
+
+    val types    = DRAM[Int](N)
+    val prices   = DRAM[T](N)
+    val strike   = DRAM[T](N)
+    val rate     = DRAM[T](N)
+    val vol      = DRAM[T](N)
+    val times    = DRAM[T](N)
+    val optprice = DRAM[T](N)
+    setMem(types, stypes)
+    setMem(prices, sprices)
+    setMem(strike, sstrike)
+    setMem(rate, srate)
+    setMem(vol, svolatility)
+    setMem(times, stimes)
+
+    Accel {
+      Foreach(N by B par OP) { i =>
+        val typeBlk   = SRAM[Int](B)
+        val priceBlk  = SRAM[T](B)
+        val strikeBlk = SRAM[T](B)
+        val rateBlk   = SRAM[T](B)
+        val volBlk    = SRAM[T](B)
+        val timeBlk   = SRAM[T](B)
+        val optpriceBlk = SRAM[T](B)
+
+        Parallel {
+          typeBlk   load types(i::i+B par par_load)
+          priceBlk  load prices(i::i+B par par_load)
+          strikeBlk load strike(i::i+B par par_load)
+          rateBlk   load rate(i::i+B par par_load)
+          volBlk    load vol(i::i+B par par_load)
+          timeBlk   load times(i::i+B par par_load)
+        }
+
+        Foreach(B par IP){ j =>
+          val price = BlkSchlsEqEuroNoDiv(priceBlk(j), strikeBlk(j), rateBlk(j), volBlk(j), timeBlk(j), typeBlk(j))
+          optpriceBlk(j) = price
+        }
+        optprice(i::i+B par par_store) store optpriceBlk
+      }
+    }
+    getMem(optprice)
+  }
+
+  @virtualize
+  def main(): Unit = {
+    val N = args(0).to[Int]
+
+    val types  = Array.fill(N)(1 + random[Int](2))
+    val prices = Array.fill(N)(1 + random[T])
+    val strike = Array.fill(N)(1 + random[T])
+    val rate   = Array.fill(N)(1 + random[T])
+    val vol    = Array.fill(N)(1 + random[T])
+    val time   = Array.fill(N)(1 + random[T])
+
+    val out = blackscholes(types, prices, strike, rate, vol, time)
+
+    val gold = Array.tabulate(N){i => 
+      BlkSchlsEqEuroNoDiv(prices(i), strike(i), rate(i), vol(i), time(i), types(i))
+    }
+    printArray(out, "result: ")
+    printArray(gold, "gold: ")
+
+    val cksum = out.zip(gold){ case (o, g) => (g < (o + margin.to[T])) && g > (o - margin.to[T])}.reduce{_&&_}
+    println("PASS: " + cksum + " (BlackSholes)")
+
+
+  }
+}
+object BlackScholes4 extends SpatialApp {
+  override val target = AWS_F1
+
+  type T = Float//FixPt[TRUE,_32,_32]
+  val margin = 0.2f // Validates true if within +/- margin
+
+  final val inv_sqrt_2xPI = 0.39894228040143270286f.to[T]
+
+  @virtualize
+  def CNDF(x: T): T = {
+    val ax = abs(x)
+
+    val xNPrimeofX = exp_taylor((ax ** 2) * -0.05f.to[T]) * inv_sqrt_2xPI
+    val xK2 = 1.to[T] / ((ax * 0.2316419f.to[T]) + 1.0f.to[T])
+
+    val xK2_2 = xK2 ** 2
+    val xK2_3 = xK2_2 * xK2
+    val xK2_4 = xK2_3 * xK2
+    val xK2_5 = xK2_4 * xK2
+
+    val xLocal_10 = xK2 * 0.319381530f.to[T]
+    val xLocal_20 = xK2_2 * -0.356563782f.to[T]
+    val xLocal_30 = xK2_3 * 1.781477937f.to[T]
+    val xLocal_31 = xK2_4 * -1.821255978f.to[T]
+    val xLocal_32 = xK2_5 * 1.330274429f.to[T]
+
+    val xLocal_21 = xLocal_20 + xLocal_30
+    val xLocal_22 = xLocal_21 + xLocal_31
+    val xLocal_23 = xLocal_22 + xLocal_32
+    val xLocal_1 = xLocal_23 + xLocal_10
+
+    val xLocal0 = xLocal_1 * xNPrimeofX
+    val xLocal  = -xLocal0 + 1.0f.to[T]
+
+    mux(x < 0.0f.to[T], xLocal0, xLocal)
+  }
+
+  @virtualize
+  def BlkSchlsEqEuroNoDiv(sptprice: T, strike: T, rate: T,
+    volatility: T, time: T, otype: Int): T = {
+
+    val xLogTerm = log_taylor( sptprice / strike )
+    sptprice*strike
+    val xPowerTerm = (volatility ** 2) * 0.5f.to[T]
+    val xNum = (rate + xPowerTerm) * time + xLogTerm
+    val xDen = volatility * sqrt_approx(time)
+
+    val xDiv = xNum / (xDen ** 2)
+    val nofXd1 = CNDF(xDiv)
+    val nofXd2 = CNDF(xDiv - xDen)
+
+    val futureValueX = strike * exp_taylor(-rate * time)
+
+    val negNofXd1 = -nofXd1 + 1.0f.to[T]
+    val negNofXd2 = -nofXd2 + 1.0f.to[T]
+
+    val optionPrice1 = (sptprice * nofXd1) - (futureValueX * nofXd2)
+    val optionPrice2 = (futureValueX * negNofXd2) - (sptprice * negNofXd1)
+    mux(otype == 0, optionPrice2, optionPrice1)
+  }
+
+  @virtualize
+  def blackscholes(
+    stypes:      Array[Int],
+    sprices:     Array[T],
+    sstrike:     Array[T],
+    srate:       Array[T],
+    svolatility: Array[T],
+    stimes:      Array[T]
+  ): Array[T] = {
+    val B  = 768 (32 -> 96 -> 19200)
+    val OP = 1 (1 -> 2)
+    val IP = 3 (1 -> 96)
     val par_load = 16
     val par_store = 16
 
@@ -3113,10 +3567,10 @@ object PageRank_Bulk1 extends SpatialApp { // Regression (Sparse) // Args: 50 0.
     printArray(edgeIds, "edgeIds: ")
 
     val tileSize = 32 (16 -> 16 -> 128)
-    val par_load = 1
-    val par_store = 1
+    val par_load = 8
+    val par_store = 8
     val tile_par = 1 (1 -> 1 -> 12)
-    val page_par = 2 (1 -> 1 -> 16)
+    val page_par = 4 (1 -> 1 -> 16)
 
     // Arguments
     val itersIN = args(0).to[Int]
@@ -3920,10 +4374,10 @@ object TPCHQ61 extends SpatialApp { // Regression (Dense) // Args: 3840
     val out = ArgOut[T]
 
     val ts = 768 (96 -> 96 -> 192000)
-    val op = 2 (1 -> 2)
-    val par_load = 8
-    val par_store = 8
-    val ip = 8 (1 -> 384)
+    val op = 4 (1 -> 2)
+    val par_load = 16
+    val par_store = 16
+    val ip = 16 (1 -> 384)
 
     setMem(dates, datesIn)
     setMem(quants, quantsIn)
@@ -4024,7 +4478,7 @@ object TPCHQ62 extends SpatialApp { // Regression (Dense) // Args: 3840
     val out = ArgOut[T]
 
     val ts = 384 (96 -> 96 -> 192000)
-    val op = 2 (1 -> 2)
+    val op = 4 (1 -> 2)
     val par_load = 16
     val par_store = 16
     val ip = 32 (1 -> 384)
@@ -4127,8 +4581,8 @@ object TPCHQ63 extends SpatialApp { // Regression (Dense) // Args: 3840
     val maxDateIn = MAX_DATE
     val out = ArgOut[T]
 
-    val ts = 384 (96 -> 96 -> 192000)
-    val op = 1 (1 -> 2)
+    val ts = 768 (96 -> 96 -> 192000)
+    val op = 2 (1 -> 2)
     val par_load = 16
     val par_store = 16
     val ip = 64 (1 -> 384)
@@ -4202,6 +4656,109 @@ object TPCHQ63 extends SpatialApp { // Regression (Dense) // Args: 3840
   }
 }
 
+object TPCHQ64 extends SpatialApp { // Regression (Dense) // Args: 3840
+  override val target = AWS_F1
+/*
+
+
+*/
+
+  type FT = Int
+
+  val MIN_DATE = 0
+  val MAX_DATE = 9999
+  val MIN_DISC = 0
+  val MAX_DISC = 9999
+  val margin = 1
+
+
+  @virtualize
+  def tpchq6[T:Type:Num](datesIn: Array[Int], quantsIn: Array[Int], disctsIn: Array[T], pricesIn: Array[T]): T = {
+    val dataSize = ArgIn[Int]
+    setArg(dataSize, datesIn.length)
+
+    val dates  = DRAM[Int](dataSize)
+    val quants = DRAM[Int](dataSize)
+    val discts = DRAM[T](dataSize)
+    val prices = DRAM[T](dataSize)
+    val minDateIn = MIN_DATE
+    val maxDateIn = MAX_DATE
+    val out = ArgOut[T]
+
+    val ts = 1152 (96 -> 96 -> 192000)
+    val op = 8 (1 -> 2)
+    val par_load = 16
+    val par_store = 16
+    val ip = 16 (1 -> 384)
+
+    setMem(dates, datesIn)
+    setMem(quants, quantsIn)
+    setMem(discts, disctsIn)
+    setMem(prices, pricesIn)
+
+    Accel {
+      val minDate = minDateIn
+      val maxDate = maxDateIn
+
+      val acc = Reg[T]
+      Reduce(acc)(dataSize by ts par op){ i =>
+        val datesTile  = SRAM[Int](ts)
+        val quantsTile = SRAM[Int](ts)
+        val disctsTile = SRAM[T](ts)
+        val pricesTile = SRAM[T](ts)
+        Parallel {
+          datesTile  load dates(i::i+ts par par_load)
+          quantsTile load quants(i::i+ts par par_load)
+          disctsTile load discts(i::i+ts par par_load)
+          pricesTile load prices(i::i+ts par par_load)
+        }
+        Reduce(Reg[T])(ts par ip){ j =>
+          val date  = datesTile(j)
+          val disct = disctsTile(j)
+          val quant = quantsTile(j)
+          val price = pricesTile(j)
+          val valid = date > minDate && date < maxDate && disct >= MIN_DISC.to[T] && disct <= MAX_DISC.to[T] && quant < 24
+          mux(valid, price * disct, 0.to[T])
+        }{_+_}
+      }{_+_}
+
+      out := acc
+    }
+    getArg(out)
+  }
+
+  @virtualize
+  def main() {
+    val N = args(0).to[Int]
+
+    // val dates  = Array.fill(N){random[Int](20) + 65}
+    // val quants = Array.fill(N){random[Int](25) }
+    // // val discts = Array.fill(N){random[FT] * 0.05f + 0.02f}
+    // // val prices = Array.fill(N){random[FT] * 1000f}
+    // val discts = Array.fill(N){random[FT] /*/ 100000*/}
+    // val prices = Array.fill(N){random[FT] /*/ 100000*/}
+
+    val dates  = Array.tabulate[Int](N){i => i % 256 } // Standard array
+    val quants = Array.tabulate[Int](N){i => i % 256 } // Standard array
+    val discts = Array.tabulate[FT](N){i => i % 256 } // Standard array
+    val prices = Array.tabulate[FT](N){i => i % 256 } // Standard array
+
+    val result = tpchq6(dates, quants, discts, prices)
+
+    // --- software version
+    val conds = Array.tabulate(N){i => dates(i) > MIN_DATE && dates(i) < MAX_DATE  &&
+                                       quants(i) < 24 && discts(i) >= MIN_DISC  && discts(i) <= MAX_DISC}
+    // printArr(conds, "conds: ")
+
+    val gold = Array.tabulate(N){i => if (conds(i)) prices(i) * discts(i) else 0.to[FT] }.reduce{_+_}
+
+    println("expected " + gold)
+    println("result " + result)
+
+    val cksum = (gold < result + margin && gold > result - margin)
+    println("PASS: " + cksum + " (TPCHQ6)")
+  }
+}
 
 // good, but pipelining vs area
 object AES1 extends SpatialApp { // Regression (Dense) // Args: 50
@@ -4257,9 +4814,9 @@ object AES1 extends SpatialApp { // Regression (Dense) // Args: 50
       0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
     )
     
-    val par_load = 16
-    val par_store = 16
-    val outer_par = 2 (1 -> 1 -> 4) // This may crash GC
+    val par_load = 2
+    val par_store = 2
+    val outer_par = 1 (1 -> 1 -> 4) // This may crash GC
 
     // Setup
     val num_bytes = ArgIn[Int]
@@ -4398,64 +4955,64 @@ object AES1 extends SpatialApp { // Regression (Dense) // Args: 50
           }
         }
 
-        /* Loopy version */
-        Sequential.Foreach(niter by 1) { round => 
-          // SubBytes
-          if (round > 0) {
-            Pipe{substitute_bytes()}
-          }
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
 
-          // ShiftRows
-          if (round > 0) {
-            Pipe{shift_rows()}
-          }
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
 
-          // MixColumns
-          if (round > 0 && round < 14 ) {
-            Pipe{mix_columns()}
-          }
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
 
-          // Expand key
-          if (round > 0 && ((round % 2) == 0)) {
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
+
+        //   // AddRoundKey
+        //   add_round_key(round)
+
+        // }
+
+        /* Partially pipelined version */
+        // Round 0
+        add_round_key(0)
+
+        // Rounds 1 - 7
+        Sequential.Foreach(1 until 8 by 1) { round => 
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          if ((round % 2) == 0) {
             Pipe{expand_key()}
           }
-
-          // AddRoundKey
           add_round_key(round)
-
         }
-
-        // /* Partially pipelined version */
-        // // Round 0
-        // add_round_key(0)
-
-        // // Rounds 1 - 7
-        // Sequential.Foreach(1 until 8 by 1) { round => 
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{mix_columns()}
-        //   if ((round % 2) == 0) {
-        //     Pipe{expand_key()}
-        //   }
-        //   add_round_key(round)
-        // }
-        // // Rounds 8 - 14
-        // Sequential.Foreach(8 until 14 by 1) { round => 
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{mix_columns()}
-        //   if ((round % 2) == 0) {
-        //     Pipe{expand_key()}
-        //   }
-        //   add_round_key(round)
-        // }
-        // // Round 14
-        // Pipe {
-        //   substitute_bytes()
-        //   Pipe{shift_rows()}
-        //   Pipe{expand_key()}
-        //   add_round_key(14)
-        // }
+        // Rounds 8 - 14
+        Sequential.Foreach(8 until 14 by 1) { round => 
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          if ((round % 2) == 0) {
+            Pipe{expand_key()}
+          }
+          add_round_key(round)
+        }
+        // Round 14
+        Pipe {
+          substitute_bytes()
+          Pipe{shift_rows()}
+          Pipe{expand_key()}
+          add_round_key(14)
+        }
 
 
         // /* Totally pipelined version */
@@ -5038,14 +5595,14 @@ object Kmeans1 extends SpatialApp { // Regression (Dense) // Args: 3 64
     bound(numCents) = MAXK
     bound(numDims) = MAXD
 
-    val BN = pts_per_ld (96 -> 96 -> 9600)
+    val BN = 1 (96 -> 96 -> 9600)
     val BD = MAXD
     val par_load = 16
     val par_store = 16
     val PX = 1 (1 -> 1)
     val P0 = 2 (1 -> 2 -> dim)
     val P1 = 4 (1 -> 2 -> dim)
-    val P2 = 4 (1 -> 2 -> dim)
+    val P2 = 6 (1 -> 2 -> dim)
     val P3 = 16 (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
@@ -5219,9 +5776,9 @@ object Kmeans2 extends SpatialApp { // Regression (Dense) // Args: 3 64
     val par_load = 16
     val par_store = 16
     val PX = 1 (1 -> 1)
-    val P0 = 1 (1 -> 2 -> dim)
+    val P0 = 2 (1 -> 2 -> dim)
     val P1 = 8 (1 -> 2 -> dim)
-    val P2 = 4 (1 -> 2 -> dim)
+    val P2 = 6 (1 -> 2 -> dim)
     val P3 = 16 (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
@@ -5565,7 +6122,7 @@ object Sobel1 extends SpatialApp { // Regression (Dense) // Args: none
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
     val row_stride = 100 (100 -> 100 -> 500)
-    val row_par = 8 (1 -> 1 -> 16)
+    val row_par = 4 (1 -> 1 -> 16)
     val par_Kh = 1 (1 -> 1 -> 3)
     val par_Kw = 1 (1 -> 1 -> 3)
 
@@ -5965,6 +6522,151 @@ object Sobel3 extends SpatialApp { // Regression (Dense) // Args: none
   }
 }
 
+object Sobel4 extends SpatialApp { // Regression (Dense) // Args: none
+
+
+  val Kh = 3
+  val Kw = 3
+  val Cmax = 1024
+
+  @virtualize
+  def convolve[T:Type:Num](image: Matrix[T]): Matrix[T] = {
+    val B = 16 (1 -> 1 -> 16)
+
+    val R = ArgIn[Int]
+    val C = ArgIn[Int]
+    setArg(R, image.rows)
+    setArg(C, image.cols)
+
+
+    val lb_par = 16 (1 -> 1 -> 16)
+    val par_store = 16
+    val row_stride = 100 (100 -> 100 -> 500)
+    val row_par = 2 (1 -> 1 -> 16)
+    val par_Kh = 3 (1 -> 1 -> 3)
+    val par_Kw = 3 (1 -> 1 -> 3)
+
+    val img = DRAM[T](R, C)
+    val imgOut = DRAM[T](R, C)
+
+    setMem(img, image)
+
+    Accel {
+      Foreach(R by row_stride par row_par){ rr => 
+        val lb = LineBuffer[T](Kh, Cmax)
+        val sr = RegFile[T](Kh, Kw)
+        val lineOut = SRAM[T](Cmax)
+        val kh = LUT[T](3,3)(1.to[T], 0.to[T], -1.to[T],
+                             2.to[T], 0.to[T], -2.to[T],
+                             1.to[T], 0.to[T], -1.to[T])
+        val kv = LUT[T](3,3)(1.to[T],  2.to[T],  1.to[T],
+                             0.to[T],  0.to[T],  0.to[T],
+                            -1.to[T], -2.to[T], -1.to[T])
+
+        Foreach(0 until row_stride+2) { r =>
+          val ldaddr = if (r.to[Index]+rr.to[Index] >= R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          lb load img(ldaddr, 0::C par lb_par)
+
+          /*println("Row " + r)
+          Foreach(0 until Kh) { i =>
+            Foreach(0 until C) { c => print("" + lb(i,c) + "\t") }
+            println("")
+          }*/
+
+          Foreach(0 until C) { c =>
+            Pipe{sr.reset(c == 0)}
+
+            Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
+            
+            
+            val horz = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kh(i,j)}}.flatten.reduce{_+_}
+            // val horz = Reduce(Reg[T])(Kh by 1 par par_Kh){i =>
+            //   Reduce(Reg[T])(Kw by 1 par par_Kw){j => 
+            //   // val number = mux((r < 2) || (c < 2) , 0.to[T], sr(i,j))
+            //   // number * kh(i,j) 
+            //     sr(i,j) * kh(i,j)
+            //   }{_+_}
+            // }{_+_}
+
+            val vert = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kv(i,j)}}.flatten.reduce{_+_}
+            // val vert = Reduce(Reg[T])(Kh by 1 par par_Kh){i => 
+            //   Reduce(Reg[T])(Kw by 1 par par_Kw){j => 
+            //   // val number = mux((r < 2) || (c < 2) , 0.to[T], sr(i,j))
+            //   // number * kv(i,j) 
+            //     sr(i,j) * kv(i,j)
+            //   }{_+_}
+            // }{_+_}
+
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz) + abs(vert))// Technically should be sqrt(horz**2 + vert**2)
+            // lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
+          }
+
+          if (r.to[Index]+rr.to[Index] < R) {imgOut(r.to[Index]+rr.to[Index], 0::C par par_store) store lineOut}
+        }
+
+      }
+    }
+
+    getMatrix(imgOut)
+
+  }
+
+  @virtualize
+  def main() {
+    val R = args(0).to[Int] //1895
+    val C = args(1).to[Int] //1024
+    val border = 3
+    // val image = (0::R, 0::C){(i,j) => if (j > 3 && i > 3 && j < 11 && i < 11) 256 else 0 }
+    val image = (0::R, 0::C){(i,j) => if (j > border && j < C-border && i > border && i < C - border) i*16 else 0}
+    val ids = (0::R, 0::C){(i,j) => if (i < 2) 0 else 1}
+
+    val kh = List((List(1,2,1), List(0,0,0), List(-1,-2,-1)))
+    val kv = List((List(1,0,-1), List(2,0,-2), List(1,0,-1)))
+
+    val output = convolve(image)
+
+    /*
+      Filters: 
+      1   2   1 
+      0   0   0 
+     -1  -2  -1
+
+      1   0  -1 
+      2   0  -2 
+      1   0  -1
+
+    */
+    val gold = (0::R, 0::C){(i,j) => 
+      // Shift result down by 2 and over by 2 because of the way accel is written
+      val px00 = if ((j-2) > border && (j-2) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px01 = if ((j-1) > border && (j-1) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px02 = if ((j+0) > border && (j+0) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px10 = if ((j-2) > border && (j-2) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px11 = if ((j-1) > border && (j-1) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px12 = if ((j+0) > border && (j+0) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px20 = if ((j-2) > border && (j-2) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px21 = if ((j-1) > border && (j-1) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px22 = if ((j+0) > border && (j+0) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)
+    };
+
+    // // This contains the "weird scheduling bug"
+    printMatrix(image, "Image")
+    printMatrix(gold, "Gold")
+    printMatrix(output, "Output")
+
+    val gold_sum = gold.map{g => g}.reduce{_+_} 
+    val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
+    println("gold " + gold_sum + " =?= output " + output_sum)
+    val cksum = gold_sum == output_sum
+    // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
+    println("PASS: " + cksum + " (Convolution_FPGA)")
+
+
+
+  }
+}
 
 object GDA1 extends SpatialApp { // Regression (Dense) // Args: 64
 
@@ -5980,8 +6682,8 @@ object GDA1 extends SpatialApp { // Regression (Dense) // Args: 64
   @virtualize
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
     val rTileSize = 32(96 -> 19200)
-    val op = 2(1 -> 8)
-    val ip = 2(1 -> 12)
+    val op = 1(1 -> 8)
+    val ip = 4(1 -> 12)
     val subLoopPar = 2(1 -> 16)
     val prodLoopPar = 8(1 -> 96)
     val outerAccumPar = 4(1 -> 1)
@@ -6112,12 +6814,12 @@ object GDA2 extends SpatialApp { // Regression (Dense) // Args: 64
 
   @virtualize
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
-    val rTileSize = 32(96 -> 19200)
+    val rTileSize = 16(96 -> 19200)
     val op = 1(1 -> 8)
-    val ip = 8(1 -> 12)
-    val subLoopPar = 16(1 -> 16)
-    val prodLoopPar = 16(1 -> 96)
-    val outerAccumPar = 4(1 -> 1)
+    val ip = 1(1 -> 12)
+    val subLoopPar = 1(1 -> 16)
+    val prodLoopPar = 1(1 -> 96)
+    val outerAccumPar = 1(1 -> 1)
 
     val rows = yCPU.length;
     bound(rows) = 360000
@@ -6150,7 +6852,7 @@ object GDA2 extends SpatialApp { // Regression (Dense) // Args: 64
 
       val sigmaOut = SRAM[T](MAXC, MAXC)
 
-      MemReduce(sigmaOut)(R by rTileSize par op){ r =>
+      Sequential.MemReduce(sigmaOut)(R by rTileSize par op){ r =>
         val gdaYtile = SRAM[Int](rTileSize)
         val gdaXtile = SRAM[T](rTileSize, MAXC)
         val blk = Reg[Int]
