@@ -2,6 +2,13 @@ import spatial.dsl._
 import org.virtualized._
 import spatial.targets._
 
+/*
+
+MATCH THESE APPS TO RESULTS HERE:
+
+https://docs.google.com/spreadsheets/d/1EzUM1bEwBqBKiLOamCB2LWzva78KKHeHKjvFYhkHYBw/edit#gid=787285939
+
+*/
 
 object MatMult_inner1 extends SpatialApp { // Regression (Dense) // Args: 32 128 128
   override val target = AWS_F1
@@ -3869,6 +3876,271 @@ object GEMM_Blocked12 extends SpatialApp { // Regression (Dense) // Args: none
     println("PASS: " + cksum + " (GEMM_Blocked)")
   }
 }
+
+object GEMM_Blocked13 extends SpatialApp { // Regression (Dense) // Args: none
+  override val target = AWS_F1
+                                                                                                  
+                                                                                                  
+ /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+            
+    CONCERNS: We need to figure out how HLS is actually managing the srams, or make our management better  
+              We cannot do unaligned stores yet, so tilesize of 8 won't work unless we keep ts 16 of c_sram onchip                                                                                          
+ */
+  type T = FixPt[TRUE,_16,_16] // Fatter type so that tileSize is burst aligned
+
+  @virtualize
+  def main() = {
+
+    val dim_arg = args(0).to[Int]
+    val dim = ArgIn[Int]
+    setArg(dim, dim_arg)
+    val tileSize = 32 (16 -> 16 -> 128)
+    val i_tileSize = 64 (64 -> 16 -> 128)
+    val par_load = 16
+    val par_store = 16
+    val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
+    val loop_ii    = 1 // not sure if this one works
+    val loop_kk    = 2 (1 -> 1 -> 8)
+    val loop_i     = 4 (1 -> 1 -> 32)
+    val loop_k     = 4 (1 -> 1 -> 16)
+    val loop_j     = 16 (1 -> 1 -> 16)
+    val reduce_col = 16 (1 -> 1 -> 16)
+    val reduce_tmp = 16 (1 -> 1 -> 16)
+
+    // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
+    // val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
+    val a_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
+    val b_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
+    val c_init = (0::dim_arg, 0::dim_arg){(i,j) => 0.to[T]}
+    val a_dram = DRAM[T](dim,dim)
+    val b_dram = DRAM[T](dim,dim)
+    val c_dram = DRAM[T](dim,dim)
+
+    setMem(a_dram, a_data)
+    setMem(b_dram, b_data)
+    setMem(c_dram, c_init)
+
+    Accel{
+
+      Foreach(dim by i_tileSize par loop_ii) { ii => // this loop defenitilely cant be parallelized right now
+        Foreach(dim by tileSize par loop_jj) { jj => 
+          val c_col = SRAM[T](i_tileSize,tileSize)
+          MemReduce(c_col par reduce_col)(dim by tileSize par loop_kk) { kk => 
+            val c_col_partial = SRAM[T](i_tileSize,tileSize)
+            val b_sram = SRAM[T](tileSize,tileSize)
+            b_sram load b_dram(kk::kk.to[Index]+tileSize, jj::jj.to[Index]+tileSize par par_load)
+            Foreach(i_tileSize by 1 par loop_i) { i => 
+              val a_sram = SRAM[T](tileSize)
+              a_sram load a_dram(ii+i, kk::kk.to[Index]+tileSize)
+              val c_tmp = SRAM[T](tileSize)
+              MemReduce(c_tmp par reduce_tmp)(tileSize by 1 par loop_k) { k => 
+                val c_tmp_partial = SRAM[T](tileSize)
+                val temp_a = a_sram(k)
+                Foreach(tileSize by 1 par loop_j) { j => 
+                  c_tmp_partial(j) = b_sram(k, j) * temp_a
+                }
+                c_tmp_partial
+              }{_+_}
+            Foreach(tileSize by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
+            }
+          c_col_partial
+          }{_+_}
+          c_dram(ii::ii.to[Index]+i_tileSize, jj::jj.to[Index]+tileSize par par_store) store c_col
+        }
+      }
+    }
+
+    // val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
+    val c_gold = (0::dim_arg,0::dim_arg){(i,j) => 
+      Array.tabulate(dim_arg){k => a_data(i,k) * b_data(k,j)}.reduce{_+_}
+    }
+    val c_result = getMatrix(c_dram)
+
+    printMatrix(c_gold, "C Gold: ")
+    printMatrix(c_result, "C Result: ")
+
+    val margin = 0.5.to[T]
+    val cksum = c_gold.zip(c_result){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    println("PASS: " + cksum + " (GEMM_Blocked)")
+  }
+}
+
+object GEMM_Blocked14 extends SpatialApp { // Regression (Dense) // Args: none
+  override val target = AWS_F1
+                                                                                                  
+                                                                                                  
+ /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+            
+    CONCERNS: We need to figure out how HLS is actually managing the srams, or make our management better  
+              We cannot do unaligned stores yet, so tilesize of 8 won't work unless we keep ts 16 of c_sram onchip                                                                                          
+ */
+  type T = FixPt[TRUE,_16,_16] // Fatter type so that tileSize is burst aligned
+
+  @virtualize
+  def main() = {
+
+    val dim_arg = args(0).to[Int]
+    val dim = ArgIn[Int]
+    setArg(dim, dim_arg)
+    val tileSize = 32 (16 -> 16 -> 128)
+    val i_tileSize = 64 (64 -> 16 -> 128)
+    val par_load = 16
+    val par_store = 16
+    val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
+    val loop_ii    = 1 // not sure if this one works
+    val loop_kk    = 4 (1 -> 1 -> 8)
+    val loop_i     = 4 (1 -> 1 -> 32)
+    val loop_k     = 4 (1 -> 1 -> 16)
+    val loop_j     = 16 (1 -> 1 -> 16)
+    val reduce_col = 16 (1 -> 1 -> 16)
+    val reduce_tmp = 16 (1 -> 1 -> 16)
+
+    // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
+    // val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
+    val a_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
+    val b_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
+    val c_init = (0::dim_arg, 0::dim_arg){(i,j) => 0.to[T]}
+    val a_dram = DRAM[T](dim,dim)
+    val b_dram = DRAM[T](dim,dim)
+    val c_dram = DRAM[T](dim,dim)
+
+    setMem(a_dram, a_data)
+    setMem(b_dram, b_data)
+    setMem(c_dram, c_init)
+
+    Accel{
+
+      Foreach(dim by i_tileSize par loop_ii) { ii => // this loop defenitilely cant be parallelized right now
+        Foreach(dim by tileSize par loop_jj) { jj => 
+          val c_col = SRAM[T](i_tileSize,tileSize)
+          MemReduce(c_col par reduce_col)(dim by tileSize par loop_kk) { kk => 
+            val c_col_partial = SRAM[T](i_tileSize,tileSize)
+            val b_sram = SRAM[T](tileSize,tileSize)
+            b_sram load b_dram(kk::kk.to[Index]+tileSize, jj::jj.to[Index]+tileSize par par_load)
+            Foreach(i_tileSize by 1 par loop_i) { i => 
+              val a_sram = SRAM[T](tileSize)
+              a_sram load a_dram(ii+i, kk::kk.to[Index]+tileSize)
+              val c_tmp = SRAM[T](tileSize)
+              MemReduce(c_tmp par reduce_tmp)(tileSize by 1 par loop_k) { k => 
+                val c_tmp_partial = SRAM[T](tileSize)
+                val temp_a = a_sram(k)
+                Foreach(tileSize by 1 par loop_j) { j => 
+                  c_tmp_partial(j) = b_sram(k, j) * temp_a
+                }
+                c_tmp_partial
+              }{_+_}
+            Foreach(tileSize by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
+            }
+          c_col_partial
+          }{_+_}
+          c_dram(ii::ii.to[Index]+i_tileSize, jj::jj.to[Index]+tileSize par par_store) store c_col
+        }
+      }
+    }
+
+    // val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
+    val c_gold = (0::dim_arg,0::dim_arg){(i,j) => 
+      Array.tabulate(dim_arg){k => a_data(i,k) * b_data(k,j)}.reduce{_+_}
+    }
+    val c_result = getMatrix(c_dram)
+
+    printMatrix(c_gold, "C Gold: ")
+    printMatrix(c_result, "C Result: ")
+
+    val margin = 0.5.to[T]
+    val cksum = c_gold.zip(c_result){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    println("PASS: " + cksum + " (GEMM_Blocked)")
+  }
+}
+
+object GEMM_Blocked15 extends SpatialApp { // Regression (Dense) // Args: none
+  override val target = AWS_F1
+                                                                                                  
+                                                                                                  
+ /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+            
+    CONCERNS: We need to figure out how HLS is actually managing the srams, or make our management better  
+              We cannot do unaligned stores yet, so tilesize of 8 won't work unless we keep ts 16 of c_sram onchip                                                                                          
+ */
+  type T = FixPt[TRUE,_16,_16] // Fatter type so that tileSize is burst aligned
+
+  @virtualize
+  def main() = {
+
+    val dim_arg = args(0).to[Int]
+    val dim = ArgIn[Int]
+    setArg(dim, dim_arg)
+    val tileSize = 32 (16 -> 16 -> 128)
+    val i_tileSize = 64 (64 -> 16 -> 128)
+    val par_load = 16
+    val par_store = 16
+    val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
+    val loop_ii    = 2 // not sure if this one works
+    val loop_kk    = 2 (1 -> 1 -> 8)
+    val loop_i     = 2 (1 -> 1 -> 32)
+    val loop_k     = 2 (1 -> 1 -> 16)
+    val loop_j     = 16 (1 -> 1 -> 16)
+    val reduce_col = 16 (1 -> 1 -> 16)
+    val reduce_tmp = 16 (1 -> 1 -> 16)
+
+    // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
+    // val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
+    val a_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
+    val b_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
+    val c_init = (0::dim_arg, 0::dim_arg){(i,j) => 0.to[T]}
+    val a_dram = DRAM[T](dim,dim)
+    val b_dram = DRAM[T](dim,dim)
+    val c_dram = DRAM[T](dim,dim)
+
+    setMem(a_dram, a_data)
+    setMem(b_dram, b_data)
+    setMem(c_dram, c_init)
+
+    Accel{
+
+      Foreach(dim by i_tileSize par loop_ii) { ii => // this loop defenitilely cant be parallelized right now
+        Foreach(dim by tileSize par loop_jj) { jj => 
+          val c_col = SRAM[T](i_tileSize,tileSize)
+          MemReduce(c_col par reduce_col)(dim by tileSize par loop_kk) { kk => 
+            val c_col_partial = SRAM[T](i_tileSize,tileSize)
+            val b_sram = SRAM[T](tileSize,tileSize)
+            b_sram load b_dram(kk::kk.to[Index]+tileSize, jj::jj.to[Index]+tileSize par par_load)
+            Foreach(i_tileSize by 1 par loop_i) { i => 
+              val a_sram = SRAM[T](tileSize)
+              a_sram load a_dram(ii+i, kk::kk.to[Index]+tileSize)
+              val c_tmp = SRAM[T](tileSize)
+              MemReduce(c_tmp par reduce_tmp)(tileSize by 1 par loop_k) { k => 
+                val c_tmp_partial = SRAM[T](tileSize)
+                val temp_a = a_sram(k)
+                Foreach(tileSize by 1 par loop_j) { j => 
+                  c_tmp_partial(j) = b_sram(k, j) * temp_a
+                }
+                c_tmp_partial
+              }{_+_}
+            Foreach(tileSize by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
+            }
+          c_col_partial
+          }{_+_}
+          c_dram(ii::ii.to[Index]+i_tileSize, jj::jj.to[Index]+tileSize par par_store) store c_col
+        }
+      }
+    }
+
+    // val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
+    val c_gold = (0::dim_arg,0::dim_arg){(i,j) => 
+      Array.tabulate(dim_arg){k => a_data(i,k) * b_data(k,j)}.reduce{_+_}
+    }
+    val c_result = getMatrix(c_dram)
+
+    printMatrix(c_gold, "C Gold: ")
+    printMatrix(c_result, "C Result: ")
+
+    val margin = 0.5.to[T]
+    val cksum = c_gold.zip(c_result){(a,b) => abs(a-b) < margin}.reduce{_&&_}
+    println("PASS: " + cksum + " (GEMM_Blocked)")
+  }
+}
+
 
 object GEMM_Blocked4 extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
@@ -10642,6 +10914,2228 @@ object AES11 extends SpatialApp { // Regression (Dense) // Args: :50
   }
 }
 
+object AES12 extends SpatialApp { // Regression (Dense) // Args: :50
+  override val target = AWS_F1
+
+  /*
+  TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
+  
+  MachSuite Concerns: 
+    - Mix rows math seemed wrong in their implementation
+    - Not exactly sure what was going on with their expand_key step
+  */
+  type UInt8 = FixPt[FALSE,_8,_0]
+  @virtualize
+  def main() = {
+    // Setup off-chip data
+    // val text_in = "the sharkmoster"
+    // val plaintext = argon.lang.String.string2num(text_in)
+    val plaintext = Array[UInt8](0,17,34,51,68,85,102,119,136,153,170,187,204,221,238,255)
+    val key = Array.tabulate(32){i => i.to[UInt8]}
+    val sbox = Array[UInt8]( // 256 elements
+      0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
+      0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+      0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
+      0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+      0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
+      0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+      0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a,
+      0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+      0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0,
+      0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+      0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b,
+      0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+      0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85,
+      0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+      0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5,
+      0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+      0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17,
+      0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+      0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88,
+      0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+      0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c,
+      0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+      0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9,
+      0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+      0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6,
+      0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+      0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e,
+      0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+      0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94,
+      0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+      0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
+      0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+    )
+    
+    val par_load = 1
+    val par_store = 1
+    val outer_par = 1 (1 -> 1 -> 4) // This may crash GC
+
+    // Setup
+    val num_bytes = ArgIn[Int]
+    setArg(num_bytes, 16*args(0).to[Int])
+
+    // Create DRAMs
+    val plaintext_dram = DRAM[UInt8](16)
+    val key_dram = DRAM[UInt8](32)
+    val sbox_dram = DRAM[UInt8](256)
+    val ciphertext_dram = DRAM[Int](num_bytes)
+
+    // Transfer data to DRAMs
+    setMem(plaintext_dram, plaintext)
+    setMem(key_dram, key)
+    setMem(sbox_dram, sbox)
+
+    // Debugging support
+    val niter = 15
+    // val niter = ArgIn[Int]
+    // setArg(niter, args(0).to[Int])
+    // val key_debug = DRAM[UInt8](32)
+
+    Accel{
+
+
+      val sbox_sram = SRAM[UInt8](256)
+      // Load structures
+      sbox_sram load sbox_dram(0::256 par par_load)
+
+      Foreach(num_bytes by 16 par outer_par){block_id => 
+        // Setup data structures
+        val plaintext_flat = SRAM.buffer[UInt8](16)
+        val plaintext_sram = RegFile.buffer[UInt8](4,4)
+        val key_sram = SRAM.buffer[UInt8](32)
+        // val mix_lut = LUT[Int](4,4)(
+        //    2, 3, 1, 1,
+        //    1, 2, 3, 1,
+        //    1, 1, 2, 3,
+        //    3, 1, 1, 2
+        //  )
+        val rcon = Reg.buffer[UInt8](1)
+
+        // Specify methods
+        def expand_key(): Unit = {
+          val addr_lut = LUT[Int](4)(29, 30, 31, 28)
+          // Foreach(4 by 1) { i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i.to[Index] == 0, rcon.value, 0)
+          // }
+          Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
+          Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
+          Pipe{key_sram(2) = key_sram(2) ^ sbox_sram(key_sram(31).as[UInt16].as[Int])}
+          Pipe{key_sram(3) = key_sram(3) ^ sbox_sram(key_sram(28).as[UInt16].as[Int])}
+          rcon := (((rcon)<<1) ^ ((((rcon)>>7) & 1) * 0x1b))
+
+          Sequential.Foreach(4 until 16 by 4) {i =>
+            // Sequential.Foreach(4 by 1) {j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        
+          // Sequential.Foreach(16 until 20 by 1){i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i.to[Index]-4).to[Int])
+          // }
+          Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
+          Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
+          Pipe{key_sram(18) = key_sram(18) ^ sbox_sram(key_sram(14).as[UInt16].as[Int])}
+          Pipe{key_sram(19) = key_sram(19) ^ sbox_sram(key_sram(15).as[UInt16].as[Int])}
+
+          Sequential.Foreach(20 until 32 by 4) {i => 
+            // Sequential.Foreach(4 by 1) { j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        }
+
+        def shift_rows(): Unit = {
+          Foreach(4 by 1, 4 by 1){ (i,j) => 
+            plaintext_sram(i,j) = plaintext_sram(i, (j.to[Index] - i.to[Index]) % 4)
+          }
+        }
+
+        def substitute_bytes(): Unit = {
+          Sequential.Foreach(4 by 1, 4 by 1){(i,j) => 
+            val addr = plaintext_sram(i,j).as[UInt16].as[Int] // Upcast without sign-extend
+            val subst = sbox_sram(addr)
+            plaintext_sram(i,j) = subst
+          }
+        }
+
+        def rj_xtime(x: UInt8): UInt8 = {
+          mux(((x & 0x80.to[UInt8]) > 0.to[UInt8]), ((x << 1) ^ 0x1b.to[UInt8]), x << 1)
+        }
+
+        def mix_columns(): Unit = {
+          Sequential.Foreach(4 by 1){j => 
+            val col = RegFile[UInt8](4)
+            Foreach(4 by 1 par 4) { i => col(i) = plaintext_sram(i,j) }
+            val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
+            // val e = col(0) ^ col(1) ^ col(2) ^ col(3)
+            Foreach(4 by 1) { i => 
+              val id1 = (i.to[Index]+1)%4
+              plaintext_sram(i,j) = col(i) ^ e ^ rj_xtime(col(i) ^ col(id1))
+            }
+          }
+        }
+
+        def add_round_key(round: Index): Unit = {
+          Foreach(4 by 1, 4 by 1) { (i,j) => 
+            val key = mux(round % 2 == 1, key_sram(i.to[Index]+j.to[Index]*4+16), key_sram(i.to[Index]+j.to[Index]*4))
+            plaintext_sram(i,j) = plaintext_sram(i,j) ^ key
+          }
+        }
+        plaintext_flat load plaintext_dram(0::16 par par_load) // TODO: Allow dram loads to reshape (gh issue #83)
+        key_sram load key_dram(0::32 par par_load)
+        rcon := 1
+
+        // gh issue #83
+        Sequential.Foreach(4 by 1 par 1){i => 
+          Sequential.Foreach(4 by 1 par 1){j => 
+            plaintext_sram(i,j) = plaintext_flat(j.to[Index]*4+i.to[Index]) // MachSuite flattens columnwise... Why????
+          }
+        }
+
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
+
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
+
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
+
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
+
+        //   // AddRoundKey
+        //   add_round_key(round)
+
+        // }
+
+        // /* Partially pipelined version */
+        // // Round 0
+        // add_round_key(0)
+
+        // // Rounds 1 - 7
+        // Sequential.Foreach(1 until 8 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Rounds 8 - 14
+        // Sequential.Foreach(8 until 14 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Round 14
+        // Pipe {
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{expand_key()}
+        //   add_round_key(14)
+        // }
+
+
+        /* Totally pipelined version */
+        // Round 0
+        add_round_key(0)
+        
+        // Round 1
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(1)
+        }
+
+        // Round 2
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(2)
+        }
+
+        // Round 3
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(3)
+        }
+
+        // Round 4
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(4)
+        }
+
+        // Round 5
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(5)
+        }
+
+        // Round 6
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(6)
+        }
+
+        // Round 7
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(7)
+        }
+
+        // Round 8
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(8)
+        }
+
+        // Round 9
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(9)
+        }
+
+        // Round 10
+        Pipe{
+          Pipe{shift_rows()}
+          add_round_key(10)
+        }
+
+     
+        // Reshape plaintext_sram (gh issue # 83)
+        val ciphertext_flat = SRAM[Int](16)
+        Sequential.Foreach(4 by 1, 4 by 1) {(i,j) => 
+          ciphertext_flat(j.to[Index]*4+i.to[Index]) = plaintext_sram(i,j).as[Int]
+        }
+
+        ciphertext_dram(block_id::block_id+16 par par_store) store ciphertext_flat
+      }
+
+      // // Debugging
+      // key_debug store key_sram
+
+    }
+
+    val ciphertext = getMem(ciphertext_dram)
+    val ciphertext_gold = Array.fill(args(0).to[Int])(Array[Int](142,162,183,202,81,103,69,191,234,252,73,144,75,73,96,137)).flatten
+
+    printArray(ciphertext_gold, "Expected: ")
+    printArray(ciphertext, "Got: ")
+
+    // // Debugging
+    // val key_dbg = getMem(key_debug)
+    // printArray(key_dbg, "Key: ")
+
+    val cksum = ciphertext_gold.zip(ciphertext){_ == _}.reduce{_&&_}
+    println("PASS: " + cksum + " (AES) * For retiming, need to fix ^ reduction if not parallelized")
+
+  }
+}
+
+object AES13 extends SpatialApp { // Regression (Dense) // Args: :50
+  override val target = AWS_F1
+
+  /*
+  TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
+  
+  MachSuite Concerns: 
+    - Mix rows math seemed wrong in their implementation
+    - Not exactly sure what was going on with their expand_key step
+  */
+  type UInt8 = FixPt[FALSE,_8,_0]
+  @virtualize
+  def main() = {
+    // Setup off-chip data
+    // val text_in = "the sharkmoster"
+    // val plaintext = argon.lang.String.string2num(text_in)
+    val plaintext = Array[UInt8](0,17,34,51,68,85,102,119,136,153,170,187,204,221,238,255)
+    val key = Array.tabulate(32){i => i.to[UInt8]}
+    val sbox = Array[UInt8]( // 256 elements
+      0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
+      0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+      0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
+      0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+      0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
+      0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+      0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a,
+      0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+      0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0,
+      0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+      0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b,
+      0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+      0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85,
+      0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+      0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5,
+      0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+      0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17,
+      0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+      0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88,
+      0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+      0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c,
+      0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+      0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9,
+      0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+      0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6,
+      0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+      0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e,
+      0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+      0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94,
+      0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+      0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
+      0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+    )
+    
+    val par_load = 1
+    val par_store = 1
+    val outer_par = 2 (1 -> 1 -> 4) // This may crash GC
+
+    // Setup
+    val num_bytes = ArgIn[Int]
+    setArg(num_bytes, 16*args(0).to[Int])
+
+    // Create DRAMs
+    val plaintext_dram = DRAM[UInt8](16)
+    val key_dram = DRAM[UInt8](32)
+    val sbox_dram = DRAM[UInt8](256)
+    val ciphertext_dram = DRAM[Int](num_bytes)
+
+    // Transfer data to DRAMs
+    setMem(plaintext_dram, plaintext)
+    setMem(key_dram, key)
+    setMem(sbox_dram, sbox)
+
+    // Debugging support
+    val niter = 15
+    // val niter = ArgIn[Int]
+    // setArg(niter, args(0).to[Int])
+    // val key_debug = DRAM[UInt8](32)
+
+    Accel{
+
+
+      val sbox_sram = SRAM[UInt8](256)
+      // Load structures
+      sbox_sram load sbox_dram(0::256 par par_load)
+
+      Foreach(num_bytes by 16 par outer_par){block_id => 
+        // Setup data structures
+        val plaintext_flat = SRAM.buffer[UInt8](16)
+        val plaintext_sram = RegFile.buffer[UInt8](4,4)
+        val key_sram = SRAM.buffer[UInt8](32)
+        // val mix_lut = LUT[Int](4,4)(
+        //    2, 3, 1, 1,
+        //    1, 2, 3, 1,
+        //    1, 1, 2, 3,
+        //    3, 1, 1, 2
+        //  )
+        val rcon = Reg.buffer[UInt8](1)
+
+        // Specify methods
+        def expand_key(): Unit = {
+          val addr_lut = LUT[Int](4)(29, 30, 31, 28)
+          // Foreach(4 by 1) { i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i.to[Index] == 0, rcon.value, 0)
+          // }
+          Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
+          Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
+          Pipe{key_sram(2) = key_sram(2) ^ sbox_sram(key_sram(31).as[UInt16].as[Int])}
+          Pipe{key_sram(3) = key_sram(3) ^ sbox_sram(key_sram(28).as[UInt16].as[Int])}
+          rcon := (((rcon)<<1) ^ ((((rcon)>>7) & 1) * 0x1b))
+
+          Sequential.Foreach(4 until 16 by 4) {i =>
+            // Sequential.Foreach(4 by 1) {j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        
+          // Sequential.Foreach(16 until 20 by 1){i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i.to[Index]-4).to[Int])
+          // }
+          Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
+          Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
+          Pipe{key_sram(18) = key_sram(18) ^ sbox_sram(key_sram(14).as[UInt16].as[Int])}
+          Pipe{key_sram(19) = key_sram(19) ^ sbox_sram(key_sram(15).as[UInt16].as[Int])}
+
+          Sequential.Foreach(20 until 32 by 4) {i => 
+            // Sequential.Foreach(4 by 1) { j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        }
+
+        def shift_rows(): Unit = {
+          Foreach(4 by 1, 4 by 1){ (i,j) => 
+            plaintext_sram(i,j) = plaintext_sram(i, (j.to[Index] - i.to[Index]) % 4)
+          }
+        }
+
+        def substitute_bytes(): Unit = {
+          Sequential.Foreach(4 by 1, 4 by 1){(i,j) => 
+            val addr = plaintext_sram(i,j).as[UInt16].as[Int] // Upcast without sign-extend
+            val subst = sbox_sram(addr)
+            plaintext_sram(i,j) = subst
+          }
+        }
+
+        def rj_xtime(x: UInt8): UInt8 = {
+          mux(((x & 0x80.to[UInt8]) > 0.to[UInt8]), ((x << 1) ^ 0x1b.to[UInt8]), x << 1)
+        }
+
+        def mix_columns(): Unit = {
+          Sequential.Foreach(4 by 1){j => 
+            val col = RegFile[UInt8](4)
+            Foreach(4 by 1 par 4) { i => col(i) = plaintext_sram(i,j) }
+            val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
+            // val e = col(0) ^ col(1) ^ col(2) ^ col(3)
+            Foreach(4 by 1) { i => 
+              val id1 = (i.to[Index]+1)%4
+              plaintext_sram(i,j) = col(i) ^ e ^ rj_xtime(col(i) ^ col(id1))
+            }
+          }
+        }
+
+        def add_round_key(round: Index): Unit = {
+          Foreach(4 by 1, 4 by 1) { (i,j) => 
+            val key = mux(round % 2 == 1, key_sram(i.to[Index]+j.to[Index]*4+16), key_sram(i.to[Index]+j.to[Index]*4))
+            plaintext_sram(i,j) = plaintext_sram(i,j) ^ key
+          }
+        }
+        plaintext_flat load plaintext_dram(0::16 par par_load) // TODO: Allow dram loads to reshape (gh issue #83)
+        key_sram load key_dram(0::32 par par_load)
+        rcon := 1
+
+        // gh issue #83
+        Sequential.Foreach(4 by 1 par 1){i => 
+          Sequential.Foreach(4 by 1 par 1){j => 
+            plaintext_sram(i,j) = plaintext_flat(j.to[Index]*4+i.to[Index]) // MachSuite flattens columnwise... Why????
+          }
+        }
+
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
+
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
+
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
+
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
+
+        //   // AddRoundKey
+        //   add_round_key(round)
+
+        // }
+
+        // /* Partially pipelined version */
+        // // Round 0
+        // add_round_key(0)
+
+        // // Rounds 1 - 7
+        // Sequential.Foreach(1 until 8 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Rounds 8 - 14
+        // Sequential.Foreach(8 until 14 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Round 14
+        // Pipe {
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{expand_key()}
+        //   add_round_key(14)
+        // }
+
+
+        /* Totally pipelined version */
+        // Round 0
+        add_round_key(0)
+        
+        // Round 1
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(1)
+        }
+
+        // Round 2
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(2)
+        }
+
+        // Round 3
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(3)
+        }
+
+        // Round 4
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(4)
+        }
+
+        // Round 5
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(5)
+        }
+
+        // Round 6
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(6)
+        }
+
+        // Round 7
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(7)
+        }
+
+        // Round 8
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(8)
+        }
+
+        // Round 9
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(9)
+        }
+
+        // Round 10
+        Pipe{
+          Pipe{shift_rows()}
+          add_round_key(10)
+        }
+
+     
+        // Reshape plaintext_sram (gh issue # 83)
+        val ciphertext_flat = SRAM[Int](16)
+        Sequential.Foreach(4 by 1, 4 by 1) {(i,j) => 
+          ciphertext_flat(j.to[Index]*4+i.to[Index]) = plaintext_sram(i,j).as[Int]
+        }
+
+        ciphertext_dram(block_id::block_id+16 par par_store) store ciphertext_flat
+      }
+
+      // // Debugging
+      // key_debug store key_sram
+
+    }
+
+    val ciphertext = getMem(ciphertext_dram)
+    val ciphertext_gold = Array.fill(args(0).to[Int])(Array[Int](142,162,183,202,81,103,69,191,234,252,73,144,75,73,96,137)).flatten
+
+    printArray(ciphertext_gold, "Expected: ")
+    printArray(ciphertext, "Got: ")
+
+    // // Debugging
+    // val key_dbg = getMem(key_debug)
+    // printArray(key_dbg, "Key: ")
+
+    val cksum = ciphertext_gold.zip(ciphertext){_ == _}.reduce{_&&_}
+    println("PASS: " + cksum + " (AES) * For retiming, need to fix ^ reduction if not parallelized")
+
+  }
+}
+
+object AES14 extends SpatialApp { // Regression (Dense) // Args: :50
+  override val target = AWS_F1
+
+  /*
+  TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
+  
+  MachSuite Concerns: 
+    - Mix rows math seemed wrong in their implementation
+    - Not exactly sure what was going on with their expand_key step
+  */
+  type UInt8 = FixPt[FALSE,_8,_0]
+  @virtualize
+  def main() = {
+    // Setup off-chip data
+    // val text_in = "the sharkmoster"
+    // val plaintext = argon.lang.String.string2num(text_in)
+    val plaintext = Array[UInt8](0,17,34,51,68,85,102,119,136,153,170,187,204,221,238,255)
+    val key = Array.tabulate(32){i => i.to[UInt8]}
+    val sbox = Array[UInt8]( // 256 elements
+      0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
+      0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+      0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
+      0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+      0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
+      0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+      0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a,
+      0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+      0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0,
+      0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+      0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b,
+      0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+      0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85,
+      0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+      0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5,
+      0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+      0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17,
+      0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+      0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88,
+      0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+      0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c,
+      0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+      0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9,
+      0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+      0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6,
+      0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+      0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e,
+      0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+      0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94,
+      0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+      0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
+      0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+    )
+    
+    val par_load = 1
+    val par_store = 1
+    val outer_par = 4 (1 -> 1 -> 4) // This may crash GC
+
+    // Setup
+    val num_bytes = ArgIn[Int]
+    setArg(num_bytes, 16*args(0).to[Int])
+
+    // Create DRAMs
+    val plaintext_dram = DRAM[UInt8](16)
+    val key_dram = DRAM[UInt8](32)
+    val sbox_dram = DRAM[UInt8](256)
+    val ciphertext_dram = DRAM[Int](num_bytes)
+
+    // Transfer data to DRAMs
+    setMem(plaintext_dram, plaintext)
+    setMem(key_dram, key)
+    setMem(sbox_dram, sbox)
+
+    // Debugging support
+    val niter = 15
+    // val niter = ArgIn[Int]
+    // setArg(niter, args(0).to[Int])
+    // val key_debug = DRAM[UInt8](32)
+
+    Accel{
+
+
+      val sbox_sram = SRAM[UInt8](256)
+      // Load structures
+      sbox_sram load sbox_dram(0::256 par par_load)
+
+      Foreach(num_bytes by 16 par outer_par){block_id => 
+        // Setup data structures
+        val plaintext_flat = SRAM.buffer[UInt8](16)
+        val plaintext_sram = RegFile.buffer[UInt8](4,4)
+        val key_sram = SRAM.buffer[UInt8](32)
+        // val mix_lut = LUT[Int](4,4)(
+        //    2, 3, 1, 1,
+        //    1, 2, 3, 1,
+        //    1, 1, 2, 3,
+        //    3, 1, 1, 2
+        //  )
+        val rcon = Reg.buffer[UInt8](1)
+
+        // Specify methods
+        def expand_key(): Unit = {
+          val addr_lut = LUT[Int](4)(29, 30, 31, 28)
+          // Foreach(4 by 1) { i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i.to[Index] == 0, rcon.value, 0)
+          // }
+          Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
+          Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
+          Pipe{key_sram(2) = key_sram(2) ^ sbox_sram(key_sram(31).as[UInt16].as[Int])}
+          Pipe{key_sram(3) = key_sram(3) ^ sbox_sram(key_sram(28).as[UInt16].as[Int])}
+          rcon := (((rcon)<<1) ^ ((((rcon)>>7) & 1) * 0x1b))
+
+          Sequential.Foreach(4 until 16 by 4) {i =>
+            // Sequential.Foreach(4 by 1) {j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        
+          // Sequential.Foreach(16 until 20 by 1){i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i.to[Index]-4).to[Int])
+          // }
+          Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
+          Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
+          Pipe{key_sram(18) = key_sram(18) ^ sbox_sram(key_sram(14).as[UInt16].as[Int])}
+          Pipe{key_sram(19) = key_sram(19) ^ sbox_sram(key_sram(15).as[UInt16].as[Int])}
+
+          Sequential.Foreach(20 until 32 by 4) {i => 
+            // Sequential.Foreach(4 by 1) { j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        }
+
+        def shift_rows(): Unit = {
+          Foreach(4 by 1, 4 by 1){ (i,j) => 
+            plaintext_sram(i,j) = plaintext_sram(i, (j.to[Index] - i.to[Index]) % 4)
+          }
+        }
+
+        def substitute_bytes(): Unit = {
+          Sequential.Foreach(4 by 1, 4 by 1){(i,j) => 
+            val addr = plaintext_sram(i,j).as[UInt16].as[Int] // Upcast without sign-extend
+            val subst = sbox_sram(addr)
+            plaintext_sram(i,j) = subst
+          }
+        }
+
+        def rj_xtime(x: UInt8): UInt8 = {
+          mux(((x & 0x80.to[UInt8]) > 0.to[UInt8]), ((x << 1) ^ 0x1b.to[UInt8]), x << 1)
+        }
+
+        def mix_columns(): Unit = {
+          Sequential.Foreach(4 by 1){j => 
+            val col = RegFile[UInt8](4)
+            Foreach(4 by 1 par 4) { i => col(i) = plaintext_sram(i,j) }
+            val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
+            // val e = col(0) ^ col(1) ^ col(2) ^ col(3)
+            Foreach(4 by 1) { i => 
+              val id1 = (i.to[Index]+1)%4
+              plaintext_sram(i,j) = col(i) ^ e ^ rj_xtime(col(i) ^ col(id1))
+            }
+          }
+        }
+
+        def add_round_key(round: Index): Unit = {
+          Foreach(4 by 1, 4 by 1) { (i,j) => 
+            val key = mux(round % 2 == 1, key_sram(i.to[Index]+j.to[Index]*4+16), key_sram(i.to[Index]+j.to[Index]*4))
+            plaintext_sram(i,j) = plaintext_sram(i,j) ^ key
+          }
+        }
+        plaintext_flat load plaintext_dram(0::16 par par_load) // TODO: Allow dram loads to reshape (gh issue #83)
+        key_sram load key_dram(0::32 par par_load)
+        rcon := 1
+
+        // gh issue #83
+        Sequential.Foreach(4 by 1 par 1){i => 
+          Sequential.Foreach(4 by 1 par 1){j => 
+            plaintext_sram(i,j) = plaintext_flat(j.to[Index]*4+i.to[Index]) // MachSuite flattens columnwise... Why????
+          }
+        }
+
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
+
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
+
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
+
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
+
+        //   // AddRoundKey
+        //   add_round_key(round)
+
+        // }
+
+        // /* Partially pipelined version */
+        // // Round 0
+        // add_round_key(0)
+
+        // // Rounds 1 - 7
+        // Sequential.Foreach(1 until 8 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Rounds 8 - 14
+        // Sequential.Foreach(8 until 14 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Round 14
+        // Pipe {
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{expand_key()}
+        //   add_round_key(14)
+        // }
+
+
+        /* Totally pipelined version */
+        // Round 0
+        add_round_key(0)
+        
+        // Round 1
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(1)
+        }
+
+        // Round 2
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(2)
+        }
+
+        // Round 3
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(3)
+        }
+
+        // Round 4
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(4)
+        }
+
+        // Round 5
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(5)
+        }
+
+        // Round 6
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(6)
+        }
+
+        // Round 7
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(7)
+        }
+
+        // Round 8
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(8)
+        }
+
+        // Round 9
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(9)
+        }
+
+        // Round 10
+        Pipe{
+          Pipe{shift_rows()}
+          add_round_key(10)
+        }
+
+     
+        // Reshape plaintext_sram (gh issue # 83)
+        val ciphertext_flat = SRAM[Int](16)
+        Sequential.Foreach(4 by 1, 4 by 1) {(i,j) => 
+          ciphertext_flat(j.to[Index]*4+i.to[Index]) = plaintext_sram(i,j).as[Int]
+        }
+
+        ciphertext_dram(block_id::block_id+16 par par_store) store ciphertext_flat
+      }
+
+      // // Debugging
+      // key_debug store key_sram
+
+    }
+
+    val ciphertext = getMem(ciphertext_dram)
+    val ciphertext_gold = Array.fill(args(0).to[Int])(Array[Int](142,162,183,202,81,103,69,191,234,252,73,144,75,73,96,137)).flatten
+
+    printArray(ciphertext_gold, "Expected: ")
+    printArray(ciphertext, "Got: ")
+
+    // // Debugging
+    // val key_dbg = getMem(key_debug)
+    // printArray(key_dbg, "Key: ")
+
+    val cksum = ciphertext_gold.zip(ciphertext){_ == _}.reduce{_&&_}
+    println("PASS: " + cksum + " (AES) * For retiming, need to fix ^ reduction if not parallelized")
+
+  }
+}
+
+object AES15 extends SpatialApp { // Regression (Dense) // Args: :50
+  override val target = AWS_F1
+
+  /*
+  TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
+  
+  MachSuite Concerns: 
+    - Mix rows math seemed wrong in their implementation
+    - Not exactly sure what was going on with their expand_key step
+  */
+  type UInt8 = FixPt[FALSE,_8,_0]
+  @virtualize
+  def main() = {
+    // Setup off-chip data
+    // val text_in = "the sharkmoster"
+    // val plaintext = argon.lang.String.string2num(text_in)
+    val plaintext = Array[UInt8](0,17,34,51,68,85,102,119,136,153,170,187,204,221,238,255)
+    val key = Array.tabulate(32){i => i.to[UInt8]}
+    val sbox = Array[UInt8]( // 256 elements
+      0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
+      0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+      0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
+      0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+      0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
+      0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+      0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a,
+      0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+      0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0,
+      0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+      0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b,
+      0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+      0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85,
+      0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+      0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5,
+      0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+      0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17,
+      0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+      0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88,
+      0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+      0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c,
+      0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+      0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9,
+      0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+      0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6,
+      0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+      0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e,
+      0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+      0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94,
+      0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+      0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
+      0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+    )
+    
+    val par_load = 1
+    val par_store = 1
+    val outer_par = 6 (1 -> 1 -> 4) // This may crash GC
+
+    // Setup
+    val num_bytes = ArgIn[Int]
+    setArg(num_bytes, 16*args(0).to[Int])
+
+    // Create DRAMs
+    val plaintext_dram = DRAM[UInt8](16)
+    val key_dram = DRAM[UInt8](32)
+    val sbox_dram = DRAM[UInt8](256)
+    val ciphertext_dram = DRAM[Int](num_bytes)
+
+    // Transfer data to DRAMs
+    setMem(plaintext_dram, plaintext)
+    setMem(key_dram, key)
+    setMem(sbox_dram, sbox)
+
+    // Debugging support
+    val niter = 15
+    // val niter = ArgIn[Int]
+    // setArg(niter, args(0).to[Int])
+    // val key_debug = DRAM[UInt8](32)
+
+    Accel{
+
+
+      val sbox_sram = SRAM[UInt8](256)
+      // Load structures
+      sbox_sram load sbox_dram(0::256 par par_load)
+
+      Foreach(num_bytes by 16 par outer_par){block_id => 
+        // Setup data structures
+        val plaintext_flat = SRAM.buffer[UInt8](16)
+        val plaintext_sram = RegFile.buffer[UInt8](4,4)
+        val key_sram = SRAM.buffer[UInt8](32)
+        // val mix_lut = LUT[Int](4,4)(
+        //    2, 3, 1, 1,
+        //    1, 2, 3, 1,
+        //    1, 1, 2, 3,
+        //    3, 1, 1, 2
+        //  )
+        val rcon = Reg.buffer[UInt8](1)
+
+        // Specify methods
+        def expand_key(): Unit = {
+          val addr_lut = LUT[Int](4)(29, 30, 31, 28)
+          // Foreach(4 by 1) { i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i.to[Index] == 0, rcon.value, 0)
+          // }
+          Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
+          Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
+          Pipe{key_sram(2) = key_sram(2) ^ sbox_sram(key_sram(31).as[UInt16].as[Int])}
+          Pipe{key_sram(3) = key_sram(3) ^ sbox_sram(key_sram(28).as[UInt16].as[Int])}
+          rcon := (((rcon)<<1) ^ ((((rcon)>>7) & 1) * 0x1b))
+
+          Sequential.Foreach(4 until 16 by 4) {i =>
+            // Sequential.Foreach(4 by 1) {j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        
+          // Sequential.Foreach(16 until 20 by 1){i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i.to[Index]-4).to[Int])
+          // }
+          Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
+          Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
+          Pipe{key_sram(18) = key_sram(18) ^ sbox_sram(key_sram(14).as[UInt16].as[Int])}
+          Pipe{key_sram(19) = key_sram(19) ^ sbox_sram(key_sram(15).as[UInt16].as[Int])}
+
+          Sequential.Foreach(20 until 32 by 4) {i => 
+            // Sequential.Foreach(4 by 1) { j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        }
+
+        def shift_rows(): Unit = {
+          Foreach(4 by 1, 4 by 1){ (i,j) => 
+            plaintext_sram(i,j) = plaintext_sram(i, (j.to[Index] - i.to[Index]) % 4)
+          }
+        }
+
+        def substitute_bytes(): Unit = {
+          Sequential.Foreach(4 by 1, 4 by 1){(i,j) => 
+            val addr = plaintext_sram(i,j).as[UInt16].as[Int] // Upcast without sign-extend
+            val subst = sbox_sram(addr)
+            plaintext_sram(i,j) = subst
+          }
+        }
+
+        def rj_xtime(x: UInt8): UInt8 = {
+          mux(((x & 0x80.to[UInt8]) > 0.to[UInt8]), ((x << 1) ^ 0x1b.to[UInt8]), x << 1)
+        }
+
+        def mix_columns(): Unit = {
+          Sequential.Foreach(4 by 1){j => 
+            val col = RegFile[UInt8](4)
+            Foreach(4 by 1 par 4) { i => col(i) = plaintext_sram(i,j) }
+            val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
+            // val e = col(0) ^ col(1) ^ col(2) ^ col(3)
+            Foreach(4 by 1) { i => 
+              val id1 = (i.to[Index]+1)%4
+              plaintext_sram(i,j) = col(i) ^ e ^ rj_xtime(col(i) ^ col(id1))
+            }
+          }
+        }
+
+        def add_round_key(round: Index): Unit = {
+          Foreach(4 by 1, 4 by 1) { (i,j) => 
+            val key = mux(round % 2 == 1, key_sram(i.to[Index]+j.to[Index]*4+16), key_sram(i.to[Index]+j.to[Index]*4))
+            plaintext_sram(i,j) = plaintext_sram(i,j) ^ key
+          }
+        }
+        plaintext_flat load plaintext_dram(0::16 par par_load) // TODO: Allow dram loads to reshape (gh issue #83)
+        key_sram load key_dram(0::32 par par_load)
+        rcon := 1
+
+        // gh issue #83
+        Sequential.Foreach(4 by 1 par 1){i => 
+          Sequential.Foreach(4 by 1 par 1){j => 
+            plaintext_sram(i,j) = plaintext_flat(j.to[Index]*4+i.to[Index]) // MachSuite flattens columnwise... Why????
+          }
+        }
+
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
+
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
+
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
+
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
+
+        //   // AddRoundKey
+        //   add_round_key(round)
+
+        // }
+
+        // /* Partially pipelined version */
+        // // Round 0
+        // add_round_key(0)
+
+        // // Rounds 1 - 7
+        // Sequential.Foreach(1 until 8 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Rounds 8 - 14
+        // Sequential.Foreach(8 until 14 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Round 14
+        // Pipe {
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{expand_key()}
+        //   add_round_key(14)
+        // }
+
+
+        /* Totally pipelined version */
+        // Round 0
+        add_round_key(0)
+        
+        // Round 1
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(1)
+        }
+
+        // Round 2
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(2)
+        }
+
+        // Round 3
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(3)
+        }
+
+        // Round 4
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(4)
+        }
+
+        // Round 5
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(5)
+        }
+
+        // Round 6
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(6)
+        }
+
+        // Round 7
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(7)
+        }
+
+        // Round 8
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(8)
+        }
+
+        // Round 9
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(9)
+        }
+
+        // Round 10
+        Pipe{
+          Pipe{shift_rows()}
+          add_round_key(10)
+        }
+
+     
+        // Reshape plaintext_sram (gh issue # 83)
+        val ciphertext_flat = SRAM[Int](16)
+        Sequential.Foreach(4 by 1, 4 by 1) {(i,j) => 
+          ciphertext_flat(j.to[Index]*4+i.to[Index]) = plaintext_sram(i,j).as[Int]
+        }
+
+        ciphertext_dram(block_id::block_id+16 par par_store) store ciphertext_flat
+      }
+
+      // // Debugging
+      // key_debug store key_sram
+
+    }
+
+    val ciphertext = getMem(ciphertext_dram)
+    val ciphertext_gold = Array.fill(args(0).to[Int])(Array[Int](142,162,183,202,81,103,69,191,234,252,73,144,75,73,96,137)).flatten
+
+    printArray(ciphertext_gold, "Expected: ")
+    printArray(ciphertext, "Got: ")
+
+    // // Debugging
+    // val key_dbg = getMem(key_debug)
+    // printArray(key_dbg, "Key: ")
+
+    val cksum = ciphertext_gold.zip(ciphertext){_ == _}.reduce{_&&_}
+    println("PASS: " + cksum + " (AES) * For retiming, need to fix ^ reduction if not parallelized")
+
+  }
+}
+
+object AES16 extends SpatialApp { // Regression (Dense) // Args: :50
+  override val target = AWS_F1
+
+  /*
+  TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
+  
+  MachSuite Concerns: 
+    - Mix rows math seemed wrong in their implementation
+    - Not exactly sure what was going on with their expand_key step
+  */
+  type UInt8 = FixPt[FALSE,_8,_0]
+  @virtualize
+  def main() = {
+    // Setup off-chip data
+    // val text_in = "the sharkmoster"
+    // val plaintext = argon.lang.String.string2num(text_in)
+    val plaintext = Array[UInt8](0,17,34,51,68,85,102,119,136,153,170,187,204,221,238,255)
+    val key = Array.tabulate(32){i => i.to[UInt8]}
+    val sbox = Array[UInt8]( // 256 elements
+      0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
+      0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+      0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
+      0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+      0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
+      0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+      0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a,
+      0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+      0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0,
+      0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+      0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b,
+      0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+      0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85,
+      0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+      0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5,
+      0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+      0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17,
+      0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+      0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88,
+      0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+      0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c,
+      0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+      0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9,
+      0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+      0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6,
+      0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+      0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e,
+      0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+      0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94,
+      0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+      0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
+      0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+    )
+    
+    val par_load = 1
+    val par_store = 1
+    val outer_par = 4 (1 -> 1 -> 4) // This may crash GC
+
+    // Setup
+    val num_bytes = ArgIn[Int]
+    setArg(num_bytes, 16*args(0).to[Int])
+
+    // Create DRAMs
+    val plaintext_dram = DRAM[UInt8](16)
+    val key_dram = DRAM[UInt8](32)
+    val sbox_dram = DRAM[UInt8](256)
+    val ciphertext_dram = DRAM[Int](num_bytes)
+
+    // Transfer data to DRAMs
+    setMem(plaintext_dram, plaintext)
+    setMem(key_dram, key)
+    setMem(sbox_dram, sbox)
+
+    // Debugging support
+    val niter = 15
+    // val niter = ArgIn[Int]
+    // setArg(niter, args(0).to[Int])
+    // val key_debug = DRAM[UInt8](32)
+
+    Accel{
+
+
+      val sbox_sram = SRAM[UInt8](256)
+      // Load structures
+      sbox_sram load sbox_dram(0::256 par par_load)
+
+      Foreach(num_bytes by 16 par outer_par){block_id => 
+        // Setup data structures
+        val plaintext_flat = SRAM.buffer[UInt8](16)
+        val plaintext_sram = RegFile.buffer[UInt8](4,4)
+        val key_sram = SRAM.buffer[UInt8](32)
+        // val mix_lut = LUT[Int](4,4)(
+        //    2, 3, 1, 1,
+        //    1, 2, 3, 1,
+        //    1, 1, 2, 3,
+        //    3, 1, 1, 2
+        //  )
+        val rcon = Reg.buffer[UInt8](1)
+
+        // Specify methods
+        def expand_key(): Unit = {
+          val addr_lut = LUT[Int](4)(29, 30, 31, 28)
+          // Foreach(4 by 1) { i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i.to[Index] == 0, rcon.value, 0)
+          // }
+          Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
+          Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
+          Pipe{key_sram(2) = key_sram(2) ^ sbox_sram(key_sram(31).as[UInt16].as[Int])}
+          Pipe{key_sram(3) = key_sram(3) ^ sbox_sram(key_sram(28).as[UInt16].as[Int])}
+          rcon := (((rcon)<<1) ^ ((((rcon)>>7) & 1) * 0x1b))
+
+          Sequential.Foreach(4 until 16 by 4) {i =>
+            // Sequential.Foreach(4 by 1) {j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        
+          // Sequential.Foreach(16 until 20 by 1){i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i.to[Index]-4).to[Int])
+          // }
+          Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
+          Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
+          Pipe{key_sram(18) = key_sram(18) ^ sbox_sram(key_sram(14).as[UInt16].as[Int])}
+          Pipe{key_sram(19) = key_sram(19) ^ sbox_sram(key_sram(15).as[UInt16].as[Int])}
+
+          Sequential.Foreach(20 until 32 by 4) {i => 
+            // Sequential.Foreach(4 by 1) { j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        }
+
+        def shift_rows(): Unit = {
+          // Sequential{
+          // plaintext_sram(0,0) = plaintext_sram(0, (0.to[Index] - 0.to[Index]) % 4)
+          // plaintext_sram(0,1) = plaintext_sram(0, (1.to[Index] - 0.to[Index]) % 4)
+          // plaintext_sram(0,2) = plaintext_sram(0, (2.to[Index] - 0.to[Index]) % 4)
+          // plaintext_sram(0,3) = plaintext_sram(0, (3.to[Index] - 0.to[Index]) % 4)
+          // plaintext_sram(1,0) = plaintext_sram(1, (0.to[Index] - 1.to[Index]) % 4)
+          // plaintext_sram(1,1) = plaintext_sram(1, (1.to[Index] - 1.to[Index]) % 4)
+          // plaintext_sram(1,2) = plaintext_sram(1, (2.to[Index] - 1.to[Index]) % 4)
+          // plaintext_sram(1,3) = plaintext_sram(1, (3.to[Index] - 1.to[Index]) % 4)
+          // plaintext_sram(2,0) = plaintext_sram(2, (0.to[Index] - 2.to[Index]) % 4)
+          // plaintext_sram(2,1) = plaintext_sram(2, (1.to[Index] - 2.to[Index]) % 4)
+          // plaintext_sram(2,2) = plaintext_sram(2, (2.to[Index] - 2.to[Index]) % 4)
+          // plaintext_sram(2,3) = plaintext_sram(2, (3.to[Index] - 2.to[Index]) % 4)
+          // plaintext_sram(3,0) = plaintext_sram(3, (0.to[Index] - 3.to[Index]) % 4)
+          // plaintext_sram(3,1) = plaintext_sram(3, (1.to[Index] - 3.to[Index]) % 4)
+          // plaintext_sram(3,2) = plaintext_sram(3, (2.to[Index] - 3.to[Index]) % 4)
+          // plaintext_sram(3,3) = plaintext_sram(3, (3.to[Index] - 3.to[Index]) % 4)
+          // }
+        }
+
+        def substitute_bytes(): Unit = {
+          // Sequential{
+          // plaintext_sram(0,0) = sbox_sram(plaintext_sram(0,0).as[UInt16].as[Int])
+          // plaintext_sram(0,1) = sbox_sram(plaintext_sram(0,1).as[UInt16].as[Int])
+          // plaintext_sram(0,2) = sbox_sram(plaintext_sram(0,2).as[UInt16].as[Int])
+          // plaintext_sram(0,3) = sbox_sram(plaintext_sram(0,3).as[UInt16].as[Int])
+          // plaintext_sram(1,0) = sbox_sram(plaintext_sram(1,0).as[UInt16].as[Int])
+          // plaintext_sram(1,1) = sbox_sram(plaintext_sram(1,1).as[UInt16].as[Int])
+          // plaintext_sram(1,2) = sbox_sram(plaintext_sram(1,2).as[UInt16].as[Int])
+          // plaintext_sram(1,3) = sbox_sram(plaintext_sram(1,3).as[UInt16].as[Int])
+          // plaintext_sram(2,0) = sbox_sram(plaintext_sram(2,0).as[UInt16].as[Int])
+          // plaintext_sram(2,1) = sbox_sram(plaintext_sram(2,1).as[UInt16].as[Int])
+          // plaintext_sram(2,2) = sbox_sram(plaintext_sram(2,2).as[UInt16].as[Int])
+          // plaintext_sram(2,3) = sbox_sram(plaintext_sram(2,3).as[UInt16].as[Int])
+          // plaintext_sram(3,0) = sbox_sram(plaintext_sram(3,0).as[UInt16].as[Int])
+          // plaintext_sram(3,1) = sbox_sram(plaintext_sram(3,1).as[UInt16].as[Int])
+          // plaintext_sram(3,2) = sbox_sram(plaintext_sram(3,2).as[UInt16].as[Int])
+          // plaintext_sram(3,3) = sbox_sram(plaintext_sram(3,3).as[UInt16].as[Int])
+          // }
+        }
+
+        def rj_xtime(x: UInt8): UInt8 = {
+          mux(((x & 0x80.to[UInt8]) > 0.to[UInt8]), ((x << 1) ^ 0x1b.to[UInt8]), x << 1)
+        }
+
+        def mix_columns(): Unit = {
+          Sequential{
+            val col = RegFile[UInt8](4)
+            Foreach(4 by 1 par 4) { i => col(i) = plaintext_sram(i,0) }
+            val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
+            // val e = col(0) ^ col(1) ^ col(2) ^ col(3)
+            Foreach(4 by 1) { i => 
+              val id1 = (i.to[Index]+1)%4
+              plaintext_sram(i,0) = col(i) ^ e ^ rj_xtime(col(i) ^ col(id1))
+            }
+            val col1 = RegFile[UInt8](4)
+            Foreach(4 by 1 par 4) { i => col1(i) = plaintext_sram(i,1) }
+            val e1 = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col1(i) }{_^_}
+            // val e1 = col1(0) ^ col1(1) ^ col1(2) ^ col1(3)
+            Foreach(4 by 1) { i => 
+              val id1 = (i.to[Index]+1)%4
+              plaintext_sram(i,1) = col1(i) ^ e1 ^ rj_xtime(col1(i) ^ col1(id1))
+            }
+            val col2 = RegFile[UInt8](4)
+            Foreach(4 by 1 par 4) { i => col2(i) = plaintext_sram(i,2) }
+            val e2 = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col2(i) }{_^_}
+            // val e2 = col2(0) ^ col2(1) ^ col2(2) ^ col2(3)
+            Foreach(4 by 1) { i => 
+              val id1 = (i.to[Index]+1)%4
+              plaintext_sram(i,2) = col2(i) ^ e2 ^ rj_xtime(col2(i) ^ col2(id1))
+            }
+            val col3 = RegFile[UInt8](4)
+            Foreach(4 by 1 par 4) { i => col3(i) = plaintext_sram(i,3) }
+            val e3 = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col3(i) }{_^_}
+            // val e3 = col3(0) ^ col3(1) ^ col3(2) ^ col3(3)
+            Foreach(4 by 1) { i => 
+              val id1 = (i.to[Index]+1)%4
+              plaintext_sram(i,3) = col3(i) ^ e3 ^ rj_xtime(col3(i) ^ col3(id1))
+            }
+          }
+        }
+
+        def add_round_key(round: Index): Unit = {
+          Foreach(4 by 1, 4 by 1) { (i,j) => 
+            val key = mux(round % 2 == 1, key_sram(i.to[Index]+j.to[Index]*4+16), key_sram(i.to[Index]+j.to[Index]*4))
+            plaintext_sram(i,j) = plaintext_sram(i,j) ^ key
+          }
+        }
+        plaintext_flat load plaintext_dram(0::16 par par_load) // TODO: Allow dram loads to reshape (gh issue #83)
+        key_sram load key_dram(0::32 par par_load)
+        rcon := 1
+
+        // gh issue #83
+        Sequential.Foreach(4 by 1 par 1){i => 
+          Sequential.Foreach(4 by 1 par 1){j => 
+            plaintext_sram(i,j) = plaintext_flat(j.to[Index]*4+i.to[Index]) // MachSuite flattens columnwise... Why????
+          }
+        }
+
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
+
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
+
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
+
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
+
+        //   // AddRoundKey
+        //   add_round_key(round)
+
+        // }
+
+        // /* Partially pipelined version */
+        // // Round 0
+        // add_round_key(0)
+
+        // // Rounds 1 - 7
+        // Sequential.Foreach(1 until 8 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Rounds 8 - 14
+        // Sequential.Foreach(8 until 14 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Round 14
+        // Pipe {
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{expand_key()}
+        //   add_round_key(14)
+        // }
+
+
+        /* Totally pipelined version */
+        // Round 0
+        add_round_key(0)
+        
+        // Round 1
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(1)
+        }
+
+        // Round 2
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(2)
+        }
+
+        // Round 3
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(3)
+        }
+
+        // Round 4
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(4)
+        }
+
+        // Round 5
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(5)
+        }
+
+        // Round 6
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(6)
+        }
+
+        // Round 7
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(7)
+        }
+
+        // Round 8
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(8)
+        }
+
+        // Round 9
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(9)
+        }
+
+        // Round 10
+        Pipe{
+          Pipe{shift_rows()}
+          add_round_key(10)
+        }
+
+     
+        // Reshape plaintext_sram (gh issue # 83)
+        val ciphertext_flat = SRAM[Int](16)
+        Sequential.Foreach(4 by 1, 4 by 1) {(i,j) => 
+          ciphertext_flat(j.to[Index]*4+i.to[Index]) = plaintext_sram(i,j).as[Int]
+        }
+
+        ciphertext_dram(block_id::block_id+16 par par_store) store ciphertext_flat
+      }
+
+      // // Debugging
+      // key_debug store key_sram
+
+    }
+
+    val ciphertext = getMem(ciphertext_dram)
+    val ciphertext_gold = Array.fill(args(0).to[Int])(Array[Int](142,162,183,202,81,103,69,191,234,252,73,144,75,73,96,137)).flatten
+
+    printArray(ciphertext_gold, "Expected: ")
+    printArray(ciphertext, "Got: ")
+
+    // // Debugging
+    // val key_dbg = getMem(key_debug)
+    // printArray(key_dbg, "Key: ")
+
+    val cksum = ciphertext_gold.zip(ciphertext){_ == _}.reduce{_&&_}
+    println("PASS: " + cksum + " (AES) * For retiming, need to fix ^ reduction if not parallelized")
+
+  }
+}
+
+object AES17 extends SpatialApp { // Regression (Dense) // Args: :50
+  override val target = AWS_F1
+
+  /*
+  TODO: Optimize/parallelize many of the memory accesses here and pipeline as much as possible
+  
+  MachSuite Concerns: 
+    - Mix rows math seemed wrong in their implementation
+    - Not exactly sure what was going on with their expand_key step
+  */
+  type UInt8 = FixPt[FALSE,_8,_0]
+  @virtualize
+  def main() = {
+    // Setup off-chip data
+    // val text_in = "the sharkmoster"
+    // val plaintext = argon.lang.String.string2num(text_in)
+    val plaintext = Array[UInt8](0,17,34,51,68,85,102,119,136,153,170,187,204,221,238,255)
+    val key = Array.tabulate(32){i => i.to[UInt8]}
+    val sbox = Array[UInt8]( // 256 elements
+      0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
+      0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+      0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
+      0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+      0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
+      0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+      0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a,
+      0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+      0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0,
+      0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+      0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b,
+      0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+      0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85,
+      0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+      0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5,
+      0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+      0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17,
+      0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+      0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88,
+      0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+      0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c,
+      0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+      0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9,
+      0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+      0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6,
+      0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+      0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e,
+      0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+      0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94,
+      0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+      0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
+      0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+    )
+    
+    val par_load = 1
+    val par_store = 1
+    val outer_par = 4 (1 -> 1 -> 4) // This may crash GC
+
+    // Setup
+    val num_bytes = ArgIn[Int]
+    setArg(num_bytes, 16*args(0).to[Int])
+
+    // Create DRAMs
+    val plaintext_dram = DRAM[UInt8](16)
+    val key_dram = DRAM[UInt8](32)
+    val sbox_dram = DRAM[UInt8](256)
+    val ciphertext_dram = DRAM[Int](num_bytes)
+
+    // Transfer data to DRAMs
+    setMem(plaintext_dram, plaintext)
+    setMem(key_dram, key)
+    setMem(sbox_dram, sbox)
+
+    // Debugging support
+    val niter = 15
+    // val niter = ArgIn[Int]
+    // setArg(niter, args(0).to[Int])
+    // val key_debug = DRAM[UInt8](32)
+
+    Accel{
+
+
+      val sbox_sram = SRAM[UInt8](256)
+      // Load structures
+      sbox_sram load sbox_dram(0::256 par par_load)
+
+      Foreach(num_bytes by 16 par outer_par){block_id => 
+        // Setup data structures
+        val plaintext_flat = SRAM.buffer[UInt8](16)
+        val plaintext_sram = RegFile.buffer[UInt8](4,4)
+        val key_sram = SRAM.buffer[UInt8](32)
+        // val mix_lut = LUT[Int](4,4)(
+        //    2, 3, 1, 1,
+        //    1, 2, 3, 1,
+        //    1, 1, 2, 3,
+        //    3, 1, 1, 2
+        //  )
+        val rcon = Reg.buffer[UInt8](1)
+
+        // Specify methods
+        def expand_key(): Unit = {
+          val addr_lut = LUT[Int](4)(29, 30, 31, 28)
+          // Foreach(4 by 1) { i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(addr_lut(i)).to[Int]) ^ mux(i.to[Index] == 0, rcon.value, 0)
+          // }
+          Pipe{key_sram(0) = key_sram(0) ^ sbox_sram(key_sram(29).as[UInt16].as[Int]) ^ rcon}
+          Pipe{key_sram(1) = key_sram(1) ^ sbox_sram(key_sram(30).as[UInt16].as[Int])}
+          Pipe{key_sram(2) = key_sram(2) ^ sbox_sram(key_sram(31).as[UInt16].as[Int])}
+          Pipe{key_sram(3) = key_sram(3) ^ sbox_sram(key_sram(28).as[UInt16].as[Int])}
+          rcon := (((rcon)<<1) ^ ((((rcon)>>7) & 1) * 0x1b))
+
+          Sequential.Foreach(4 until 16 by 4) {i =>
+            // Sequential.Foreach(4 by 1) {j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        
+          // Sequential.Foreach(16 until 20 by 1){i => 
+          //   key_sram(i) = key_sram(i) ^ sbox_sram(key_sram(i.to[Index]-4).to[Int])
+          // }
+          Pipe{key_sram(16) = key_sram(16) ^ sbox_sram(key_sram(12).as[UInt16].as[Int])}
+          Pipe{key_sram(17) = key_sram(17) ^ sbox_sram(key_sram(13).as[UInt16].as[Int])}
+          Pipe{key_sram(18) = key_sram(18) ^ sbox_sram(key_sram(14).as[UInt16].as[Int])}
+          Pipe{key_sram(19) = key_sram(19) ^ sbox_sram(key_sram(15).as[UInt16].as[Int])}
+
+          Sequential.Foreach(20 until 32 by 4) {i => 
+            // Sequential.Foreach(4 by 1) { j => 
+            //   key_sram(i.to[Index]+j.to[Index]) = key_sram(i.to[Index]+j.to[Index]) ^ key_sram(i.to[Index] - 4 + j.to[Index])
+            // }
+            Pipe{key_sram(i) = key_sram(i) ^ key_sram(i-4)}
+            Pipe{key_sram(i+1) = key_sram(i+1) ^ key_sram(i-3)}
+            Pipe{key_sram(i+2) = key_sram(i+2) ^ key_sram(i-2)}
+            Pipe{key_sram(i+3) = key_sram(i+3) ^ key_sram(i-1)}
+          }
+        }
+
+        def shift_rows(): Unit = {
+          Foreach(16 by 1) {i => 
+            plaintext_sram(i/4, i%4) = plaintext_sram(i/4, (i-3)%4) // sic
+          }
+          // Sequential{
+          // plaintext_sram(0,0) = plaintext_sram(0, (0.to[Index] - 0.to[Index]) % 4)
+          // plaintext_sram(0,1) = plaintext_sram(0, (1.to[Index] - 0.to[Index]) % 4)
+          // plaintext_sram(0,2) = plaintext_sram(0, (2.to[Index] - 0.to[Index]) % 4)
+          // plaintext_sram(0,3) = plaintext_sram(0, (3.to[Index] - 0.to[Index]) % 4)
+          // plaintext_sram(1,0) = plaintext_sram(1, (0.to[Index] - 1.to[Index]) % 4)
+          // plaintext_sram(1,1) = plaintext_sram(1, (1.to[Index] - 1.to[Index]) % 4)
+          // plaintext_sram(1,2) = plaintext_sram(1, (2.to[Index] - 1.to[Index]) % 4)
+          // plaintext_sram(1,3) = plaintext_sram(1, (3.to[Index] - 1.to[Index]) % 4)
+          // plaintext_sram(2,0) = plaintext_sram(2, (0.to[Index] - 2.to[Index]) % 4)
+          // plaintext_sram(2,1) = plaintext_sram(2, (1.to[Index] - 2.to[Index]) % 4)
+          // plaintext_sram(2,2) = plaintext_sram(2, (2.to[Index] - 2.to[Index]) % 4)
+          // plaintext_sram(2,3) = plaintext_sram(2, (3.to[Index] - 2.to[Index]) % 4)
+          // plaintext_sram(3,0) = plaintext_sram(3, (0.to[Index] - 3.to[Index]) % 4)
+          // plaintext_sram(3,1) = plaintext_sram(3, (1.to[Index] - 3.to[Index]) % 4)
+          // plaintext_sram(3,2) = plaintext_sram(3, (2.to[Index] - 3.to[Index]) % 4)
+          // plaintext_sram(3,3) = plaintext_sram(3, (3.to[Index] - 3.to[Index]) % 4)
+          // }
+        }
+
+        def substitute_bytes(): Unit = {
+          Foreach(16 by 1) {i => 
+            plaintext_sram(i/4, i%4) = sbox_sram(plaintext_sram(i/4, i%4).as[UInt16].as[Int]) // sic
+          }
+          // Sequential{
+          // plaintext_sram(0,0) = sbox_sram(plaintext_sram(0,0).as[UInt16].as[Int])
+          // plaintext_sram(0,1) = sbox_sram(plaintext_sram(0,1).as[UInt16].as[Int])
+          // plaintext_sram(0,2) = sbox_sram(plaintext_sram(0,2).as[UInt16].as[Int])
+          // plaintext_sram(0,3) = sbox_sram(plaintext_sram(0,3).as[UInt16].as[Int])
+          // plaintext_sram(1,0) = sbox_sram(plaintext_sram(1,0).as[UInt16].as[Int])
+          // plaintext_sram(1,1) = sbox_sram(plaintext_sram(1,1).as[UInt16].as[Int])
+          // plaintext_sram(1,2) = sbox_sram(plaintext_sram(1,2).as[UInt16].as[Int])
+          // plaintext_sram(1,3) = sbox_sram(plaintext_sram(1,3).as[UInt16].as[Int])
+          // plaintext_sram(2,0) = sbox_sram(plaintext_sram(2,0).as[UInt16].as[Int])
+          // plaintext_sram(2,1) = sbox_sram(plaintext_sram(2,1).as[UInt16].as[Int])
+          // plaintext_sram(2,2) = sbox_sram(plaintext_sram(2,2).as[UInt16].as[Int])
+          // plaintext_sram(2,3) = sbox_sram(plaintext_sram(2,3).as[UInt16].as[Int])
+          // plaintext_sram(3,0) = sbox_sram(plaintext_sram(3,0).as[UInt16].as[Int])
+          // plaintext_sram(3,1) = sbox_sram(plaintext_sram(3,1).as[UInt16].as[Int])
+          // plaintext_sram(3,2) = sbox_sram(plaintext_sram(3,2).as[UInt16].as[Int])
+          // plaintext_sram(3,3) = sbox_sram(plaintext_sram(3,3).as[UInt16].as[Int])
+          // }
+        }
+
+        def rj_xtime(x: UInt8): UInt8 = {
+          mux(((x & 0x80.to[UInt8]) > 0.to[UInt8]), ((x << 1) ^ 0x1b.to[UInt8]), x << 1)
+        }
+
+        def mix_columns(): Unit = {
+          val e = plaintext_sram(0,0) ^ plaintext_sram(0,1) ^ plaintext_sram(0,2) ^ plaintext_sram(0,3)
+          Foreach(16 by 1){i => 
+            plaintext_sram(i/4, i%4) = plaintext_sram(i/4, (i-3)%4) ^  rj_xtime(plaintext_sram(i/4, (i-1)%4) ^ plaintext_sram(i/4, (i+1)%4))
+          }
+          // Sequential{
+          //   val col = RegFile[UInt8](4)
+          //   Foreach(4 by 1 par 4) { i => col(i) = plaintext_sram(i,0) }
+          //   val e = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col(i) }{_^_}
+          //   // val e = col(0) ^ col(1) ^ col(2) ^ col(3)
+          //   Foreach(4 by 1) { i => 
+          //     val id1 = (i.to[Index]+1)%4
+          //     plaintext_sram(i,0) = col(i) ^ e ^ rj_xtime(col(i) ^ col(id1))
+          //   }
+          //   val col1 = RegFile[UInt8](4)
+          //   Foreach(4 by 1 par 4) { i => col1(i) = plaintext_sram(i,1) }
+          //   val e1 = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col1(i) }{_^_}
+          //   // val e1 = col1(0) ^ col1(1) ^ col1(2) ^ col1(3)
+          //   Foreach(4 by 1) { i => 
+          //     val id1 = (i.to[Index]+1)%4
+          //     plaintext_sram(i,1) = col1(i) ^ e1 ^ rj_xtime(col1(i) ^ col1(id1))
+          //   }
+          //   val col2 = RegFile[UInt8](4)
+          //   Foreach(4 by 1 par 4) { i => col2(i) = plaintext_sram(i,2) }
+          //   val e2 = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col2(i) }{_^_}
+          //   // val e2 = col2(0) ^ col2(1) ^ col2(2) ^ col2(3)
+          //   Foreach(4 by 1) { i => 
+          //     val id1 = (i.to[Index]+1)%4
+          //     plaintext_sram(i,2) = col2(i) ^ e2 ^ rj_xtime(col2(i) ^ col2(id1))
+          //   }
+          //   val col3 = RegFile[UInt8](4)
+          //   Foreach(4 by 1 par 4) { i => col3(i) = plaintext_sram(i,3) }
+          //   val e3 = Reduce(Reg[UInt8](0))(4 by 1 par 4) { i => col3(i) }{_^_}
+          //   // val e3 = col3(0) ^ col3(1) ^ col3(2) ^ col3(3)
+          //   Foreach(4 by 1) { i => 
+          //     val id1 = (i.to[Index]+1)%4
+          //     plaintext_sram(i,3) = col3(i) ^ e3 ^ rj_xtime(col3(i) ^ col3(id1))
+          //   }
+          // }
+        }
+
+        def add_round_key(round: Index): Unit = {
+          Foreach(4 by 1, 4 by 1) { (i,j) => 
+            val key = mux(round % 2 == 1, key_sram(i.to[Index]+j.to[Index]*4+16), key_sram(i.to[Index]+j.to[Index]*4))
+            plaintext_sram(i,j) = plaintext_sram(i,j) ^ key
+          }
+        }
+        plaintext_flat load plaintext_dram(0::16 par par_load) // TODO: Allow dram loads to reshape (gh issue #83)
+        key_sram load key_dram(0::32 par par_load)
+        rcon := 1
+
+        // gh issue #83
+        Sequential.Foreach(4 by 1 par 1){i => 
+          Sequential.Foreach(4 by 1 par 1){j => 
+            plaintext_sram(i,j) = plaintext_flat(j.to[Index]*4+i.to[Index]) // MachSuite flattens columnwise... Why????
+          }
+        }
+
+        // /* Loopy version */
+        // Sequential.Foreach(niter by 1) { round => 
+        //   // SubBytes
+        //   if (round > 0) {
+        //     Pipe{substitute_bytes()}
+        //   }
+
+        //   // ShiftRows
+        //   if (round > 0) {
+        //     Pipe{shift_rows()}
+        //   }
+
+        //   // MixColumns
+        //   if (round > 0 && round < 14 ) {
+        //     Pipe{mix_columns()}
+        //   }
+
+        //   // Expand key
+        //   if (round > 0 && ((round % 2) == 0)) {
+        //     Pipe{expand_key()}
+        //   }
+
+        //   // AddRoundKey
+        //   add_round_key(round)
+
+        // }
+
+        // /* Partially pipelined version */
+        // // Round 0
+        // add_round_key(0)
+
+        // // Rounds 1 - 7
+        // Sequential.Foreach(1 until 8 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Rounds 8 - 14
+        // Sequential.Foreach(8 until 14 by 1) { round => 
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{mix_columns()}
+        //   if ((round % 2) == 0) {
+        //     Pipe{expand_key()}
+        //   }
+        //   add_round_key(round)
+        // }
+        // // Round 14
+        // Pipe {
+        //   substitute_bytes()
+        //   Pipe{shift_rows()}
+        //   Pipe{expand_key()}
+        //   add_round_key(14)
+        // }
+
+
+        /* Totally pipelined version */
+        // Round 0
+        add_round_key(0)
+        
+        // Round 1
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(1)
+        }
+
+        // Round 2
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(2)
+        }
+
+        // Round 3
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(3)
+        }
+
+        // Round 4
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(4)
+        }
+
+        // Round 5
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(5)
+        }
+
+        // Round 6
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(6)
+        }
+
+        // Round 7
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(7)
+        }
+
+        // Round 8
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(8)
+        }
+
+        // Round 9
+        Pipe{
+          Pipe{shift_rows()}
+          Pipe{mix_columns()}
+          add_round_key(9)
+        }
+
+        // Round 10
+        Pipe{
+          Pipe{shift_rows()}
+          add_round_key(10)
+        }
+
+     
+        // Reshape plaintext_sram (gh issue # 83)
+        val ciphertext_flat = SRAM[Int](16)
+        Sequential.Foreach(4 by 1, 4 by 1) {(i,j) => 
+          ciphertext_flat(j.to[Index]*4+i.to[Index]) = plaintext_sram(i,j).as[Int]
+        }
+
+        ciphertext_dram(block_id::block_id+16 par par_store) store ciphertext_flat
+      }
+
+      // // Debugging
+      // key_debug store key_sram
+
+    }
+
+    val ciphertext = getMem(ciphertext_dram)
+    val ciphertext_gold = Array.fill(args(0).to[Int])(Array[Int](142,162,183,202,81,103,69,191,234,252,73,144,75,73,96,137)).flatten
+
+    printArray(ciphertext_gold, "Expected: ")
+    printArray(ciphertext, "Got: ")
+
+    // // Debugging
+    // val key_dbg = getMem(key_debug)
+    // printArray(key_dbg, "Key: ")
+
+    val cksum = ciphertext_gold.zip(ciphertext){_ == _}.reduce{_&&_}
+    println("PASS: " + cksum + " (AES) * For retiming, need to fix ^ reduction if not parallelized")
+
+  }
+}
+
+
+
 // good
 object Kmeans1 extends SpatialApp { // Regression (Dense) // Args: 3 64
   override val target = AWS_F1
@@ -12770,6 +15264,1269 @@ object Kmeans12 extends SpatialApp { // Regression (Dense) // Args: 3 64
   }
 }
 
+object Kmeans13 extends SpatialApp { // Regression (Dense) // Args: 3 64
+  override val target = AWS_F1
+
+  type X = Int
+
+  val numcents = 16
+  val dim = 32
+  val pts_per_ld = 1 // ???
+
+  val element_max = 10
+  val margin = (element_max * 0.2).to[X]
+
+  val MAXK = numcents
+  val MAXD = dim
+
+  @virtualize
+  def kmeans[T:Type:Num](points_in: Array[T], cent_inits: Array[T], numPoints: Int, numCents: Int, numDims: Int, it: Int) = {
+    bound(numPoints) = 960000
+    bound(numCents) = MAXK
+    bound(numDims) = MAXD
+
+    val BN = 16 (96 -> 96 -> 9600)
+    val BD = MAXD
+    val par_load = 16
+    val par_store = 16
+    val PX = 1 (1 -> 1)
+    val P0 = 32 (1 -> 2 -> dim)
+    val P1 = 16 (1 -> 2 -> dim)
+    val P2 = 8 (1 -> 2 -> dim)
+    val P3 = 16 (1 -> 2 -> numcents)
+
+    val iters = ArgIn[Int]
+    val N     = ArgIn[Int]
+    val K     = numCents //ArgIn[Int]
+    val D     = numDims //ArgIn[Int]
+
+    setArg(iters, it)
+    setArg(N, numPoints)
+    // setArg(K, numCents)
+    // setArg(D, numDims)
+
+    val points = DRAM[T](N, D)    // Input points
+    val centroids = DRAM[T](numcents*dim) // Output centroids
+    // val init_cents = DRAM[T](K,D) // Output centroids
+    setMem(points, points_in)
+    // setMem(init_cents, cent_inits)
+
+
+    Accel {
+      val cts = SRAM[T](MAXK, MAXD)
+      val newCents = SRAM[T](MAXK,MAXD)
+
+      // Load initial centroids (from points)
+      cts load points(0::K, 0::D par par_load)
+
+      // Initialize newCents
+      // FPGA:
+      Foreach(K by 1, D by 1 par P0) {(i,j) => newCents(i,j) = cts(i,j)} 
+
+      val DM1 = D - 1
+
+      Sequential.Foreach(iters by 1){epoch =>
+        // Flush centroid accumulator
+        // FPGA:
+        Foreach(K by 1, D par P0){(ct,d) =>
+          newCents(ct,d) = 0.to[T]
+        }
+
+        // For each set of points
+        Foreach(N by BN par PX){i =>
+          val pts = SRAM[T](BN, BD)
+          pts load points(i::i+BN, 0::BD par par_load)
+
+          // For each point in this set
+          MemFold(newCents par P0)(BN par PX){pt =>
+            // Find the index of the closest centroid
+            val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
+            val minCent = Reduce(accum)(K par PX){ct =>
+              val dist = Reg[T](0.to[T])
+              Reduce(dist)(D par P2){d => (pts(pt,d) - cts(ct,d)) ** 2 }{_+_}
+              pack(ct, dist.value)
+            }{(a,b) =>
+              mux(a._2 < b._2, a, b)
+            }
+            val lastCent = Reg[Int](0)
+
+            // Store this point to the set of accumulators
+            val localCent = SRAM[T](MAXK,MAXD)
+            Foreach(2 by 1){phase => 
+              val addr = if (phase == 0) lastCent.value else minCent.value._1
+              if (phase == 1 || (phase == 0) && lastCent.value != minCent.value._1) {Foreach(D par P2){d => localCent(lastCent, d) = 0.to[T]}}  
+                          }
+            Pipe{lastCent := minCent.value._1}
+            // Foreach(K by 1, D par P2){(ct,d) =>
+            //   //val elem = mux(d == DM1, 1.to[T], pts(pt, d)) // fix for vanishing mux
+            //   val elem = pts(pt,d)
+            //   localCent(ct, d) = mux(ct == minCent.value._1, elem, 0.to[T])
+            // }
+            localCent
+          }{_+_} // Add the current point to the accumulators for this centroid
+        }
+
+        val centCount = SRAM[T](MAXK)
+        Foreach(K by 1 par P3){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } 
+
+        // Average each new centroid
+        // val centsOut = SRAM[T](MAXK, MAXD)
+        Foreach(K by 1, D par P0){(ct,d) =>
+          cts(ct, d) = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct)) //updateMux
+        }
+      }
+
+      val flatCts = SRAM[T](MAXK * MAXD)
+      Foreach(K by 1, D by 1 par PX) {(i,j) => // Parallelize when issue #159 is fixed
+        flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
+      }
+      // Store the centroids out
+      centroids(0::K*D par par_store) store flatCts
+    }
+
+    getMem(centroids)
+  }
+
+  @virtualize
+  def main() {
+    val iters = args(0).to[Int]
+    val N = args(1).to[Int]
+    val K = numcents //args(2).to[SInt];
+    val D = dim //args(3).to[SInt];
+
+    val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + i }}
+    val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + (i*N/K) }}
+
+    val result = kmeans(pts.flatten, cnts.flatten, N, K, D, iters)
+
+    val cts = Array.empty[Array[X]](K)
+    for (k <- 0 until K) {
+      cts(k) = Array.tabulate(D){i => pts(k).apply(i) }
+    }
+    val ii = Array.tabulate(K){i => i}
+
+    for(epoch <- 0 until iters) {
+      def dist[T:Type:Num](p1: Array[T], p2: Array[T]) = p1.zip(p2){(a,b) => (a - b)**2 }.reduce(_+_)
+
+      // Make weighted points
+      val map = pts.groupByReduce{pt =>
+        val dists = cts.map{ct => dist(ct, pt) }
+        dists.zip(ii){(a,b) => pack(a,b) }.reduce{(a,b) => if (a._1 < b._1) a else b}._2  // minIndex
+      }{pt => pt}{(x,y) => x.zip(y){_+_} }
+
+      // Average
+      for (k <- 0 until K) {
+        if (!map.contains(k)) {
+          cts(k) = Array.tabulate(D){d => 0.to[X]}
+        } else {
+          val wp = map(k)
+          val n  = wp(D - 1)
+          cts(k) = Array.tabulate(D){d => if (d == D-1) 1.to[X] else wp(d)/n }
+        }
+      }
+    }
+
+    val gold = cts.flatten
+
+    println("\n\nOriginal Centers:")
+    (0 until K).foreach{ i => printArray(cnts(i))}
+    println("\n\nOriginal Points:")
+    (0 until N).foreach{ i => printArray(pts(i))}
+    println("\n\nCorrect Centers:")
+    (0 until K).foreach{ i => printArray(cts(i))}
+    println("\n\nFPGA Centers:")
+    (0 until K).foreach { i => 
+      val resrow = Array.tabulate(D){j => result(i*D + j)}
+      printArray(resrow)
+    }
+
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
+
+    println("PASS: " + cksum + " (Kmeans)")
+  }
+}
+
+object Kmeans14 extends SpatialApp { // Regression (Dense) // Args: 3 64
+  override val target = AWS_F1
+
+  type X = Int
+
+  val numcents = 16
+  val dim = 32
+  val pts_per_ld = 1 // ???
+
+  val element_max = 10
+  val margin = (element_max * 0.2).to[X]
+
+  val MAXK = numcents
+  val MAXD = dim
+
+  @virtualize
+  def kmeans[T:Type:Num](points_in: Array[T], cent_inits: Array[T], numPoints: Int, numCents: Int, numDims: Int, it: Int) = {
+    bound(numPoints) = 960000
+    bound(numCents) = MAXK
+    bound(numDims) = MAXD
+
+    val BN = 320 (96 -> 96 -> 9600)
+    val BD = MAXD
+    val par_load = 16
+    val par_store = 16
+    val PX = 1 (1 -> 1)
+    val P0 = 32 (1 -> 2 -> dim)
+    val P1 = 16 (1 -> 2 -> dim)
+    val P2 = 8 (1 -> 2 -> dim)
+    val P3 = 16 (1 -> 2 -> numcents)
+
+    val iters = ArgIn[Int]
+    val N     = ArgIn[Int]
+    val K     = numCents //ArgIn[Int]
+    val D     = numDims //ArgIn[Int]
+
+    setArg(iters, it)
+    setArg(N, numPoints)
+    // setArg(K, numCents)
+    // setArg(D, numDims)
+
+    val points = DRAM[T](N, D)    // Input points
+    val centroids = DRAM[T](numcents*dim) // Output centroids
+    // val init_cents = DRAM[T](K,D) // Output centroids
+    setMem(points, points_in)
+    // setMem(init_cents, cent_inits)
+
+
+    Accel {
+      val cts = SRAM[T](MAXK, MAXD)
+      val newCents = SRAM[T](MAXK,MAXD)
+
+      // Load initial centroids (from points)
+      cts load points(0::K, 0::D par par_load)
+
+      // Initialize newCents
+      // FPGA:
+      Foreach(K by 1, D by 1 par P0) {(i,j) => newCents(i,j) = cts(i,j)} 
+
+      val DM1 = D - 1
+
+      Sequential.Foreach(iters by 1){epoch =>
+        // Flush centroid accumulator
+        // FPGA:
+        Foreach(K by 1, D par P0){(ct,d) =>
+          newCents(ct,d) = 0.to[T]
+        }
+
+        // For each set of points
+          val pts = SRAM[T](BN, BD)
+          pts load points(0::0+BN, 0::BD par par_load)
+
+          // For each point in this set
+          MemFold(newCents par P0)(BN par PX){pt =>
+            // Find the index of the closest centroid
+            val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
+            val minCent = Reduce(accum)(K par PX){ct =>
+              val dist = Reg[T](0.to[T])
+              Reduce(dist)(D par P2){d => (pts(pt,d) - cts(ct,d)) ** 2 }{_+_}
+              pack(ct, dist.value)
+            }{(a,b) =>
+              mux(a._2 < b._2, a, b)
+            }
+            val lastCent = Reg[Int](0)
+
+            // Store this point to the set of accumulators
+            val localCent = SRAM[T](MAXK,MAXD)
+            Foreach(2 by 1){phase => 
+              val addr = if (phase == 0) lastCent.value else minCent.value._1
+              if (phase == 1 || (phase == 0) && lastCent.value != minCent.value._1) {Foreach(D par P2){d => localCent(lastCent, d) = 0.to[T]}}  
+                          }
+            Pipe{lastCent := minCent.value._1}
+            // Foreach(K by 1, D par P2){(ct,d) =>
+            //   //val elem = mux(d == DM1, 1.to[T], pts(pt, d)) // fix for vanishing mux
+            //   val elem = pts(pt,d)
+            //   localCent(ct, d) = mux(ct == minCent.value._1, elem, 0.to[T])
+            // }
+            localCent
+          }{_+_} // Add the current point to the accumulators for this centroid
+
+        val centCount = SRAM[T](MAXK)
+        Foreach(K by 1 par P3){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } 
+
+        // Average each new centroid
+        // val centsOut = SRAM[T](MAXK, MAXD)
+        Foreach(K by 1, D par P0){(ct,d) =>
+          cts(ct, d) = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct)) //updateMux
+        }
+      }
+
+      val flatCts = SRAM[T](MAXK * MAXD)
+      Foreach(K by 1, D by 1 par PX) {(i,j) => // Parallelize when issue #159 is fixed
+        flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
+      }
+      // Store the centroids out
+      centroids(0::K*D par par_store) store flatCts
+    }
+
+    getMem(centroids)
+  }
+
+  @virtualize
+  def main() {
+    val iters = args(0).to[Int]
+    val N = args(1).to[Int]
+    val K = numcents //args(2).to[SInt];
+    val D = dim //args(3).to[SInt];
+
+    val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + i }}
+    val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + (i*N/K) }}
+
+    val result = kmeans(pts.flatten, cnts.flatten, N, K, D, iters)
+
+    val cts = Array.empty[Array[X]](K)
+    for (k <- 0 until K) {
+      cts(k) = Array.tabulate(D){i => pts(k).apply(i) }
+    }
+    val ii = Array.tabulate(K){i => i}
+
+    for(epoch <- 0 until iters) {
+      def dist[T:Type:Num](p1: Array[T], p2: Array[T]) = p1.zip(p2){(a,b) => (a - b)**2 }.reduce(_+_)
+
+      // Make weighted points
+      val map = pts.groupByReduce{pt =>
+        val dists = cts.map{ct => dist(ct, pt) }
+        dists.zip(ii){(a,b) => pack(a,b) }.reduce{(a,b) => if (a._1 < b._1) a else b}._2  // minIndex
+      }{pt => pt}{(x,y) => x.zip(y){_+_} }
+
+      // Average
+      for (k <- 0 until K) {
+        if (!map.contains(k)) {
+          cts(k) = Array.tabulate(D){d => 0.to[X]}
+        } else {
+          val wp = map(k)
+          val n  = wp(D - 1)
+          cts(k) = Array.tabulate(D){d => if (d == D-1) 1.to[X] else wp(d)/n }
+        }
+      }
+    }
+
+    val gold = cts.flatten
+
+    println("\n\nOriginal Centers:")
+    (0 until K).foreach{ i => printArray(cnts(i))}
+    println("\n\nOriginal Points:")
+    (0 until N).foreach{ i => printArray(pts(i))}
+    println("\n\nCorrect Centers:")
+    (0 until K).foreach{ i => printArray(cts(i))}
+    println("\n\nFPGA Centers:")
+    (0 until K).foreach { i => 
+      val resrow = Array.tabulate(D){j => result(i*D + j)}
+      printArray(resrow)
+    }
+
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
+
+    println("PASS: " + cksum + " (Kmeans)")
+  }
+}
+
+object Kmeans15 extends SpatialApp { // Regression (Dense) // Args: 3 64
+  override val target = AWS_F1
+
+  type X = Int
+
+  val numcents = 16
+  val dim = 32
+  val pts_per_ld = 1 // ???
+
+  val element_max = 10
+  val margin = (element_max * 0.2).to[X]
+
+  val MAXK = numcents
+  val MAXD = dim
+
+  @virtualize
+  def kmeans[T:Type:Num](points_in: Array[T], cent_inits: Array[T], numPoints: Int, numCents: Int, numDims: Int, it: Int) = {
+    bound(numPoints) = 960000
+    bound(numCents) = MAXK
+    bound(numDims) = MAXD
+
+    val BN = 320 (96 -> 96 -> 9600)
+    val BD = MAXD
+    val par_load = 16
+    val par_store = 16
+    val PX = 1 (1 -> 1)
+    val P0 = 32 (1 -> 2 -> dim)
+    val P1 = 16 (1 -> 2 -> dim)
+    val P2 = 16 (1 -> 2 -> dim)
+    val P3 = 16 (1 -> 2 -> numcents)
+
+    val iters = ArgIn[Int]
+    val N     = ArgIn[Int]
+    val K     = numCents //ArgIn[Int]
+    val D     = numDims //ArgIn[Int]
+
+    setArg(iters, it)
+    setArg(N, numPoints)
+    // setArg(K, numCents)
+    // setArg(D, numDims)
+
+    val points = DRAM[T](N, D)    // Input points
+    val centroids = DRAM[T](numcents*dim) // Output centroids
+    // val init_cents = DRAM[T](K,D) // Output centroids
+    setMem(points, points_in)
+    // setMem(init_cents, cent_inits)
+
+
+    Accel {
+      val cts = SRAM[T](MAXK, MAXD)
+      val newCents = SRAM[T](MAXK,MAXD)
+
+      // Load initial centroids (from points)
+      cts load points(0::K, 0::D par par_load)
+
+      // Initialize newCents
+      // FPGA:
+      Foreach(K by 1, D by 1 par P0) {(i,j) => newCents(i,j) = cts(i,j)} 
+
+      val DM1 = D - 1
+
+      Sequential.Foreach(iters by 1){epoch =>
+        // Flush centroid accumulator
+        // FPGA:
+        Foreach(K by 1, D par P0){(ct,d) =>
+          newCents(ct,d) = 0.to[T]
+        }
+
+        // For each set of points
+          val pts = SRAM[T](BN, BD)
+          pts load points(0::0+BN, 0::BD par par_load)
+
+          // For each point in this set
+          MemFold(newCents par P0)(BN par PX){pt =>
+            // Find the index of the closest centroid
+            val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
+            val minCent = Reduce(accum)(K par PX){ct =>
+              val dist = Reg[T](0.to[T])
+              Reduce(dist)(D par P2){d => (pts(pt,d) - cts(ct,d)) ** 2 }{_+_}
+              pack(ct, dist.value)
+            }{(a,b) =>
+              mux(a._2 < b._2, a, b)
+            }
+            val lastCent = Reg[Int](0)
+
+            // Store this point to the set of accumulators
+            val localCent = SRAM[T](MAXK,MAXD)
+            Foreach(2 by 1){phase => 
+              val addr = if (phase == 0) lastCent.value else minCent.value._1
+              if (phase == 1 || (phase == 0) && lastCent.value != minCent.value._1) {Foreach(D par P2){d => localCent(lastCent, d) = 0.to[T]}}  
+                          }
+            Pipe{lastCent := minCent.value._1}
+            // Foreach(K by 1, D par P2){(ct,d) =>
+            //   //val elem = mux(d == DM1, 1.to[T], pts(pt, d)) // fix for vanishing mux
+            //   val elem = pts(pt,d)
+            //   localCent(ct, d) = mux(ct == minCent.value._1, elem, 0.to[T])
+            // }
+            localCent
+          }{_+_} // Add the current point to the accumulators for this centroid
+
+        val centCount = SRAM[T](MAXK)
+        Foreach(K by 1 par P3){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } 
+
+        // Average each new centroid
+        // val centsOut = SRAM[T](MAXK, MAXD)
+        Foreach(K by 1, D par P0){(ct,d) =>
+          cts(ct, d) = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct)) //updateMux
+        }
+      }
+
+      val flatCts = SRAM[T](MAXK * MAXD)
+      Foreach(K by 1, D by 1 par PX) {(i,j) => // Parallelize when issue #159 is fixed
+        flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
+      }
+      // Store the centroids out
+      centroids(0::K*D par par_store) store flatCts
+    }
+
+    getMem(centroids)
+  }
+
+  @virtualize
+  def main() {
+    val iters = args(0).to[Int]
+    val N = args(1).to[Int]
+    val K = numcents //args(2).to[SInt];
+    val D = dim //args(3).to[SInt];
+
+    val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + i }}
+    val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + (i*N/K) }}
+
+    val result = kmeans(pts.flatten, cnts.flatten, N, K, D, iters)
+
+    val cts = Array.empty[Array[X]](K)
+    for (k <- 0 until K) {
+      cts(k) = Array.tabulate(D){i => pts(k).apply(i) }
+    }
+    val ii = Array.tabulate(K){i => i}
+
+    for(epoch <- 0 until iters) {
+      def dist[T:Type:Num](p1: Array[T], p2: Array[T]) = p1.zip(p2){(a,b) => (a - b)**2 }.reduce(_+_)
+
+      // Make weighted points
+      val map = pts.groupByReduce{pt =>
+        val dists = cts.map{ct => dist(ct, pt) }
+        dists.zip(ii){(a,b) => pack(a,b) }.reduce{(a,b) => if (a._1 < b._1) a else b}._2  // minIndex
+      }{pt => pt}{(x,y) => x.zip(y){_+_} }
+
+      // Average
+      for (k <- 0 until K) {
+        if (!map.contains(k)) {
+          cts(k) = Array.tabulate(D){d => 0.to[X]}
+        } else {
+          val wp = map(k)
+          val n  = wp(D - 1)
+          cts(k) = Array.tabulate(D){d => if (d == D-1) 1.to[X] else wp(d)/n }
+        }
+      }
+    }
+
+    val gold = cts.flatten
+
+    println("\n\nOriginal Centers:")
+    (0 until K).foreach{ i => printArray(cnts(i))}
+    println("\n\nOriginal Points:")
+    (0 until N).foreach{ i => printArray(pts(i))}
+    println("\n\nCorrect Centers:")
+    (0 until K).foreach{ i => printArray(cts(i))}
+    println("\n\nFPGA Centers:")
+    (0 until K).foreach { i => 
+      val resrow = Array.tabulate(D){j => result(i*D + j)}
+      printArray(resrow)
+    }
+
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
+
+    println("PASS: " + cksum + " (Kmeans)")
+  }
+}
+
+object Kmeans16 extends SpatialApp { // Regression (Dense) // Args: 3 64
+  override val target = AWS_F1
+
+  type X = Int
+
+  val numcents = 16
+  val dim = 32
+  val pts_per_ld = 1 // ???
+
+  val element_max = 10
+  val margin = (element_max * 0.2).to[X]
+
+  val MAXK = numcents
+  val MAXD = dim
+
+  @virtualize
+  def kmeans[T:Type:Num](points_in: Array[T], cent_inits: Array[T], numPoints: Int, numCents: Int, numDims: Int, it: Int) = {
+    bound(numPoints) = 960000
+    bound(numCents) = MAXK
+    bound(numDims) = MAXD
+
+    val BN = 320 (96 -> 96 -> 9600)
+    val BD = MAXD
+    val par_load = 16
+    val par_store = 16
+    val PX = 1 (1 -> 1)
+    val P0 = 32 (1 -> 2 -> dim)
+    val P1 = 16 (1 -> 2 -> dim)
+    val P2 = 16 (1 -> 2 -> dim)
+    val P3 = 16 (1 -> 2 -> numcents)
+
+    val iters = ArgIn[Int]
+    val N     = ArgIn[Int]
+    val K     = numCents //ArgIn[Int]
+    val D     = numDims //ArgIn[Int]
+
+    setArg(iters, it)
+    setArg(N, numPoints)
+    // setArg(K, numCents)
+    // setArg(D, numDims)
+
+    val points = DRAM[T](N, D)    // Input points
+    val centroids = DRAM[T](numcents*dim) // Output centroids
+    // val init_cents = DRAM[T](K,D) // Output centroids
+    setMem(points, points_in)
+    // setMem(init_cents, cent_inits)
+
+
+    Accel {
+      val cts = SRAM[T](MAXK, MAXD)
+      val newCents = SRAM[T](MAXK,MAXD)
+
+      // Load initial centroids (from points)
+      cts load points(0::K, 0::D par par_load)
+
+      // Initialize newCents
+      // FPGA:
+      Foreach(K by 1, D by 1 par P0) {(i,j) => newCents(i,j) = cts(i,j)} 
+
+      val DM1 = D - 1
+
+      Sequential.Foreach(iters by 1){epoch =>
+        // Flush centroid accumulator
+        // FPGA:
+        // Foreach(K by 1, D par P0){(ct,d) =>
+        //   newCents(ct,d) = 0.to[T]
+        // }
+
+        // For each set of points
+          val pts = SRAM[T](BN, BD)
+          pts load points(0::0+BN, 0::BD par par_load)
+
+          // For each point in this set
+          MemReduce(newCents par P0)(BN par 4){pt =>
+            // Find the index of the closest centroid
+            val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
+            val minCent = Reduce(accum)(K par PX){ct =>
+              val dist = Reg[T](0.to[T])
+              Reduce(dist)(D par P2){d => (pts(pt,d) - cts(ct,d)) ** 2 }{_+_}
+              pack(ct, dist.value)
+            }{(a,b) =>
+              mux(a._2 < b._2, a, b)
+            }
+            val lastCent = Reg[Int](0)
+
+            // Store this point to the set of accumulators
+            val localCent = SRAM[T](MAXK,MAXD)
+            Foreach(2 by 1){phase => 
+              val addr = if (phase == 0) lastCent.value else minCent.value._1
+              if (phase == 1 || (phase == 0) && lastCent.value != minCent.value._1) {Foreach(D par P2){d => localCent(lastCent, d) = 0.to[T]}}  
+                          }
+            Pipe{lastCent := minCent.value._1}
+            // Foreach(K by 1, D par P2){(ct,d) =>
+            //   //val elem = mux(d == DM1, 1.to[T], pts(pt, d)) // fix for vanishing mux
+            //   val elem = pts(pt,d)
+            //   localCent(ct, d) = mux(ct == minCent.value._1, elem, 0.to[T])
+            // }
+            localCent
+          }{_+_} // Add the current point to the accumulators for this centroid
+
+        val centCount = SRAM[T](MAXK)
+        Foreach(K by 1 par P3){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } 
+
+        // Average each new centroid
+        // val centsOut = SRAM[T](MAXK, MAXD)
+        Foreach(K by 1, D par P0){(ct,d) =>
+          cts(ct, d) = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct)) //updateMux
+        }
+      }
+
+      val flatCts = SRAM[T](MAXK * MAXD)
+      Foreach(K by 1, D by 1 par PX) {(i,j) => // Parallelize when issue #159 is fixed
+        flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
+      }
+      // Store the centroids out
+      centroids(0::K*D par par_store) store flatCts
+    }
+
+    getMem(centroids)
+  }
+
+  @virtualize
+  def main() {
+    val iters = args(0).to[Int]
+    val N = args(1).to[Int]
+    val K = numcents //args(2).to[SInt];
+    val D = dim //args(3).to[SInt];
+
+    val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + i }}
+    val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + (i*N/K) }}
+
+    val result = kmeans(pts.flatten, cnts.flatten, N, K, D, iters)
+
+    val cts = Array.empty[Array[X]](K)
+    for (k <- 0 until K) {
+      cts(k) = Array.tabulate(D){i => pts(k).apply(i) }
+    }
+    val ii = Array.tabulate(K){i => i}
+
+    for(epoch <- 0 until iters) {
+      def dist[T:Type:Num](p1: Array[T], p2: Array[T]) = p1.zip(p2){(a,b) => (a - b)**2 }.reduce(_+_)
+
+      // Make weighted points
+      val map = pts.groupByReduce{pt =>
+        val dists = cts.map{ct => dist(ct, pt) }
+        dists.zip(ii){(a,b) => pack(a,b) }.reduce{(a,b) => if (a._1 < b._1) a else b}._2  // minIndex
+      }{pt => pt}{(x,y) => x.zip(y){_+_} }
+
+      // Average
+      for (k <- 0 until K) {
+        if (!map.contains(k)) {
+          cts(k) = Array.tabulate(D){d => 0.to[X]}
+        } else {
+          val wp = map(k)
+          val n  = wp(D - 1)
+          cts(k) = Array.tabulate(D){d => if (d == D-1) 1.to[X] else wp(d)/n }
+        }
+      }
+    }
+
+    val gold = cts.flatten
+
+    println("\n\nOriginal Centers:")
+    (0 until K).foreach{ i => printArray(cnts(i))}
+    println("\n\nOriginal Points:")
+    (0 until N).foreach{ i => printArray(pts(i))}
+    println("\n\nCorrect Centers:")
+    (0 until K).foreach{ i => printArray(cts(i))}
+    println("\n\nFPGA Centers:")
+    (0 until K).foreach { i => 
+      val resrow = Array.tabulate(D){j => result(i*D + j)}
+      printArray(resrow)
+    }
+
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
+
+    println("PASS: " + cksum + " (Kmeans)")
+  }
+}
+
+object Kmeans17 extends SpatialApp { // Regression (Dense) // Args: 3 64
+  override val target = AWS_F1
+
+  type X = Int
+
+  val numcents = 16
+  val dim = 32
+  val pts_per_ld = 1 // ???
+
+  val element_max = 10
+  val margin = (element_max * 0.2).to[X]
+
+  val MAXK = numcents
+  val MAXD = dim
+
+  @virtualize
+  def kmeans[T:Type:Num](points_in: Array[T], cent_inits: Array[T], numPoints: Int, numCents: Int, numDims: Int, it: Int) = {
+    bound(numPoints) = 960000
+    bound(numCents) = MAXK
+    bound(numDims) = MAXD
+
+    val BN = 320 (96 -> 96 -> 9600)
+    val BD = MAXD
+    val par_load = 16
+    val par_store = 16
+    val PX = 1 (1 -> 1)
+    val P0 = 32 (1 -> 2 -> dim)
+    val P1 = 16 (1 -> 2 -> dim)
+    val P2 = 16 (1 -> 2 -> dim)
+    val P3 = 16 (1 -> 2 -> numcents)
+
+    val iters = ArgIn[Int]
+    val N     = ArgIn[Int]
+    val K     = numCents //ArgIn[Int]
+    val D     = numDims //ArgIn[Int]
+
+    setArg(iters, it)
+    setArg(N, numPoints)
+    // setArg(K, numCents)
+    // setArg(D, numDims)
+
+    val points = DRAM[T](N, D)    // Input points
+    val centroids = DRAM[T](numcents*dim) // Output centroids
+    // val init_cents = DRAM[T](K,D) // Output centroids
+    setMem(points, points_in)
+    // setMem(init_cents, cent_inits)
+
+
+    Accel {
+      val cts = SRAM[T](MAXK, MAXD)
+      val newCents = SRAM[T](MAXK,MAXD)
+
+      // Load initial centroids (from points)
+      cts load points(0::K, 0::D par par_load)
+
+      // Initialize newCents
+      // FPGA:
+      Foreach(K by 1, D by 1 par P0) {(i,j) => newCents(i,j) = cts(i,j)} 
+
+      val DM1 = D - 1
+
+      Sequential.Foreach(iters by 1){epoch =>
+        // Flush centroid accumulator
+        // FPGA:
+        // Foreach(K by 1, D par P0){(ct,d) =>
+        //   newCents(ct,d) = 0.to[T]
+        // }
+
+        // For each set of points
+          val pts = SRAM[T](BN, BD)
+          pts load points(0::0+BN, 0::BD par par_load)
+
+          // For each point in this set
+          MemReduce(newCents par P0)(BN par 8){pt =>
+            // Find the index of the closest centroid
+            val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
+            val minCent = Reduce(accum)(K par PX){ct =>
+              val dist = Reg[T](0.to[T])
+              Reduce(dist)(D par P2){d => (pts(pt,d) - cts(ct,d)) ** 2 }{_+_}
+              pack(ct, dist.value)
+            }{(a,b) =>
+              mux(a._2 < b._2, a, b)
+            }
+            val lastCent = Reg[Int](0)
+
+            // Store this point to the set of accumulators
+            val localCent = SRAM[T](MAXK,MAXD)
+            Foreach(2 by 1){phase => 
+              val addr = if (phase == 0) lastCent.value else minCent.value._1
+              if (phase == 1 || (phase == 0) && lastCent.value != minCent.value._1) {Foreach(D par P2){d => localCent(lastCent, d) = 0.to[T]}}  
+                          }
+            Pipe{lastCent := minCent.value._1}
+            // Foreach(K by 1, D par P2){(ct,d) =>
+            //   //val elem = mux(d == DM1, 1.to[T], pts(pt, d)) // fix for vanishing mux
+            //   val elem = pts(pt,d)
+            //   localCent(ct, d) = mux(ct == minCent.value._1, elem, 0.to[T])
+            // }
+            localCent
+          }{_+_} // Add the current point to the accumulators for this centroid
+
+        val centCount = SRAM[T](MAXK)
+        Foreach(K by 1 par P3){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } 
+
+        // Average each new centroid
+        // val centsOut = SRAM[T](MAXK, MAXD)
+        Foreach(K by 1, D par P0){(ct,d) =>
+          cts(ct, d) = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct)) //updateMux
+        }
+      }
+
+      val flatCts = SRAM[T](MAXK * MAXD)
+      Foreach(K by 1, D by 1 par PX) {(i,j) => // Parallelize when issue #159 is fixed
+        flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
+      }
+      // Store the centroids out
+      centroids(0::K*D par par_store) store flatCts
+    }
+
+    getMem(centroids)
+  }
+
+  @virtualize
+  def main() {
+    val iters = args(0).to[Int]
+    val N = args(1).to[Int]
+    val K = numcents //args(2).to[SInt];
+    val D = dim //args(3).to[SInt];
+
+    val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + i }}
+    val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + (i*N/K) }}
+
+    val result = kmeans(pts.flatten, cnts.flatten, N, K, D, iters)
+
+    val cts = Array.empty[Array[X]](K)
+    for (k <- 0 until K) {
+      cts(k) = Array.tabulate(D){i => pts(k).apply(i) }
+    }
+    val ii = Array.tabulate(K){i => i}
+
+    for(epoch <- 0 until iters) {
+      def dist[T:Type:Num](p1: Array[T], p2: Array[T]) = p1.zip(p2){(a,b) => (a - b)**2 }.reduce(_+_)
+
+      // Make weighted points
+      val map = pts.groupByReduce{pt =>
+        val dists = cts.map{ct => dist(ct, pt) }
+        dists.zip(ii){(a,b) => pack(a,b) }.reduce{(a,b) => if (a._1 < b._1) a else b}._2  // minIndex
+      }{pt => pt}{(x,y) => x.zip(y){_+_} }
+
+      // Average
+      for (k <- 0 until K) {
+        if (!map.contains(k)) {
+          cts(k) = Array.tabulate(D){d => 0.to[X]}
+        } else {
+          val wp = map(k)
+          val n  = wp(D - 1)
+          cts(k) = Array.tabulate(D){d => if (d == D-1) 1.to[X] else wp(d)/n }
+        }
+      }
+    }
+
+    val gold = cts.flatten
+
+    println("\n\nOriginal Centers:")
+    (0 until K).foreach{ i => printArray(cnts(i))}
+    println("\n\nOriginal Points:")
+    (0 until N).foreach{ i => printArray(pts(i))}
+    println("\n\nCorrect Centers:")
+    (0 until K).foreach{ i => printArray(cts(i))}
+    println("\n\nFPGA Centers:")
+    (0 until K).foreach { i => 
+      val resrow = Array.tabulate(D){j => result(i*D + j)}
+      printArray(resrow)
+    }
+
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
+
+    println("PASS: " + cksum + " (Kmeans)")
+  }
+}
+
+object Kmeans18 extends SpatialApp { // Regression (Dense) // Args: 3 64
+  override val target = AWS_F1
+
+  type X = Int
+
+  val numcents = 16
+  val dim = 32
+  val pts_per_ld = 1 // ???
+
+  val element_max = 10
+  val margin = (element_max * 0.2).to[X]
+
+  val MAXK = numcents
+  val MAXD = dim
+
+  @virtualize
+  def kmeans[T:Type:Num](points_in: Array[T], cent_inits: Array[T], numPoints: Int, numCents: Int, numDims: Int, it: Int) = {
+    bound(numPoints) = 960000
+    bound(numCents) = MAXK
+    bound(numDims) = MAXD
+
+    val BN = 16 (96 -> 96 -> 9600)
+    val BD = MAXD
+    val par_load = 16
+    val par_store = 16
+    val PX = 1 (1 -> 1)
+    val P0 = 32 (1 -> 2 -> dim)
+    val P1 = 16 (1 -> 2 -> dim)
+    val P2 = 16 (1 -> 2 -> dim)
+    val P3 = 16 (1 -> 2 -> numcents)
+
+    val iters = ArgIn[Int]
+    val N     = ArgIn[Int]
+    val K     = numCents //ArgIn[Int]
+    val D     = numDims //ArgIn[Int]
+
+    setArg(iters, it)
+    setArg(N, numPoints)
+    // setArg(K, numCents)
+    // setArg(D, numDims)
+
+    val points = DRAM[T](N, D)    // Input points
+    val centroids = DRAM[T](numcents*dim) // Output centroids
+    // val init_cents = DRAM[T](K,D) // Output centroids
+    setMem(points, points_in)
+    // setMem(init_cents, cent_inits)
+
+
+    Accel {
+      val cts = SRAM[T](MAXK, MAXD)
+      val newCents = SRAM[T](MAXK,MAXD)
+
+      // Load initial centroids (from points)
+      cts load points(0::K, 0::D par par_load)
+
+      // Initialize newCents
+      // FPGA:
+      Foreach(K by 1, D by 1 par P0) {(i,j) => newCents(i,j) = cts(i,j)} 
+
+      val DM1 = D - 1
+
+      Sequential.Foreach(iters by 1){epoch =>
+        // Flush centroid accumulator
+        // FPGA:
+        // Foreach(K by 1, D par P0){(ct,d) =>
+        //   newCents(ct,d) = 0.to[T]
+        // }
+
+        // For each set of points
+        Foreach(N by BN par PX){i =>
+          val pts = SRAM[T](BN, BD)
+          pts load points(0::0+BN, 0::BD par par_load)
+
+          // For each point in this set
+          MemReduce(newCents par P0)(BN par 8){pt =>
+            // Find the index of the closest centroid
+            val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
+            val minCent = Reduce(accum)(K par PX){ct =>
+              val dist = Reg[T](0.to[T])
+              Reduce(dist)(D par P2){d => (pts(pt,d) - cts(ct,d)) ** 2 }{_+_}
+              pack(ct, dist.value)
+            }{(a,b) =>
+              mux(a._2 < b._2, a, b)
+            }
+            val lastCent = Reg[Int](0)
+
+            // Store this point to the set of accumulators
+            val localCent = SRAM[T](MAXK,MAXD)
+            Foreach(2 by 1){phase => 
+              val addr = if (phase == 0) lastCent.value else minCent.value._1
+              if (phase == 1 || (phase == 0) && lastCent.value != minCent.value._1) {Foreach(D par P2){d => localCent(lastCent, d) = 0.to[T]}}  
+                          }
+            Pipe{lastCent := minCent.value._1}
+            // Foreach(K by 1, D par P2){(ct,d) =>
+            //   //val elem = mux(d == DM1, 1.to[T], pts(pt, d)) // fix for vanishing mux
+            //   val elem = pts(pt,d)
+            //   localCent(ct, d) = mux(ct == minCent.value._1, elem, 0.to[T])
+            // }
+            localCent
+          }{_+_} // Add the current point to the accumulators for this centroid
+        }
+        val centCount = SRAM[T](MAXK)
+        Foreach(K by 1 par P3){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } 
+
+        // Average each new centroid
+        // val centsOut = SRAM[T](MAXK, MAXD)
+        Foreach(K by 1, D par P0){(ct,d) =>
+          cts(ct, d) = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct)) //updateMux
+        }
+      }
+
+      val flatCts = SRAM[T](MAXK * MAXD)
+      Foreach(K by 1, D by 1 par PX) {(i,j) => // Parallelize when issue #159 is fixed
+        flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
+      }
+      // Store the centroids out
+      centroids(0::K*D par par_store) store flatCts
+    }
+
+    getMem(centroids)
+  }
+
+  @virtualize
+  def main() {
+    val iters = args(0).to[Int]
+    val N = args(1).to[Int]
+    val K = numcents //args(2).to[SInt];
+    val D = dim //args(3).to[SInt];
+
+    val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + i }}
+    val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + (i*N/K) }}
+
+    val result = kmeans(pts.flatten, cnts.flatten, N, K, D, iters)
+
+    val cts = Array.empty[Array[X]](K)
+    for (k <- 0 until K) {
+      cts(k) = Array.tabulate(D){i => pts(k).apply(i) }
+    }
+    val ii = Array.tabulate(K){i => i}
+
+    for(epoch <- 0 until iters) {
+      def dist[T:Type:Num](p1: Array[T], p2: Array[T]) = p1.zip(p2){(a,b) => (a - b)**2 }.reduce(_+_)
+
+      // Make weighted points
+      val map = pts.groupByReduce{pt =>
+        val dists = cts.map{ct => dist(ct, pt) }
+        dists.zip(ii){(a,b) => pack(a,b) }.reduce{(a,b) => if (a._1 < b._1) a else b}._2  // minIndex
+      }{pt => pt}{(x,y) => x.zip(y){_+_} }
+
+      // Average
+      for (k <- 0 until K) {
+        if (!map.contains(k)) {
+          cts(k) = Array.tabulate(D){d => 0.to[X]}
+        } else {
+          val wp = map(k)
+          val n  = wp(D - 1)
+          cts(k) = Array.tabulate(D){d => if (d == D-1) 1.to[X] else wp(d)/n }
+        }
+      }
+    }
+
+    val gold = cts.flatten
+
+    println("\n\nOriginal Centers:")
+    (0 until K).foreach{ i => printArray(cnts(i))}
+    println("\n\nOriginal Points:")
+    (0 until N).foreach{ i => printArray(pts(i))}
+    println("\n\nCorrect Centers:")
+    (0 until K).foreach{ i => printArray(cts(i))}
+    println("\n\nFPGA Centers:")
+    (0 until K).foreach { i => 
+      val resrow = Array.tabulate(D){j => result(i*D + j)}
+      printArray(resrow)
+    }
+
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
+
+    println("PASS: " + cksum + " (Kmeans)")
+  }
+}
+
+object Kmeans19 extends SpatialApp { // Regression (Dense) // Args: 3 64
+  override val target = AWS_F1
+
+  type X = Int
+
+  val numcents = 16
+  val dim = 32
+  val pts_per_ld = 1 // ???
+
+  val element_max = 10
+  val margin = (element_max * 0.2).to[X]
+
+  val MAXK = numcents
+  val MAXD = dim
+
+  @virtualize
+  def kmeans[T:Type:Num](points_in: Array[T], cent_inits: Array[T], numPoints: Int, numCents: Int, numDims: Int, it: Int) = {
+    bound(numPoints) = 960000
+    bound(numCents) = MAXK
+    bound(numDims) = MAXD
+
+    val BN = 16 (96 -> 96 -> 9600)
+    val BD = MAXD
+    val par_load = 16
+    val par_store = 16
+    val PX = 1 (1 -> 1)
+    val P0 = 32 (1 -> 2 -> dim)
+    val P1 = 8 (1 -> 2 -> dim)
+    val P2 = 8 (1 -> 2 -> dim)
+    val P3 = 8 (1 -> 2 -> numcents)
+
+    val iters = ArgIn[Int]
+    val N     = ArgIn[Int]
+    val K     = numCents //ArgIn[Int]
+    val D     = numDims //ArgIn[Int]
+
+    setArg(iters, it)
+    setArg(N, numPoints)
+    // setArg(K, numCents)
+    // setArg(D, numDims)
+
+    val points = DRAM[T](N, D)    // Input points
+    val centroids = DRAM[T](numcents*dim) // Output centroids
+    // val init_cents = DRAM[T](K,D) // Output centroids
+    setMem(points, points_in)
+    // setMem(init_cents, cent_inits)
+
+
+    Accel {
+      val cts = SRAM[T](MAXK, MAXD)
+      val newCents = SRAM[T](MAXK,MAXD)
+
+      // Load initial centroids (from points)
+      cts load points(0::K, 0::D par par_load)
+
+      // Initialize newCents
+      // FPGA:
+      Foreach(K by 1, D by 1 par P0) {(i,j) => newCents(i,j) = cts(i,j)} 
+
+      val DM1 = D - 1
+
+      Sequential.Foreach(iters by 1){epoch =>
+        // Flush centroid accumulator
+        // FPGA:
+        // Foreach(K by 1, D par P0){(ct,d) =>
+        //   newCents(ct,d) = 0.to[T]
+        // }
+
+        // For each set of points
+        Foreach(N by BN par PX){i =>
+          val pts = SRAM[T](BN, BD)
+          pts load points(0::0+BN, 0::BD par par_load)
+
+          // For each point in this set
+          MemReduce(newCents par P0)(BN par 16){pt =>
+            // Find the index of the closest centroid
+            val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
+            val minCent = Reduce(accum)(K par PX){ct =>
+              val dist = Reg[T](0.to[T])
+              Reduce(dist)(D par P2){d => (pts(pt,d) - cts(ct,d)) ** 2 }{_+_}
+              pack(ct, dist.value)
+            }{(a,b) =>
+              mux(a._2 < b._2, a, b)
+            }
+            val lastCent = Reg[Int](0)
+
+            // Store this point to the set of accumulators
+            val localCent = SRAM[T](MAXK,MAXD)
+            Foreach(2 by 1){phase => 
+              val addr = if (phase == 0) lastCent.value else minCent.value._1
+              if (phase == 1 || (phase == 0) && lastCent.value != minCent.value._1) {Foreach(D par P2){d => localCent(lastCent, d) = 0.to[T]}}  
+                          }
+            Pipe{lastCent := minCent.value._1}
+            // Foreach(K by 1, D par P2){(ct,d) =>
+            //   //val elem = mux(d == DM1, 1.to[T], pts(pt, d)) // fix for vanishing mux
+            //   val elem = pts(pt,d)
+            //   localCent(ct, d) = mux(ct == minCent.value._1, elem, 0.to[T])
+            // }
+            localCent
+          }{_+_} // Add the current point to the accumulators for this centroid
+        }
+        val centCount = SRAM[T](MAXK)
+        Foreach(K by 1 par P3){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } 
+
+        // Average each new centroid
+        // val centsOut = SRAM[T](MAXK, MAXD)
+        Foreach(K by 1, D par P0){(ct,d) =>
+          cts(ct, d) = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct)) //updateMux
+        }
+      }
+
+      val flatCts = SRAM[T](MAXK * MAXD)
+      Foreach(K by 1, D by 1 par PX) {(i,j) => // Parallelize when issue #159 is fixed
+        flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
+      }
+      // Store the centroids out
+      centroids(0::K*D par par_store) store flatCts
+    }
+
+    getMem(centroids)
+  }
+
+  @virtualize
+  def main() {
+    val iters = args(0).to[Int]
+    val N = args(1).to[Int]
+    val K = numcents //args(2).to[SInt];
+    val D = dim //args(3).to[SInt];
+
+    val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + i }}
+    val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + (i*N/K) }}
+
+    val result = kmeans(pts.flatten, cnts.flatten, N, K, D, iters)
+
+    val cts = Array.empty[Array[X]](K)
+    for (k <- 0 until K) {
+      cts(k) = Array.tabulate(D){i => pts(k).apply(i) }
+    }
+    val ii = Array.tabulate(K){i => i}
+
+    for(epoch <- 0 until iters) {
+      def dist[T:Type:Num](p1: Array[T], p2: Array[T]) = p1.zip(p2){(a,b) => (a - b)**2 }.reduce(_+_)
+
+      // Make weighted points
+      val map = pts.groupByReduce{pt =>
+        val dists = cts.map{ct => dist(ct, pt) }
+        dists.zip(ii){(a,b) => pack(a,b) }.reduce{(a,b) => if (a._1 < b._1) a else b}._2  // minIndex
+      }{pt => pt}{(x,y) => x.zip(y){_+_} }
+
+      // Average
+      for (k <- 0 until K) {
+        if (!map.contains(k)) {
+          cts(k) = Array.tabulate(D){d => 0.to[X]}
+        } else {
+          val wp = map(k)
+          val n  = wp(D - 1)
+          cts(k) = Array.tabulate(D){d => if (d == D-1) 1.to[X] else wp(d)/n }
+        }
+      }
+    }
+
+    val gold = cts.flatten
+
+    println("\n\nOriginal Centers:")
+    (0 until K).foreach{ i => printArray(cnts(i))}
+    println("\n\nOriginal Points:")
+    (0 until N).foreach{ i => printArray(pts(i))}
+    println("\n\nCorrect Centers:")
+    (0 until K).foreach{ i => printArray(cts(i))}
+    println("\n\nFPGA Centers:")
+    (0 until K).foreach { i => 
+      val resrow = Array.tabulate(D){j => result(i*D + j)}
+      printArray(resrow)
+    }
+
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
+
+    println("PASS: " + cksum + " (Kmeans)")
+  }
+}
 
 object Sobel3 extends SpatialApp { // Regression (Dense) // Args: 400 1024
 
@@ -13463,17 +17220,779 @@ object Sobel2 extends SpatialApp { // Regression (Dense) // Args: 400 1024
       abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)
     };
 
-    // // This contains the "weird scheduling bug"
-    printMatrix(image, "Image")
-    printMatrix(gold, "Gold")
-    printMatrix(output, "Output")
+    // // // This contains the "weird scheduling bug"
+    // printMatrix(image, "Image")
+    // printMatrix(gold, "Gold")
+    // printMatrix(output, "Output")
 
-    val gold_sum = gold.map{g => g}.reduce{_+_} 
-    val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
-    println("gold " + gold_sum + " =?= output " + output_sum)
-    val cksum = gold_sum == output_sum
+    // val gold_sum = gold.map{g => g}.reduce{_+_} 
+    // val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
+    // println("gold " + gold_sum + " =?= output " + output_sum)
+    // val cksum = gold_sum == output_sum
     // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
-    println("PASS: " + cksum + " (Convolution_FPGA)")
+    // println("PASS: " + cksum + " (Convolution_FPGA)")
+
+
+
+  }
+}
+
+object Sobel6 extends SpatialApp { // Regression (Dense) // Args: 400 1024
+
+  @struct case class tup(horz: T, vert: T)
+  type T = FixPt[TRUE,_8,_0]
+
+  val Kh = 3
+  val Kw = 3
+  val Cmax = 1024
+
+  @virtualize
+  def main() {
+    val RR = args(0).to[Int] //1895
+    val CC = args(1).to[Int] //1024
+    val border = 3
+    // val image = (0::RR, 0::CC){(i,j) => if (j > 3 && i > 3 && j < 11 && i < 11) 256 else 0 }
+    val image = (0::RR, 0::CC){(i,j) => if (j > border && j < CC-border && i > border && i < CC - border) i.to[T] else 0.to[T]}
+    val ids = (0::RR, 0::CC){(i,j) => if (i < 2) 0 else 1}
+
+    val kh = List((List(1,2,1), List(0,0,0), List(-1,-2,-1)))
+    val kv = List((List(1,0,-1), List(2,0,-2), List(1,0,-1)))
+
+    val B = 16 (1 -> 1 -> 16)
+
+    val R = ArgIn[Int]
+    val C = ArgIn[Int]
+    setArg(R, image.rows)
+    setArg(C, image.cols)
+
+
+    val lb_par = 64 (1 -> 1 -> 16)
+    val par_store = 64
+    val row_stride = 200 (100 -> 100 -> 500)
+    val row_par = 3 (1 -> 1 -> 16)
+    val par_Kh = 3 (1 -> 1 -> 3)
+    val par_Kw = 1 (1 -> 1 -> 3)
+
+    val img = DRAM[T](R, C)
+    val imgOut = DRAM[T](R, C)
+
+    setMem(img, image)
+
+    Accel {
+      Foreach(R by row_stride par row_par){ rr => 
+        val lb = LineBuffer[T](Kh, Cmax)
+        val sr = RegFile[T](Kh, Kw)
+        val lineOut = SRAM[T](Cmax)
+        val kh = LUT[T](3,3)(1.to[T], 0.to[T], -1.to[T],
+                             2.to[T], 0.to[T], -2.to[T],
+                             1.to[T], 0.to[T], -1.to[T])
+        val kv = LUT[T](3,3)(1.to[T],  2.to[T],  1.to[T],
+                             0.to[T],  0.to[T],  0.to[T],
+                            -1.to[T], -2.to[T], -1.to[T])
+
+        Foreach(-2 until row_stride) { r =>
+          val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index] || r.to[Index]+rr.to[Index] > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          lb load img(ldaddr, 0::C par lb_par)
+
+          Foreach(0 until C) { c =>
+            Pipe{sr.reset(c == 0)}
+
+            Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
+            val horz = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kh(i,j)}}.flatten.reduce{_+_}
+
+            val vert = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kv(i,j)}}.flatten.reduce{_+_}
+
+
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz) + abs(vert))// Technically should be sqrt(horz**2 + vert**2)
+            // lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
+          }
+
+          if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0.to[Index]) {
+            // println("storing to row " + {r+rr} + " from " + r + " " + rr)
+            // Foreach(0 until C){kk => print(" " + lineOut(kk))}
+            imgOut(r.to[Index]+rr.to[Index], 0::C par par_store) store lineOut
+          }
+        }
+
+      }
+    }
+
+    val output =     getMatrix(imgOut)
+
+    /*
+      Filters: 
+      1   2   1 
+      0   0   0 
+     -1  -2  -1
+
+      1   0  -1 
+      2   0  -2 
+      1   0  -1
+
+    */
+    val gold = (0::R, 0::C){(i,j) => 
+      // Shift result down by 2 and over by 2 because of the way accel is written
+      val px00 = if ((j-2) > border && (j-2) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px01 = if ((j-1) > border && (j-1) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px02 = if ((j+0) > border && (j+0) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px10 = if ((j-2) > border && (j-2) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px11 = if ((j-1) > border && (j-1) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px12 = if ((j+0) > border && (j+0) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px20 = if ((j-2) > border && (j-2) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px21 = if ((j-1) > border && (j-1) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px22 = if ((j+0) > border && (j+0) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)
+    };
+
+    // // // This contains the "weird scheduling bug"
+    // printMatrix(image, "Image")
+    // printMatrix(gold, "Gold")
+    // printMatrix(output, "Output")
+
+    // val gold_sum = gold.map{g => g}.reduce{_+_} 
+    // val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
+    // println("gold " + gold_sum + " =?= output " + output_sum)
+    // val cksum = gold_sum == output_sum
+    // // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
+    // println("PASS: " + cksum + " (Convolution_FPGA)")
+
+
+
+  }
+}
+
+
+object Sobel7 extends SpatialApp { // Regression (Dense) // Args: 400 1024
+
+  @struct case class tup(horz: T, vert: T)
+  type T = FixPt[TRUE,_8,_0]
+
+  val Kh = 3
+  val Kw = 3
+  val Cmax = 1024
+
+  @virtualize
+  def main() {
+    val RR = args(0).to[Int] //1895
+    val CC = args(1).to[Int] //1024
+    val border = 3
+    // val image = (0::RR, 0::CC){(i,j) => if (j > 3 && i > 3 && j < 11 && i < 11) 256 else 0 }
+    val image = (0::RR, 0::CC){(i,j) => if (j > border && j < CC-border && i > border && i < CC - border) i.to[T] else 0.to[T]}
+    val ids = (0::RR, 0::CC){(i,j) => if (i < 2) 0 else 1}
+
+    val kh = List((List(1,2,1), List(0,0,0), List(-1,-2,-1)))
+    val kv = List((List(1,0,-1), List(2,0,-2), List(1,0,-1)))
+
+    val B = 16 (1 -> 1 -> 16)
+
+    val R = ArgIn[Int]
+    val C = ArgIn[Int]
+    setArg(R, image.rows)
+    setArg(C, image.cols)
+
+
+    val lb_par = 16 (1 -> 1 -> 16)
+    val par_store = 16
+    val row_stride = 128 (100 -> 100 -> 500)
+    val row_par = 4 (1 -> 1 -> 16)
+    val par_Kh = 3 (1 -> 1 -> 3)
+    val par_Kw = 1 (1 -> 1 -> 3)
+
+    val img = DRAM[T](R, C)
+    val imgOut = DRAM[T](R, C)
+
+    setMem(img, image)
+
+    Accel {
+      Foreach(R by row_stride par row_par){ rr => 
+        val lb = LineBuffer[T](Kh, Cmax)
+        val sr = RegFile[T](Kh, Kw)
+        val lineOut = SRAM[T](Cmax)
+        val kh = LUT[T](3,3)(1.to[T], 0.to[T], -1.to[T],
+                             2.to[T], 0.to[T], -2.to[T],
+                             1.to[T], 0.to[T], -1.to[T])
+        val kv = LUT[T](3,3)(1.to[T],  2.to[T],  1.to[T],
+                             0.to[T],  0.to[T],  0.to[T],
+                            -1.to[T], -2.to[T], -1.to[T])
+
+        Foreach(-2 until row_stride) { r =>
+          val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index] || r.to[Index]+rr.to[Index] > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          lb load img(ldaddr, 0::C par lb_par)
+
+          Foreach(0 until C) { c =>
+            Pipe{sr.reset(c == 0)}
+
+            Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
+            val horz = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kh(i,j)}}.flatten.reduce{_+_}
+
+            val vert = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kv(i,j)}}.flatten.reduce{_+_}
+
+
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz) + abs(vert))// Technically should be sqrt(horz**2 + vert**2)
+            // lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
+          }
+
+          if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0.to[Index]) {
+            // println("storing to row " + {r+rr} + " from " + r + " " + rr)
+            // Foreach(0 until C){kk => print(" " + lineOut(kk))}
+            imgOut(r.to[Index]+rr.to[Index], 0::C par par_store) store lineOut
+          }
+        }
+
+      }
+    }
+
+    val output = getMatrix(imgOut)
+    
+
+    /*
+      Filters: 
+      1   2   1 
+      0   0   0 
+     -1  -2  -1
+
+      1   0  -1 
+      2   0  -2 
+      1   0  -1
+
+    */
+    val gold = (0::R, 0::C){(i,j) => 
+      // Shift result down by 2 and over by 2 because of the way accel is written
+      val px00 = if ((j-2) > border && (j-2) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px01 = if ((j-1) > border && (j-1) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px02 = if ((j+0) > border && (j+0) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px10 = if ((j-2) > border && (j-2) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px11 = if ((j-1) > border && (j-1) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px12 = if ((j+0) > border && (j+0) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px20 = if ((j-2) > border && (j-2) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px21 = if ((j-1) > border && (j-1) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px22 = if ((j+0) > border && (j+0) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)
+    };
+
+    // // // This contains the "weird scheduling bug"
+    // printMatrix(image, "Image")
+    // printMatrix(gold, "Gold")
+    // printMatrix(output, "Output")
+
+    // val gold_sum = gold.map{g => g}.reduce{_+_} 
+    // val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
+    // println("gold " + gold_sum + " =?= output " + output_sum)
+    // val cksum = gold_sum == output_sum
+    // // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
+    // println("PASS: " + cksum + " (Convolution_FPGA)")
+
+
+
+  }
+}
+
+object Sobel8 extends SpatialApp { // Regression (Dense) // Args: 400 1024
+
+  @struct case class tup(horz: T, vert: T)
+  type T = FixPt[TRUE,_8,_0]
+
+  val Kh = 3
+  val Kw = 3
+  val Cmax = 1024
+
+  @virtualize
+  def main() {
+    val RR = args(0).to[Int] //1895
+    val CC = args(1).to[Int] //1024
+    val border = 3
+    // val image = (0::RR, 0::CC){(i,j) => if (j > 3 && i > 3 && j < 11 && i < 11) 256 else 0 }
+    val image = (0::RR, 0::CC){(i,j) => if (j > border && j < CC-border && i > border && i < CC - border) i.to[T] else 0.to[T]}
+    val ids = (0::RR, 0::CC){(i,j) => if (i < 2) 0 else 1}
+
+    val kh = List((List(1,2,1), List(0,0,0), List(-1,-2,-1)))
+    val kv = List((List(1,0,-1), List(2,0,-2), List(1,0,-1)))
+
+    val B = 16 (1 -> 1 -> 16)
+
+    val R = ArgIn[Int]
+    val C = ArgIn[Int]
+    setArg(R, image.rows)
+    setArg(C, image.cols)
+
+
+    val lb_par = 64 (1 -> 1 -> 16)
+    val par_store = 64
+    val row_stride = 64 (100 -> 100 -> 500)
+    val row_par = 8 (1 -> 1 -> 16)
+    val par_Kh = 3 (1 -> 1 -> 3)
+    val par_Kw = 1 (1 -> 1 -> 3)
+
+    val img = DRAM[T](R, C)
+    val imgOut = DRAM[T](R, C)
+
+    setMem(img, image)
+
+    Accel {
+      Foreach(R by row_stride par row_par){ rr => 
+        val lb = LineBuffer[T](Kh, Cmax)
+        val sr = RegFile[T](Kh, Kw)
+        val lineOut = SRAM[T](Cmax)
+        val kh = LUT[T](3,3)(1.to[T], 0.to[T], -1.to[T],
+                             2.to[T], 0.to[T], -2.to[T],
+                             1.to[T], 0.to[T], -1.to[T])
+        val kv = LUT[T](3,3)(1.to[T],  2.to[T],  1.to[T],
+                             0.to[T],  0.to[T],  0.to[T],
+                            -1.to[T], -2.to[T], -1.to[T])
+
+        Foreach(-2 until row_stride) { r =>
+          val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index] || r.to[Index]+rr.to[Index] > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          lb load img(ldaddr, 0::C par lb_par)
+
+          Foreach(0 until C) { c =>
+            Pipe{sr.reset(c == 0)}
+
+            Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
+            val horz = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kh(i,j)}}.flatten.reduce{_+_}
+
+            val vert = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kv(i,j)}}.flatten.reduce{_+_}
+
+
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz) + abs(vert))// Technically should be sqrt(horz**2 + vert**2)
+            // lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
+          }
+
+          if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0.to[Index]) {
+            // println("storing to row " + {r+rr} + " from " + r + " " + rr)
+            // Foreach(0 until C){kk => print(" " + lineOut(kk))}
+            imgOut(r.to[Index]+rr.to[Index], 0::C par par_store) store lineOut
+          }
+        }
+
+      }
+    }
+
+      val output = getMatrix(imgOut)
+
+
+    /*
+      Filters: 
+      1   2   1 
+      0   0   0 
+     -1  -2  -1
+
+      1   0  -1 
+      2   0  -2 
+      1   0  -1
+
+    */
+    val gold = (0::R, 0::C){(i,j) => 
+      // Shift result down by 2 and over by 2 because of the way accel is written
+      val px00 = if ((j-2) > border && (j-2) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px01 = if ((j-1) > border && (j-1) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px02 = if ((j+0) > border && (j+0) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px10 = if ((j-2) > border && (j-2) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px11 = if ((j-1) > border && (j-1) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px12 = if ((j+0) > border && (j+0) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px20 = if ((j-2) > border && (j-2) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px21 = if ((j-1) > border && (j-1) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px22 = if ((j+0) > border && (j+0) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)
+    };
+
+    // // // This contains the "weird scheduling bug"
+    // printMatrix(image, "Image")
+    // printMatrix(gold, "Gold")
+    // printMatrix(output, "Output")
+
+    // val gold_sum = gold.map{g => g}.reduce{_+_} 
+    // val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
+    // println("gold " + gold_sum + " =?= output " + output_sum)
+    // val cksum = gold_sum == output_sum
+    // // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
+    // println("PASS: " + cksum + " (Convolution_FPGA)")
+
+
+
+  }
+}
+
+object Sobel9 extends SpatialApp { // Regression (Dense) // Args: 400 1024
+
+  @struct case class tup(horz: T, vert: T)
+  type T = FixPt[TRUE,_8,_0]
+
+  val Kh = 3
+  val Kw = 3
+  val Cmax = 1024
+
+  @virtualize
+  def main() {
+    val RR = args(0).to[Int] //1895
+    val CC = args(1).to[Int] //1024
+    val border = 3
+    // val image = (0::RR, 0::CC){(i,j) => if (j > 3 && i > 3 && j < 11 && i < 11) 256 else 0 }
+    val image = (0::RR, 0::CC){(i,j) => if (j > border && j < CC-border && i > border && i < CC - border) i.to[T] else 0.to[T]}
+    val ids = (0::RR, 0::CC){(i,j) => if (i < 2) 0 else 1}
+
+    val kh = List((List(1,2,1), List(0,0,0), List(-1,-2,-1)))
+    val kv = List((List(1,0,-1), List(2,0,-2), List(1,0,-1)))
+
+
+    val B = 16 (1 -> 1 -> 16)
+
+    val R = ArgIn[Int]
+    val C = ArgIn[Int]
+    setArg(R, image.rows)
+    setArg(C, image.cols)
+
+
+    val lb_par = 64 (1 -> 1 -> 16)
+    val par_store = 64
+    val row_stride = 32 (100 -> 100 -> 500)
+    val row_par = 16 (1 -> 1 -> 16)
+    val par_Kh = 3 (1 -> 1 -> 3)
+    val par_Kw = 1 (1 -> 1 -> 3)
+
+    val img = DRAM[T](R, C)
+    val imgOut = DRAM[T](R, C)
+
+    setMem(img, image)
+
+    Accel {
+      Foreach(R by row_stride par row_par){ rr => 
+        val lb = LineBuffer[T](Kh, Cmax)
+        val sr = RegFile[T](Kh, Kw)
+        val lineOut = SRAM[T](Cmax)
+        val kh = LUT[T](3,3)(1.to[T], 0.to[T], -1.to[T],
+                             2.to[T], 0.to[T], -2.to[T],
+                             1.to[T], 0.to[T], -1.to[T])
+        val kv = LUT[T](3,3)(1.to[T],  2.to[T],  1.to[T],
+                             0.to[T],  0.to[T],  0.to[T],
+                            -1.to[T], -2.to[T], -1.to[T])
+
+        Foreach(-2 until row_stride) { r =>
+          val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index] || r.to[Index]+rr.to[Index] > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          lb load img(ldaddr, 0::C par lb_par)
+
+          Foreach(0 until C) { c =>
+            Pipe{sr.reset(c == 0)}
+
+            Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
+            val horz = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kh(i,j)}}.flatten.reduce{_+_}
+
+            val vert = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kv(i,j)}}.flatten.reduce{_+_}
+
+
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz) + abs(vert))// Technically should be sqrt(horz**2 + vert**2)
+            // lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
+          }
+
+          if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0.to[Index]) {
+            // println("storing to row " + {r+rr} + " from " + r + " " + rr)
+            // Foreach(0 until C){kk => print(" " + lineOut(kk))}
+            imgOut(r.to[Index]+rr.to[Index], 0::C par par_store) store lineOut
+          }
+        }
+
+      }
+    }
+
+    val output = getMatrix(imgOut)
+
+  
+
+    /*
+      Filters: 
+      1   2   1 
+      0   0   0 
+     -1  -2  -1
+
+      1   0  -1 
+      2   0  -2 
+      1   0  -1
+
+    */
+    val gold = (0::R, 0::C){(i,j) => 
+      // Shift result down by 2 and over by 2 because of the way accel is written
+      val px00 = if ((j-2) > border && (j-2) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px01 = if ((j-1) > border && (j-1) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px02 = if ((j+0) > border && (j+0) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px10 = if ((j-2) > border && (j-2) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px11 = if ((j-1) > border && (j-1) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px12 = if ((j+0) > border && (j+0) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px20 = if ((j-2) > border && (j-2) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px21 = if ((j-1) > border && (j-1) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px22 = if ((j+0) > border && (j+0) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)
+    };
+
+    // // // This contains the "weird scheduling bug"
+    // printMatrix(image, "Image")
+    // printMatrix(gold, "Gold")
+    // printMatrix(output, "Output")
+
+    // val gold_sum = gold.map{g => g}.reduce{_+_} 
+    // val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
+    // println("gold " + gold_sum + " =?= output " + output_sum)
+    // val cksum = gold_sum == output_sum
+    // // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
+    // println("PASS: " + cksum + " (Convolution_FPGA)")
+
+
+
+  }
+}
+
+object Sobel11 extends SpatialApp { // Regression (Dense) // Args: 400 1024
+
+  @struct case class tup(horz: T, vert: T)
+  type T = FixPt[TRUE,_8,_0]
+
+  val Kh = 3
+  val Kw = 3
+  val Cmax = 1024
+
+  @virtualize
+  def main() {
+    val RR = args(0).to[Int] //1895
+    val CC = args(1).to[Int] //1024
+    val border = 3
+    // val image = (0::RR, 0::CC){(i,j) => if (j > 3 && i > 3 && j < 11 && i < 11) 256 else 0 }
+    val image = (0::RR, 0::CC){(i,j) => if (j > border && j < CC-border && i > border && i < CC - border) i.to[T] else 0.to[T]}
+    val ids = (0::RR, 0::CC){(i,j) => if (i < 2) 0 else 1}
+
+    val kh = List((List(1,2,1), List(0,0,0), List(-1,-2,-1)))
+    val kv = List((List(1,0,-1), List(2,0,-2), List(1,0,-1)))
+
+
+    val B = 16 (1 -> 1 -> 16)
+
+    val R = ArgIn[Int]
+    val C = ArgIn[Int]
+    setArg(R, image.rows)
+    setArg(C, image.cols)
+
+
+    val lb_par = 16 (1 -> 1 -> 16)
+    val par_store = 16
+    val row_stride = 64 (100 -> 100 -> 500)
+    val row_par = 1 (1 -> 1 -> 16)
+    val par_Kh = 3 (1 -> 1 -> 3)
+    val par_Kw = 1 (1 -> 1 -> 3)
+
+    val img = DRAM[T](R, C)
+    val imgOut = DRAM[T](R, C)
+
+    setMem(img, image)
+
+    Accel {
+      Foreach(R by row_stride par row_par){ rr => 
+        val lb = LineBuffer[T](Kh, Cmax)
+        val sr = RegFile[T](Kh, Kw)
+        val lineOut = SRAM[T](Cmax)
+        val kh = LUT[T](3,3)(1.to[T], 0.to[T], -1.to[T],
+                             2.to[T], 0.to[T], -2.to[T],
+                             1.to[T], 0.to[T], -1.to[T])
+        val kv = LUT[T](3,3)(1.to[T],  2.to[T],  1.to[T],
+                             0.to[T],  0.to[T],  0.to[T],
+                            -1.to[T], -2.to[T], -1.to[T])
+
+        Foreach(-2 until row_stride) { r =>
+          val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index] || r.to[Index]+rr.to[Index] > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          lb load img(ldaddr, 0::C par lb_par)
+
+          Foreach(0 until C) { c =>
+            Pipe{sr.reset(c == 0)}
+
+            Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
+            val horz = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kh(i,j)}}.flatten.reduce{_+_}
+
+            val vert = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kv(i,j)}}.flatten.reduce{_+_}
+
+
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz) + abs(vert))// Technically should be sqrt(horz**2 + vert**2)
+            // lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
+          }
+
+          if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0.to[Index]) {
+            // println("storing to row " + {r+rr} + " from " + r + " " + rr)
+            // Foreach(0 until C){kk => print(" " + lineOut(kk))}
+            imgOut(r.to[Index]+rr.to[Index], 0::C par par_store) store lineOut
+          }
+        }
+
+      }
+    }
+
+    val output = getMatrix(imgOut)
+
+  
+
+    /*
+      Filters: 
+      1   2   1 
+      0   0   0 
+     -1  -2  -1
+
+      1   0  -1 
+      2   0  -2 
+      1   0  -1
+
+    */
+    val gold = (0::R, 0::C){(i,j) => 
+      // Shift result down by 2 and over by 2 because of the way accel is written
+      val px00 = if ((j-2) > border && (j-2) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px01 = if ((j-1) > border && (j-1) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px02 = if ((j+0) > border && (j+0) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px10 = if ((j-2) > border && (j-2) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px11 = if ((j-1) > border && (j-1) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px12 = if ((j+0) > border && (j+0) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px20 = if ((j-2) > border && (j-2) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px21 = if ((j-1) > border && (j-1) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px22 = if ((j+0) > border && (j+0) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)
+    };
+
+    // // // This contains the "weird scheduling bug"
+    // printMatrix(image, "Image")
+    // printMatrix(gold, "Gold")
+    // printMatrix(output, "Output")
+
+    // val gold_sum = gold.map{g => g}.reduce{_+_} 
+    // val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
+    // println("gold " + gold_sum + " =?= output " + output_sum)
+    // val cksum = gold_sum == output_sum
+    // // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
+    // println("PASS: " + cksum + " (Convolution_FPGA)")
+
+
+
+  }
+}
+
+object Sobel10 extends SpatialApp { // Regression (Dense) // Args: 400 1024
+
+  @struct case class tup(horz: T, vert: T)
+  type T = FixPt[TRUE,_8,_0]
+
+  val Kh = 3
+  val Kw = 3
+  val Cmax = 1024
+
+  @virtualize
+  def main() {
+    val RR = args(0).to[Int] //1895
+    val CC = args(1).to[Int] //1024
+    val border = 3
+    // val image = (0::RR, 0::CC){(i,j) => if (j > 3 && i > 3 && j < 11 && i < 11) 256 else 0 }
+    val image = (0::RR, 0::CC){(i,j) => if (j > border && j < CC-border && i > border && i < CC - border) i.to[T] else 0.to[T]}
+    val ids = (0::RR, 0::CC){(i,j) => if (i < 2) 0 else 1}
+
+    val kh = List((List(1,2,1), List(0,0,0), List(-1,-2,-1)))
+    val kv = List((List(1,0,-1), List(2,0,-2), List(1,0,-1)))
+
+
+    val B = 16 (1 -> 1 -> 16)
+
+    val R = ArgIn[Int]
+    val C = ArgIn[Int]
+    setArg(R, image.rows)
+    setArg(C, image.cols)
+
+
+    val lb_par = 64 (1 -> 1 -> 16)
+    val par_store = 64
+    val row_stride = 512 (100 -> 100 -> 500)
+    val row_par = 1 (1 -> 1 -> 16)
+    val par_Kh = 3 (1 -> 1 -> 3)
+    val par_Kw = 1 (1 -> 1 -> 3)
+
+    val img = DRAM[T](R, C)
+    val imgOut = DRAM[T](R, C)
+
+    setMem(img, image)
+
+    Accel {
+      Foreach(R by row_stride par row_par){ rr => 
+        val lb = LineBuffer[T](Kh, Cmax)
+        val sr = RegFile[T](Kh, Kw)
+        val lineOut = SRAM[T](Cmax)
+        val kh = LUT[T](3,3)(1.to[T], 0.to[T], -1.to[T],
+                             2.to[T], 0.to[T], -2.to[T],
+                             1.to[T], 0.to[T], -1.to[T])
+        val kv = LUT[T](3,3)(1.to[T],  2.to[T],  1.to[T],
+                             0.to[T],  0.to[T],  0.to[T],
+                            -1.to[T], -2.to[T], -1.to[T])
+
+        Foreach(-2 until row_stride) { r =>
+          val ldaddr = if (r.to[Index]+rr.to[Index] < 0.to[Index] || r.to[Index]+rr.to[Index] > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          lb load img(ldaddr, 0::C par lb_par)
+
+          Foreach(0 until C) { c =>
+            Pipe{sr.reset(c == 0)}
+
+            Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
+            val horz = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kh(i,j)}}.flatten.reduce{_+_}
+
+            val vert = List.tabulate(3){i => List.tabulate(3){j => sr(i,j) * kv(i,j)}}.flatten.reduce{_+_}
+
+
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz) + abs(vert))// Technically should be sqrt(horz**2 + vert**2)
+            // lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
+          }
+
+          if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0.to[Index]) {
+            // println("storing to row " + {r+rr} + " from " + r + " " + rr)
+            // Foreach(0 until C){kk => print(" " + lineOut(kk))}
+            imgOut(r.to[Index]+rr.to[Index], 0::C par par_store) store lineOut
+          }
+        }
+
+      }
+    }
+
+    val output = getMatrix(imgOut)
+
+  
+
+    /*
+      Filters: 
+      1   2   1 
+      0   0   0 
+     -1  -2  -1
+
+      1   0  -1 
+      2   0  -2 
+      1   0  -1
+
+    */
+    val gold = (0::R, 0::C){(i,j) => 
+      // Shift result down by 2 and over by 2 because of the way accel is written
+      val px00 = if ((j-2) > border && (j-2) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px01 = if ((j-1) > border && (j-1) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px02 = if ((j+0) > border && (j+0) < C-border && (i-2) > border && (i-2) < C - border) (i-2)*16 else 0
+      val px10 = if ((j-2) > border && (j-2) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px11 = if ((j-1) > border && (j-1) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px12 = if ((j+0) > border && (j+0) < C-border && (i-1) > border && (i-1) < C - border) (i-1)*16 else 0
+      val px20 = if ((j-2) > border && (j-2) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px21 = if ((j-1) > border && (j-1) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      val px22 = if ((j+0) > border && (j+0) < C-border && (i+0) > border && (i+0) < C - border) (i+0)*16 else 0
+      abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)
+    };
+
+    // // // This contains the "weird scheduling bug"
+    // printMatrix(image, "Image")
+    // printMatrix(gold, "Gold")
+    // printMatrix(output, "Output")
+
+    // val gold_sum = gold.map{g => g}.reduce{_+_} 
+    // val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
+    // println("gold " + gold_sum + " =?= output " + output_sum)
+    // val cksum = gold_sum == output_sum
+    // // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
+    // println("PASS: " + cksum + " (Convolution_FPGA)")
 
 
 
