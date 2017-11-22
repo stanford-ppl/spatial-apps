@@ -365,7 +365,7 @@ object Regression {
     backends ::= Backend(
       name = "Zynq",
       stagingArgs = flags :+ "--synth" :+ "--retime",
-      make = genDir => Process(Seq("make","zynq-hw"), new java.io.File(genDir)),
+      make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "Zynq"), new java.io.File(genDir))
     )
     backends ::= Backend(
