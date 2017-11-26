@@ -3850,7 +3850,7 @@ object SimpleRowStridedConv extends SpatialApp { // Regression (Unit) // Args: n
       val lb = LineBuffer.strided[Int](3, C, 2)
       Foreach(R/2 by 1){row =>
         val line = SRAM[Int](C)
-        lb load img(row*2::row*2+2, 0::C)
+        lb load img(row*2::row*2+2, 0::C par 16)
         Foreach(C by 1){col =>
           val conv = Reduce(0)(3 by 1, 3 by 1){(r,c) => if (row - 1 + r < 0) 0 else lb(r, (col + c)%C)}{_+_} / 9
           line(col) = conv

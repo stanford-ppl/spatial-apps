@@ -63,15 +63,15 @@ object Regression {
     dense ::= (AES, Array(50))
 
     var sparse = List[(SpatialApp, Array[Any])]()
-    // sparse ::= (ScatterGather, Array(160))
-    // sparse ::= (GatherStore, NoArgs)
+    sparse ::= (ScatterGather, Array(160))
+    sparse ::= (GatherStore, NoArgs)
     sparse ::= (PageRank_Bulk, Array(50, 0.125))
     // sparse ::= (SPMV_DumbPack, Array(1536))
-    // sparse ::= (PageRank, Array(50, 0.125))
+    sparse ::= (PageRank, Array(50, 0.125))
     sparse ::= (BFS_Queue, NoArgs)
     sparse ::= (BFS_Bulk, NoArgs)
-    // sparse ::= (SPMV_ELL, NoArgs)
-    // sparse ::= (SPMV_CRS, NoArgs)
+    sparse ::= (SPMV_ELL, NoArgs)
+    sparse ::= (SPMV_CRS, NoArgs)
 
     var unit = List[(SpatialApp, Array[Any])]()
     unit ::= (ArbitraryLambda, Array(8))
@@ -125,12 +125,7 @@ object Regression {
 
     var fixme = List[(SpatialApp, Array[Any])]()
     fixme ::= (KMP, Array("the"))
-    fixme ::= (ScatterGather, Array(160))
-    fixme ::= (PageRank, Array(50, 0.125))
-    fixme ::= (GatherStore, NoArgs)
     fixme ::= (SPMV_DumbPack, Array(1536))
-    fixme ::= (SPMV_ELL, NoArgs)
-    fixme ::= (SPMV_CRS, NoArgs)
     fixme ::= (Backprop, Array(5))
 
 
