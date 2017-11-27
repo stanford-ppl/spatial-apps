@@ -2288,22 +2288,19 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
 
             Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
             
-            val horz = Reduce(Reg[T])(Kh by 1 par par_Kh){i =>
-              Reduce(Reg[T])(Kw by 1 par par_Kw){j => 
-              // val number = mux((r < 2) || (c < 2) , 0.to[T], sr(i,j))
-              // number * kh(i,j) 
-                sr(i,j) * kh(i,j)
-              }{_+_}
-            }{_+_}
-            val vert = Reduce(Reg[T])(Kh by 1 par par_Kh){i => 
-              Reduce(Reg[T])(Kw by 1 par par_Kw){j => 
-              // val number = mux((r < 2) || (c < 2) , 0.to[T], sr(i,j))
-              // number * kv(i,j) 
-                sr(i,j) * kv(i,j)
-              }{_+_}
-            }{_+_}
+            // val accum = Reg[Tup2[T,T]](pack(0.to[T], 0.to[T]))
 
-            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index] || r.to[Index] + rr.to[Index] >= R-2, 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            // Reduce(accum)(Kh by 1, Kh by 1 par 3) {(i,j) => 
+            //   val pxl = sr(i,j)
+            //   pack(pxl * kh(i,j), pxl * kv(i,j))
+            // }{(a,b) => pack(a._1 + b._1, a._2 + b._2)}
+
+            val accum = List.tabulate(Kh){i => List.tabulate(Kh){j => 
+              val pxl = sr(i,j)
+              pack(pxl * kh(i,j), pxl * kv(i,j))
+            }}.flatten.reduce{(a,b) => pack(a._1 + b._1, a._2 + b._2)}
+
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index] || r.to[Index] + rr.to[Index] >= R-2, 0.to[T], abs(accum._1) + abs(accum._2))// Technically should be sqrt(horz**2 + vert**2)
             // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
           }
 

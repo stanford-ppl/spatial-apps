@@ -1217,6 +1217,30 @@ object ParFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
 }
 
 
+object EfficiencyTest extends SpatialApp {
+  def main() {
+
+    val N = ArgIn[Int]
+    setArg(N, args(0).to[Int])
+    val out = ArgOut[Int]
+    Accel {
+      val reg = Reg[Int]
+      Foreach(N by 1){i => 
+        Foreach(3 by 1){j => reg := j}
+        Foreach(3 by 1){j => reg := j}
+        Foreach(3 by 1){j => reg := j}
+        Foreach(3 by 1){j => out := j}
+      }
+
+      Sequential.Foreach(N by 1){i => 
+        Foreach(3 by 1){j => out := j}
+        Foreach(3 by 1){j => out := j}
+        Foreach(3 by 1){j => out := j}
+        Foreach(3 by 1){j => out := j}
+      }
+    }
+  }
+}
 
 object FifoLoadStore extends SpatialApp { // Regression (Unit) // Args: none
 
