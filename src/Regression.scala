@@ -369,6 +369,12 @@ object Regression {
       make = genDir => Process(Seq("make","aws-F1-afi"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "AWS"), new java.io.File(genDir))
     )
+    backends ::= Backend(
+      name = "Stats",
+      stagingArgs = flags :+ "--synth" :+ "--retime",
+      make = genDir => Process(Seq("make","null"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "stats.sh"), new java.io.File(genDir))
+    )
 
     var testBackends = backends.filter{b => args.contains(b.name) }
     if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
