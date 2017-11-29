@@ -738,7 +738,6 @@ object JPEG_Decompress extends SpatialApp { // Regression (Dense) // Args: none
         Pipe{p_dhtbl_ml_mem(idx) = p_dhtbl_ml.value.as[UInt16]}
       }
 
-
       // START DESIGN
 
       // Init structures

@@ -3,8 +3,7 @@ import spatial.targets._
 import org.virtualized._
 
 object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
-  override val target = AWS_F1
-
+  override val target = targets.Default
   type X = Int
 
   val numcents = 16
@@ -37,6 +36,8 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
     val N     = ArgIn[Int]
     val K     = numCents //ArgIn[Int]
     val D     = numDims //ArgIn[Int]
+
+    bound(iters) = 9
 
     setArg(iters, it)
     setArg(N, numPoints)
@@ -297,7 +298,7 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
 
 
 object BlackScholes extends SpatialApp {
-
+  override val target = targets.Default
 
   val margin = 0.5f // Validates true if within +/- margin
   val innerPar = 16
@@ -710,7 +711,8 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
     val ip = innerPar(1 -> 12)
     val subLoopPar = innerPar(1 -> 16)
     val prodLoopPar = innerPar(1 -> 96)
-    val outerAccumPar = innerPar(1 -> 1)
+    val outerAccumPar = innerPar(1 -> 16)
+    val innerAccumPar = innerPar(1 -> 16)
 
     val rows = yCPU.length;
     bound(rows) = 360000
@@ -743,7 +745,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
       val sigmaOut = SRAM[T](MAXC, MAXC)
 
-      MemReduce(sigmaOut)(R by rTileSize par op){ r =>
+      MemReduce(sigmaOut par outerAccumPar)(R by rTileSize par op){ r =>
         val gdaYtile = SRAM[Int](rTileSize)
         val gdaXtile = SRAM[T](rTileSize, MAXC)
         val blk = Reg[Int]
@@ -757,7 +759,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
         val sigmaBlk = SRAM[T](MAXC, MAXC)
 
-        MemReduce(sigmaBlk)(blk par param(1)) { rr =>
+        MemReduce(sigmaBlk par innerAccumPar)(blk par param(1)) { rr =>
           val subTile = SRAM[T](MAXC)
           val sigmaTile = SRAM[T](MAXC, MAXC)
           Foreach(C par subLoopPar) { cc =>
@@ -1163,7 +1165,7 @@ object LogReg extends SpatialApp {
 }
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
-
+  override val target = targets.Default
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
 
@@ -1696,8 +1698,7 @@ WHERE
 */
 
 object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
-
-
+  override val target = targets.Default
   type FT = Int
 
   val MIN_DATE = 0
@@ -1715,6 +1716,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   def tpchq6[T:Type:Num](datesIn: Array[Int], quantsIn: Array[Int], disctsIn: Array[T], pricesIn: Array[T]): T = {
     val dataSize = ArgIn[Int]
     setArg(dataSize, datesIn.length)
+    bound(dataSize) = 96000000
 
     val dates  = DRAM[Int](dataSize)
     val quants = DRAM[Int](dataSize)
@@ -2012,9 +2014,7 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
 }
 
 object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
-  override val target = AWS_F1
-
-
+  override val target = targets.Default
  /*
   
   Smith-Waterman Genetic Alignment algorithm                                                  
@@ -2066,9 +2066,9 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     setArg(dash,d)
     val underscore = argon.lang.String.char2num("_")
 
-    val par_load = 16
-    val par_store = 16
-    val row_par = 2 (1 -> 1 -> 8)
+    val par_load = 16 (1 -> 1 -> 64)
+    val par_store = 16 (1 -> 1 -> 64)
+    val row_par = 2 (1 -> 1 -> 256)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -2081,6 +2081,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     val seqa_string = args(0).to[MString] //"tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc"
     val seqb_string = args(1).to[MString] //"ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"
     val measured_length = seqa_string.length
+    bound(measured_length) = 160
     val length = ArgIn[Int]
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
@@ -2237,8 +2238,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 }
 
 object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
-
-
+  override val target = targets.Default
   val Kh = 3
   val Kw = 3
   val Cmax = 160
@@ -2251,11 +2251,12 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
     val C = ArgIn[Int]
     setArg(R, image.rows)
     setArg(C, image.cols)
-
+    bound(R) = 256
+    bound(C) = 160
 
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
-    val row_stride = 10 (100 -> 100 -> 500)
+    val row_stride = 10 (3 -> 3 -> 500)
     val row_par = 2 (1 -> 1 -> 16)
     val par_Kh = 3 (1 -> 1 -> 3)
     val par_Kw = 3 (1 -> 1 -> 3)

@@ -128,9 +128,8 @@ object SRAMChar extends SpatialApp {
 
 
 object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -283.70
-  // import IR._
+  type T = Float //FixPt[TRUE,_16,_16]
 
-  type T = Float//FixPt[TRUE,_16,_16]
   @virtualize
   def main() {
 
@@ -408,6 +407,7 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
       Pipe { y2 := 999 }
       Pipe { y1 := x1.value + 6 }
       Pipe { y2 := x2.value + 8 }
+
       val reg = Reg[Int](0) // Nbuffered reg with multi writes, note that it does not do what you think!
       Sequential.Foreach(3 by 1) {i => 
         Pipe{reg :+= 1}
@@ -1344,8 +1344,6 @@ object StackLoadStore extends SpatialApp { // Regression (Unit) // Args: none
 
 
 object SimpleReduce extends SpatialApp { // Regression (Unit) // Args: 7
-
-
   val N = 16.to[Int]
 
   def simpleReduce[T:Type:Num](xin: T) = {
