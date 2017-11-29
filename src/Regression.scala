@@ -121,6 +121,7 @@ object Regression {
     unit ::= (InOutArg, Array(32))
     unit ::= (Tensor5D, Array(32, 4, 4, 4, 4))
     unit ::= (Tensor4D, Array(32, 4, 4, 4))
+    unit ::= (IndirectLoad, NoArgs)
     unit ::= (SequentialWrites, Array(7))
 
     var fixme = List[(SpatialApp, Array[Any])]()

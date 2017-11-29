@@ -2047,8 +2047,8 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
           val start_id = rowid_sram(i)
           val stop_id = rowid_sram(i+1)
           Parallel{
-            cols_sram load cols_dram(start_id :: stop_id par par_segment_load)
-            values_sram load values_dram(start_id :: stop_id par par_segment_load)
+            Pipe{cols_sram load cols_dram(start_id :: stop_id par par_segment_load)} // Remove when bug #244 is resolved
+            Pipe{values_sram load values_dram(start_id :: stop_id par par_segment_load)} // Remove when bug #244 is resolved
           }
           vec_sram gather vec_dram(cols_sram, stop_id - start_id)
           println("row " + {i + tile})

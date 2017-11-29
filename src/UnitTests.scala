@@ -1510,6 +1510,38 @@ object Memcpy2D extends SpatialApp { // Regression (Unit) // Args: none
   }
 }
 
+object IndirectLoad extends SpatialApp { // This hangs with retime on in SPMV_CRS
+  @virtualize
+  def main() {
+    val ids = Array.tabulate(16){i => 32*i}
+    val data = Array.tabulate(32*16){i => random[Int](5)}
+    val id_dram = DRAM[Int](16)
+    val data_dram = DRAM[Int](32*16)
+    val result_dram = DRAM[Int](32)
+    setMem(id_dram, ids)
+    setMem(data_dram, data)
+    Accel{
+      val id_sram = SRAM[Int](16)
+      val data_sram = SRAM[Int](32)
+      id_sram load id_dram
+      Foreach(8 by 1) {i => 
+        val start = id_sram(i)
+        val end = id_sram(i+1)
+        Parallel{
+          Pipe{data_sram load data_dram(start::end)} // Remove pipe when bug #244 is fixed, required for now for retime to pass
+        }
+        result_dram store data_sram 
+      }
+    }
+    val result = getMem(result_dram)
+    val gold = Array.tabulate(32){i => data(ids(7) + i)}
+    printArray(result, "result")
+    printArray(gold, "gold")
+    val cksum = gold.zip(result){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (IndirectLoad)")
+  }
+}
+
 object UniqueParallelLoad extends SpatialApp { // Regression (Unit) // Args: none
 
 
@@ -1740,6 +1772,87 @@ object BlockReduce2D extends SpatialApp { // Regression (Unit) // Args: 192 384
     println("PASS: " + cksum + " (BlockReduce2D)")
 
     //    (0 until tileSize) foreach { i => assert(dst(i) == gold(i)) }
+  }
+}
+
+object EvilNesting extends SpatialApp {
+
+  def main() {
+
+    val out = ArgOut[Int]
+    Accel{
+      Pipe {
+        Pipe {
+          out := Reduce(Reg[Int])(3 by 1, 3 by 1) { (k,l) => k + l}{_+_}
+        }
+      }
+      Pipe {
+        Pipe {
+          out := Reduce(Reg[Int])(3 by 1, 3 by 1 par 3) { (k,l) => k + l}{_+_}
+        }
+      }
+      Pipe {
+        Pipe {
+          out := Reduce(Reg[Int])(3 by 1 par 3) {k => 
+            Reduce(Reg[Int])(3 by 1 par 3) { l => k + l}{_+_}
+          }{_+_}
+        }
+      }
+      Pipe {
+        Pipe {
+          out := List.tabulate(3){k => List.tabulate(3){l => k + l}}.flatten.reduce{_+_}
+        }
+      }
+
+      Pipe {
+        Foreach(4 by 1 par 4){ j => out := j}
+      }
+    }
+
+  }
+}
+
+object EvilMemory extends SpatialApp {
+
+  def main() {
+    val DATA = DRAM[Int](4,16,128,128)
+
+    Accel{
+      val THICK = SRAM[Int](4,16,3,3)
+      val WIDE = SRAM[Int](2, 128)
+      val TALL = SRAM.buffer[Int](128, 6)
+      val BIGSQUARE = SRAM[Int](64,64)
+      val LILSQUARE = SRAM[Int](16,16)
+      val BIGLINE = SRAM[Int](128)
+      val LILLINE = SRAM[Int](8)
+
+      // One-time loads
+      THICK load DATA(0::4, 0::16, 0::3, 0::3 par 1)
+      WIDE load DATA(0,0,0::2, 0::128 par 1)  
+      LILSQUARE load DATA(0,0,0::16, 0::16 par 1)
+      Parallel{
+        BIGSQUARE load DATA(0,0,0::64,0::64 par 1)
+        LILLINE load DATA(0,0,0,0::8 par 1)
+      }
+
+      Foreach(200 by 1) {i => 
+        Parallel{
+          BIGLINE load DATA(0,0,0,0::128 par 1)
+          LILLINE load DATA(0,0,0,128::136 par 1)
+        }
+        Foreach(10 by 1) {j => 
+          TALL load DATA(0,0,0::128, 0::6 par 1)
+          Foreach(128 by 1) {k => WIDE(0,k) = TALL(k,0) + THICK(0,0,0,0) + BIGLINE(0) + LILLINE(0) + BIGSQUARE(0,0) + LILSQUARE(0,0)}
+          BIGSQUARE load DATA(0,0,0::64,0::64 par 1)
+        }
+        Sequential.Foreach(10 by 1) {j => 
+          DATA(0,0,0,0::128 par 1) store BIGLINE
+          DATA(0,0,0::2,0::128 par 1) store WIDE
+        }
+        DATA(0,0,0::2,0::128 par 1) store WIDE
+      }
+      
+    }
   }
 }
 
