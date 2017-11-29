@@ -561,7 +561,8 @@ def bestSummary():
     best['GEMM_Blocked'] = ('GEMM_Blocked__tileSize_256_i_tileSize_256_loop_jj_1_loop_ii_1_loop_kk_1_loop_i_4_loop_k_3', '')
     best['GDA'] = ('GDA_38400_tileSize_1600_outerPar_6_midPar_1', '38400')
 
-    headers = ['App', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'mcUtil', 'totalFUUtil']
+    headers = ['App', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'mcUtil', 'totalFUUtil', 'cycle',
+            'args']
     with open(BEST_SUMMARY_CSV_PATH, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
         writer.writeheader()
@@ -573,11 +574,13 @@ def bestSummary():
                     pass
                 elif header in ['lavgbw', 'savgbw']:
                     dict[header] = round(summary[app][args][fullname][header] / max_bw * 100, 2)
-                elif header not in ['cycle']:
+                elif header == 'cycle':
+                    dict[header] = summary[app][args][fullname][header]
+                elif header == 'args':
+                    dict[header] = args
+                elif 'Util' not in header:
                     used, total = summary[app][args][fullname][header]
                     dict[header] = futil(used, total) * 100
-                else:
-                    dict[header] = summary[app][args][fullname][header]
             writer.writerow(dict)
 
 def summaryToCsv():
