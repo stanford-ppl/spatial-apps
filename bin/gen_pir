@@ -12,6 +12,6 @@ if [ -e $app_file ]; then rm $app_file; fi
 mkdir -p $SPATIAL_HOME/gen/$app
 mkdir -p $pir_src_dir 
 mkdir -p $pir_dir
-$SPATIAL_HOME/bin/spatial $app --dot --cgra+ --pirsrc $pir_src_dir &>> $log
+$SPATIAL_HOME/bin/spatial $app --dot --cgra+ --pirsrc $pir_src_dir >> $log 2>&1
 
 echo "-------------PASS (DONE)------------" >> $log

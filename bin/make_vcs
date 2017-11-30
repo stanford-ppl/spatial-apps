@@ -4,6 +4,6 @@ app=$1
 log=$2
 
 cd $SPATIAL_HOME/gen/$app/
-make vcs &>> $log
+make vcs >> $log 2>&1
 
 echo "-------------PASS (DONE)------------" >> $log

@@ -11,6 +11,6 @@ if [ -e $chisel_dir ]; then rm -r $chisel_dir; fi
 if [ -e $make_file ]; then rm $make_file; fi
 if [ -e $run_script ]; then rm $run_script; fi
 mkdir -p $SPATIAL_HOME/gen/$app
-$SPATIAL_HOME/bin/spatial $app --retiming --synth &>> $log
+$SPATIAL_HOME/bin/spatial $app --retiming --synth >> $log 2>&1
 
 echo "-------------PASS (DONE)------------" >> $log

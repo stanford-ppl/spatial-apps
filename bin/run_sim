@@ -5,6 +5,7 @@ log=$2
 
 cd $SPATIAL_HOME/gen/$app/
 chmod u+wrx run.sh
-./run.sh $args &>> $log
+export CLOCK_FREQ_MHZ=1000
+./run.sh $args >> $log 2>&1
 
 echo "-------------PASS (DONE)------------" >> $log

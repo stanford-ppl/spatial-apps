@@ -5,6 +5,6 @@ log=$2
 
 cd $PIR_HOME
 mkdir -p $PIR_HOME/out/$app
-$PIR_HOME/bin/pir $app --debug --mapping=false --verbose --simulate=false --arch=SN16x8_LD &>> $log &
+$PIR_HOME/bin/pir $app --debug --mapping=false --verbose --simulate=false --arch=SN16x8_LD >> $log 2>&1
 
 echo "-------------PASS (DONE)------------" >> $log
