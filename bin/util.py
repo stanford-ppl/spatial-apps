@@ -123,7 +123,6 @@ def checkProcess():
         job_list = pickle.load(openfile(JOB_PATH, 'rb'))
     for key in job_list.keys():
         pid = job_list[key]
-        os.kill(pid, 0)
         if not check_pid(pid):
             del job_list[key]
     pickle.dump(job_list, openfile(JOB_PATH, 'wb'))
