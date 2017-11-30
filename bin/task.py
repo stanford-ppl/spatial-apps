@@ -100,10 +100,10 @@ def runJob(app, args, params):
         runPass(fullname, passName)
 
 def launchJob(app, args, params):
-    if opts.parallel:
+    if opts.parallel > 1:
         waitProcess()
     print("Running app={}, args={}, params={} running ...".format(app, args, params))
-    if opts.parallel:
+    if opts.parallel > 1:
         pid = os.fork()
         if pid==0:
             runJob(app, args, params)

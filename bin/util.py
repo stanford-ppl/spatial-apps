@@ -33,7 +33,6 @@ SUMMARY_PATH="{}/apps/summary.pickle".format(SPATIAL_HOME)
 SUMMARY_CSV_PATH="{}/apps/summary.csv".format(SPATIAL_HOME)
 BEST_SUMMARY_CSV_PATH="{}/apps/best.csv".format(SPATIAL_HOME)
 
-proc_thresh = 40
 cycle_cache = {}
 
 dependency = {
@@ -130,7 +129,7 @@ def checkProcess():
 
 def waitProcess():
     job_list = checkProcess()
-    if len(job_list) > proc_thresh:
+    if len(job_list) > opts.parallel:
         print("Number of active process={}. Waiting....".format(len(job_list)))
         time.sleep(10)
         waitProcess()
@@ -192,8 +191,7 @@ def write(log, msg):
         f.write(msg)
 
 parser = argparse.ArgumentParser(description='Run experiments')
-parser.add_argument('--sequential', dest='parallel', action='store_false', default=True) 
-parser.add_argument('--parallel', dest='parallel', action='store_true', default=True) 
+parser.add_argument('--parallel', dest='parallel', nargs='?', default=5, type=int)
 parser.add_argument('--single', dest='single', action='store_true', default=False) 
 parser.add_argument('--run', dest='run', action='store_true', default=False) 
 parser.add_argument('--status', dest='status', action='store_true', default=False) 

@@ -41,7 +41,7 @@ def regression():
         apps.append("SimpleIf")
         apps.append("Backprop")
         apps.append("Gibbs_Ising2D")
-        apps.append("SPMV_CRS")
+        # apps.append("SPMV_CRS")
         # apps.append("Kmeans_plasticine")
         # apps.append("PageRank_plasticine")
         apps.append("GEMM_Blocked")
