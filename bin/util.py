@@ -105,6 +105,15 @@ def openfile(path, flag):
         time.sleep(1)
         return openfile(path, flat)
         
+def check_pid(pid):        
+    """ Check For the existence of a unix pid. """
+    # return os.path.exists("/proc/{}".format(pid))
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    else:
+        return True
 
 def checkProcess():
     if not os.path.exists(JOB_PATH):
@@ -114,7 +123,8 @@ def checkProcess():
         job_list = pickle.load(openfile(JOB_PATH, 'rb'))
     for key in job_list.keys():
         pid = job_list[key]
-        if not os.path.exists("/proc/{}".format(pid)):
+        os.kill(pid, 0)
+        if not check_pid(pid):
             del job_list[key]
     pickle.dump(job_list, openfile(JOB_PATH, 'wb'))
     return job_list
