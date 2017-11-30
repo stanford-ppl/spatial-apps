@@ -203,6 +203,7 @@ parser.add_argument('--regen', dest='regen', action='store', default='false',
     help='force pass to rerun' )
 parser.add_argument('--torun', dest='torun', action='store', default='ALL',
     help='Pass to run')
+parser.add_argument('--regression', dest='regression', action='store_true', default=False) 
 parser.add_argument('--summary', dest='summary', action='store_true', default=False) 
 parser.add_argument('--best', dest='best', action='store_true', default=False) 
 parser.add_argument('--plot', dest='plot', action='store_true', default=False) 

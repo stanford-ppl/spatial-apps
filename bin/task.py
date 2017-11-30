@@ -54,6 +54,8 @@ def getCommand(passName, fullapp):
     log = logs(fullapp, passName)
     if passName=="GEN_PIR":
         command = "{}/apps/bin/gen_pir {} {}".format(SPATIAL_HOME, fullapp, log)
+        if opts.regression:
+            command += ' {}/pir/apps/src'.format(PIR_HOME)
     elif passName=="FIT_PIR":
         command = "{}/apps/bin/fit_pir {} {}".format(SPATIAL_HOME, fullapp, log)
     elif passName=="GEN_CHISEL":
