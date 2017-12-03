@@ -4,11 +4,13 @@ import spatial.stdlib._
 import spatial.targets._
 
 
-object SimplePrimitiveTestReuseAll extends SpatialApp {
+object SimpleLoopTestReuseNone extends SpatialApp {
   
   //@module
-  def primitive_function(arg1: Int, arg2: Int): Int = {
-    arg1 * arg2
+  def loop_function(loop_max: Int): Int = {
+    Reduce(Reg[Int](0))(0 until loop_max by 1){ i =>
+      2*i
+    } {_+_}
   }
   
   
@@ -16,8 +18,7 @@ object SimplePrimitiveTestReuseAll extends SpatialApp {
   def main() {
     // Declare SW-HW interface vals
     val x = ArgIn[Int]
-    val y = ArgIn[Int]
-    val w = ArgOut[Int]
+    val y = ArgOut[Int]
     val z = ArgOut[Int]
 
     val N0 = args(0).to[Int]
@@ -25,7 +26,6 @@ object SimplePrimitiveTestReuseAll extends SpatialApp {
 
     // Connect SW vals to HW vals
     setArg(x, N0)
-    setArg(y, N1)
 
     // Create HW accelerator
     Accel {
@@ -35,24 +35,27 @@ object SimplePrimitiveTestReuseAll extends SpatialApp {
       val out2 = Reg[Int](0)
 
       Foreach(0 until max){ i=>
-        Sequential {
-          Pipe { out1 := primitive_function(x, y) }
-          Pipe { out2 := primitive_function(x, y) }
+        Parallel {
+          Pipe { out1 := loop_function(x) }
+          Pipe { out2 := loop_function(x) }
         }
       }
 
-      w := out1
+      y := out1
       z := out2
 
     }
 
 
     // Extract results from accelerator
-    val result1 = getArg(w)
+    val result1 = getArg(y)
     val result2 = getArg(z)
 
     // Create validation checks and debug code
-    val gold = N0 * N1
+    var gold = 0
+    for (i <- 0 until N0){
+      gold = gold + 2*i
+    }
     println("expected: " + gold)
     println("result1: " + result1)
     println("result2: " + result2)
@@ -62,7 +65,7 @@ object SimplePrimitiveTestReuseAll extends SpatialApp {
     val cksum = cksum1 && cksum2
 
 
-    println("PASS: " + cksum + " (SimplePrimitiveTestReuseAll)")
+    println("PASS: " + cksum + " (SimpleLoopTestReuseNone)")
   }
 }
 
