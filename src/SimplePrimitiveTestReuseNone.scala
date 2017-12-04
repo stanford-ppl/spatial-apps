@@ -4,9 +4,9 @@ import spatial.stdlib._
 import spatial.targets._
 
 
-object SimplePrimitiveTestReuseAll extends SpatialApp {
+object SimplePrimitiveTestReuseNone extends SpatialApp {
   
-  @module
+  //@module
   def primitive_function(arg1: Int, arg2: Int): Int = {
     arg1 * arg2
   }
@@ -35,7 +35,7 @@ object SimplePrimitiveTestReuseAll extends SpatialApp {
       val out2 = Reg[Int](0)
 
       Foreach(0 until max){ i=>
-        Sequential {
+        Parallel {
           Pipe { out1 := primitive_function(x, y) }
           Pipe { out2 := primitive_function(x, y) }
         }
@@ -62,7 +62,7 @@ object SimplePrimitiveTestReuseAll extends SpatialApp {
     val cksum = cksum1 && cksum2
 
 
-    println("PASS: " + cksum + " (SimplePrimitiveTestReuseAll)")
+    println("PASS: " + cksum + " (SimplePrimitiveTestReuseNone)")
   }
 }
 
