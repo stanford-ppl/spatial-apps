@@ -118,6 +118,7 @@ object Regression {
     unit ::= (MemTest2D, Array(7))
     unit ::= (MemTest1D, Array(7))
     unit ::= (Niter, Array(100))
+    unit ::= (StridedLoad, NoArgs)
     unit ::= (InOutArg, Array(32))
     unit ::= (Tensor5D, Array(32, 4, 4, 4, 4))
     unit ::= (Tensor4D, Array(32, 4, 4, 4))
