@@ -980,9 +980,6 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     // val cksumB = seqb_aligned_string == seqb_gold_string //seqb_aligned_result.zip(seqb_gold_bin){_==_}.reduce{_&&_}
     // val cksum = cksumA && cksumB
     println("PASS: " + cksum + " (NW)")
-
-
-
   }
 }
 
