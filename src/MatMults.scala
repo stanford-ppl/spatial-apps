@@ -2,9 +2,10 @@ import spatial.dsl._
 import org.virtualized._
 
 object MatMult_outer extends SpatialApp { // Regression (Dense) // Args: 32 128 128
+  override val target = targets.Default
   type X = FixPt[TRUE,_16,_16]
 
-  val innerPar = 16
+  val innerPar = 4
   val midPar = 2
   val outerPar = 2
 
@@ -17,6 +18,9 @@ object MatMult_outer extends SpatialApp { // Regression (Dense) // Args: 32 128 
     val M = ArgIn[Int]
     val N = ArgIn[Int]
     val P = ArgIn[Int]
+    bound(M) = 1152
+    bound(N) = 1152
+    bound(P) = 1152
     setArg(M,mm)
     setArg(N,nn)
     setArg(P,pp)
@@ -99,8 +103,7 @@ object MatMult_outer extends SpatialApp { // Regression (Dense) // Args: 32 128 
 }
 
 object MatMult_inner extends SpatialApp { // Regression (Dense) // Args: 32 128 128
-
-
+  override val target = targets.Default
   type X = FixPt[TRUE,_16,_16]
 
   val innerPar = 16

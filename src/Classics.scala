@@ -1,16 +1,14 @@
 import spatial.dsl._
+import spatial.targets._
 import org.virtualized._
 
 object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
-
+  override val target = targets.Default
   type X = Int
 
   val numcents = 16
   val dim = 32
   val pts_per_ld = 1 // ???
-
-  val ip = 16
-  val op = 1
 
   val element_max = 10
   val margin = (element_max * 0.2).to[X]
@@ -26,18 +24,20 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
 
     val BN = pts_per_ld (96 -> 96 -> 9600)
     val BD = MAXD
+    val par_load = 16
+    val par_store = 16
     val PX = 1 (1 -> 1)
-    val P0 = ip (32 -> 96 -> 192) // Dimensions loaded in parallel
-    val P1 = op (1 -> 12)         // Sets of points calculated in parallel
-    val P2 = ip (1 -> 4 -> 96)    // Dimensions accumulated in parallel (outer)
-    val P3 = ip (1 -> 4 -> 16)    // Points calculated in parallel
-    val PR = ip (1 -> 4 -> 96)
-    val P4 = ip (1 -> 4 -> 96)
+    val P0 = 4 (1 -> 2 -> dim)
+    val P1 = 4 (1 -> 2 -> dim)
+    val P2 = 4 (1 -> 2 -> dim)
+    val P3 = 16 (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
     val N     = ArgIn[Int]
     val K     = numCents //ArgIn[Int]
     val D     = numDims //ArgIn[Int]
+
+    bound(iters) = 9
 
     setArg(iters, it)
     setArg(N, numPoints)
@@ -56,16 +56,15 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
       val newCents = SRAM[T](MAXK,MAXD)
 
       // Load initial centroids (from points)
-      cts load points(0::K, 0::D par 16)
+      cts load points(0::K, 0::D par par_load)
 
       // Initialize newCents
       // FPGA:
-      Foreach(K by 1, D by 1) {(i,j) => newCents(i,j) = cts(i,j)} 
+      Foreach(K by 1, D by 1 par P0) {(i,j) => newCents(i,j) = cts(i,j)} 
 
       val DM1 = D - 1
 
       Sequential.Foreach(iters by 1){epoch =>
-
         // Flush centroid accumulator
         // FPGA:
         Foreach(K by 1, D par P0){(ct,d) =>
@@ -75,10 +74,10 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
         // For each set of points
         Foreach(N by BN par PX){i =>
           val pts = SRAM[T](BN, BD)
-          pts load points(i::i+BN, 0::BD par 16)
+          pts load points(i::i+BN, 0::BD par par_load)
 
           // For each point in this set
-          MemFold(newCents)(BN par PX){pt =>
+          MemFold(newCents par P0)(BN par PX){pt =>
             // Find the index of the closest centroid
             val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
             val minCent = Reduce(accum)(K par PX){ct =>
@@ -88,21 +87,6 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
             }{(a,b) =>
               mux(a._2 < b._2, a, b)
             }
-            /*// PIR Version
-            val minCent = Reg[Int]
-            val minDist = Reg[T](100000.to[T])
-            Foreach(K par PX){ct =>
-              val dist = Reduce(Reg[T])(D par P2){d =>
-                val cent = mux(epoch == 0, origCts(ct,d), cts(ct,d))
-                (pts(pt,d) - cent) ** 2
-              }{_+_}
-
-              Pipe {
-                val d = dist.value
-                minDist := min(minDist.value, d)
-                minCent := mux(minDist.value == d, ct, minCent.value)
-              }
-            }*/
 
             // Store this point to the set of accumulators
             val localCent = SRAM[T](MAXK,MAXD)
@@ -116,22 +100,21 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
         }
 
         val centCount = SRAM[T](MAXK)
-        Foreach(K by 1 par PX){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } // Until diagonal banking is allowed
+        Foreach(K by 1 par P3){ct => centCount(ct) = max(newCents(ct,DM1), 1.to[T]) } 
 
         // Average each new centroid
         // val centsOut = SRAM[T](MAXK, MAXD)
         Foreach(K by 1, D par P0){(ct,d) =>
-//          val updateMux = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct))
           cts(ct, d) = mux(centCount(ct) == 0.to[T], 0.to[T], newCents(ct,d) / centCount(ct)) //updateMux
         }
       }
 
       val flatCts = SRAM[T](MAXK * MAXD)
-      Foreach(K by 1, D by 1) {(i,j) =>
-        flatCts(i*D+j) = cts(i,j)
+      Foreach(K by 1, D by 1 par PX) {(i,j) => // Parallelize when issue #159 is fixed
+        flatCts(i.to[Index]*D+j.to[Index]) = cts(i,j)
       }
       // Store the centroids out
-      centroids(0::K*D par 16) store flatCts
+      centroids(0::K*D par par_store) store flatCts
     }
 
     getMem(centroids)
@@ -146,13 +129,6 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
 
     val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + i }}
     val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else random[X](element_max) + (i*N/K) }}
-    // val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else if (d == 0) random[X](element_max) + i else 0.to[X]}}
-    // val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else if (d == 0) random[X](element_max) + i else 0.to[X]}}
-    // val pts = Array.tabulate(N){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else 5*i }}
-    // val cnts = Array.tabulate(K){i => Array.tabulate(D){d => if (d == D-1) 1.to[X] else 5*i+1 }}
-
-    // println("points: ")
-    // for (i <- 0 until N) { println(i.mkString + ": " + pts(i).mkString(", ")) }
 
     val result = kmeans(pts.flatten, cnts.flatten, N, K, D, iters)
 
@@ -197,17 +173,10 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
       printArray(resrow)
     }
 
-    // for (i <- 0 until result.length) {
-    //   val diff = result(i) - gold(i)
-    //   if (abs(diff) > margin)
-    //     println("[" + i + "] gold: " + gold(i) + ", result: " + result(i) + ", diff: " + diff)
-    // }
-
     val cksum = result.zip(gold){ case (o, g) => (g < (o + margin)) && g > (o - margin)}.reduce{_&&_}
 
     println("PASS: " + cksum + " (Kmeans)")
   }
-
 }
 
 
@@ -328,114 +297,12 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
 }
 
 
-object BFS_FSM extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
-  val tileSize = 8000
-
-  @virtualize
-  def bfs(nodesIn: Array[Int], edgesIn: Array[Int], lensIn: Array[Int], idsIn: Array[Int], n: Int, e: Int, average_nodes_per_edge: Int) = {
-    val edges = DRAM[Int](e)
-    val lens = DRAM[Int](n)
-    val ids = DRAM[Int](n)
-    val result = DRAM[Int](n)
-
-    setMem(edges, edgesIn)
-    setMem(lens, lensIn)
-    setMem(ids, idsIn)
-
-    val depth = ArgIn[Int]
-    val d = args(1).to[Int]
-    setArg(depth, d)
-    // val anpe = ArgIn[Int]
-    // setArg(anpe, average_nodes_per_edge)
-
-    Accel {
-      val init = 0
-      val gatherEdgeInfo = 1
-      val denseEdgeLoads = 2
-      val scatterDepths = 3
-      val done = 4
-
-      val layer = Reg[Int](0)
-      val depths = SRAM[Int](tileSize)
-      val frontierStack = FILO[Int](tileSize) // TODO: Eventually allow scatters on stacks
-      val idList = SRAM[Int](tileSize)
-      val lenList = SRAM[Int](tileSize)
-      val frontier = SRAM[Int](tileSize)
-      val size = Reg[Int](1)
-      FSM[Int]{state => state < done}{state =>
-        if (state == init.to[Int]) {
-          frontier(0) = 0.to[Int]
-        } else if (state == gatherEdgeInfo.to[Int]) {
-          // Increment layer
-          layer :+= 1
-          // Collect edge ids and lens
-          idList gather ids(frontier par 1, size.value)
-          lenList gather lens(frontier par 1, size.value)
-        } else if (state == denseEdgeLoads.to[Int]) {
-          // Accumulate frontier
-          Foreach(size.value by 1) {i =>
-            val start = idList(i)
-            val end = lenList(i) + start
-            frontierStack load edges(start::end par 1)
-          }
-        } else if (state == scatterDepths.to[Int]) {
-          // Grab size of this scatter
-          size := frontierStack.numel
-          // Drain stack and set up scatter addrs + depth srams
-          Foreach(frontierStack.numel by 1) { i => 
-            depths(i) = layer.value
-            frontier(i) = frontierStack.pop()
-          }
-          result(frontier, size) scatter depths
-        }
-      }{state => 
-
-        mux(state == init.to[Int], gatherEdgeInfo, 
-          mux(state == gatherEdgeInfo, denseEdgeLoads,
-            mux(state == denseEdgeLoads, scatterDepths, 
-              mux(state == scatterDepths && layer.value < depth, gatherEdgeInfo, done))))
-        }
-
-    }
-
-    getMem(result)
-  }
-
-  @virtualize
-  def main() {
-    /* NEW VERSION FOR PERFORMANCE MEASUREMENTS */
-    val E = 9600000
-    val N = 96000
-    val average_nodes_per_edge = args(0).to[Int]
-    val spacing = 3 
-    val ed = E //args(1).to[SInt] // Set to roughly max_edges_per_node * N 
-
-    val OCnodes = Array.tabulate(N) {i => 0.to[Int]}
-    val OCedges = Array.tabulate(ed){ i => i*2 % N}
-    val OCids = Array.tabulate(N)( i => average_nodes_per_edge*average_nodes_per_edge*i+1 % E)
-    val OCcounts = Array.tabulate(N){ i => random[Int](average_nodes_per_edge-1)*2+1}
-
-    val result = bfs(OCnodes, OCedges, OCcounts, OCids, N, E, average_nodes_per_edge)
-    val gold = 0
-    // println("Cksum: " + gold + " == " + result.reduce{_+_})
-
-    val cksum = gold == result.reduce{_+_}
-    printArray(result, "result: ")
-    println("Cksum = " + result.reduce{_+_})
-    // println("PASS: " + cksum + " (BFS)")
-
-
-
-  }
-
-}
-
 object BlackScholes extends SpatialApp {
-
+  override val target = targets.Default
 
   val margin = 0.5f // Validates true if within +/- margin
   val innerPar = 16
-  val outerPar = 1
+  val outerPar = 2
   val tileSize = 2000
 
   final val inv_sqrt_2xPI = 0.39894228040143270286f
@@ -444,7 +311,7 @@ object BlackScholes extends SpatialApp {
   def CNDF(x: Float) = {
     val ax = abs(x)
 
-    val xNPrimeofX = exp((ax ** 2) * -0.05f) * inv_sqrt_2xPI
+    val xNPrimeofX = exp_taylor((ax ** 2) * -0.05f) * inv_sqrt_2xPI
     val xK2 = 1.to[Float] / ((ax * 0.2316419f) + 1.0f)
 
     val xK2_2 = xK2 ** 2
@@ -473,16 +340,16 @@ object BlackScholes extends SpatialApp {
   def BlkSchlsEqEuroNoDiv(sptprice: Float, strike: Float, rate: Float,
     volatility: Float, time: Float, otype: Int) = {
 
-    val xLogTerm = log( sptprice / strike )
+    val xLogTerm = log_taylor( sptprice / strike )
     val xPowerTerm = (volatility ** 2) * 0.5f
     val xNum = (rate + xPowerTerm) * time + xLogTerm
-    val xDen = volatility * sqrt(time)
+    val xDen = volatility * sqrt_approx(time)
 
     val xDiv = xNum / (xDen ** 2)
     val nofXd1 = CNDF(xDiv)
     val nofXd2 = CNDF(xDiv - xDen)
 
-    val futureValueX = strike * exp(-rate * time)
+    val futureValueX = strike * exp_taylor(-rate * time)
 
     val negNofXd1 = -nofXd1 + 1.0f
     val negNofXd2 = -nofXd2 + 1.0f
@@ -590,6 +457,7 @@ object Convolution_FPGA extends SpatialApp { // Regression (Dense) // Args: none
     val C = ArgIn[Int]
     setArg(R, image.rows)
     setArg(C, image.cols)
+    val lb_par = 8
 
     val img = DRAM[T](R, C)
     val imgOut = DRAM[T](R, C)
@@ -610,7 +478,7 @@ object Convolution_FPGA extends SpatialApp { // Regression (Dense) // Args: none
       val lineOut = SRAM[T](Cmax)
 
       Foreach(0 until R) { r =>
-        lb load img(r, 0::C)
+        lb load img(r, 0::C par lb_par)
 
         /*println("Row " + r)
         Foreach(0 until Kh) { i =>
@@ -832,7 +700,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   val margin = 1
 
   val innerPar = 16
-  val outerPar = 4
+  val outerPar = 2
 
   val tileSize = 20
 
@@ -843,7 +711,8 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
     val ip = innerPar(1 -> 12)
     val subLoopPar = innerPar(1 -> 16)
     val prodLoopPar = innerPar(1 -> 96)
-    val outerAccumPar = innerPar(1 -> 1)
+    val outerAccumPar = innerPar(1 -> 16)
+    val innerAccumPar = innerPar(1 -> 16)
 
     val rows = yCPU.length;
     bound(rows) = 360000
@@ -876,7 +745,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
       val sigmaOut = SRAM[T](MAXC, MAXC)
 
-      MemReduce(sigmaOut)(R by rTileSize par op){ r =>
+      MemReduce(sigmaOut par outerAccumPar)(R by rTileSize par op){ r =>
         val gdaYtile = SRAM[Int](rTileSize)
         val gdaXtile = SRAM[T](rTileSize, MAXC)
         val blk = Reg[Int]
@@ -890,7 +759,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
         val sigmaBlk = SRAM[T](MAXC, MAXC)
 
-        MemReduce(sigmaBlk)(blk par param(1)) { rr =>
+        MemReduce(sigmaBlk par innerAccumPar)(blk par param(1)) { rr =>
           val subTile = SRAM[T](MAXC)
           val sigmaTile = SRAM[T](MAXC, MAXC)
           Foreach(C par subLoopPar) { cc =>
@@ -959,7 +828,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 }
 
 
-object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3 2
+object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 25 0.3 1
   /*
   Implementation based on http://cs.stanford.edu/people/karpathy/visml/ising_example.html
    pi(x) = exp(J* 𝚺x_j*x_i + J_b * 𝚺b_i*x_i)        
@@ -970,10 +839,10 @@ object Gibbs_Ising2D extends SpatialApp { // Regression (Dense) // Args: 200 0.3
                            
           _________________________________________
          |                                         |
-         |   --->                                  |
-x_par=4  |  --->            X                XX    |
-         | --->                            XXXX    |
-         |--->          .------------.X   X XXX    |
+         | update --->                             |
+x_par=4  |       --->       X                XX    |
+         |      --->                       XXXX    |
+         |     --->     .------------.X   X XXX    |
          |          X   .BIAS REGION .  XX   X     |
          |            XX.            .     XX      |
          |              .     X XX   .             |
@@ -986,8 +855,8 @@ x_par=4  |  --->            X                XX    |
          |_________________________________________|
 
   */
-  type T = FixPt[TRUE,_32,_32]
-  type PROB = FixPt[FALSE, _0, _16]
+  type T = FixPt[TRUE,_16,_16] // FixPt[TRUE,_32,_32]
+  type PROB = FixPt[FALSE, _0, _8]
   @virtualize
   def main() = {
 
@@ -1117,8 +986,8 @@ x_par=4  |  --->            X                XX    |
             val p_flip = exp_sram(-sum+lut_size/2)
             val pi_x = exp_sram(sum+4) * mux((bias_sram(i,j) * self) < 0, exp_posbias, exp_negbias)
             val threshold = min(1.to[T], pi_x)
-            val rng = unif[_16]()
-            val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(31::16).as[PROB], 1.to[T], 0.to[T]))
+            val rng = unif[_8]()
+            val flip = mux(pi_x > 1, 1.to[T], mux(rng < threshold(15::8).as[PROB], 1.to[T], 0.to[T]))
             if (j >= 0 && j < COLS) {
               grid_sram(i,j) = mux(flip == 1.to[T], -self, self)
             }
@@ -1296,7 +1165,7 @@ object LogReg extends SpatialApp {
 }
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
-
+  override val target = targets.Default
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
 
@@ -1332,9 +1201,9 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
     printArray(edgeLens, "edgeLens: ")
     printArray(edgeIds, "edgeIds: ")
 
-    val par_load = 16
-    val par_store = 16
-    val tile_par = 2 (1 -> 1 -> 12)
+    val par_load = 1 // Do not change
+    val par_store = 1 // Do not change
+    val tile_par = 1 // Do not change
     val page_par = 2 (1 -> 1 -> tileSize)
 
     // Arguments
@@ -1400,7 +1269,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
             local_farEdgeLens gather OCedgeLens(farPages2)
 
             // Do math to find new rank
-            val pagerank = Reduce(Reg[X](0))(len by 1){i => 
+            val pagerank = Pipe.Reduce(Reg[X](0))(len by 1){i => 
               if (nearPages.empty) {
                 println("page: " + page + ", local_page: " + local_page + " deq from far")
                 local_farPages.deq() / local_farEdgeLens.deq().to[X]
@@ -1829,8 +1698,7 @@ WHERE
 */
 
 object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
-
-
+  override val target = targets.Default
   type FT = Int
 
   val MIN_DATE = 0
@@ -1848,6 +1716,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   def tpchq6[T:Type:Num](datesIn: Array[Int], quantsIn: Array[Int], disctsIn: Array[T], pricesIn: Array[T]): T = {
     val dataSize = ArgIn[Int]
     setArg(dataSize, datesIn.length)
+    bound(dataSize) = 96000000
 
     val dates  = DRAM[Int](dataSize)
     val quants = DRAM[Int](dataSize)
@@ -2023,14 +1892,17 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
       def sha_transform(): Unit = {
         val m = SRAM[ULong](64)
         Foreach(0 until 64 by 1){i => 
-          if ( i < 16 ) {
-            val j = 4*i
+          if ( i.to[Index] < 16 ) {
+            val j = 4*i.to[Index]
             // println(" m(" + i + ") = " + {(data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])})
             m(i) = (data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])
           } else {
             // println(" m(" + i + ") = " + SIG1(m(i-2)) + " " + m(i-7) + " " + SIG0(m(i-15)) + " " + m(i-16))
             m(i) = SIG1(m(i-2)) + m(i-7) + SIG0(m(i-15)) + m(i-16)
           } 
+          // val j = 4*i.to[Index]
+          // m(i) = if (i.to[Index] < 16) {(data(j).as[ULong] << 24) | (data(j+1).as[ULong] << 16) | (data(j+2).as[ULong] << 8) | (data(j+3).as[ULong])}
+          //        else {SIG1(m(i-2)) + m(i-7) + SIG0(m(i-15)) + m(i-16)}
         }
         val A = Reg[ULong] 
         val B = Reg[ULong] 
@@ -2060,8 +1932,8 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
         }
 
         Foreach(8 by 1 par 8){i => 
-          state(i) = state(i) + mux(i == 0, A, mux(i == 1, B, mux(i == 2, C, mux(i == 3, D, 
-            mux(i == 4, E, mux(i == 5, F, mux(i == 6, G, H)))))))
+          state(i) = state(i) + mux(i.to[Index] == 0, A, mux(i.to[Index] == 1, B, mux(i.to[Index] == 2, C, mux(i.to[Index] == 3, D, 
+            mux(i.to[Index] == 4, E, mux(i.to[Index] == 5, F, mux(i.to[Index] == 6, G, H)))))))
         }
 
       }
@@ -2087,7 +1959,7 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
 
         // Final
         val pad_stop = if (datalen.value < 56) 56 else 64
-        Foreach(datalen until pad_stop by 1){i => data(i) = if (i == datalen) 0x80.to[UInt8] else 0.to[UInt8]}
+        Foreach(datalen until pad_stop by 1){i => data(i) = if (i.to[Index] == datalen) 0x80.to[UInt8] else 0.to[UInt8]}
         if (datalen.value >= 56) {
           sha_transform()
           Foreach(56 by 1){i => data(i) = 0}
@@ -2107,21 +1979,21 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
         // Foreach(8 by 1){i => println(" " + state(i))}
 
         Sequential.Foreach(4 by 1){ i => 
-          hash(i)    = (SHFR(state(0), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+4)  = (SHFR(state(1), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+8)  = (SHFR(state(2), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+12) = (SHFR(state(3), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+16) = (SHFR(state(4), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+20) = (SHFR(state(5), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+24) = (SHFR(state(6), (24-i*8))).apply(7::0).as[UInt8]
-          hash(i+28) = (SHFR(state(7), (24-i*8))).apply(7::0).as[UInt8]
+          hash(i)    = (SHFR(state(0), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+4)  = (SHFR(state(1), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+8)  = (SHFR(state(2), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+12) = (SHFR(state(3), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+16) = (SHFR(state(4), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+20) = (SHFR(state(5), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+24) = (SHFR(state(6), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
+          hash(i+28) = (SHFR(state(7), (24-i.to[Index]*8))).apply(7::0).as[UInt8]
         }
 
       }
 
       Sequential.Foreach(2 by 1){i => 
         Pipe{SHA256()}
-        if (i == 0) {
+        if (i.to[Index] == 0) {
           text_dram(0::32) store hash
           len := 32
         }
@@ -2139,4 +2011,538 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
     println("PASS: " + cksum + " (BTC)")
 
   }
+}
+
+object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
+  override val target = targets.Default
+ /*
+  
+  Smith-Waterman Genetic Alignment algorithm                                                  
+  
+  This is just like SW algorithm, except negative scores are capped at 0, backwards traversal starts at highest score from any 
+     element on the perimeter, and end when score is 0
+
+
+    [SIC] SW diagram
+    LETTER KEY:         Scores                   Ptrs                                                                                                  
+      a = 0                   T  T  C  G                T  T  C  G                                                                                                                          
+      c = 1                0 -1 -2 -3 -4 ...         0  ←  ←  ←  ← ...                                                                                                        
+      g = 2             T -1  1  0 -1 -2          T  ↑  ↖  ←  ←  ←                                                                                                                          
+      t = 3             C -2  0 -1  1  0          C  ↑  ↑  ↑  ↖  ←                                                                                                                         
+      - = 4             G -3 -2 -2  0  2          G  ↑  ↑  ↑  ↑  ↖                                                                                                                                  
+      _ = 5             A -4 -3 -3 -1  1          A  ↑  ↑  ↑  ↑  ↖                                                                                                                                 
+                           .                         .                                                                                                                        
+                           .                         .                       
+                           .                         .                       
+                                                                                                           
+    PTR KEY:                                                                                                                                                                                                      
+      ← = 0 = skipB
+      ↑ = 1 = skipA
+      ↖ = 2 = align                                                                                      
+                                    
+
+                                                                                                           
+
+                                                                                                           
+ */
+
+  @struct case class sw_tuple(score: Int16, ptr: Int16)
+  @struct case class entry_tuple(row: Index, col: Index, score: Int16)
+
+  @virtualize
+  def main() = {
+
+    // FSM setup
+    val traverseState = 0
+    val padBothState = 1
+    val doneState = 2
+
+    val a = argon.lang.String.char2num("a")
+    val c = argon.lang.String.char2num("c")
+    val g = argon.lang.String.char2num("g")
+    val t = argon.lang.String.char2num("t")
+    val d = argon.lang.String.char2num("-")
+    val dash = ArgIn[Int8]
+    setArg(dash,d)
+    val underscore = argon.lang.String.char2num("_")
+
+    val par_load = 16 (1 -> 1 -> 64)
+    val par_store = 16 (1 -> 1 -> 64)
+    val row_par = 2 (1 -> 1 -> 256)
+
+    val SKIPB = 0
+    val SKIPA = 1
+    val ALIGN = 2
+    val MATCH_SCORE = 2
+    val MISMATCH_SCORE = -1
+    val GAP_SCORE = -1 
+    // val seqa_string = "tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc".toText
+    // val seqb_string = "ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat".toText
+    val seqa_string = args(0).to[MString] //"tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc"
+    val seqb_string = args(1).to[MString] //"ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"
+    val measured_length = seqa_string.length
+    bound(measured_length) = 160
+    val length = ArgIn[Int]
+    val lengthx2 = ArgIn[Int]
+    setArg(length, measured_length)
+    setArg(lengthx2, 2*measured_length)
+    val max_length = 512
+    assert(max_length >= length, "Cannot have string longer than 512 elements")
+
+    val seqa_bin = argon.lang.String.string2num(seqa_string)
+    // Array.tabulate[Int](seqa_string.length){i => 
+    //   val char = seqa_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else {6.to[Int]}
+    // } // TODO: Support c++ types with 2 bits in dram
+    val seqb_bin = argon.lang.String.string2num(seqb_string)
+    // Array.tabulate[Int](seqb_string.length){i => 
+    //   val char = seqb_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else {6.to[Int]}
+    // } // TODO: Support c++ types with 2 bits in dram
+
+    val seqa_dram_raw = DRAM[Int8](length)
+    val seqb_dram_raw = DRAM[Int8](length)
+    val seqa_dram_aligned = DRAM[Int8](lengthx2)
+    val seqb_dram_aligned = DRAM[Int8](lengthx2)
+    setMem(seqa_dram_raw, seqa_bin)
+    setMem(seqb_dram_raw, seqb_bin)
+
+    Accel{
+      val seqa_sram_raw = SRAM[Int8](max_length)
+      val seqb_sram_raw = SRAM[Int8](max_length)
+      val seqa_fifo_aligned = FIFO[Int8](max_length*2)
+      val seqb_fifo_aligned = FIFO[Int8](max_length*2)
+
+      seqa_sram_raw load seqa_dram_raw(0::length par par_load)
+      seqb_sram_raw load seqb_dram_raw(0::length par par_load)
+
+      val score_matrix = SRAM[sw_tuple](max_length+1,max_length+1)
+
+      val entry_point = Reg[entry_tuple]
+      // Build score matrix
+      Reduce(entry_point)(length+1 by 1 par row_par){ r =>
+        val possible_entry_point = Reg[entry_tuple]
+        val this_body = r % row_par
+        Sequential.Foreach(-this_body until length+1 by 1) { c => // Bug #151, should be able to remove previous_result reg when fixed
+          val previous_result = Reg[sw_tuple]
+          val update = if (r == 0) (sw_tuple(0, 0)) else if (c == 0) (sw_tuple(0, 1)) else {
+            val match_score = mux(seqa_sram_raw(c-1) == seqb_sram_raw(r-1), MATCH_SCORE.to[Int16], MISMATCH_SCORE.to[Int16])
+            val from_top = score_matrix(r-1, c).score + GAP_SCORE
+            val from_left = previous_result.score + GAP_SCORE
+            val from_diag = score_matrix(r-1, c-1).score + match_score
+            mux(from_left >= from_top && from_left >= from_diag, sw_tuple(from_left, SKIPB), mux(from_top >= from_diag, sw_tuple(from_top,SKIPA), sw_tuple(from_diag, ALIGN)))
+          }
+          previous_result := update
+          if ((c == length || r == length) && possible_entry_point.score < update.score) possible_entry_point := entry_tuple(r, c, update.score)
+          if (c >= 0) {score_matrix(r,c) = sw_tuple(max(0, update.score),update.ptr)}
+          // score_matrix(r,c) = update
+        }
+        possible_entry_point
+      }{(a,b) => mux(a.score > b.score, a, b)}
+
+      // Read score matrix
+      val b_addr = Reg[Int](0)
+      val a_addr = Reg[Int](0)
+      Parallel{b_addr := entry_point.row; a_addr := entry_point.col}
+      val done_backtrack = Reg[Bit](false)
+      FSM[Int](state => state != doneState) { state =>
+        if (state == traverseState) {
+          if (score_matrix(b_addr,a_addr).ptr == ALIGN.to[Int16]) {
+            seqa_fifo_aligned.enq(seqa_sram_raw(a_addr-1), !done_backtrack)
+            seqb_fifo_aligned.enq(seqb_sram_raw(b_addr-1), !done_backtrack)
+            done_backtrack := b_addr == 1.to[Int] || a_addr == 1.to[Int]
+            b_addr :-= 1
+            a_addr :-= 1
+          } else if (score_matrix(b_addr,a_addr).ptr == SKIPA.to[Int16]) {
+            seqb_fifo_aligned.enq(seqb_sram_raw(b_addr-1), !done_backtrack)  
+            seqa_fifo_aligned.enq(dash, !done_backtrack)          
+            done_backtrack := b_addr == 1.to[Int]
+            b_addr :-= 1
+          } else {
+            seqa_fifo_aligned.enq(seqa_sram_raw(a_addr-1), !done_backtrack)
+            seqb_fifo_aligned.enq(dash, !done_backtrack)          
+            done_backtrack := a_addr == 1.to[Int]
+            a_addr :-= 1
+          }
+        } else if (state == padBothState) {
+          seqa_fifo_aligned.enq(underscore, !seqa_fifo_aligned.full) // I think this FSM body either needs to be wrapped in a body or last enq needs to be masked or else we are full before FSM sees full
+          seqb_fifo_aligned.enq(underscore, !seqb_fifo_aligned.full)
+        } else {}
+      } { state => 
+        mux(state == traverseState && (score_matrix(b_addr,a_addr).score == 0.to[Int16]), doneState, state) 
+      }
+
+      Parallel{
+        seqa_dram_aligned(0::seqa_fifo_aligned.numel par par_store) store seqa_fifo_aligned
+        seqb_dram_aligned(0::seqb_fifo_aligned.numel par par_store) store seqb_fifo_aligned
+      }
+
+    }
+
+    val seqa_aligned_result = getMem(seqa_dram_aligned)
+    val seqb_aligned_result = getMem(seqb_dram_aligned)
+    val seqa_aligned_string = argon.lang.String.num2string(seqa_aligned_result)
+    val seqb_aligned_string = argon.lang.String.num2string(seqb_aligned_result)
+
+    // val seqa_gold_string = "cggccgcttag-tgggtgcggtgctaagggggctagagggcttg-tc-gcggggcacgggacatgcg--gcg-t--cgtaaaccaaacat-g-gcgccgggag-attatgctcttgcacg-acag-ta----g-gat-aaagc---agc-t_________________________________________________________________________________________________________".toText
+    // val seqb_gold_string = "--------tagct-ggtaccgt-ctaa-gtggc--ccggg-ttgagcggctgggca--gg-c-tg-gaag-gttagcgt-aaggagatatagtccg-cgggtgcagggtg-gctggcccgtacagctacctggcgctgtgcgcgggagctt_________________________________________________________________________________________________________".toText
+
+    // val seqa_gold_bin = argon.lang.String.string2num(seqa_gold_string)
+    // Array.tabulate[Int](seqa_gold_string.length){i => 
+    //   val char = seqa_gold_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else if (char == "-") {4.to[Int]}
+    //   else if (char == "_") {5.to[Int]}
+    //   else {6.to[Int]}
+    // }
+    // val seqb_gold_bin = argon.lang.String.string2num(seqb_gold_string)
+    // Array.tabulate[Int](seqb_gold_string.length){i => 
+    //   val char = seqb_gold_string(i)
+    //   if (char == "a") {0.to[Int]}
+    //   else if (char == "c") {1.to[Int]}
+    //   else if (char == "g") {2.to[Int]}
+    //   else if (char == "t") {3.to[Int]}
+    //   else if (char == "-") {4.to[Int]}
+    //   else if (char == "_") {5.to[Int]}
+    //   else {6.to[Int]}
+    // }
+
+    // Pass if >75% match
+    val matches = seqa_aligned_result.zip(seqb_aligned_result){(a,b) => if ((a == b) || (a == dash) || (b == dash)) 1 else 0}.reduce{_+_}
+    val cksum = matches.to[Float] > 0.75.to[Float]*measured_length.to[Float]*2
+
+    println("Result A: " + seqa_aligned_string)
+    // println("Gold A:   " + seqa_gold_string)
+    println("Result B: " + seqb_aligned_string)
+    // println("Gold B:   " + seqb_gold_string)
+    println("Found " + matches + " matches out of " + measured_length*2 + " elements")
+    // val cksumA = seqa_aligned_string == seqa_gold_string //seqa_aligned_result.zip(seqa_gold_bin){_==_}.reduce{_&&_}
+    // val cksumB = seqb_aligned_string == seqb_gold_string //seqb_aligned_result.zip(seqb_gold_bin){_==_}.reduce{_&&_}
+    // val cksum = cksumA && cksumB
+    println("PASS: " + cksum + " (SW)")
+
+
+
+  }
+}
+
+object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
+  override val target = targets.Default
+  val Kh = 3
+  val Kw = 3
+  val Cmax = 160
+
+  @virtualize
+  def convolve[T:Type:Num](image: Matrix[T]): Matrix[T] = {
+    val B = 16 (1 -> 1 -> 16)
+
+    val R = ArgIn[Int]
+    val C = ArgIn[Int]
+    setArg(R, image.rows)
+    setArg(C, image.cols)
+    bound(R) = 256
+    bound(C) = 160
+
+    val lb_par = 16 (1 -> 1 -> 16)
+    val par_store = 16
+    val row_stride = 10 (3 -> 3 -> 500)
+    val row_par = 2 (1 -> 1 -> 16)
+    val par_Kh = 3 (1 -> 1 -> 3)
+    val par_Kw = 3 (1 -> 1 -> 3)
+
+    val img = DRAM[T](R, C)
+    val imgOut = DRAM[T](R, C)
+
+    setMem(img, image)
+
+    Accel {
+      Foreach(R by row_stride par row_par){ rr => 
+        val rows_todo = min(row_stride, R - rr)
+        val lb = LineBuffer[T](Kh, Cmax)
+        val sr = RegFile[T](Kh, Kw)
+        val lineOut = SRAM[T](Cmax)
+        val kh = LUT[T](3,3)(1.to[T], 0.to[T], -1.to[T],
+                             2.to[T], 0.to[T], -2.to[T],
+                             1.to[T], 0.to[T], -1.to[T])
+        val kv = LUT[T](3,3)(1.to[T],  2.to[T],  1.to[T],
+                             0.to[T],  0.to[T],  0.to[T],
+                            -1.to[T], -2.to[T], -1.to[T])
+
+        Foreach(-2 until rows_todo) { r =>
+          // println(" r is " + r)
+          val ldaddr = if ((r.to[Index]+rr.to[Index]) < 0.to[Index] || (r.to[Index]+rr.to[Index]) > R.value) 0.to[Index] else {r.to[Index]+rr.to[Index]} 
+          lb load img(ldaddr, 0::C par lb_par)
+
+          Foreach(0 until C) { c =>
+            Pipe{sr.reset(c == 0)}
+
+            Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
+            
+            // val accum = Reg[Tup2[T,T]](pack(0.to[T], 0.to[T]))
+
+            // Reduce(accum)(Kh by 1, Kh by 1 par 3) {(i,j) => 
+            //   val pxl = sr(i,j)
+            //   pack(pxl * kh(i,j), pxl * kv(i,j))
+            // }{(a,b) => pack(a._1 + b._1, a._2 + b._2)}
+
+            val accum = List.tabulate(Kh){i => List.tabulate(Kh){j => 
+              val pxl = sr(i,j)
+              pack(pxl * kh(i,j), pxl * kv(i,j))
+            }}.flatten.reduce{(a,b) => pack(a._1 + b._1, a._2 + b._2)}
+
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index] || r.to[Index] + rr.to[Index] >= R-2, 0.to[T], abs(accum._1) + abs(accum._2))// Technically should be sqrt(horz**2 + vert**2)
+            // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
+          }
+
+          if (r.to[Index]+rr.to[Index] < R && r.to[Index] >= 0.to[Index]) {
+            // println("storing to row " + {r+rr} + " from " + r + " " + rr)
+            // Foreach(0 until C){kk => print(" " + lineOut(kk))}
+            // println(" ")
+            imgOut(r.to[Index]+rr.to[Index], 0::C par par_store) store lineOut
+          }
+        }
+
+      }
+    }
+
+    getMatrix(imgOut)
+
+  }
+
+  @virtualize
+  def main() {
+    val R = args(0).to[Int] //1895
+    val C = args(1).to[Int] //1024
+    val border = 3
+    // val image = (0::R, 0::C){(i,j) => if (j > 3 && i > 3 && j < 11 && i < 11) 256 else 0 }
+    val image = (0::R, 0::C){(i,j) => if (j > border && j < C-border && i > border && i < C - border) i*16 else 0}
+    val ids = (0::R, 0::C){(i,j) => if (i < 2) 0 else 1}
+
+    val kh = List((List(1,2,1), List(0,0,0), List(-1,-2,-1)))
+    val kv = List((List(1,0,-1), List(2,0,-2), List(1,0,-1)))
+
+    val output = convolve(image)
+
+    /*
+      Filters: 
+      1   2   1 
+      0   0   0 
+     -1  -2  -1
+
+      1   0  -1 
+      2   0  -2 
+      1   0  -1
+
+    */
+    val gold = (0::R, 0::C){(i,j) => 
+      if (i >= R-2) {
+        0
+      } else if (i >= 2 && j >= 2) {
+        val px00 = image(i,j)
+        val px01 = image(i,j-1)
+        val px02 = image(i,j-2)
+        val px10 = image(i-1,j)
+        val px11 = image(i-1,j-1)
+        val px12 = image(i-1,j-2)
+        val px20 = image(i-2,j)
+        val px21 = image(i-2,j-1)
+        val px22 = image(i-2,j-2)
+        abs(px00 * 1 + px01 * 2 + px02 * 1 - px20 * 1 - px21 * 2 - px22 * 1) + abs(px00 * 1 - px02 * 1 + px10 * 2 - px12 * 2 + px20 * 1 - px22 * 1)        
+      } else {
+        0
+      }
+      // Shift result down by 2 and over by 2 because of the way accel is written
+      
+    };
+
+    // // This contains the "weird scheduling bug"
+    printMatrix(image, "Image")
+    printMatrix(gold, "Gold")
+    printMatrix(output, "Output")
+
+    val gold_sum = gold.map{g => g}.reduce{_+_} 
+    val output_sum = output.zip(ids){case (o,i) => i * o}.reduce{_+_}
+    println("gold " + gold_sum + " =?= output " + output_sum)
+    val cksum = gold_sum == output_sum
+    // val cksum = gold.zip(output){(g, o) => g == o}.reduce{_&&_}
+    println("PASS: " + cksum + " (Sobel)")
+
+
+
+  }
+}
+
+object PageRank_Bulk extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
+  override val target = Zynq
+
+  type Elem = FixPt[TRUE,_16,_16] // Float
+  type X = FixPt[TRUE,_16,_16] // Float
+
+  /*
+    Currently testing with DIMACS10 Chesapeake dataset from UF Sparse Matrix collection
+
+  */
+  val margin = 0.3f
+
+  @virtualize
+  def main() {
+    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val rows = sparse_data(0,0)
+    val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
+    val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
+    // Preprocess to get frontier sizes.  We can do this on chip also if we wanted
+    println("Matrix has " + rows + " rows")
+    val edgeLens = Array.tabulate(rows){i => Array.tabulate(node1_list.length){j => 
+      if (node1_list(j) == i) 1 else 0
+    }.reduce{_+_}}
+    val edgeIds = Array.tabulate(rows){i => 
+      var id = -1
+      Array.tabulate(node1_list.length){j => 
+        if (id == -1 && node1_list(j) == i) {
+          id = j
+          j
+        } else { 0 }
+    }.reduce{_+_}}
+
+    // printArray(node1_list, "node1_list:")
+    // printArray(node2_list, "node2_list:")
+    printArray(edgeLens, "edgeLens: ")
+    printArray(edgeIds, "edgeIds: ")
+
+    val tileSize = 16 (16 -> 16 -> 128)
+    val par_load = 1
+    val par_store = 1
+    val tile_par = 1 (1 -> 1 -> 12)
+    val page_par = 1 (1 -> 1 -> 16)
+
+    // Arguments
+    val itersIN = args(0).to[Int]
+    val dampIN = args(1).to[X]
+
+    val iters = ArgIn[Int]
+    val NP    = ArgIn[Int]
+    val damp  = ArgIn[X]
+    val NE    = ArgIn[Int]
+    setArg(iters, itersIN)
+    setArg(NP, rows)
+    setArg(damp, dampIN)
+    setArg(NE, node2_list.length)
+
+    val OCpages    = DRAM[X](NP)
+    val OCedges    = DRAM[Int](NE)    // srcs of edges
+    val OCedgeLens   = DRAM[Int](NP)    // counts for each edge
+    val OCedgeIds   = DRAM[Int](NP) // Start index of edges
+
+    val pagesInit = Array.tabulate(NP){i => 4.to[X]}
+
+    setMem(OCpages, pagesInit)
+    setMem(OCedges, node2_list)
+    setMem(OCedgeLens, edgeLens)
+    setMem(OCedgeIds, edgeIds)
+
+    Accel {
+      Sequential.Foreach(iters by 1){iter => 
+        // Step through each tile
+        Foreach(NP by tileSize par tile_par){page => 
+          val local_pages = SRAM.buffer[X](tileSize)
+          val local_edgeIds = SRAM[Int](tileSize)
+          val local_edgeLens = SRAM[Int](tileSize)
+          val pages_left = min(tileSize.to[Int], NP-page)
+          local_pages load OCpages(page::page+pages_left par par_load)
+          local_edgeLens load OCedgeLens(page::page+pages_left par par_load)
+          local_edgeIds load OCedgeIds(page::page+pages_left par par_load)
+          // Process each page in local tile
+          Sequential.Foreach(pages_left by 1 par page_par){local_page => 
+            // Fetch edge list for this page
+            val edgeList = FIFO[Int](128)
+            val id = local_edgeIds(local_page)
+            val len = local_edgeLens(local_page)
+            edgeList load OCedges(id::id+len)
+            // Triage between edges that exist in local tiles and off chip
+            val nearPages = FIFO[Int](128)
+            val farPages = FIFO[Int](128)
+            Foreach(edgeList.numel by 1){i => 
+              val tmp = edgeList.deq()
+              if (tmp >= page && tmp < page+pages_left) {
+                nearPages.enq(tmp - page)
+              } else {
+                farPages.enq(tmp)
+              }
+            }
+            // Fetch off chip info
+            val local_farPages = FIFO[X](128)
+            val local_farEdgeLens = FIFO[Int](128)
+            Foreach(farPages.numel by 1){ i => 
+              val el = farPages.deq()
+              local_farPages load OCpages(el::el+1)
+              local_farEdgeLens load OCedgeLens(el::el+1)
+            }
+
+            // Do math to find new rank
+            // val pagerank = Pipe(ii=7).Reduce(Reg[X](0))(len by 1){i => 
+            val pagerank = Pipe.Reduce(Reg[X](0))(len by 1){i => 
+              if (nearPages.empty) {
+                println("page: " + page + ", local_page: " + local_page + " deq from far")
+                local_farPages.deq() / local_farEdgeLens.deq().to[X]
+              } else {
+                val addr = nearPages.deq()
+                println("page: " + page + ", local_page: " + local_page + " deq from near addr " + addr)
+                local_pages(addr) / local_edgeLens(addr).to[X]
+              }
+            }{_+_}
+
+            // Write new rank
+            local_pages(local_page) = pagerank * damp + (1.to[X] - damp)
+          }
+          OCpages(page::page+pages_left par par_store) store local_pages
+        }
+      }
+    }
+
+    val result = getMem(OCpages)
+
+    val gold = Array.empty[X](NP)
+    // Init
+    for (i <- 0 until NP) {
+      gold(i) = pagesInit(i)
+    }
+
+    // Really bad imperative version
+    for (ep <- 0 until iters) {
+      // println("Iter " + ep)
+      for (i <- 0 until NP) {
+        val numEdges = edgeLens(i)
+        val startId = edgeIds(i)
+        val iterator = Array.tabulate(numEdges){kk => startId + kk}
+        val these_edges = iterator.map{j => node2_list(j)}
+        val these_pages = these_edges.map{j => gold(j)}
+        val these_counts = these_edges.map{j => edgeLens(j)}
+        val pr = these_pages.zip(these_counts){ (p,c) =>
+          // println("page " + i + " doing " + p + " / " + c)
+          p/c.to[X]
+        }.reduce{_+_}
+        // println("new pr for " + i + " is " + pr)
+        gold(i) = pr*dampIN + (1.to[X]-dampIN)
+      }
+    }
+
+    println("PageRank on DIMACS10 Chesapeake dataset downloaded from UF Sparse Matrix collection")
+    printArray(gold, "gold: ")
+    printArray(result, "result: ")
+    val cksum = result.zip(gold){ case (o, g) => (g < (o + margin.to[X])) && g > (o - margin.to[X])}.reduce{_&&_}
+    println("PASS: " + cksum + " (PageRank)")
+
+  }
+
 }

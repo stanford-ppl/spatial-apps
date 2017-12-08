@@ -23,7 +23,7 @@ object BandwidthTests extends SpatialCompiler {
 
   def synthesize(name: String): Unit = {
     try {
-      val output = Seq("python", s"$SPATIAL_HOME/bin/scrape.py", s"${Config.cwd}/gen/$name").!!
+      val output = Seq("python", s"$SPATIAL_HOME/bin/scrape.py", s"${config.cwd}/gen/$name").!!
 
       if (output.contains("failed") || output.contains("error") || output.contains("aborting")) {
         println(s"$name: FAIL (Synthesis)")
@@ -198,12 +198,11 @@ object BandwidthTests extends SpatialCompiler {
 
     programs.zipWithIndex.foreach{case (program,i) =>
       val name = program.name
-      initConfig(stagingArgs)
 
-      Config.name = name
-      Config.genDir = s"${Config.cwd}/gen/$name"
-      Config.logDir = s"${Config.cwd}/logs/$name"
-      resetState()
+      init(stagingArgs)
+      config.name = name
+      config.genDir = s"${config.cwd}/gen/$name"
+      config.logDir = s"${config.cwd}/logs/$name"
 
       //println(s"Compiling #$i: " + name + "...")
       try {
