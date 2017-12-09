@@ -2,7 +2,30 @@
 import spatial.dsl._
 import org.virtualized._
 
-object BankingTests extends SpatialApp {
+object MultiWriteTest extends SpatialApp {
+  val R = 32; val C = 16
+  val P = 1;  val Q = 1
+
+  @virtualize
+  def main() {
+    val dram = DRAM[Int](R,C)
+
+    Accel {
+      val x = SRAM[Int](R,C)
+
+      Foreach(0 until R, 0 until C by 2){(i,j) =>
+        x(i,j+1) = i + j
+        x(i,j)   = i + j + 1
+      }
+      dram store x
+    }
+
+    val data = getMatrix(dram)
+    printMatrix(data, "data")
+  }
+}
+
+object UpdateTest extends SpatialApp {
   val R = 32; val C = 16
   val P = 1;  val Q = 4
 
