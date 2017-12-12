@@ -266,6 +266,13 @@ object Benchmarks {
       make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "Zynq", args), new java.io.File(genDir))
     )
+
+    backends ::= Backend(
+      name = "Baseline",
+      stagingArgs = flags :+ "--synth" :+ "--retime" :+ "--inline",
+      make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "Zynq", args), new java.io.File(genDir))
+    )
     /*backends ::= Backend(
       name = "AWS",
       stagingArgs = flags :+ "--synth" :+ "--retime",
