@@ -20,19 +20,21 @@ object Benchmarks {
 
   private final val NoArgs = Array[Any]()
 
+  final val N = 100
+
   lazy val tests = {
     var tests = List[(SpatialApp, Array[Any])]()
-    tests ::= (SimplePrimitiveTestReuseNone, Array(32, 16))
-    tests ::= (SimplePrimitiveTestReuseSome, Array(32, 16))
-    tests ::= (SimplePrimitiveTestReuseAll,  Array(32, 16))
+    tests ::= (SimplePrimitiveTestReuseNone, Array(N, 32, 16))
+    tests ::= (SimplePrimitiveTestReuseSome, Array(N, 32, 16))
+    tests ::= (SimplePrimitiveTestReuseAll,  Array(N, 32, 16))
 
-    tests ::= (ComplexPrimitiveTestReuseNone, Array(1.0f, 32.0f, 16.0f, 15.0f, 4.0f, 1))
-    tests ::= (ComplexPrimitiveTestReuseSome, Array(1.0f, 32.0f, 16.0f, 15.0f, 4.0f, 1))
-    tests ::= (ComplexPrimitiveTestReuseAll, Array(1.0f, 32.0f, 16.0f, 15.0f, 4.0f, 1))
+    tests ::= (ComplexPrimitiveTestReuseNone, Array(N, 1.0f, 32.0f, 16.0f, 15.0f, 4.0f, 1))
+    tests ::= (ComplexPrimitiveTestReuseSome, Array(N, 1.0f, 32.0f, 16.0f, 15.0f, 4.0f, 1))
+    tests ::= (ComplexPrimitiveTestReuseAll, Array(N, 1.0f, 32.0f, 16.0f, 15.0f, 4.0f, 1))
 
-    tests ::= (SimpleLoopTestReuseNone, Array(1000))
-    tests ::= (SimpleLoopTestReuseSome, Array(1000))
-    tests ::= (SimpleLoopTestReuseAll, Array(1000))
+    tests ::= (SimpleLoopTestReuseNone, Array(N, 1000))
+    tests ::= (SimpleLoopTestReuseSome, Array(N, 1000))
+    tests ::= (SimpleLoopTestReuseAll, Array(N, 1000))
 
     Array("Tests" -> tests)
   }

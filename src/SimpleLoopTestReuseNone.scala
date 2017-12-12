@@ -17,20 +17,22 @@ object SimpleLoopTestReuseNone extends SpatialApp {
   @virtualize
   def main() {
     // Declare SW-HW interface vals
+    val n = ArgIn[Int]
     val x = ArgIn[Int]
     val y = ArgOut[Int]
     val z = ArgOut[Int]
 
-    val N0 = args(0).to[Int]
-    val N1 = args(1).to[Int]
+    val MAX = args(0).to[Int]
+    val N0 = args(1).to[Int]
 
     // Connect SW vals to HW vals
     setArg(x, N0)
+    setArg(n, MAX)
 
     // Create HW accelerator
     Accel {
 
-      val max = 100000
+      val max = n.value
       val out1 = Reg[Int](0)
       val out2 = Reg[Int](0)
 

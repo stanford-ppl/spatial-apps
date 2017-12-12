@@ -65,6 +65,7 @@ object ComplexPrimitiveTestReuseAll extends SpatialApp {
   @virtualize
   def main() {
     // Declare SW-HW interface vals
+    val mx = ArgIn[Int]
     val x0 = ArgIn[Float]
     val x1 = ArgIn[Float]
     val x2 = ArgIn[Float]
@@ -75,12 +76,13 @@ object ComplexPrimitiveTestReuseAll extends SpatialApp {
     val y0 = ArgOut[Float]
     val y1 = ArgOut[Float]
 
-    val N0 = args(0).to[Float]
-    val N1 = args(1).to[Float]
-    val N2 = args(2).to[Float]
-    val N3 = args(3).to[Float]
-    val N4 = args(4).to[Float]
-    val N5 = args(5).to[Int]
+    val MAX = args(0).to[Int]
+    val N0 = args(1).to[Float]
+    val N1 = args(2).to[Float]
+    val N2 = args(3).to[Float]
+    val N3 = args(4).to[Float]
+    val N4 = args(5).to[Float]
+    val N5 = args(6).to[Int]
 
     // Connect SW vals to HW vals
     setArg(x0, N0)
@@ -89,11 +91,11 @@ object ComplexPrimitiveTestReuseAll extends SpatialApp {
     setArg(x3, N3)
     setArg(x4, N4)
     setArg(x5, N5)
+    setArg(mx, MAX)
 
     // Create HW accelerator
     Accel {
-
-      val max = 100000
+      val max = mx.value
       val out1 = Reg[Float](0)
       val out2 = Reg[Float](0)
 
