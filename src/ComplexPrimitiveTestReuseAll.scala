@@ -12,7 +12,7 @@ object ComplexPrimitiveTestReuseAll extends SpatialApp {
   def CNDF(x: Float) = {
     val ax = abs(x)
 
-    val xNPrimeofX = exp((ax ** 2) * -0.05f) * inv_sqrt_2xPI
+    val xNPrimeofX = exp_taylor((ax ** 2) * -0.05f) * inv_sqrt_2xPI
     val xK2 = 1.to[Float] / ((ax * 0.2316419f) + 1.0f)
 
     val xK2_2 = xK2 ** 2
@@ -42,7 +42,7 @@ object ComplexPrimitiveTestReuseAll extends SpatialApp {
   def BlkSchlsEqEuroNoDiv(sptprice: Float, strike: Float, rate: Float,
     volatility: Float, time: Float, otype: Int) = {
 
-      val xLogTerm = log( sptprice / strike )
+      val xLogTerm = log_taylor( sptprice / strike )
       val xPowerTerm = (volatility ** 2) * 0.5f
       val xNum = (rate + xPowerTerm) * time + xLogTerm
       val xDen = volatility * sqrt(time)
@@ -51,7 +51,7 @@ object ComplexPrimitiveTestReuseAll extends SpatialApp {
       val nofXd1 = CNDF(xDiv)
       val nofXd2 = CNDF(xDiv - xDen)
 
-      val futureValueX = strike * exp(-rate * time)
+      val futureValueX = strike * exp_taylor(-rate * time)
 
       val negNofXd1 = -nofXd1 + 1.0f
       val negNofXd2 = -nofXd2 + 1.0f

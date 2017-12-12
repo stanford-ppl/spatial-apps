@@ -12,7 +12,7 @@ object ComplexPrimitiveTestReuseSome extends SpatialApp {
   def CNDF(x: Float) = {
     val ax = abs(x)
 
-    val xNPrimeofX = exp((ax ** 2) * -0.05f) * inv_sqrt_2xPI
+    val xNPrimeofX = exp_taylor((ax ** 2) * -0.05f) * inv_sqrt_2xPI
     val xK2 = 1.to[Float] / ((ax * 0.2316419f) + 1.0f)
 
     val xK2_2 = xK2 ** 2
@@ -39,25 +39,26 @@ object ComplexPrimitiveTestReuseSome extends SpatialApp {
 
 
   @module
-  def BlkSchlsEqEuroNoDiv(sptprice: Float, strike: Float, rate: Float, volatility: Float, time: Float, otype: Int) = {
+  def BlkSchlsEqEuroNoDiv(sptprice: Float, strike: Float, rate: Float,
+    volatility: Float, time: Float, otype: Int) = {
 
-      val xLogTerm = log( sptprice / strike )
-      val xPowerTerm = (volatility ** 2) * 0.5f
-      val xNum = (rate + xPowerTerm) * time + xLogTerm
-      val xDen = volatility * sqrt(time)
+    val xLogTerm = log_taylor( sptprice / strike )
+    val xPowerTerm = (volatility ** 2) * 0.5f
+    val xNum = (rate + xPowerTerm) * time + xLogTerm
+    val xDen = volatility * sqrt(time)
 
-      val xDiv = xNum / (xDen ** 2)
-      val nofXd1 = CNDF(xDiv)
-      val nofXd2 = CNDF(xDiv - xDen)
+    val xDiv = xNum / (xDen ** 2)
+    val nofXd1 = CNDF(xDiv)
+    val nofXd2 = CNDF(xDiv - xDen)
 
-      val futureValueX = strike * exp(-rate * time)
+    val futureValueX = strike * exp_taylor(-rate * time)
 
-      val negNofXd1 = -nofXd1 + 1.0f
-      val negNofXd2 = -nofXd2 + 1.0f
+    val negNofXd1 = -nofXd1 + 1.0f
+    val negNofXd2 = -nofXd2 + 1.0f
 
-      val optionPrice1 = (sptprice * nofXd1) - (futureValueX * nofXd2)
-      val optionPrice2 = (futureValueX * negNofXd2) - (sptprice * negNofXd1)
-      mux(otype == 0, optionPrice2, optionPrice1)
+    val optionPrice1 = (sptprice * nofXd1) - (futureValueX * nofXd2)
+    val optionPrice2 = (futureValueX * negNofXd2) - (sptprice * negNofXd1)
+    mux(otype == 0, optionPrice2, optionPrice1)
   }
   
   
