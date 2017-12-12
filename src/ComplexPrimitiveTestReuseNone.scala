@@ -1,15 +1,12 @@
 import spatial.dsl._
 import org.virtualized._
-import spatial.stdlib._
-import spatial.targets._
 
 
 object ComplexPrimitiveTestReuseNone extends SpatialApp {
   
   final val inv_sqrt_2xPI = 0.39894228040143270286f
 
-  //@module
-  // Taken from Black Scholes
+  @module
   def CNDF(x: Float) = {
     val ax = abs(x)
 
@@ -39,8 +36,7 @@ object ComplexPrimitiveTestReuseNone extends SpatialApp {
   }
 
 
-  //@module
-  // Taken from Black Scholes
+  @module
   def BlkSchlsEqEuroNoDiv(sptprice: Float, strike: Float, rate: Float,
     volatility: Float, time: Float, otype: Int) = {
 
@@ -94,7 +90,6 @@ object ComplexPrimitiveTestReuseNone extends SpatialApp {
 
     // Create HW accelerator
     Accel {
-
       val max = 100000
       val out1 = Reg[Float](0)
       val out2 = Reg[Float](0)

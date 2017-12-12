@@ -6,7 +6,7 @@ import spatial.targets._
 
 object SimplePrimitiveTestReuseNone extends SpatialApp {
   
-  //@module
+  @module
   def primitive_function(arg1: Int, arg2: Int): Int = {
     arg1 * arg2
   }

@@ -8,8 +8,7 @@ object ComplexPrimitiveTestReuseSome extends SpatialApp {
   
   final val inv_sqrt_2xPI = 0.39894228040143270286f
 
-  //@module
-  // Taken from Black Scholes
+  @module
   def CNDF(x: Float) = {
     val ax = abs(x)
 
@@ -39,10 +38,8 @@ object ComplexPrimitiveTestReuseSome extends SpatialApp {
   }
 
 
-  //@module
-  // Taken from Black Scholes
-  def BlkSchlsEqEuroNoDiv(sptprice: Float, strike: Float, rate: Float,
-    volatility: Float, time: Float, otype: Int) = {
+  @module
+  def BlkSchlsEqEuroNoDiv(sptprice: Float, strike: Float, rate: Float, volatility: Float, time: Float, otype: Int) = {
 
       val xLogTerm = log( sptprice / strike )
       val xPowerTerm = (volatility ** 2) * 0.5f
@@ -99,19 +96,15 @@ object ComplexPrimitiveTestReuseSome extends SpatialApp {
       val out1 = Reg[Float](0)
       val out2 = Reg[Float](0)
 
-      Foreach(0 until max){ i=>
+      Sequential.Foreach(0 until max){ i=>
+        Pipe { out1 := BlkSchlsEqEuroNoDiv(x0, x1, x2, x3, x4, x5) }
 
-        Sequential {
-
+        Parallel {
           Pipe { out1 := BlkSchlsEqEuroNoDiv(x0, x1, x2, x3, x4, x5) }
-
-          Parallel {
-            Pipe { out1 := BlkSchlsEqEuroNoDiv(x0, x1, x2, x3, x4, x5) }
-            Pipe { out2 := BlkSchlsEqEuroNoDiv(x0, x1, x2, x3, x4, x5) }
-          }
-        
           Pipe { out2 := BlkSchlsEqEuroNoDiv(x0, x1, x2, x3, x4, x5) }
         }
+
+        Pipe { out2 := BlkSchlsEqEuroNoDiv(x0, x1, x2, x3, x4, x5) }
       }
 
       y0 := out1

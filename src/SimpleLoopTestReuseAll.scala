@@ -6,11 +6,11 @@ import spatial.targets._
 
 object SimpleLoopTestReuseAll extends SpatialApp {
   
-  //@module
+  @module
   def loop_function(loop_max: Int): Int = {
     Reduce(Reg[Int](0))(0 until loop_max by 1){ i =>
       2*i
-    } {_+_}
+    }{_+_}
   }
   
   

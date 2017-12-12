@@ -8,8 +8,7 @@ object ComplexPrimitiveTestReuseAll extends SpatialApp {
   
   final val inv_sqrt_2xPI = 0.39894228040143270286f
 
-  //@module
-  // Taken from Black Scholes
+  @module
   def CNDF(x: Float) = {
     val ax = abs(x)
 
@@ -39,8 +38,7 @@ object ComplexPrimitiveTestReuseAll extends SpatialApp {
   }
 
 
-  //@module
-  // Taken from Black Scholes
+  @module
   def BlkSchlsEqEuroNoDiv(sptprice: Float, strike: Float, rate: Float,
     volatility: Float, time: Float, otype: Int) = {
 
@@ -99,11 +97,9 @@ object ComplexPrimitiveTestReuseAll extends SpatialApp {
       val out1 = Reg[Float](0)
       val out2 = Reg[Float](0)
 
-      Foreach(0 until max){ i=>
-        Sequential {
-          Pipe { out1 := BlkSchlsEqEuroNoDiv(x0, x1, x2, x3, x4, x5) }
-          Pipe { out2 := BlkSchlsEqEuroNoDiv(x0, x1, x2, x3, x4, x5) }
-        }
+      Sequential.Foreach(0 until max){ i=>
+        Pipe { out1 := BlkSchlsEqEuroNoDiv(x0, x1, x2, x3, x4, x5) }
+        Pipe { out2 := BlkSchlsEqEuroNoDiv(x1, x3, x2, x4, x0, x5) }
       }
 
       y0 := out1
