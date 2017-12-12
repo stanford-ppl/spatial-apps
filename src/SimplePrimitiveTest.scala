@@ -3,9 +3,10 @@ import org.virtualized._
 import spatial.stdlib._
 import spatial.targets._
 
+trait SimplePrimitiveTest extends SpatialApp {
 
-object SimplePrimitiveTestReuseAll extends SpatialApp {
-  
+  def body(i: Int, x: Int, y: Int, out1: Reg[Int], out2: Reg[Int]): Unit
+
   @module
   def primitive_function(arg1: Int, arg2: Int): Int = {
     arg1 * arg2
@@ -32,21 +33,14 @@ object SimplePrimitiveTestReuseAll extends SpatialApp {
 
     // Create HW accelerator
     Accel {
-
       val max = n.value
       val out1 = Reg[Int](0)
       val out2 = Reg[Int](0)
 
-      Foreach(0 until max){ i=>
-        Sequential {
-          Pipe { out1 := primitive_function(x, y) }
-          Pipe { out2 := primitive_function(x, y) }
-        }
-      }
+      Foreach(0 until max){ i => body(i,x,y,out1,out2) }
 
       w := out1
       z := out2
-
     }
 
 
@@ -66,6 +60,39 @@ object SimplePrimitiveTestReuseAll extends SpatialApp {
 
 
     println("PASS: " + cksum + " (SimplePrimitiveTestReuseAll)")
+  }
+}
+
+object SimplePrimitiveTestReuseAll extends SimplePrimitiveTest {
+  def body(i: Int, x: Int, y: Int, out1: Reg[Int], out2: Reg[Int]): Unit = {
+    Sequential {
+      Pipe { out1 := primitive_function(x, y) }
+      Pipe { out2 := primitive_function(x, y) }
+    }
+  }
+}
+
+object SimplePrimitiveTestReuseSome extends SimplePrimitiveTest {
+  def body(i: Int, x: Int, y: Int, out1: Reg[Int], out2: Reg[Int]): Unit = {
+    Sequential {
+      Pipe { out1 := primitive_function(x, y) }
+
+      Parallel {
+        Pipe { out1 := primitive_function(x, y) }
+        Pipe { out2 := primitive_function(x, y) }
+      }
+
+      Pipe { out2 := primitive_function(x, y) }
+    }
+  }
+}
+
+object SimplePrimitiveTestReuseNone extends SimplePrimitiveTest {
+  def body(i: Int, x: Int, y: Int, out1: Reg[Int], out2: Reg[Int]): Unit = {
+    Parallel {
+      Pipe { out1 := primitive_function(x, y) }
+      Pipe { out2 := primitive_function(x, y) }
+    }
   }
 }
 

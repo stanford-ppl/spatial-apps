@@ -28,9 +28,9 @@ object Benchmarks {
     tests ::= (SimplePrimitiveTestReuseSome, Array(N, 32, 16))
     tests ::= (SimplePrimitiveTestReuseAll,  Array(N, 32, 16))
 
-    tests ::= (ComplexPrimitiveTestReuseNone, Array(N, 1.0f, 32.0f, 16.0f, 15.0f, 4.0f, 1))
-    tests ::= (ComplexPrimitiveTestReuseSome, Array(N, 1.0f, 32.0f, 16.0f, 15.0f, 4.0f, 1))
-    tests ::= (ComplexPrimitiveTestReuseAll, Array(N, 1.0f, 32.0f, 16.0f, 15.0f, 4.0f, 1))
+    tests ::= (ComplexPrimitiveTestReuseNone, Array(N, 1, 32, 16, 15, 4, 1))
+    tests ::= (ComplexPrimitiveTestReuseSome, Array(N, 1, 32, 16, 15, 4, 1))
+    tests ::= (ComplexPrimitiveTestReuseAll, Array(N, 1, 32, 16, 15, 4, 1))
 
     tests ::= (SimpleLoopTestReuseNone, Array(N, 1000))
     tests ::= (SimpleLoopTestReuseSome, Array(N, 1000))

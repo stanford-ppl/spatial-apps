@@ -3,17 +3,15 @@ import org.virtualized._
 import spatial.stdlib._
 import spatial.targets._
 
+trait SimpleLoopTest extends SpatialApp {
 
-object SimpleLoopTestReuseAll extends SpatialApp {
-  
+  def body(i: Int, x: Int, out1: Reg[Int], out2: Reg[Int]): Unit
+
   @module
   def loop_function(loop_max: Int): Int = {
-    Reduce(Reg[Int](0))(0 until loop_max by 1){ i =>
-      2*i
-    }{_+_}
+    Reduce(Reg[Int](0))(0 until loop_max by 1){i => 2*i }{_+_}
   }
-  
-  
+
   @virtualize
   def main() {
     // Declare SW-HW interface vals
@@ -31,21 +29,14 @@ object SimpleLoopTestReuseAll extends SpatialApp {
 
     // Create HW accelerator
     Accel {
-
       val max = n.value
       val out1 = Reg[Int](0)
       val out2 = Reg[Int](0)
 
-      Foreach(0 until max){ i=>
-        Sequential {
-          Pipe { out1 := loop_function(x) }
-          Pipe { out2 := loop_function(x) }
-        }
-      }
+      Foreach(0 until max){ i => body(i, x, out1, out2) }
 
       y := out1
       z := out2
-
     }
 
 
@@ -68,6 +59,39 @@ object SimpleLoopTestReuseAll extends SpatialApp {
 
 
     println("PASS: " + cksum + " (SimpleLoopTestReuseAll)")
+  }
+}
+
+object SimpleLoopTestReuseAll extends SimpleLoopTest {
+  def body(i: Int, x: Int, out1: Reg[Int], out2: Reg[Int]): Unit = {
+    Sequential {
+      Pipe { out1 := loop_function(x) }
+      Pipe { out2 := loop_function(x) }
+    }
+  }
+}
+
+object SimpleLoopTestReuseNone extends SimpleLoopTest {
+  def body(i: Int, x: Int, out1: Reg[Int], out2: Reg[Int]): Unit = {
+    Parallel {
+      Pipe { out1 := loop_function(x) }
+      Pipe { out2 := loop_function(x) }
+    }
+  }
+}
+
+object SimpleLoopTestReuseSome extends SimpleLoopTest {
+  def body(i: Int, x: Int, out1: Reg[Int], out2: Reg[Int]): Unit = {
+    Sequential {
+      Pipe { out1 := loop_function(x) }
+
+      Parallel {
+        Pipe { out1 := loop_function(x) }
+        Pipe { out2 := loop_function(x) }
+      }
+
+      Pipe { out2 := loop_function(x) }
+    }
   }
 }
 
