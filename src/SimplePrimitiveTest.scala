@@ -1,7 +1,5 @@
 import spatial.dsl._
 import org.virtualized._
-import spatial.stdlib._
-import spatial.targets._
 
 trait SimplePrimitiveTest extends SpatialApp {
 
