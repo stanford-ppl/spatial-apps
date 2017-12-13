@@ -357,7 +357,7 @@ object Regression {
       name = "Chisel",
       stagingArgs = flags :+ "--synth",
       make = genDir => Process(Seq("make","vcs"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "run.sh", args), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "regression_run.sh", branch, args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "Zynq",
