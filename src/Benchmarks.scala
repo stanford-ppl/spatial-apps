@@ -13,14 +13,14 @@ import scala.concurrent.{Await, Future, TimeoutException}
 // Usage: <threads> <branch> <type [Scala, Chisel]>
 object Benchmarks {
   // Times to wait for compilation and running, in seconds
-  var MAKE_TIMEOUT = 1800
+  var MAKE_TIMEOUT = 11000 //1800
   var RUN_TIMEOUT = 1800
   var ZYNQ_TIMEOUT = 11000
   var AWS_TIMEOUT = 32400
 
   private final val NoArgs = Array[Any]()
 
-  final val N = 100
+  final val N = 1000000
 
   lazy val tests = {
     var tests = List[(SpatialApp, Array[Any])]()
@@ -35,6 +35,10 @@ object Benchmarks {
     tests ::= (SimpleLoopTestReuseNone, Array(N, 1000))
     tests ::= (SimpleLoopTestReuseSome, Array(N, 1000))
     tests ::= (SimpleLoopTestReuseAll, Array(N, 1000))
+
+    tests ::= (Nested3TestReuseNone, Array(N, 1, 32, 16, 15, 4, 1))
+    tests ::= (Nested3TestReuseSome, Array(N, 1, 32, 16, 15, 4, 1))
+    tests ::= (Nested3TestReuseAll,  Array(N, 1, 32, 16, 15, 4, 1))
 
     Array("Tests" -> tests)
   }
