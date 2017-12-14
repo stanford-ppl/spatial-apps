@@ -113,6 +113,7 @@ object Benchmarks {
         // Couple of really dumb heuristics for finding reported errors at runtime
         if (line.contains("Placer could not place all instances") && cause == "") cause = line
         else if ("ERROR.*Value '[0-9]+' is out of the range".r.findFirstIn(line).isDefined && cause == "") cause = line
+        else if (line.contains("errors")) cause = "Chisel build errors"
         makeLog.println(line)
       }
       val logger = ProcessLogger(log,log)
