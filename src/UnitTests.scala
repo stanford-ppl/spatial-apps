@@ -446,6 +446,68 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
   }
 }
 
+object MultiplexedWriteTestZynq extends SpatialApp { // Regression (Unit) // Args: none
+  override val target = targets.Zynq
+
+
+  val tileSize = 16
+  val I = 5
+  val N = 192
+
+  @virtualize
+  def multiplexedwrtest[W:Type:Num](w: Array[W], i: Array[W]): Array[W] = {
+    val T = param(tileSize)
+    val P = param(4)
+    val weights = DRAM[W](N)
+    val inputs  = DRAM[W](N)
+    val weightsResult = DRAM[W](N*I)
+    setMem(weights, w)
+    setMem(inputs,i)
+    Accel {
+      val wt = SRAM[W](T)
+      val in = SRAM[W](T)
+      Sequential.Foreach(N by T){i =>
+        wt load weights(i::i+T par 16)
+        in load inputs(i::i+T par 16)
+
+        // Some math nonsense (definitely not a correct implementation of anything)
+        Foreach(I by 1){x =>
+          val niter = Reg[Int]
+          niter := x+1
+          MemReduce(wt)(niter by 1){ i =>  // s0 write
+            in
+          }{_+_}
+          weightsResult(i*I+x*T::i*I+x*T+T par 16) store wt //s1 read
+        }
+      }
+
+    }
+    getMem(weightsResult)
+  }
+
+  @virtualize
+  def main() = {
+    val w = Array.tabulate(N){ i => i % 256}
+    val i = Array.tabulate(N){ i => i % 256 }
+
+    val result = multiplexedwrtest(w, i)
+
+    val gold = Array.tabulate(N/tileSize) { k =>
+      Array.tabulate(I){ j => 
+        val in = Array.tabulate(tileSize) { i => (j)*(k*tileSize + i) }
+        val wt = Array.tabulate(tileSize) { i => k*tileSize + i }
+        in.zip(wt){_+_}
+      }.flatten
+    }.flatten
+    printArray(gold, "gold: ");
+    printArray(result, "result: ");
+
+    val cksum = gold.zip(result){_==_}.reduce{_&&_}
+    println("PASS: " + cksum  + " (MultiplexedWriteTest)")
+  }
+}
+
+
 // Args: None
 object MultiplexedWriteTest extends SpatialApp { // Regression (Unit) // Args: none
 
@@ -693,6 +755,7 @@ object Niter extends SpatialApp { // Regression (Unit) // Args: 100
     println("PASS: " + cksum + " (Niter)")
   }
 }
+
 
 object MemTest1D extends SpatialApp { // Regression (Unit) // Args: 7
 
@@ -2547,6 +2610,39 @@ object FifoStackFSM extends SpatialApp { // Regression (Unit) // Args: none
     val cksum6 = stack_sum_almost_gold == stack_sum_almost_res
     val cksum = cksum1 && cksum2 && cksum3 && cksum4 && cksum5 && cksum6
     println("PASS: " + cksum + " (FifoStackFSM)")
+  }
+}
+
+object RetimedFifoBranch extends SpatialApp { // Regression (Unit) // Args: 13 25
+  @virtualize
+  def main() {
+    val num_enq_1 = ArgIn[Int]
+    val num_enq_2 = ArgIn[Int]
+    val out = ArgOut[Int]
+
+    setArg(num_enq_1, args(0).to[Int])
+    setArg(num_enq_2, args(1).to[Int])
+
+    Accel{
+      val fifo1 = FIFO[Int](128)
+      val fifo2 = FIFO[Int](128)
+      Foreach(num_enq_1 by 1) {i => fifo1.enq(i)}
+      Foreach(num_enq_2 by 1) {i => fifo2.enq(i)}
+      out := Reduce(Reg[Int])(num_enq_1 + num_enq_2 by 1) {i => 
+        if (fifo1.empty) {
+          fifo2.deq()
+        } else {
+          fifo1.deq()
+        }
+      }{_+_}
+    }
+
+    val result = getArg(out)
+    val gold = Array.tabulate(args(0).to[Int]){i => i}.reduce{_+_} + Array.tabulate(args(1).to[Int])(i => i).reduce{_+_}
+    val cksum = gold == result
+    println("Got " + result + ", wanted " + gold)
+    println("PASS: " + cksum + " (RetimedFifoBranch)")
+
   }
 }
 

@@ -79,6 +79,7 @@ object Regression {
     unit ::= (MultiplexedWriteTest, NoArgs)
     unit ::= (MixedIOTest, NoArgs)
     unit ::= (LUTTest, Array(2))
+    unit ::= (RetimedFifoBranch, Array(13,25))
     unit ::= (SSV2D, NoArgs)
     unit ::= (SSV1D, NoArgs)
     unit ::= (MultiWriteBuffer, NoArgs)
