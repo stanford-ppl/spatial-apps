@@ -31,7 +31,7 @@ trait SimpleLoopTest extends SpatialApp {
     Accel {
       val max = n.value
       bound(max) = 1000000
-      bound(x) = 10
+      bound(x) = 100
       val out1 = Reg[Int](0)
       val out2 = Reg[Int](0)
 
