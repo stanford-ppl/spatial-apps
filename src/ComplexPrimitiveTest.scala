@@ -90,6 +90,7 @@ trait ComplexPrimitiveTest extends SpatialApp {
     // Create HW accelerator
     Accel {
       val max = mx.value
+      bound(max) = 1000000
       val out1 = Reg[Int](0)
       val out2 = Reg[Int](0)
 

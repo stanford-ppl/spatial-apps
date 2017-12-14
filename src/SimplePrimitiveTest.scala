@@ -32,6 +32,7 @@ trait SimplePrimitiveTest extends SpatialApp {
     // Create HW accelerator
     Accel {
       val max = n.value
+      bound(max) = 1000000
       val out1 = Reg[Int](0)
       val out2 = Reg[Int](0)
 
