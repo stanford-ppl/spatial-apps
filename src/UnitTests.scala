@@ -335,11 +335,15 @@ object LUTTest extends SpatialApp { // Regression (Unit) // Args: 2
   def main() {
     // Declare SW-HW interface vals
     val i = ArgIn[Int]
+    val j = ArgIn[Int]
     val y = ArgOut[T]
+    val by = ArgOut[Bit]
     val ii = args(0).to[Int]
+    val jj = args(0).to[Int]
 
     // Connect SW vals to HW vals
     setArg(i, ii)
+    setArg(j, jj)
 
     // Create HW accelerator
     Accel {
@@ -353,18 +357,31 @@ object LUTTest extends SpatialApp { // Regression (Unit) // Args: 2
         lut(q,q)
       }{_^_}
       y := lut(1, 3) ^ lut(3, 3) ^ red ^ lut(i,0)
+
+      val blut = LUT[Bit](4, 4)(
+         true, true,  true, false,
+         true, false, true, true,
+         true, false, true, false,
+         true, true,  true, false
+      )
+      by := blut(j, j)
+
     }
 
 
     // Extract results from accelerator
     val result = getArg(y)
+    val bresult = getArg(by)
 
     // Create validation checks and debug code
     val gold = (-15 ^ 7 ^ -0 ^ -5 ^ -10 ^ 4*ii).to[T]
+    val bgold = if (jj % 2 == 0) true else false
     println("expected: " + gold)
     println("result: " + result)
+    println("bexpected: " + bgold)
+    println("bresult: " + bresult)
 
-    val cksum = gold == result
+    val cksum = gold == result && bgold == bresult
     println("PASS: " + cksum + " (InOutArg)")
   }
 }
