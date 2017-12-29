@@ -400,6 +400,7 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
     val io_unused = HostIO[Int]
     val x1 = ArgIn[Int]
     val x2 = ArgIn[Int]
+    val list_x = List.tabulate(3){i => ArgIn[Int]}
     val x_unused = ArgIn[Int]
     val y1 = ArgOut[Int]
     val y2 = ArgOut[Int]
@@ -414,6 +415,7 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
     setArg(io2, cst2)
     setArg(x1, cst3)
     setArg(x2, cst4)
+    list_x.foreach{x => setArg(x, 3)}
     val data = Array[Int](0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
     // val data = Array.tabulate(16){i => i}
     setMem(m1, data)
@@ -422,7 +424,7 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
       Pipe { io1 := io1.value + 2}
       Pipe { io2 := io2.value + 4}
       Pipe { y2 := 999 }
-      Pipe { y1 := x1.value + 6 }
+      Pipe { y1 := x1.value + 6 + list_x(0).value + list_x(1).value + list_x(2).value }
       Pipe { y2 := x2.value + 8 }
 
       val reg = Reg[Int](0) // Nbuffered reg with multi writes, note that it does not do what you think!
@@ -445,7 +447,7 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
     val r2 = getArg(io2)
     val g2 = cst2 + 4
     val r3 = getArg(y1)
-    val g3 = cst3 + 6
+    val g3 = cst3 + 6 + 3 + 3 + 3
     val r4 = getArg(y2)
     val g4 = cst4 + 8
     val r5 = getMem(m2)
@@ -989,7 +991,7 @@ object SimpleTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 10
     val x = ArgIn[T]
     setArg(x, value)
     Accel {
-      Sequential.Foreach(N by tileSize par 2) { i =>
+      Sequential.Foreach(N by tileSize par 1) { i =>
         val b1 = SRAM[T](tileSize)
 
         b1 load srcFPGA(i::i+tileSize par 1)
@@ -1023,6 +1025,52 @@ object SimpleTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 10
 
     val cksum = dst.zip(gold){_ == _}.reduce{_&&_}
     println("PASS: " + cksum + " (SimpleTileLoadStore)")
+  }
+}
+
+object OneTileLoad extends SpatialApp { // Regression (Unit) // Args: 100
+
+
+
+  @virtualize
+  def onetileload(srcHost: Array[Int], value: Int) = {
+    val loadPar  = 1 (1 -> 1)
+    val storePar = 1 (1 -> 1)
+    val tileSize = 16 (16 -> 16)
+
+
+    val N = ArgIn[Int]
+    setArg(N, value)
+    val srcFPGA = DRAM[Int](N)
+    setMem(srcFPGA, srcHost)
+    val out = ArgOut[Int]
+    Accel {
+      Sequential.Foreach(N.value by tileSize par 1) { i =>
+        val b1 = SRAM[Int](tileSize)
+
+        b1 load srcFPGA(i::i+tileSize par 1)
+
+        val acc = Reg[Int]
+        Foreach(tileSize by 1 par 4) { ii =>
+          acc := b1(ii)
+        }
+
+        out := acc
+      }
+    }
+    getArg(out)
+  }
+
+  @virtualize
+  def main() {
+    val arraySize = args(0).to[Int]
+
+    val src = Array.tabulate[Int](arraySize) { i => i % 256 }
+    val dst = onetileload(src, arraySize)
+
+
+    val cksum = dst == src(arraySize-1)
+    println("PASS: " + cksum + " (OneTileLoad)")
   }
 }
 
