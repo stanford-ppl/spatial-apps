@@ -52,7 +52,7 @@ object Regression {
     dense ::= (Sort_Radix, NoArgs)
     dense ::= (GEMM_Blocked, Array(128))
     dense ::= (GEMM_NCubed, NoArgs)
-    // dense ::= (KMP, Array("the"))
+    dense ::= (KMP, Array("the"))
     dense ::= (MD_Grid, NoArgs)
     dense ::= (MD_KNN, NoArgs)
     dense ::= (NW, Array("tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"))
@@ -127,7 +127,7 @@ object Regression {
     unit ::= (SequentialWrites, Array(7))
 
     var fixme = List[(SpatialApp, Array[Any])]()
-    fixme ::= (KMP, Array("the"))
+    // fixme ::= (KMP, Array("the"))
     fixme ::= (SPMV_DumbPack, Array(1536))
     fixme ::= (Backprop, Array(5))
 
