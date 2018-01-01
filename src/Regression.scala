@@ -74,6 +74,7 @@ object Regression {
     sparse ::= (SPMV_CRS, NoArgs)
 
     var unit = List[(SpatialApp, Array[Any])]()
+    unit ::= (Breakpoint, NoArgs)
     unit ::= (ArbitraryLambda, Array(8))
     unit ::= (BubbledWriteTest, NoArgs)
     unit ::= (MultiplexedWriteTest, NoArgs)

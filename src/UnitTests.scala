@@ -813,6 +813,36 @@ object MemTest1D extends SpatialApp { // Regression (Unit) // Args: 7
   }
 }
 
+object Breakpoint extends SpatialApp { // Regression (Unit) // Args: 7
+  @virtualize
+  def main() {
+
+    // Declare SW-HW interface vals
+    val y = ArgOut[Int]
+    val z = HostIO[Int]
+
+    // Create HW accelerator
+    Accel {
+      Sequential.Foreach(16 by 1) {i => 
+        Pipe{y := i}
+        if (i == 8) exit() // breakpoint() also works
+        Pipe{z := i}
+      }
+    }
+
+
+    // Extract results from accelerator
+    val Y = getArg(y)
+    val Z = getArg(z)
+
+    println("Y = " + Y + ", Z = " + Z)
+
+    val cksum = Y == 8 && Z == 7
+    println("PASS: " + cksum + " (Breakpoint)")
+  }
+}
+
+
 object MemTest2D extends SpatialApp { // Regression (Unit) // Args: 7
 
 
@@ -4179,6 +4209,7 @@ object SimpleRowStridedConv extends SpatialApp { // Regression (Unit) // Args: n
         Foreach(C by 1){col =>
           val conv = Reduce(0)(3 by 1, 3 by 1){(r,c) => if (row - 1 + r < 0) 0 else lb(r, (col + c)%C)}{_+_} / 9
           line(col) = conv
+          if (col > C) breakpoint()
         }
         out(row,0::C) store line
       }
