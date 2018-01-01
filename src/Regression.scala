@@ -354,7 +354,7 @@ object Regression {
     var flags = Array[String]()
     if (branch.contains("retim")) flags = flags :+ "--retiming"
     if (branch.contains("syncMem")) flags = flags :+ "--syncMem"
-    if (branch.contains("syncMem") || branch == "master" ) flags = flags :+ "--multifile=4" else flags = flags :+ "--multifile=5"
+    flags = flags :+ "--multifile=4"
     if (branch.contains("pre-master")) flags = flags :+ "--instrument"
 
     backends ::= Backend(
