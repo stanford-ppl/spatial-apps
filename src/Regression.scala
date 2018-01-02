@@ -359,25 +359,25 @@ object Regression {
       name = "Chisel",
       stagingArgs = flags :+ "--synth",
       make = genDir => Process(Seq("make","vcs"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "regression_run.sh", branch, args), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "scripts/regression_run.sh", branch, args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "Zynq",
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "Zynq", args), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Zynq", args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "AWS",
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","aws-F1-afi"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "AWS"), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "AWS"), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "Stats",
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","null"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "stats.sh"), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "scripts/stats.sh"), new java.io.File(genDir))
     )
 
     var testBackends = backends.filter{b => args.contains(b.name) }
