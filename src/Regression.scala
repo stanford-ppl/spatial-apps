@@ -13,8 +13,8 @@ import scala.concurrent.{Await, Future, TimeoutException}
 // Usage: <threads> <branch> <type [Scala, Chisel]>
 object Regression {
   // Times to wait for compilation and running, in seconds
-  var MAKE_TIMEOUT = 1800
-  var RUN_TIMEOUT = 1800
+  var MAKE_TIMEOUT = 2000
+  var RUN_TIMEOUT = 2000
   var ZYNQ_TIMEOUT = 11000
   var AWS_TIMEOUT = 32400
 

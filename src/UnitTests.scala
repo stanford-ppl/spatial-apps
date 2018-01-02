@@ -826,7 +826,10 @@ object Breakpoint extends SpatialApp { // Regression (Unit) // Args: 7
       Sequential.Foreach(16 by 1) {i => 
         sleep(100)
         Pipe{y := i}
-        if (i == 8) exit() // breakpoint() also works
+        if (i == 8) { Sequential{
+          Pipe{exit()}
+          sleep(100)
+        }} // breakpoint() also works
         Pipe{z := i}
       }
     }
