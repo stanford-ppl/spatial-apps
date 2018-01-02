@@ -824,6 +824,7 @@ object Breakpoint extends SpatialApp { // Regression (Unit) // Args: 7
     // Create HW accelerator
     Accel {
       Sequential.Foreach(16 by 1) {i => 
+        sleep(100)
         Pipe{y := i}
         if (i == 8) exit() // breakpoint() also works
         Pipe{z := i}
@@ -4209,7 +4210,7 @@ object SimpleRowStridedConv extends SpatialApp { // Regression (Unit) // Args: n
         Foreach(C by 1){col =>
           val conv = Reduce(0)(3 by 1, 3 by 1){(r,c) => if (row - 1 + r < 0) 0 else lb(r, (col + c)%C)}{_+_} / 9
           line(col) = conv
-          if (col > C) breakpoint()
+          if (col > C) breakpoint() // Testing codegen, should never be activated
         }
         out(row,0::C) store line
       }
