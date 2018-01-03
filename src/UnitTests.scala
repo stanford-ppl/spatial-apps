@@ -1717,7 +1717,7 @@ object IndirectLoad extends SpatialApp { // This hangs with retime on in SPMV_CR
         val start = id_sram(i)
         val end = id_sram(i+1)
         Parallel{
-          Pipe{data_sram load data_dram(start::end)} // Remove pipe when bug #244 is fixed, required for now for retime to pass
+          Pipe{data_sram load data_dram(start::end)}
         }
         result_dram store data_sram 
       }
