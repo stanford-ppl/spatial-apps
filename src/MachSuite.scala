@@ -1316,7 +1316,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
     val raw_string = argon.lang.String.string2num(raw_string_data(0))
     val raw_pattern = argon.lang.String.string2num(raw_string_pattern)
     val par_load = 16
-    val outer_par = 4 (1 -> 1 -> 16)
+    val outer_par = 2 (1 -> 1 -> 16)
     val STRING_SIZE_NUM = raw_string.length.to[Int]
     val PATTERN_SIZE_NUM = raw_pattern.length.to[Int]
     val STRING_SIZE = ArgIn[Int]
@@ -1350,11 +1350,12 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
       }
 
       // Scan string portions
-      val global_matches = Sequential.Reduce(Reg[Int](0))(STRING_SIZE by (STRING_SIZE/outer_par) by STRING_SIZE/outer_par par outer_par) {chunk => 
+      val global_matches = Sequential.Reduce(Reg[Int](0))(STRING_SIZE by (STRING_SIZE/outer_par) par outer_par) {chunk =>  // Attempt to run all in one iteration (but won't if outer_par does not evenly divide STRING_SIZE)
+        val end = min((chunk + STRING_SIZE/outer_par + PATTERN_SIZE-1), STRING_SIZE.value)
         val num_matches = Reg[Int](0)
         num_matches.reset
         val string_sram = SRAM[Int8](32411) // Conveniently sized
-        string_sram load string_dram(chunk::chunk + (STRING_SIZE/outer_par) + (PATTERN_SIZE-1) par par_load)
+        string_sram load string_dram(chunk::end par par_load)
         val q = Reg[Int](0)
         Sequential.Foreach(0 until STRING_SIZE/outer_par + PATTERN_SIZE-1 by 1) { i => 
           // val whileCond = Reg[Bit](false)
