@@ -1802,6 +1802,7 @@ object BlockReduce1D extends SpatialApp { // Regression (Unit) // Args: 1920
 
     val srcFPGA = DRAM[T](sizeIn)
     val dstFPGA = DRAM[T](tileSize)
+    val dstFPGA_partial = DRAM[T](tileSize*2)
 
     setMem(srcFPGA, src)
 
@@ -1813,8 +1814,16 @@ object BlockReduce1D extends SpatialApp { // Regression (Unit) // Args: 1920
         tile
       }{_+_}
       dstFPGA(0::tileSize par 16) store accum
+
+      val accum_partial = SRAM[T](tileSize*2)
+      MemReduce((tileSize until tileSize*2 by 1), accum_partial)(4 by 1){i => 
+        val tile_partial = SRAM[T](tileSize*2)
+        Foreach(tileSize by 1){j => tile_partial(tileSize + j) = i.to[T]}
+        tile_partial
+      }{_+_}
+      dstFPGA_partial store accum_partial
     }
-    getMem(dstFPGA)
+    (getMem(dstFPGA), getMem(dstFPGA_partial))
   }
 
   @virtualize
@@ -1822,16 +1831,114 @@ object BlockReduce1D extends SpatialApp { // Regression (Unit) // Args: 1920
     val size = args(0).to[Int]
     val src = Array.tabulate(size){i => i % 256}
 
-    val dst = blockreduce_1d(src, size)
+    val (dst, partial) = blockreduce_1d(src, size)
 
     val tsArr = Array.tabulate(tileSize){i => i % 256}
     val perArr = Array.tabulate(size/tileSize){i => i}
     val gold = tsArr.map{ i => perArr.map{j => src(i+j*tileSize)}.reduce{_+_}}
 
+    val partial_gold = Array.fill(tileSize)(6.to[Int])
+    val partial_result = Array.tabulate(tileSize){i => partial(tileSize + i)}
+
+    printArray(gold, "gold:")
+    printArray(dst, "result:")
+    printArray(partial_gold, "partial gold:")
+    printArray(partial_result, "partial result:")
+    val cksum = dst.zip(gold){_ == _}.reduce{_&&_} && partial_gold.zip(partial_result){_==_}.reduce{_&&_}
+    
+    println("PASS: " + cksum + " (BlockReduce1D)")
+
+    //    (0 until tileSize) foreach { i => assert(dst(i) == gold(i)) }
+  }
+}
+
+object BlockReduce2D extends SpatialApp { // Regression (Unit) // Args: 192 384
+
+
+  val N = 1920
+  val tileSize = 16
+
+
+  @virtualize
+  def main() = {
+    val numRows = args(0).to[Int]
+    val numCols = args(1).to[Int]
+    val src = Array.tabulate(numRows) { i => Array.tabulate(numCols) { j => (i*numCols + j)%256 } } // Standard array
+    val flatsrc = src.flatten
+
+    val rowsIn = ArgIn[Int]; setArg(rowsIn, numRows)
+    val colsIn = ArgIn[Int]; setArg(colsIn, numCols)
+
+    val srcFPGA = DRAM[Int](rowsIn, colsIn)
+    val dstFPGA = DRAM[Int](tileSize, tileSize)
+    val dstFPGAPartial = DRAM[Int](tileSize*2, tileSize*2)
+    val probe = ArgOut[Int]
+
+    val partialQuadrantX = ArgIn[Int]
+    val partialQuadrantY = ArgIn[Int]
+    setArg(partialQuadrantX, 0.to[Int])
+    setArg(partialQuadrantY, 1.to[Int])
+
+    setMem(srcFPGA, src.flatten)
+
+    Accel {
+      val accum = SRAM[Int](tileSize,tileSize)
+      MemReduce(accum)(rowsIn by tileSize, colsIn by tileSize par 2){ (i,j)  =>
+        val tile = SRAM[Int](tileSize,tileSize)
+        tile load srcFPGA(i::i+tileSize, j::j+tileSize  par 1)
+        tile
+      }{_+_}
+      probe := accum(tileSize-1, tileSize-1)
+      dstFPGA(0::tileSize, 0::tileSize par 1) store accum
+
+      // Reduce into top right corner of 32x32 accum
+      val partial_accum = SRAM[Int](tileSize*2,tileSize*2)
+      val x_start = mux(partialQuadrantX.value == 0.to[Int], 0.to[Int], tileSize.to[Int])
+      val x_end = mux(partialQuadrantX.value == 0.to[Int], tileSize.to[Int], 2*tileSize.to[Int])
+      val y_start = mux(partialQuadrantY.value == 0.to[Int], 0.to[Int], tileSize.to[Int])
+      val y_end = mux(partialQuadrantY.value == 0.to[Int], tileSize.to[Int], 2*tileSize.to[Int])
+      MemReduce(x_start until x_end by 1, y_start until y_end by 1, partial_accum)(4 by 1) {i => 
+        val partial_tile = SRAM[Int](tileSize*2, tileSize*2)
+        Foreach(tileSize by 1, tileSize by 1){ (ii,jj) => 
+          partial_tile(x_start + ii, y_start + jj) = i
+        }
+        partial_tile
+      }{_+_}
+      dstFPGAPartial store partial_accum
+
+    }
+    val dst = getMem(dstFPGA)
+    val dstpartial = getMatrix(dstFPGAPartial)
+
+    val portion = (0::tileSize, tileSize::tileSize*2){(i,j) => dstpartial(i,j)}
+
+
+    val numHorizontal = numRows/tileSize
+    val numVertical = numCols/tileSize
+    val numBlocks = numHorizontal*numVertical
+    // val gold = Array.tabulate(tileSize){i =>
+    //   Array.tabulate(tileSize){j =>
+
+    //     flatsrc(i*tileSize*tileSize + j*tileSize) }}.flatten
+    // }.reduce{(a,b) => a.zip(b){_+_}}
+    val a1 = Array.tabulate(tileSize) { i => i }
+    val a2 = Array.tabulate(tileSize) { i => i }
+    val a3 = Array.tabulate(numHorizontal) { i => i }
+    val a4 = Array.tabulate(numVertical) { i => i }
+    val gold = a1.map{i=> a2.map{j => a3.map{ k=> a4.map {l=> 
+      flatsrc(i*numCols + j + k*tileSize*tileSize + l*tileSize) }}.flatten.reduce{_+_}
+    }}.flatten
+
+    val gold_partial = (0::tileSize, 0::tileSize){(i,j) => 6}
     printArray(gold, "src:")
     printArray(dst, "dst:")
-    val cksum = dst.zip(gold){_ == _}.reduce{_&&_}
-    println("PASS: " + cksum + " (BlockReduce1D)")
+    printMatrix(gold_partial, "gold partial:")
+    printMatrix(portion, "portion:")
+    printMatrix(dstpartial, "Full tile from partial accum:")
+    println("Probe is " + getArg(probe) + ".  Should equal " + gold(tileSize * tileSize - 1))
+    // dst.zip(gold){_==_} foreach {println(_)}
+    val cksum = dst.zip(gold){_ == _}.reduce{_&&_} && getArg(probe) == gold(tileSize * tileSize - 1) && gold_partial.zip(portion){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (BlockReduce2D)")
 
     //    (0 until tileSize) foreach { i => assert(dst(i) == gold(i)) }
   }
@@ -1892,77 +1999,6 @@ object UnalignedLd extends SpatialApp { // Regression (Unit) // Args: 100 9
   }
 }
 
-
-// Args: 192 384
-object BlockReduce2D extends SpatialApp { // Regression (Unit) // Args: 192 384
-
-
-  val N = 1920
-  val tileSize = 16
-
-
-  @virtualize
-  def main() = {
-    val numRows = args(0).to[Int]
-    val numCols = args(1).to[Int]
-    val src = Array.tabulate(numRows) { i => Array.tabulate(numCols) { j => (i*numCols + j)%256 } } // Standard array
-    val flatsrc = src.flatten
-
-    val rowsIn = ArgIn[Int]; setArg(rowsIn, numRows)
-    val colsIn = ArgIn[Int]; setArg(colsIn, numCols)
-
-    val srcFPGA = DRAM[Int](rowsIn, colsIn)
-    val dstFPGA = DRAM[Int](tileSize, tileSize)
-    val probe = ArgOut[Int]
-
-    setMem(srcFPGA, src.flatten)
-
-    Accel {
-      val accum = SRAM[Int](tileSize,tileSize)
-      MemReduce(accum)(rowsIn by tileSize, colsIn by tileSize par 2){ (i,j)  =>
-        val tile = SRAM[Int](tileSize,tileSize)
-        tile load srcFPGA(i::i+tileSize, j::j+tileSize  par 1)
-        tile
-      }{_+_}
-      probe := accum(tileSize-1, tileSize-1)
-      dstFPGA(0::tileSize, 0::tileSize par 1) store accum
-    }
-    val dst = getMem(dstFPGA)
-
-
-    val numHorizontal = numRows/tileSize
-    val numVertical = numCols/tileSize
-    val numBlocks = numHorizontal*numVertical
-    // val gold = Array.tabulate(tileSize){i =>
-    //   Array.tabulate(tileSize){j =>
-
-    //     flatsrc(i*tileSize*tileSize + j*tileSize) }}.flatten
-    // }.reduce{(a,b) => a.zip(b){_+_}}
-    val a1 = Array.tabulate(tileSize) { i => i }
-    val a2 = Array.tabulate(tileSize) { i => i }
-    val a3 = Array.tabulate(numHorizontal) { i => i }
-    val a4 = Array.tabulate(numVertical) { i => i }
-    val gold = a1.map{i=> a2.map{j => a3.map{ k=> a4.map {l=> 
-      flatsrc(i*numCols + j + k*tileSize*tileSize + l*tileSize) }}.flatten.reduce{_+_}
-    }}.flatten
-
-    // val first_el = (0 until numVertical).map{ case j => (0 until numHorizontal).map {case i => src.flatten(tileSize*j + tileSize*tileSize*i)}}.flatten.reduce{_+_}
-    // val first_collapse_cols = ((numVertical*tileSize)/2)*(numVertical-1)
-    // val last_collapse_cols = (( numVertical*tileSize*tileSize*(numHorizontal-1) + (first_collapse_cols + numVertical*tileSize*tileSize*(numHorizontal-1)) ) / 2)*(numVertical-1)
-    // val first_collapse_rows = if (numHorizontal == 1) {first_collapse_cols} else { ((first_collapse_cols + last_collapse_cols) / 2) * (numHorizontal-1) }
-    // // TODO: Why does DEG crash if I add first_collapse_rows rather???
-    // val gold = Array.tabulate(tileSize*tileSize) { i => first_collapse_cols + i*numBlocks }
-
-    printArray(gold, "src:")
-    printArray(dst, "dst:")
-    println("Probe is " + getArg(probe) + ".  Should equal " + gold(tileSize * tileSize - 1))
-    // dst.zip(gold){_==_} foreach {println(_)}
-    val cksum = dst.zip(gold){_ == _}.reduce{_&&_} && getArg(probe) == gold(tileSize * tileSize - 1)
-    println("PASS: " + cksum + " (BlockReduce2D)")
-
-    //    (0 until tileSize) foreach { i => assert(dst(i) == gold(i)) }
-  }
-}
 
 object EvilNesting extends SpatialApp {
 
