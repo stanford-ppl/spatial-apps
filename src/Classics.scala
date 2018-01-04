@@ -1707,7 +1707,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   val MAX_DISC = 9999
   val margin = 1
 
-  val innerPar = 16
+  val innerPar = 8
   val outerPar = 2
 
   val tileSize = 384
