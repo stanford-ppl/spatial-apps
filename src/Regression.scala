@@ -364,15 +364,16 @@ object Regression {
     backends ::= Backend(
       name = "Zynq",
       stagingArgs = flags :+ "--synth" :+ "--retime",
-      make = genDir => Process(Seq("make","zynq-hw"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "Zynq"), new java.io.File(genDir))
+      make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Zynq", args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "AWS",
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","aws-F1-afi"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "AWS"), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "AWS"), new java.io.File(genDir))
     )
+
 
     var testBackends = backends.filter{b => args.contains(b.name) }
     if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
