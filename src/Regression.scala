@@ -16,6 +16,7 @@ object Regression {
   var MAKE_TIMEOUT = 2000
   var RUN_TIMEOUT = 2000
   var ZYNQ_TIMEOUT = 11000
+  var ZCU_TIMEOUT = 11000
   var AWS_TIMEOUT = 32400
 
   private final val NoArgs = Array[Any]()
@@ -366,6 +367,12 @@ object Regression {
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Zynq", args), new java.io.File(genDir))
+    )
+    backends ::= Backend(
+      name = "ZCU",
+      stagingArgs = flags :+ "--synth" :+ "--retime",
+      make = genDir => Process(Seq("make","zcu"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "ZCU", args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "AWS",
