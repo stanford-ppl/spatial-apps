@@ -16,6 +16,7 @@ object Regression {
   var MAKE_TIMEOUT = 1800
   var RUN_TIMEOUT = 1800
   var ZYNQ_TIMEOUT = 13000
+  var ZCU_TIMEOUT = 13000
   var AWS_TIMEOUT = 32400
 
   private final val NoArgs = Array[Any]()
@@ -376,6 +377,12 @@ object Regression {
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Zynq", args), new java.io.File(genDir))
     )
     backends ::= Backend(
+      name = "ZCU",
+      stagingArgs = flags :+ "--synth" :+ "--retime",
+      make = genDir => Process(Seq("make","zcu"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "ZCU", args), new java.io.File(genDir))
+    )
+    backends ::= Backend(
       name = "AWS",
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","aws-F1-afi"), new java.io.File(genDir)),
@@ -385,6 +392,7 @@ object Regression {
 
     var testBackends = backends.filter{b => args.contains(b.name) }
     if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
+    else if (args.contains("ZCU")) MAKE_TIMEOUT = ZCU_TIMEOUT
     else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
     if (testBackends.isEmpty) testBackends = backends
     var testDomains = tests.filter{t => args.contains(t._1) }
