@@ -13,8 +13,8 @@ import scala.concurrent.{Await, Future, TimeoutException}
 // Usage: <threads> <branch> <type [Scala, Chisel]>
 object Regression {
   // Times to wait for compilation and running, in seconds
-  var MAKE_TIMEOUT = 1800
-  var RUN_TIMEOUT = 1800
+  var MAKE_TIMEOUT = 2000
+  var RUN_TIMEOUT = 2000
   var ZYNQ_TIMEOUT = 13000
   var ZCU_TIMEOUT = 13000
   var AWS_TIMEOUT = 32400
@@ -51,7 +51,7 @@ object Regression {
     dense ::= (Sort_Radix, NoArgs)
     dense ::= (GEMM_Blocked, Array(1024))
     dense ::= (GEMM_NCubed, NoArgs)
-    // dense ::= (KMP, Array("the"))
+    dense ::= (KMP, Array("the"))
     dense ::= (MD_Grid, NoArgs)
     dense ::= (MD_KNN, NoArgs)
     dense ::= (NW, Array("tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"))
@@ -71,22 +71,24 @@ object Regression {
     dense ::= (Tensor4D, Array(32, 4, 4, 4))
     
     var sparse = List[(SpatialApp, Array[Any])]()
-    // sparse ::= (ScatterGather, Array(160))
-    // sparse ::= (GatherStore, NoArgs)
+    sparse ::= (ScatterGather, Array(160))
+    sparse ::= (GatherStore, NoArgs)
     sparse ::= (PageRank_Bulk, Array(10000, 0.125))
     // sparse ::= (SPMV_DumbPack, Array(1536))
-    // sparse ::= (PageRank, Array(50, 0.125))
+    sparse ::= (PageRank, Array(50, 0.125))
     sparse ::= (BFS_Queue, NoArgs)
     sparse ::= (BFS_Bulk, NoArgs)
-    // sparse ::= (SPMV_ELL, NoArgs)
-    // sparse ::= (SPMV_CRS, NoArgs)
+    sparse ::= (SPMV_ELL, NoArgs)
+    sparse ::= (SPMV_CRS, NoArgs)
 
     var unit = List[(SpatialApp, Array[Any])]()
+    unit ::= (Breakpoint, NoArgs)
     unit ::= (ArbitraryLambda, Array(8))
     unit ::= (BubbledWriteTest, NoArgs)
 
     unit ::= (MixedIOTest, NoArgs)
-    unit ::= (LUTTest, Array(2))
+    unit ::= (LUTTest, Array(2, 3))
+    unit ::= (RetimedFifoBranch, Array(13,25))
     unit ::= (SSV2D, NoArgs)
     unit ::= (SSV1D, NoArgs)
     unit ::= (MultiWriteBuffer, NoArgs)
@@ -126,19 +128,16 @@ object Regression {
     unit ::= (MemTest2D, Array(7))
     unit ::= (MemTest1D, Array(7))
     unit ::= (Niter, Array(100))
+    unit ::= (StridedLoad, NoArgs)
     unit ::= (InOutArg, Array(32))
     unit ::= (Tensor5D, Array(32, 4, 4, 4, 4))
     unit ::= (Tensor4D, Array(32, 4, 4, 4))
+    unit ::= (IndirectLoad, NoArgs)
     unit ::= (SequentialWrites, Array(7))
 
     var fixme = List[(SpatialApp, Array[Any])]()
-    fixme ::= (KMP, Array("the"))
-    fixme ::= (ScatterGather, Array(160))
-    fixme ::= (PageRank, Array(50, 0.125))
-    fixme ::= (GatherStore, NoArgs)
+    // fixme ::= (KMP, Array("the"))
     fixme ::= (SPMV_DumbPack, Array(1536))
-    fixme ::= (SPMV_ELL, NoArgs)
-    fixme ::= (SPMV_CRS, NoArgs)
     fixme ::= (Backprop, Array(5))
 
 
@@ -368,7 +367,7 @@ object Regression {
       name = "Chisel",
       stagingArgs = flags :+ "--synth",
       make = genDir => Process(Seq("make","vcs"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "run.sh", args), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "scripts/regression_run.sh", branch, args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "Zynq",
@@ -387,6 +386,12 @@ object Regression {
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","aws-F1-afi"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "AWS"), new java.io.File(genDir))
+    )
+    backends ::= Backend(
+      name = "Stats",
+      stagingArgs = flags :+ "--synth" :+ "--retime",
+      make = genDir => Process(Seq("make","null"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scripts/stats.sh"), new java.io.File(genDir))
     )
 
 
