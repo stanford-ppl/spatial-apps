@@ -3333,7 +3333,7 @@ object CSV1D extends SpatialApp {
   def main() {
     type T = FixPt[TRUE, _16, _16]
     val tilesize = 16
-    val data = loadCSV1D[T]("/remote/regression/data/1d.csv", ",")
+    val data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/unittests/1d.csv", ",")
     val memsize = ArgIn[Int]
     setArg(memsize, data.length.to[Int])
     val srcmem = DRAM[T](memsize)
@@ -3355,7 +3355,7 @@ object CSV1D extends SpatialApp {
 
     val gold = data.reduce {_+_}
 
-    writeCSV1D[T](data, "/remote/regression/data/1d_store.csv", ",")
+    writeCSV1D[T](data, sys.env("SPATIAL_HOME") + "/apps/data/unittests/1d_store.csv", ",")
     printArray(data)
     println("Gold sum is " + gold)
     println("Accel sum is " + r)
@@ -3371,8 +3371,8 @@ object CSV2D extends SpatialApp {
     type T = FixPt[TRUE, _16, _16]
     val rowtile = 2
     val coltile = 16
-    val data = loadCSV2D[T]("/remote/regression/data/2d.csv", ",", "\n")
-    writeCSV2D[T](data, "/remote/regression/data/2d_store.csv", ",", "\n")
+    val data = loadCSV2D[T](sys.env("SPATIAL_HOME") + "/apps/data/unittests/2d.csv", ",", "\n")
+    writeCSV2D[T](data, sys.env("SPATIAL_HOME") + "/apps/data/unittests/2d_store.csv", ",", "\n")
     val memrows = ArgIn[Int]
     val memcols = ArgIn[Int]
     setArg(memrows, data.rows.to[Int])
@@ -3417,7 +3417,7 @@ object SSV1D extends SpatialApp { // Regression (Unit) // Args: none
   def main() {
     type T = FixPt[TRUE, _16, _16]
     val tilesize = 16
-    val data = loadCSV1D[T]("/remote/regression/data/1d.ssv", " ")
+    val data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/unittests/1d.ssv", " ")
     val memsize = ArgIn[Int]
     setArg(memsize, data.length.to[Int])
     val srcmem = DRAM[T](memsize)
@@ -3454,7 +3454,7 @@ object SSV2D extends SpatialApp { // Regression (Unit) // Args: none
     type T = FixPt[TRUE, _16, _16]
     val rowtile = 2
     val coltile = 16
-    val data = loadCSV2D[T]("/remote/regression/data/2d.ssv", " ", "\n")
+    val data = loadCSV2D[T](sys.env("SPATIAL_HOME") + "/apps/data/unittests/2d.ssv", " ", "\n")
     val memrows = ArgIn[Int]
     val memcols = ArgIn[Int]
     setArg(memrows, data.rows.to[Int])
