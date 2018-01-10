@@ -980,9 +980,6 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     // val cksumB = seqb_aligned_string == seqb_gold_string //seqb_aligned_result.zip(seqb_gold_bin){_==_}.reduce{_&&_}
     // val cksum = cksumA && cksumB
     println("PASS: " + cksum + " (NW)")
-
-
-
   }
 }
 
@@ -1026,10 +1023,10 @@ object MD_KNN extends SpatialApp { // Regression (Dense) // Args: none
     val N_NEIGHBORS = 16 
     val lj1 = 1.5.to[T]
     val lj2 = 2.to[T]
-    val raw_xpos = loadCSV1D[T]("/remote/regression/data/machsuite/knn_x.csv", "\n")
-    val raw_ypos = loadCSV1D[T]("/remote/regression/data/machsuite/knn_y.csv", "\n")
-    val raw_zpos = loadCSV1D[T]("/remote/regression/data/machsuite/knn_z.csv", "\n")
-    val raw_interactions_data = loadCSV1D[Int]("/remote/regression/data/machsuite/knn_interactions.csv", "\n")
+    val raw_xpos = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/MD/knn_x.csv", "\n")
+    val raw_ypos = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/MD/knn_y.csv", "\n")
+    val raw_zpos = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/MD/knn_z.csv", "\n")
+    val raw_interactions_data = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/MD/knn_interactions.csv", "\n")
     val raw_interactions = raw_interactions_data.reshape(N_ATOMS, N_NEIGHBORS)
 
     val xpos_dram = DRAM[T](N_ATOMS)
@@ -1086,9 +1083,9 @@ object MD_KNN extends SpatialApp { // Regression (Dense) // Args: none
     val xforce_received = getMem(xforce_dram)
     val yforce_received = getMem(yforce_dram)
     val zforce_received = getMem(zforce_dram)
-    val xforce_gold = loadCSV1D[T]("/remote/regression/data/machsuite/knn_x_gold.csv", "\n")
-    val yforce_gold = loadCSV1D[T]("/remote/regression/data/machsuite/knn_y_gold.csv", "\n")
-    val zforce_gold = loadCSV1D[T]("/remote/regression/data/machsuite/knn_z_gold.csv", "\n")
+    val xforce_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/MD/knn_x_gold.csv", "\n")
+    val yforce_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/MD/knn_y_gold.csv", "\n")
+    val zforce_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/MD/knn_z_gold.csv", "\n")
 
     printArray(xforce_gold, "Gold x:")
     printArray(xforce_received, "Received x:")
@@ -1178,7 +1175,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
                                  2,1,7,1,3,7,6,3,3,4,3,4,5,5,6,4,2,5,7,6,5,4,3,3,5,4,4,4,3,2,3,2,7,5)
     val npoints_data = raw_npoints.reshape(BLOCK_SIDE,BLOCK_SIDE,BLOCK_SIDE)
 
-    val raw_dvec = loadCSV1D[T]("/remote/regression/data/machsuite/grid_dvec.csv", "\n")
+    val raw_dvec = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/MD/grid_dvec.csv", "\n")
     // Strip x,y,z vectors from raw_dvec
     val dvec_x_data = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => raw_dvec(i*BLOCK_SIDE*BLOCK_SIDE*density*3 + j*BLOCK_SIDE*density*3 + k*density*3 + 3*l)}
     val dvec_y_data = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => raw_dvec(i*BLOCK_SIDE*BLOCK_SIDE*density*3 + j*BLOCK_SIDE*density*3 + k*density*3 + 3*l+1)}
@@ -1274,7 +1271,7 @@ object MD_Grid extends SpatialApp { // Regression (Dense) // Args: none
     val force_x_received = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => force_x_received_aligned(i,j,k,l)}
     val force_y_received = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => force_y_received_aligned(i,j,k,l)}
     val force_z_received = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => force_z_received_aligned(i,j,k,l)}
-    val raw_force_gold = loadCSV1D[T]("/remote/regression/data/machsuite/grid_gold.csv", "\n")
+    val raw_force_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/MD/grid_gold.csv", "\n")
     val force_x_gold = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => raw_force_gold(i*BLOCK_SIDE*BLOCK_SIDE*density*3 + j*BLOCK_SIDE*density*3 + k*density*3 + 3*l)}
     val force_y_gold = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => raw_force_gold(i*BLOCK_SIDE*BLOCK_SIDE*density*3 + j*BLOCK_SIDE*density*3 + k*density*3 + 3*l+1)}
     val force_z_gold = (0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::BLOCK_SIDE, 0::density){(i,j,k,l) => raw_force_gold(i*BLOCK_SIDE*BLOCK_SIDE*density*3 + j*BLOCK_SIDE*density*3 + k*density*3 + 3*l+2)}
@@ -1319,7 +1316,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
     val raw_string = argon.lang.String.string2num(raw_string_data(0))
     val raw_pattern = argon.lang.String.string2num(raw_string_pattern)
     val par_load = 16
-    val outer_par = 4 (1 -> 1 -> 16)
+    val outer_par = 2 (1 -> 1 -> 16)
     val STRING_SIZE_NUM = raw_string.length.to[Int]
     val PATTERN_SIZE_NUM = raw_pattern.length.to[Int]
     val STRING_SIZE = ArgIn[Int]
@@ -1353,11 +1350,12 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
       }
 
       // Scan string portions
-      val global_matches = Sequential.Reduce(Reg[Int](0))(STRING_SIZE by (STRING_SIZE/outer_par) by STRING_SIZE/outer_par par outer_par) {chunk => 
+      val global_matches = Sequential.Reduce(Reg[Int](0))(STRING_SIZE by (STRING_SIZE/outer_par) par outer_par) {chunk =>  // Attempt to run all in one iteration (but won't if outer_par does not evenly divide STRING_SIZE)
+        val end = min((chunk + STRING_SIZE/outer_par + PATTERN_SIZE-1), STRING_SIZE.value)
         val num_matches = Reg[Int](0)
         num_matches.reset
         val string_sram = SRAM[Int8](32411) // Conveniently sized
-        string_sram load string_dram(chunk::chunk + (STRING_SIZE/outer_par) + (PATTERN_SIZE-1) par par_load)
+        string_sram load string_dram(chunk::end par par_load)
         val q = Reg[Int](0)
         Sequential.Foreach(0 until STRING_SIZE/outer_par + PATTERN_SIZE-1 by 1) { i => 
           // val whileCond = Reg[Bit](false)
@@ -1413,8 +1411,8 @@ object GEMM_NCubed extends SpatialApp { // Regression (Dense) // Args: none
 
     val dim = 64
 
-    val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
-    val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
+    val a_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/gemm/gemm_a.csv", "\n").reshape(dim,dim)
+    val b_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/gemm/gemm_b.csv", "\n").reshape(dim,dim)
 
     val a_dram = DRAM[T](dim,dim)
     val b_dram = DRAM[T](dim,dim)
@@ -1442,7 +1440,7 @@ object GEMM_NCubed extends SpatialApp { // Regression (Dense) // Args: none
       c_dram store c_sram
     }
 
-    val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
+    val c_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/gemm/gemm_gold.csv", "\n").reshape(dim,dim)
     val c_result = getMatrix(c_dram)
 
     printMatrix(c_gold, "C Gold: ")
@@ -1657,15 +1655,15 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
     val par_store = 1
     val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
     val loop_ii    = 1 // not sure if this one works
-    val loop_kk    = 1 (1 -> 1 -> 8)
-    val loop_i     = 1 (1 -> 1 -> 32)
-    val loop_k     = 1 (1 -> 1 -> 16)
+    val loop_kk    = 2 (1 -> 1 -> 8)
+    val loop_i     = 2 (1 -> 1 -> 32)
+    val loop_k     = 2 (1 -> 1 -> 16)
     val loop_j     = 1 (1 -> 1 -> 16)
     val reduce_col = 1 (1 -> 1 -> 16)
     val reduce_tmp = 1 (1 -> 1 -> 16)
 
-    // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
-    // val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
+    // val a_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/gemm/gemm_a.csv", "\n").reshape(dim,dim)
+    // val b_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/gemm/gemm_b.csv", "\n").reshape(dim,dim)
     val a_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
     val b_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
     val c_init = (0::dim_arg, 0::dim_arg){(i,j) => 0.to[T]}
@@ -1707,7 +1705,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
       }
     }
 
-    // val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
+    // val c_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/gemm/gemm_gold.csv", "\n").reshape(dim,dim)
     val c_gold = (0::dim_arg,0::dim_arg){(i,j) => 
       Array.tabulate(dim_arg){k => a_data(i,k) * b_data(k,j)}.reduce{_+_}
     }
@@ -1766,7 +1764,7 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
     val par_load = 8
     val par_store = 8
 
-    val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/sort_data.csv", "\n")
+    val raw_data = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/sort/sort_data.csv", "\n")
 
     val data_dram = DRAM[Int](numel)
     // val sorted_dram = DRAM[Int](numel)
@@ -1805,7 +1803,7 @@ object Sort_Merge extends SpatialApp { // Regression (Dense) // Args: none
       data_dram(0::numel par par_store) store data_sram
     }
 
-    val sorted_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/sort_gold.csv", "\n")
+    val sorted_gold = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/sort/sort_gold.csv", "\n")
     val sorted_result = getMem(data_dram)
 
     printArray(sorted_gold, "Sorted Gold: ")
@@ -1842,7 +1840,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
     val a = false.to[Bit]
     val b = true.to[Bit]
 
-    val raw_data = loadCSV1D[Int]("/remote/regression/data/machsuite/sort_data.csv", "\n")
+    val raw_data = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/sort/sort_data.csv", "\n")
 
     val data_dram = DRAM[Int](numel)
 
@@ -1961,7 +1959,7 @@ object Sort_Radix extends SpatialApp { // Regression (Dense) // Args: none
 
     }
 
-    val sorted_gold = loadCSV1D[Int]("/remote/regression/data/machsuite/sort_gold.csv", "\n")
+    val sorted_gold = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/sort/sort_gold.csv", "\n")
     val sorted_result = getMem(data_dram)
 
     printArray(sorted_gold, "Sorted Gold: ")
@@ -2010,10 +2008,10 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
     val N = 494
     val tileSize = 494
 
-    val raw_values = loadCSV1D[T]("/remote/regression/data/machsuite/crs_values.csv", "\n")
-    val raw_cols = loadCSV1D[Int]("/remote/regression/data/machsuite/crs_cols.csv", "\n")
-    val raw_rowid = loadCSV1D[Int]("/remote/regression/data/machsuite/crs_rowid.csv", "\n")
-    val raw_vec = loadCSV1D[T]("/remote/regression/data/machsuite/crs_vec.csv", "\n")
+    val raw_values = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/SPMV/crs_values.csv", "\n")
+    val raw_cols = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/SPMV/crs_cols.csv", "\n")
+    val raw_rowid = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/SPMV/crs_rowid.csv", "\n")
+    val raw_vec = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/SPMV/crs_vec.csv", "\n")
 
     val values_dram = DRAM[T](NNZ) 
     val cols_dram = DRAM[Int](NNZ) 
@@ -2047,8 +2045,8 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
           val start_id = rowid_sram(i)
           val stop_id = rowid_sram(i+1)
           Parallel{
-            cols_sram load cols_dram(start_id :: stop_id par par_segment_load)
-            values_sram load values_dram(start_id :: stop_id par par_segment_load)
+            Pipe{cols_sram load cols_dram(start_id :: stop_id par par_segment_load)} // Remove when bug #244 is resolved
+            Pipe{values_sram load values_dram(start_id :: stop_id par par_segment_load)} // Remove when bug #244 is resolved
           }
           vec_sram gather vec_dram(cols_sram, stop_id - start_id)
           println("row " + {i + tile})
@@ -2062,7 +2060,7 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
       }
     }
 
-    val data_gold = loadCSV1D[T]("/remote/regression/data/machsuite/crs_gold.csv", "\n")
+    val data_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/SPMV/crs_gold.csv", "\n")
     val data_result = getMem(result_dram)
 
     printArray(data_gold, "Gold: ")
@@ -2108,9 +2106,9 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
     val L = 10    
     val tileSize = N
 
-    val raw_values = loadCSV1D[T]("/remote/regression/data/machsuite/ell_values.csv", "\n").reshape(N,L)
-    val raw_cols = loadCSV1D[Int]("/remote/regression/data/machsuite/ell_cols.csv", "\n").reshape(N,L)
-    val raw_vec = loadCSV1D[T]("/remote/regression/data/machsuite/ell_vec.csv", "\n")
+    val raw_values = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/SPMV/ell_values.csv", "\n").reshape(N,L)
+    val raw_cols = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/SPMV/ell_cols.csv", "\n").reshape(N,L)
+    val raw_vec = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/SPMV/ell_vec.csv", "\n")
 
     val values_dram = DRAM[T](N,L) 
     val cols_dram = DRAM[Int](N,L) 
@@ -2144,7 +2142,7 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
       }
     }
 
-    val data_gold = loadCSV1D[T]("/remote/regression/data/machsuite/ell_gold.csv", "\n")
+    val data_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/SPMV/ell_gold.csv", "\n")
     val data_result = getMem(result_dram)
 
     printArray(data_gold, "Gold: ")
@@ -2222,14 +2220,14 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: 5
     val ud_weight3_norm = 2 (1 -> 1 -> 16)
     val ud_bias3_norm   = 2 (1 -> 1 -> 16)
 
-    val weights1_data = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_weights1.csv").reshape(input_dimension, nodes_per_layer)
-    val weights2_data = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_weights2.csv").reshape(nodes_per_layer, nodes_per_layer)
-    val weights3_data = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_weights3.csv")//.reshape(nodes_per_layer, possible_outputs)
-    val biases1_data = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_bias1.csv")
-    val biases2_data = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_bias2.csv")
+    val weights1_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_weights1.csv").reshape(input_dimension, nodes_per_layer)
+    val weights2_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_weights2.csv").reshape(nodes_per_layer, nodes_per_layer)
+    val weights3_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_weights3.csv")//.reshape(nodes_per_layer, possible_outputs)
+    val biases1_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_bias1.csv")
+    val biases2_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_bias2.csv")
     val biases3_data = Array[T](0.255050659180.to[T],0.018173217773.to[T],-0.353927612305.to[T],0.to[T],0.to[T],0.to[T],0.to[T],0.to[T],0.to[T],0.to[T],0.to[T],0.to[T],0.to[T],0.to[T],0.to[T],0.to[T])
-    val training_data = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_training_data.csv")//.reshape(training_sets, input_dimension)
-    val training_targets_data = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_training_targets.csv")//.reshape(training_sets, possible_outputs)
+    val training_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_training_data.csv")//.reshape(training_sets, input_dimension)
+    val training_targets_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_training_targets.csv")//.reshape(training_sets, possible_outputs)
 
     val weights1_dram = DRAM[T](input_dimension, nodes_per_layer)
     val weights2_dram = DRAM[T](nodes_per_layer, nodes_per_layer)
@@ -2533,19 +2531,19 @@ object Backprop extends SpatialApp { // Regression (Dense) // Args: 5
     val biases3_result = Array.tabulate(possible_outputs){ i => biases3_result_aligned(i) }
 
     // // Store these results as gold - USE AT YOUR OWN RISK
-    // writeCSV1D[T](weights1_result.flatten, "/remote/regression/data/machsuite/backprop_weights1_gold.csv", "\n")
-    // writeCSV1D[T](weights2_result.flatten, "/remote/regression/data/machsuite/backprop_weights2_gold.csv", "\n")
-    // writeCSV1D[T](weights3_result.flatten, "/remote/regression/data/machsuite/backprop_weights3_gold.csv", "\n")
-    // writeCSV1D[T](biases1_result, "/remote/regression/data/machsuite/backprop_bias1_gold.csv", "\n")
-    // writeCSV1D[T](biases2_result, "/remote/regression/data/machsuite/backprop_bias2_gold.csv", "\n")
-    // writeCSV1D[T](biases3_result, "/remote/regression/data/machsuite/backprop_bias3_gold.csv", "\n")
+    // writeCSV1D[T](weights1_result.flatten, sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_weights1_gold.csv", "\n")
+    // writeCSV1D[T](weights2_result.flatten, sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_weights2_gold.csv", "\n")
+    // writeCSV1D[T](weights3_result.flatten, sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_weights3_gold.csv", "\n")
+    // writeCSV1D[T](biases1_result, sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_bias1_gold.csv", "\n")
+    // writeCSV1D[T](biases2_result, sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_bias2_gold.csv", "\n")
+    // writeCSV1D[T](biases3_result, sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_bias3_gold.csv", "\n")
 
-    val weights1_gold = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_weights1_gold.csv", "\n").reshape(input_dimension, nodes_per_layer)
-    val weights2_gold = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_weights2_gold.csv", "\n").reshape(nodes_per_layer, nodes_per_layer)
-    val weights3_gold = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_weights3_gold.csv", "\n").reshape(nodes_per_layer, possible_outputs)
-    val biases1_gold = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_bias1_gold.csv")
-    val biases2_gold = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_bias2_gold.csv")
-    val biases3_gold = loadCSV1D[T]("/remote/regression/data/machsuite/backprop_bias3_gold.csv")
+    val weights1_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_weights1_gold.csv", "\n").reshape(input_dimension, nodes_per_layer)
+    val weights2_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_weights2_gold.csv", "\n").reshape(nodes_per_layer, nodes_per_layer)
+    val weights3_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_weights3_gold.csv", "\n").reshape(nodes_per_layer, possible_outputs)
+    val biases1_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_bias1_gold.csv")
+    val biases2_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_bias2_gold.csv")
+    val biases3_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/backprop/backprop_bias3_gold.csv")
 
     printMatrix(weights1_gold, "Gold weights 1:")
     printMatrix(weights1_result, "Result weights 1:")
@@ -2611,10 +2609,10 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
     val FFT_SIZE = 1024
     val numiter = (scala.math.log(FFT_SIZE) / scala.math.log(2)).to[Int]
 
-    val data_real = loadCSV1D[T]("/remote/regression/data/machsuite/fft_strided_real.csv", "\n")
-    val data_img = loadCSV1D[T]("/remote/regression/data/machsuite/fft_strided_img.csv", "\n")
-    val data_twid_real = loadCSV1D[T]("/remote/regression/data/machsuite/fft_strided_twidreal.csv", "\n")
-    val data_twid_img = loadCSV1D[T]("/remote/regression/data/machsuite/fft_strided_twidimg.csv", "\n")
+    val data_real = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_strided_real.csv", "\n")
+    val data_img = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_strided_img.csv", "\n")
+    val data_twid_real = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_strided_twidreal.csv", "\n")
+    val data_twid_img = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_strided_twidimg.csv", "\n")
 
     val data_real_dram = DRAM[T](FFT_SIZE)
     val data_img_dram = DRAM[T](FFT_SIZE)
@@ -2673,8 +2671,8 @@ object FFT_Strided extends SpatialApp { // Regression (Dense) // Args: none
 
     val result_real = getMem(result_real_dram)
     val result_img = getMem(result_img_dram)
-    val gold_real = loadCSV1D[T]("/remote/regression/data/machsuite/fft_strided_real_gold.csv", "\n")
-    val gold_img = loadCSV1D[T]("/remote/regression/data/machsuite/fft_strided_img_gold.csv", "\n")
+    val gold_real = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_strided_real_gold.csv", "\n")
+    val gold_img = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_strided_img_gold.csv", "\n")
 
     printArray(gold_real, "Gold real: ")
     printArray(result_real, "Result real: ")
@@ -2709,8 +2707,8 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
     val M_SQRT1_2 = 0.70710678118654752440.to[T]
     val TWOPI = 6.28318530717959.to[T]
 
-    val data_x = loadCSV1D[T]("/remote/regression/data/machsuite/fft_transpose_x.csv", "\n").reshape(8,stride)
-    val data_y = loadCSV1D[T]("/remote/regression/data/machsuite/fft_transpose_y.csv", "\n").reshape(8,stride)
+    val data_x = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_transpose_x.csv", "\n").reshape(8,stride)
+    val data_y = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_transpose_y.csv", "\n").reshape(8,stride)
 
     val work_x_dram = DRAM[T](8,stride)
     val work_y_dram = DRAM[T](8,stride)
@@ -2925,10 +2923,10 @@ object FFT_Transpose extends SpatialApp { // Regression (Dense) // Args: none
 
     val result_x = getMatrix(result_x_dram)
     val result_y = getMatrix(result_y_dram)
-    // val gold_x = loadCSV1D[T]("/remote/regression/data/machsuite/fft_transpose_x_gold.csv", "\n").reshape(8,stride)
-    // val gold_y = loadCSV1D[T]("/remote/regression/data/machsuite/fft_transpose_y_gold.csv", "\n").reshape(8,stride)
-    val gold_x = loadCSV1D[T]("/remote/regression/data/machsuite/fft_transpose_x_gold.csv", "\n").reshape(8,stride)
-    val gold_y = loadCSV1D[T]("/remote/regression/data/machsuite/fft_transpose_y_gold.csv", "\n").reshape(8,stride)
+    // val gold_x = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_transpose_x_gold.csv", "\n").reshape(8,stride)
+    // val gold_y = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_transpose_y_gold.csv", "\n").reshape(8,stride)
+    val gold_x = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_transpose_x_gold.csv", "\n").reshape(8,stride)
+    val gold_y = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/fft/fft_transpose_y_gold.csv", "\n").reshape(8,stride)
 
     printMatrix(gold_x, "Gold x: ")
     println("")
@@ -2989,8 +2987,8 @@ object BFS_Bulk extends SpatialApp { // Regression (Sparse) // Args: none
     val unvisited = -1
     val start_id = 38
 
-    val nodes_raw = loadCSV1D[Int]("/remote/regression/data/machsuite/bfs_nodes.csv", "\n")
-    val edges_data = loadCSV1D[Int]("/remote/regression/data/machsuite/bfs_edges.csv", "\n")
+    val nodes_raw = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/bfs/bfs_nodes.csv", "\n")
+    val edges_data = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/bfs/bfs_edges.csv", "\n")
 
     val node_starts_data = Array.tabulate[Int](N_NODES){i => nodes_raw(2*i)}
     val node_ends_data = Array.tabulate[Int](N_NODES){i => nodes_raw(2*i+1)}
@@ -3097,8 +3095,8 @@ object BFS_Queue extends SpatialApp { // Regression (Sparse) // Args: none
     val unvisited = -1
     val start_id = 38
 
-    val nodes_raw = loadCSV1D[Int]("/remote/regression/data/machsuite/bfs_nodes.csv", "\n")
-    val edges_data = loadCSV1D[Int]("/remote/regression/data/machsuite/bfs_edges.csv", "\n")
+    val nodes_raw = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/bfs/bfs_nodes.csv", "\n")
+    val edges_data = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/bfs/bfs_edges.csv", "\n")
 
     val node_starts_data = Array.tabulate[Int](N_NODES){i => nodes_raw(2*i)}
     val node_ends_data = Array.tabulate[Int](N_NODES){i => nodes_raw(2*i+1)}
