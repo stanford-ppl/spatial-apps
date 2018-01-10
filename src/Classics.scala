@@ -579,7 +579,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
     type T = FixPt[TRUE,_16,_16]
     val rowtile = 16
     val coltile = 64
-    val data = loadCSV2D[T]("/remote/regression/data/slacsample2d.csv", ",", "\n")
+    val data = loadCSV2D[T](sys.env("SPATIAL_HOME") + "/apps/data/slac/slacsample2d.csv", ",", "\n")
     val memrows = ArgIn[Int]
     val memcols = ArgIn[Int]
     setArg(memrows, data.rows.to[Int])
@@ -622,7 +622,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
 
     // Extract results from accelerator
     val results = getMem(risingEdges)
-    val gold = loadCSV1D[Int]("/remote/regression/data/edge_gold.csv", ",")
+    val gold = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/slac/edge_gold.csv", ",")
     val margin = 2.to[Int]
 
     // Create validation checks and debug code
@@ -641,7 +641,7 @@ object Differentiator extends SpatialApp { // Regression (Dense) // Args: none
   def main() {
     type T = FixPt[TRUE,_16,_16]
     val coltile = 64
-    val data = loadCSV1D[T]("/remote/regression/data/slacsample1d.csv", ",")
+    val data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/slac/slacsample1d.csv", ",")
     val memcols = ArgIn[Int]
     setArg(memcols, data.length.to[Int])
     val srcmem = DRAM[T](memcols)
@@ -679,7 +679,7 @@ object Differentiator extends SpatialApp { // Regression (Dense) // Args: none
     // // Write answer for first time
     // writeCSV1D(results, "/remote/regression/data/deriv_gold.csv", ",")
     // Read answer
-    val gold = loadCSV1D[T]("/remote/regression/data/deriv_gold.csv", ",")
+    val gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/slac/deriv_gold.csv", ",")
 
     // Create validation checks and debug code
     printArray(results, "Results:")
@@ -1178,7 +1178,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
   @virtualize
   def main() {
     val tileSize = 16
-    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val sparse_data = loadCSV2D[Int](sys.env("SPATIAL_HOME") + "/apps/data/pagerank/pagerank_chesapeake.csv", " ", "\n").transpose
     val rows = sparse_data(0,0)
     val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
     val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
@@ -2397,7 +2397,7 @@ object PageRank_Bulk extends SpatialApp { // Regression (Sparse) // Args: 50 0.1
 
   @virtualize
   def main() {
-    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val sparse_data = loadCSV2D[Int](sys.env("SPATIAL_HOME") + "/apps/data/pagerank/pagerank_chesapeake.csv", " ", "\n").transpose
     val rows = sparse_data(0,0)
     val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
     val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
