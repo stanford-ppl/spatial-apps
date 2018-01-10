@@ -19,6 +19,7 @@ object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
     Accel {
       println("hi")
       Pipe { y := x + 4 }
+      assert(x.value == -99.to[Int], "Thou shalt not input -99 to this app")
     }
 
 
