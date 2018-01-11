@@ -4,6 +4,35 @@ import spatial.stdlib._
 import spatial.targets._
 
 
+object SRAMRWTest extends SpatialApp {
+  @virtualize
+  def main() {
+    type T = Int
+    val memSize = 16
+
+    val x = ArgIn[Int]
+    val y = ArgOut[Int]
+    val N = args(0).to[Int]
+
+    setArg(x, N)
+
+    Accel {
+      Pipe {
+        val fpgaMem = SRAM[T](memSize)
+        Foreach(memSize by 1) { i =>
+          fpgaMem(i) = i + 1
+        }
+
+        y := fpgaMem(3) + x
+      }
+    }
+
+    val result = getArg(y)
+    println("result = " + result)
+  }
+}
+
+
 object DRAMWriteTest extends SpatialApp {
   @virtualize
   def main() {
@@ -21,7 +50,7 @@ object DRAMWriteTest extends SpatialApp {
     }
 
     val testRe = getMem(re)
-    printArray(testRe, " Got")
+    printArray(testRe, " Result is")
   }
 }
 
