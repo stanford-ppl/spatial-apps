@@ -203,8 +203,6 @@ object SRAMChar extends SpatialApp {
 
 
 object FloatBasics extends SpatialApp { // Regression (Unit) // Args: 3.2752 -283.70
-  // import IR._
-
   type T = Float//FixPt[TRUE,_16,_16]
   @virtualize
   def main() {
@@ -969,7 +967,7 @@ object DeviceMemcpy extends SpatialApp { // Regression (Unit) // Args: 50
 object SimpleTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 100
 
 
-  val N = 192
+  val N = 512
 
   @virtualize
   def simpleLoadStore[T:Type:Num](srcHost: Array[T], value: T) = {
@@ -984,7 +982,7 @@ object SimpleTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 10
     val x = ArgIn[T]
     setArg(x, value)
     Accel {
-      Sequential.Foreach(N by tileSize par 2) { i =>
+      Sequential.Foreach(N by tileSize par 4) { i =>
         val b1 = SRAM[T](tileSize)
 
         b1 load srcFPGA(i::i+tileSize par 1)
