@@ -3096,7 +3096,9 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val satur_add_signed = ArgOut[SGN] // 4
     val unbiased_sat_mul_unsigned = ArgOut[USGN] // 5
     val unbiased_lower_sat_mul_signed = ArgOut[SGN] // 6
-    val unbiased_upper_sat_mul_signed = ArgOut[SGN] // 6
+    val unbiased_upper_sat_mul_signed = ArgOut[SGN] // 7
+    val regular_add_signed = ArgOut[SGN] // 8
+    val a_sgn_passthru = ArgOut[SGN] // 9
 
 
     Accel {
@@ -3113,6 +3115,8 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
       Pipe{ unbiased_sat_mul_unsigned := B_usgn <*&> C_usgn}
       Pipe{ unbiased_lower_sat_mul_signed := C_sgn <*&> A_sgn}
       Pipe{ unbiased_upper_sat_mul_signed := C_sgn <*&> (-1.to[SGN]*A_sgn)}
+      Pipe{ regular_add_signed := C_sgn * A_sgn }
+      Pipe{ a_sgn_passthru := A_sgn }
     }
 
 
@@ -3155,6 +3159,8 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     println(cksum5 + " Unbiased Saturating Multiplication Unsigned: " + unbiased_sat_mul_unsigned_res + " =?= " + gold_unbiased_sat_mul_unsigned.to[SGN])
     println(cksum6 + " Unbiased (lower) Saturating Multiplication Signed: " + unbiased_lower_sat_mul_signed_res + " =?= " + gold_unbiased_lower_sat_mul_signed.to[SGN])
     println(cksum6 + " Unbiased (upper) Saturating Multiplication Signed: " + unbiased_upper_sat_mul_signed_res + " =?= " + gold_unbiased_upper_sat_mul_signed.to[SGN])
+    println(" Regular Multiplication Signed: " + getArg(regular_add_signed) + " =?= " + (a_sgn * c_sgn).to[SGN])
+    println(" A_sgn Passthru: " + getArg(a_sgn_passthru) + " =?= " + a_sgn)
 
 
     println("PASS: " + cksum + " (SpecialMath) * Need to check subtraction and division ")
