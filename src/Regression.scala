@@ -173,7 +173,8 @@ object Regression {
       app.__stagingArgs = backend.stagingArgs   // just in case the app refers to this
       try {
         app.init(backend.stagingArgs)
-        app.IR.config.verbosity = -2  // Won't see any of this output anyway
+        app.IR.config.verbosity = -2      // Won't see any of this output anyway
+        app.IR.config.exitOnBug = false   // Never exit, even on errors
         app.IR.config.genDir = s"${app.IR.config.cwd}/gen/$backend/$cat/$name/"
         app.IR.config.logDir = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/"
         val consoleLog = argon.core.createLog(s"${app.IR.config.logDir}", "console.log")
@@ -395,6 +396,10 @@ object Regression {
     if (testDomains.isEmpty) testDomains = tests
 
     val nPrograms = testDomains.map(_._2.length).sum
+    println(s"$nPrograms total tests to run:")
+    testDomains.foreach{case (cat, apps) =>
+      apps.foreach{case (app,_) => println(s"  $cat.${app.name}") }
+    }
 
     val regressionLog = new PrintStream(s"regression_$timestamp.log")
     val flagsLog = new PrintStream(s"flags_$timestamp.log")
