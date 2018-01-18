@@ -25,7 +25,7 @@ object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
     val result = getArg(y)
 
     // Create validation checks and debug code
-    val gold = N + 4
+    val gold = N + 123
     println("expected: " + gold)
     println("result: " + result)
 
