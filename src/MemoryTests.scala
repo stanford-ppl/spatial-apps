@@ -23,12 +23,17 @@ object SRAMRWTest extends SpatialApp {
           fpgaMem(i) = i + 1
         }
 
-        y := fpgaMem(3) + x
+        // For fixing, not setting the par.
+        val sum = Reduce(Reg[T](0))(memSize by 1) { i =>
+          fpgaMem(i)
+        }{_+_}
+
+        y := sum + x
       }
     }
 
     val result = getArg(y)
-    val gold = N + 4
+    val gold = N + Array.tabulate(memSize){i => i + 1}.reduce{_+_}
     println("result = " + result)
     println("gold = " + gold)
   }
