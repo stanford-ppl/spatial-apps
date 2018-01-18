@@ -3,7 +3,7 @@ import org.virtualized._
 import spatial.stdlib._
 import spatial.targets._
 
-
+// SRAMTest passed on arria10soc
 object SRAMRWTest extends SpatialApp {
   @virtualize
   def main() {
