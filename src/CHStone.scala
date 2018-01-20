@@ -5,6 +5,7 @@ import spatial.targets._
 object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
   override val target = AWS_F1
 
+  
   type ULong = FixPt[FALSE, _32, _0]
   @struct case class byte_pack(a: Int8, b: Int8, c: Int8, d: Int8)
 
