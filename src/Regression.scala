@@ -85,6 +85,7 @@ object Regression {
     unit ::= (SSV2D, NoArgs)
     unit ::= (SSV1D, NoArgs)
     unit ::= (MultiWriteBuffer, NoArgs)
+    unit ::= (PageBoundaryTest, Array(896))
     unit ::= (DiagBanking, NoArgs)
     unit ::= (SpecialMath, Array(0.125, 5.625, 14, 1.875, -3.4375, -5))
     unit ::= (FixPtMem, Array(5.25, 2.125))
