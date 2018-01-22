@@ -85,6 +85,7 @@ object Regression {
     unit ::= (SSV2D, NoArgs)
     unit ::= (SSV1D, NoArgs)
     unit ::= (MultiWriteBuffer, NoArgs)
+    unit ::= (PageBoundaryTest, Array(896))
     unit ::= (DiagBanking, NoArgs)
     unit ::= (SpecialMath, Array(0.125, 5.625, 14, 1.875, -3.4375, -5))
     unit ::= (FixPtMem, Array(5.25, 2.125))
@@ -174,7 +175,7 @@ object Regression {
       try {
         app.init(backend.stagingArgs)
         app.IR.config.verbosity = -2      // Won't see any of this output anyway
-        app.IR.config.exitOnBug = false   // Never exit, even on errors
+        // app.IR.config.exitOnBug = false   // Never exit, even on errors
         app.IR.config.genDir = s"${app.IR.config.cwd}/gen/$backend/$cat/$name/"
         app.IR.config.logDir = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/"
         val consoleLog = argon.core.createLog(s"${app.IR.config.logDir}", "console.log")
