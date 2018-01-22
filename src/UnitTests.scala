@@ -355,9 +355,19 @@ object LUTTest extends SpatialApp { // Regression (Unit) // Args: 2
         12, 13, 14, -15
       )
       val red = Reduce(Reg[T](0))(3 by 1 par 3) {q =>
-        lut(q,q)
+        val x = lut(q,q)
+        println("" + q + "," + q + ": " + x)
+        x
       }{_^_}
-      y := lut(1, 3) ^ lut(3, 3) ^ red ^ lut(i,0)
+
+      val x13 = lut(1,3)
+      val x33 = lut(3,3)
+      val xi0 = lut(i,0)
+      println("1,3: " + x13)
+      println("3,3: " + x33)
+      println("i,0: " + xi0)
+
+      y := x13 ^ x33 ^ red ^ xi0
 
       val blut = LUT[Bit](4, 4)(
          true, true,  true, false,
@@ -383,7 +393,7 @@ object LUTTest extends SpatialApp { // Regression (Unit) // Args: 2
     println("bresult: " + bresult)
 
     val cksum = gold == result && bgold == bresult
-    println("PASS: " + cksum + " (InOutArg)")
+    println("PASS: " + cksum + " (LUTTest)")
   }
 }
 
@@ -618,6 +628,13 @@ object BubbledWriteTest extends SpatialApp { // Regression (Unit) // Args: none
       Sequential.Foreach(N by T){i =>
         wt load weights(i::i+T par 16)
         in load inputs(i::i+T par 16)
+
+        print("[i: " + i + "] in: ")
+        Foreach(T by 1){j =>
+          print(in(j) + " ")
+        }
+        println()
+
         val niter = Reg[Int]
         Pipe{niter.reset}
         Pipe{niter.reset} // Testing codegen for multiple resetters
@@ -627,6 +644,11 @@ object BubbledWriteTest extends SpatialApp { // Regression (Unit) // Args: none
           MemReduce(wt)(niter by 1){ k =>  // s0 write
             in
           }{_+_}
+          print("[x:" + x + "] wt: ")
+          Foreach(T by 1){i =>
+            print(wt(i) + " ")
+          }
+          println()
           val dummyReg1 = Reg[Int]
           val dummyReg2 = Reg[Int]
           val dummyReg3 = Reg[Int]
