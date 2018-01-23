@@ -55,6 +55,7 @@ object Regression {
     dense ::= (MD_Grid, NoArgs)
     dense ::= (MD_KNN, NoArgs)
     dense ::= (NW, Array("tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"))
+    dense ::= (PageBoundaryTest, Array(896))
     dense ::= (Stencil3D, NoArgs)
     dense ::= (Stencil2D, NoArgs)
     dense ::= (Viterbi, NoArgs)
