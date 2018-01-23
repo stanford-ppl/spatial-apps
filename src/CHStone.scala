@@ -21,7 +21,7 @@ object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
     val CONST3 = 0x8f1bbcdcL
     val CONST4 = 0xca62c1d6L
 
-    val raw_text = loadCSV1D[String]("/remote/regression/data/machsuite/sha_txt.csv", "\n").apply(0)
+    val raw_text = loadCSV1D[String](sys.env("SPATIAL_HOME") + "/apps/data/crypto/sha_txt.csv", "\n").apply(0)
     // val raw_text = loadCSV1D[String]("/home/mattfel/txt", "\n").apply(0)
     val data_text = argon.lang.String.string2num(raw_text)
     // val data_text = loadCSV1D[Int8]("/home/mattfel/txt",",")
@@ -199,7 +199,7 @@ object JPEG_Markers extends SpatialApp { // Regression (Dense) // Args: none
     val out_p_jinfo_image_width_get_sof = 90
     val out_p_jinfo_num_components_get_sof = 3
 
-    val jpg_data = loadCSV1D[UInt8]("/remote/regression/data/machsuite/jpeg_input.csv", ",")
+    val jpg_data = loadCSV1D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_input.csv", ",")
     val numel = jpg_data.length
     assert(!(jpg_data(0) != 255.to[UInt8] || jpg_data(1) != M_SOI.to[UInt8]), "Not a jpeg file!")
 
@@ -521,12 +521,12 @@ object JPEG_Markers extends SpatialApp { // Regression (Dense) // Args: none
     // Get gold checks
     val jpeg_data_start_gold = 623
     val smp_fact_gold = 2
-    val quant_tbl_quantval_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_tbl_quantval.csv", " ", "\n")
-    val dc_xhuff_tbl_bits_gold = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_bits.csv", " ", "\n")
-    val dc_xhuff_tbl_huffval_gold = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_huffval.csv", " ", "\n")
-    val ac_xhuff_tbl_bits_gold = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_bits.csv", " ", "\n")
-    val ac_xhuff_tbl_huffval_gold = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_huffval.csv", " ", "\n")
-    // val component_acdc_gold = loadCSV1D[comp_struct]("/remote/regression/data/machsuite/jpeg_acdc.csv", "\n")
+    val quant_tbl_quantval_gold = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_tbl_quantval.csv", " ", "\n")
+    val dc_xhuff_tbl_bits_gold = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_xhuff_tbl_bits.csv", " ", "\n")
+    val dc_xhuff_tbl_huffval_gold = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_xhuff_tbl_huffval.csv", " ", "\n")
+    val ac_xhuff_tbl_bits_gold = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_xhuff_tbl_bits.csv", " ", "\n")
+    val ac_xhuff_tbl_huffval_gold = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_xhuff_tbl_huffval.csv", " ", "\n")
+    // val component_acdc_gold = loadCSV1D[comp_struct](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_acdc.csv", "\n")
 
     // Do checks
     println("\nRESULTS: ")
@@ -596,7 +596,7 @@ object JPEG_Decompress extends SpatialApp { // Regression (Dense) // Args: none
     val out_p_jinfo_image_width_get_sof = 90
     val out_p_jinfo_num_components_get_sof = 3
 
-    val jpg_data = loadCSV1D[UInt8]("/remote/regression/data/machsuite/jpeg_input.csv", ",")
+    val jpg_data = loadCSV1D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_input.csv", ",")
     val numel = jpg_data.length
     assert(!(jpg_data(0) != 255.to[UInt8] || jpg_data(1) != M_SOI.to[UInt8]), "Not a jpeg file!")
 
@@ -606,10 +606,10 @@ object JPEG_Decompress extends SpatialApp { // Regression (Dense) // Args: none
     // setMem(jpg_dram, jpg_data)
 
     // Get temp results
-    val dc_xhuff_tbl_bits_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_bits.csv", " ", "\n")
-    val dc_xhuff_tbl_huffval_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_huffval.csv", " ", "\n")
-    val ac_xhuff_tbl_bits_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_bits.csv", " ", "\n")
-    val ac_xhuff_tbl_huffval_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_huffval.csv", " ", "\n")
+    val dc_xhuff_tbl_bits_data = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_xhuff_tbl_bits.csv", " ", "\n")
+    val dc_xhuff_tbl_huffval_data = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_xhuff_tbl_huffval.csv", " ", "\n")
+    val ac_xhuff_tbl_bits_data = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_xhuff_tbl_bits.csv", " ", "\n")
+    val ac_xhuff_tbl_huffval_data = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_xhuff_tbl_huffval.csv", " ", "\n")
 
     val smp_fact = ArgIn[UInt2]
     val dc_xhuff_tbl_bits = DRAM[UInt8](NUM_HUFF_TBLS,36) // 36)
@@ -738,7 +738,6 @@ object JPEG_Decompress extends SpatialApp { // Regression (Dense) // Args: none
         Pipe{p_dhtbl_ml_mem(idx) = p_dhtbl_ml.value.as[UInt16]}
       }
 
-
       // START DESIGN
 
       // Init structures
@@ -809,13 +808,13 @@ object JPEG_Decompress extends SpatialApp { // Regression (Dense) // Args: none
 
     // Get gold checks
     val dc_dhuff_tbl_ml_gold = Array[UInt16](9,11)
-    val dc_dhuff_tbl_maxcode_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_maxcode.csv", " ", "\n")
-    val dc_dhuff_tbl_mincode_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_mincode.csv", " ", "\n")
-    val dc_dhuff_tbl_valptr_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_valptr.csv", " ", "\n")
+    val dc_dhuff_tbl_maxcode_gold = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_dhuff_tbl_maxcode.csv", " ", "\n")
+    val dc_dhuff_tbl_mincode_gold = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_dhuff_tbl_mincode.csv", " ", "\n")
+    val dc_dhuff_tbl_valptr_gold = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_dhuff_tbl_valptr.csv", " ", "\n")
     val ac_dhuff_tbl_ml_gold = Array[UInt16](16,16)
-    val ac_dhuff_tbl_maxcode_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_maxcode.csv", " ", "\n")
-    val ac_dhuff_tbl_mincode_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_mincode.csv", " ", "\n")
-    val ac_dhuff_tbl_valptr_gold = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_valptr.csv", " ", "\n")
+    val ac_dhuff_tbl_maxcode_gold = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_dhuff_tbl_maxcode.csv", " ", "\n")
+    val ac_dhuff_tbl_mincode_gold = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_dhuff_tbl_mincode.csv", " ", "\n")
+    val ac_dhuff_tbl_valptr_gold = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_dhuff_tbl_valptr.csv", " ", "\n")
 
     // Do checks
     println("\nRESULTS: ")
@@ -883,7 +882,7 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
     val out_p_jinfo_image_width_get_sof = 90
     val out_p_jinfo_num_components_get_sof = 3
 
-    val jpg_data = loadCSV1D[UInt8]("/remote/regression/data/machsuite/jpeg_input.csv", ",")
+    val jpg_data = loadCSV1D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_input.csv", ",")
     val numel = jpg_data.length
     assert(!(jpg_data(0) != 255.to[UInt8] || jpg_data(1) != M_SOI.to[UInt8]), "Not a jpeg file!")
 
@@ -917,17 +916,17 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
     val ac_dhuff_tbl_mincode = DRAM[UInt16](NUM_HUFF_TBLS, 36)
     val ac_dhuff_tbl_valptr = DRAM[UInt16](NUM_HUFF_TBLS, 36)
 
-    val dc_xhuff_tbl_bits_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_bits.csv", " ", "\n")
-    val dc_xhuff_tbl_huffval_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_dc_xhuff_tbl_huffval.csv", " ", "\n")
-    val dc_dhuff_tbl_maxcode_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_maxcode.csv", " ", "\n")
-    val dc_dhuff_tbl_mincode_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_mincode.csv", " ", "\n")
-    val dc_dhuff_tbl_valptr_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_dc_dhuff_tbl_valptr.csv", " ", "\n")
+    val dc_xhuff_tbl_bits_data = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_xhuff_tbl_bits.csv", " ", "\n")
+    val dc_xhuff_tbl_huffval_data = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_xhuff_tbl_huffval.csv", " ", "\n")
+    val dc_dhuff_tbl_maxcode_data = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_dhuff_tbl_maxcode.csv", " ", "\n")
+    val dc_dhuff_tbl_mincode_data = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_dhuff_tbl_mincode.csv", " ", "\n")
+    val dc_dhuff_tbl_valptr_data = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_dc_dhuff_tbl_valptr.csv", " ", "\n")
     val ac_dhuff_tbl_ml_data = Array[UInt16](16,16)
-    val ac_xhuff_tbl_bits_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_bits.csv", " ", "\n")
-    val ac_xhuff_tbl_huffval_data = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_ac_xhuff_tbl_huffval.csv", " ", "\n")
-    val ac_dhuff_tbl_maxcode_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_maxcode.csv", " ", "\n")
-    val ac_dhuff_tbl_mincode_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_mincode.csv", " ", "\n")
-    val ac_dhuff_tbl_valptr_data = loadCSV2D[UInt16]("/remote/regression/data/machsuite/jpeg_ac_dhuff_tbl_valptr.csv", " ", "\n")
+    val ac_xhuff_tbl_bits_data = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_xhuff_tbl_bits.csv", " ", "\n")
+    val ac_xhuff_tbl_huffval_data = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_xhuff_tbl_huffval.csv", " ", "\n")
+    val ac_dhuff_tbl_maxcode_data = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_dhuff_tbl_maxcode.csv", " ", "\n")
+    val ac_dhuff_tbl_mincode_data = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_dhuff_tbl_mincode.csv", " ", "\n")
+    val ac_dhuff_tbl_valptr_data = loadCSV2D[UInt16](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_ac_dhuff_tbl_valptr.csv", " ", "\n")
 
     setMem(dc_xhuff_tbl_bits, dc_xhuff_tbl_bits_data)
     setMem(dc_xhuff_tbl_huffval, dc_xhuff_tbl_huffval_data)
@@ -1260,7 +1259,7 @@ object JPEG_Decode extends SpatialApp { // DISABLED Regression (Dense) // Args: 
       }
     }
 
-    val gold_bmp = loadCSV2D[UInt8]("/remote/regression/data/machsuite/jpeg_input.csv", ",", "\n")
+    val gold_bmp = loadCSV2D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/jpeg/jpeg_input.csv", ",", "\n")
     // printMatrix(gold_bmp, "gold")
   }
 }
@@ -1280,7 +1279,7 @@ object MPEG2 extends SpatialApp { // DISABLED Regression (Dense) // Args: none
     val mvscale = 1
     val MV_FIELD = 0
     val ERROR = 255
-    val inRdBfr_data = loadCSV1D[UInt8]("/remote/regression/data/machsuite/mpeg2_inRdBfr.csv", ",")
+    val inRdBfr_data = loadCSV1D[UInt8](sys.env("SPATIAL_HOME") + "/apps/data/mpeg/mpeg2_inRdBfr.csv", ",")
     val inRdBfr_dram = DRAM[UInt8](NUMEL)
     setMem(inRdBfr_dram, inRdBfr_data)
 

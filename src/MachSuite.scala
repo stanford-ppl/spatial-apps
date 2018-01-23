@@ -823,7 +823,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     val par_store = 16
     val row_par = 2 (1 -> 1 -> 8)
 
-    val SKIPB = 0
+      val SKIPB = 0
     val SKIPA = 1
     val ALIGN = 2
     val MATCH_SCORE = 1
@@ -980,9 +980,6 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     // val cksumB = seqb_aligned_string == seqb_gold_string //seqb_aligned_result.zip(seqb_gold_bin){_==_}.reduce{_&&_}
     // val cksum = cksumA && cksumB
     println("PASS: " + cksum + " (NW)")
-
-
-
   }
 }
 
@@ -1319,7 +1316,7 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
     val raw_string = argon.lang.String.string2num(raw_string_data(0))
     val raw_pattern = argon.lang.String.string2num(raw_string_pattern)
     val par_load = 16
-    val outer_par = 4 (1 -> 1 -> 16)
+    val outer_par = 2 (1 -> 1 -> 16)
     val STRING_SIZE_NUM = raw_string.length.to[Int]
     val PATTERN_SIZE_NUM = raw_pattern.length.to[Int]
     val STRING_SIZE = ArgIn[Int]
@@ -1353,11 +1350,12 @@ object KMP extends SpatialApp { // Regression (Dense) // Args: the
       }
 
       // Scan string portions
-      val global_matches = Sequential.Reduce(Reg[Int](0))(STRING_SIZE by (STRING_SIZE/outer_par) by STRING_SIZE/outer_par par outer_par) {chunk => 
+      val global_matches = Sequential.Reduce(Reg[Int](0))(STRING_SIZE by (STRING_SIZE/outer_par) par outer_par) {chunk =>  // Attempt to run all in one iteration (but won't if outer_par does not evenly divide STRING_SIZE)
+        val end = min((chunk + STRING_SIZE/outer_par + PATTERN_SIZE-1), STRING_SIZE.value)
         val num_matches = Reg[Int](0)
         num_matches.reset
         val string_sram = SRAM[Int8](32411) // Conveniently sized
-        string_sram load string_dram(chunk::chunk + (STRING_SIZE/outer_par) + (PATTERN_SIZE-1) par par_load)
+        string_sram load string_dram(chunk::end par par_load)
         val q = Reg[Int](0)
         Sequential.Foreach(0 until STRING_SIZE/outer_par + PATTERN_SIZE-1 by 1) { i => 
           // val whileCond = Reg[Bit](false)
@@ -2047,8 +2045,8 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
           val start_id = rowid_sram(i)
           val stop_id = rowid_sram(i+1)
           Parallel{
-            cols_sram load cols_dram(start_id :: stop_id par par_segment_load)
-            values_sram load values_dram(start_id :: stop_id par par_segment_load)
+            Pipe{cols_sram load cols_dram(start_id :: stop_id par par_segment_load)} // Remove when bug #244 is resolved
+            Pipe{values_sram load values_dram(start_id :: stop_id par par_segment_load)} // Remove when bug #244 is resolved
           }
           vec_sram gather vec_dram(cols_sram, stop_id - start_id)
           println("row " + {i + tile})

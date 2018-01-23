@@ -13,10 +13,12 @@ import scala.concurrent.{Await, Future, TimeoutException}
 // Usage: <threads> <branch> <type [Scala, Chisel]>
 object Regression {
   // Times to wait for compilation and running, in seconds
-  var MAKE_TIMEOUT = 1800
-  var RUN_TIMEOUT = 1800
+  var MAKE_TIMEOUT = 2000
+  var RUN_TIMEOUT = 2000
   var ZYNQ_TIMEOUT = 11000
+  var ZCU_TIMEOUT = 11000
   var AWS_TIMEOUT = 32400
+  var ARRIA10_TIMEOUT = 11000
 
   private final val NoArgs = Array[Any]()
 
@@ -52,7 +54,7 @@ object Regression {
     dense ::= (Sort_Radix, NoArgs)
     dense ::= (GEMM_Blocked, Array(128))
     dense ::= (GEMM_NCubed, NoArgs)
-    // dense ::= (KMP, Array("the"))
+    dense ::= (KMP, Array("the"))
     dense ::= (MD_Grid, NoArgs)
     dense ::= (MD_KNN, NoArgs)
     dense ::= (NW, Array("tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"))
@@ -63,25 +65,28 @@ object Regression {
     dense ::= (AES, Array(50))
 
     var sparse = List[(SpatialApp, Array[Any])]()
-    // sparse ::= (ScatterGather, Array(160))
-    // sparse ::= (GatherStore, NoArgs)
+    sparse ::= (ScatterGather, Array(160))
+    sparse ::= (GatherStore, NoArgs)
     sparse ::= (PageRank_Bulk, Array(50, 0.125))
     // sparse ::= (SPMV_DumbPack, Array(1536))
-    // sparse ::= (PageRank, Array(50, 0.125))
+    sparse ::= (PageRank, Array(50, 0.125))
     sparse ::= (BFS_Queue, NoArgs)
     sparse ::= (BFS_Bulk, NoArgs)
-    // sparse ::= (SPMV_ELL, NoArgs)
-    // sparse ::= (SPMV_CRS, NoArgs)
+    sparse ::= (SPMV_ELL, NoArgs)
+    sparse ::= (SPMV_CRS, NoArgs)
 
     var unit = List[(SpatialApp, Array[Any])]()
+    unit ::= (Breakpoint, NoArgs)
     unit ::= (ArbitraryLambda, Array(8))
     unit ::= (BubbledWriteTest, NoArgs)
     unit ::= (MultiplexedWriteTest, NoArgs)
     unit ::= (MixedIOTest, NoArgs)
-    unit ::= (LUTTest, Array(2))
+    unit ::= (LUTTest, Array(2, 3))
+    unit ::= (RetimedFifoBranch, Array(13,25))
     unit ::= (SSV2D, NoArgs)
     unit ::= (SSV1D, NoArgs)
     unit ::= (MultiWriteBuffer, NoArgs)
+    unit ::= (PageBoundaryTest, Array(896))
     unit ::= (DiagBanking, NoArgs)
     unit ::= (SpecialMath, Array(0.125, 5.625, 14, 1.875, -3.4375, -5))
     unit ::= (FixPtMem, Array(5.25, 2.125))
@@ -118,19 +123,16 @@ object Regression {
     unit ::= (MemTest2D, Array(7))
     unit ::= (MemTest1D, Array(7))
     unit ::= (Niter, Array(100))
+    unit ::= (StridedLoad, NoArgs)
     unit ::= (InOutArg, Array(32))
     unit ::= (Tensor5D, Array(32, 4, 4, 4, 4))
     unit ::= (Tensor4D, Array(32, 4, 4, 4))
+    unit ::= (IndirectLoad, NoArgs)
     unit ::= (SequentialWrites, Array(7))
 
     var fixme = List[(SpatialApp, Array[Any])]()
-    fixme ::= (KMP, Array("the"))
-    fixme ::= (ScatterGather, Array(160))
-    fixme ::= (PageRank, Array(50, 0.125))
-    fixme ::= (GatherStore, NoArgs)
+    // fixme ::= (KMP, Array("the"))
     fixme ::= (SPMV_DumbPack, Array(1536))
-    fixme ::= (SPMV_ELL, NoArgs)
-    fixme ::= (SPMV_CRS, NoArgs)
     fixme ::= (Backprop, Array(5))
 
 
@@ -173,7 +175,8 @@ object Regression {
       app.__stagingArgs = backend.stagingArgs   // just in case the app refers to this
       try {
         app.init(backend.stagingArgs)
-        app.IR.config.verbosity = -2  // Won't see any of this output anyway
+        app.IR.config.verbosity = -2      // Won't see any of this output anyway
+        // app.IR.config.exitOnBug = false   // Never exit, even on errors
         app.IR.config.genDir = s"${app.IR.config.cwd}/gen/$backend/$cat/$name/"
         app.IR.config.logDir = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/"
         val consoleLog = argon.core.createLog(s"${app.IR.config.logDir}", "console.log")
@@ -360,29 +363,53 @@ object Regression {
       name = "Chisel",
       stagingArgs = flags :+ "--synth",
       make = genDir => Process(Seq("make","vcs"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "run.sh", args), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "scripts/regression_run.sh", branch, args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "Zynq",
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "Zynq", args), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Zynq", args), new java.io.File(genDir))
+    )
+    backends ::= Backend(
+      name = "ZCU",
+      stagingArgs = flags :+ "--synth" :+ "--retime",
+      make = genDir => Process(Seq("make","zcu"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "ZCU", args), new java.io.File(genDir))
+    )
+    backends ::= Backend(
+      name = "Arria10",
+      stagingArgs = flags :+ "--synth" :+ "--retime",
+      make = genDir => Process(Seq("make","arria10"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Arria10", args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "AWS",
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","aws-F1-afi"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "scrape.sh", "AWS"), new java.io.File(genDir))
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "AWS"), new java.io.File(genDir))
+    )
+    backends ::= Backend(
+      name = "Stats",
+      stagingArgs = flags :+ "--synth" :+ "--retime",
+      make = genDir => Process(Seq("make","null"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scripts/stats.sh"), new java.io.File(genDir))
     )
 
     var testBackends = backends.filter{b => args.contains(b.name) }
     if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
+    else if (args.contains("ZCU")) MAKE_TIMEOUT = ZCU_TIMEOUT
+    else if (args.contains("Arria10")) MAKE_TIMEOUT = ARRIA10_TIMEOUT
     else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
     if (testBackends.isEmpty) testBackends = backends
     var testDomains = tests.filter{t => args.contains(t._1) }
     if (testDomains.isEmpty) testDomains = tests
 
     val nPrograms = testDomains.map(_._2.length).sum
+    println(s"$nPrograms total tests to run:")
+    testDomains.foreach{case (cat, apps) =>
+      apps.foreach{case (app,_) => println(s"  $cat.${app.name}") }
+    }
 
     val regressionLog = new PrintStream(s"regression_$timestamp.log")
     val flagsLog = new PrintStream(s"flags_$timestamp.log")

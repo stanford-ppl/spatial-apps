@@ -2,7 +2,7 @@ import spatial.dsl._
 import org.virtualized._
 
 object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
-
+  override val target = targets.Default
   type X = FixPt[TRUE,_32,_0]
 
   val ip = 4
@@ -80,8 +80,7 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
 }
 
 object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
-
-
+  override val target = targets.Default
   type X = FixPt[TRUE,_32,_0]
 
   val innerPar = 4
@@ -91,12 +90,21 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
 
   @virtualize
   def dotproduct[T:Type:Num](aIn: Array[T], bIn: Array[T]): T = {
+<<<<<<< HEAD:examples/Products.scala
     val B  = tileSize (32 -> 64 -> 19200)
     val P1 = outerPar (1 -> 6)
     val P2 = innerPar (1 -> 192)
     val P3 = innerPar (1 -> 192)
 
     val size = aIn.length; bound(size) = 1920000
+=======
+    val B  = tileSize (64 -> 64 -> 9600) // 150
+    val P1 = outerPar (1 -> 6) // 6
+    val P2 = innerPar (1 -> 256) // 256
+    val P3 = innerPar (1 -> 256) // 256
+
+    val size = aIn.length; bound(size) = 19200000
+>>>>>>> 77f47a028b6016d15079bf38129f29558a134ef3:src/Products.scala
 
     val N = ArgIn[Int]
     setArg(N, size)

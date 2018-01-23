@@ -3,8 +3,7 @@ import spatial.targets._
 import org.virtualized._
 
 object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
-  override val target = AWS_F1
-
+  override val target = targets.Default
   type X = Int
 
   val numcents = 16
@@ -37,6 +36,8 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
     val N     = ArgIn[Int]
     val K     = numCents //ArgIn[Int]
     val D     = numDims //ArgIn[Int]
+
+    bound(iters) = 9
 
     setArg(iters, it)
     setArg(N, numPoints)
@@ -297,7 +298,7 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
 
 
 object BlackScholes extends SpatialApp {
-
+  override val target = targets.Default
 
   val margin = 0.5f // Validates true if within +/- margin
   val innerPar = 16
@@ -578,7 +579,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
     type T = FixPt[TRUE,_16,_16]
     val rowtile = 16
     val coltile = 64
-    val data = loadCSV2D[T]("/remote/regression/data/slacsample2d.csv", ",", "\n")
+    val data = loadCSV2D[T](sys.env("SPATIAL_HOME") + "/apps/data/slac/slacsample2d.csv", ",", "\n")
     val memrows = ArgIn[Int]
     val memcols = ArgIn[Int]
     setArg(memrows, data.rows.to[Int])
@@ -621,7 +622,7 @@ object EdgeDetector extends SpatialApp { // Regression (Dense) // Args: none
 
     // Extract results from accelerator
     val results = getMem(risingEdges)
-    val gold = loadCSV1D[Int]("/remote/regression/data/edge_gold.csv", ",")
+    val gold = loadCSV1D[Int](sys.env("SPATIAL_HOME") + "/apps/data/slac/edge_gold.csv", ",")
     val margin = 2.to[Int]
 
     // Create validation checks and debug code
@@ -640,7 +641,7 @@ object Differentiator extends SpatialApp { // Regression (Dense) // Args: none
   def main() {
     type T = FixPt[TRUE,_16,_16]
     val coltile = 64
-    val data = loadCSV1D[T]("/remote/regression/data/slacsample1d.csv", ",")
+    val data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/slac/slacsample1d.csv", ",")
     val memcols = ArgIn[Int]
     setArg(memcols, data.length.to[Int])
     val srcmem = DRAM[T](memcols)
@@ -678,7 +679,7 @@ object Differentiator extends SpatialApp { // Regression (Dense) // Args: none
     // // Write answer for first time
     // writeCSV1D(results, "/remote/regression/data/deriv_gold.csv", ",")
     // Read answer
-    val gold = loadCSV1D[T]("/remote/regression/data/deriv_gold.csv", ",")
+    val gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/slac/deriv_gold.csv", ",")
 
     // Create validation checks and debug code
     printArray(results, "Results:")
@@ -710,7 +711,8 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
     val ip = innerPar(1 -> 12)
     val subLoopPar = innerPar(1 -> 16)
     val prodLoopPar = innerPar(1 -> 96)
-    val outerAccumPar = innerPar(1 -> 1)
+    val outerAccumPar = innerPar(1 -> 16)
+    val innerAccumPar = innerPar(1 -> 16)
 
     val rows = yCPU.length;
     bound(rows) = 360000
@@ -743,7 +745,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
       val sigmaOut = SRAM[T](MAXC, MAXC)
 
-      MemReduce(sigmaOut)(R by rTileSize par op){ r =>
+      MemReduce(sigmaOut par outerAccumPar)(R by rTileSize par op){ r =>
         val gdaYtile = SRAM[Int](rTileSize)
         val gdaXtile = SRAM[T](rTileSize, MAXC)
         val blk = Reg[Int]
@@ -757,7 +759,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
         val sigmaBlk = SRAM[T](MAXC, MAXC)
 
-        MemReduce(sigmaBlk)(blk par param(1)) { rr =>
+        MemReduce(sigmaBlk par innerAccumPar)(blk par param(1)) { rr =>
           val subTile = SRAM[T](MAXC)
           val sigmaTile = SRAM[T](MAXC, MAXC)
           Foreach(C par subLoopPar) { cc =>
@@ -1163,7 +1165,7 @@ object LogReg extends SpatialApp {
 }
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
-
+  override val target = targets.Default
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
 
@@ -1176,7 +1178,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
   @virtualize
   def main() {
     val tileSize = 16
-    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val sparse_data = loadCSV2D[Int](sys.env("SPATIAL_HOME") + "/apps/data/pagerank/pagerank_chesapeake.csv", " ", "\n").transpose
     val rows = sparse_data(0,0)
     val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
     val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
@@ -1696,8 +1698,7 @@ WHERE
 */
 
 object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
-
-
+  override val target = targets.Default
   type FT = Int
 
   val MIN_DATE = 0
@@ -1706,7 +1707,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   val MAX_DISC = 9999
   val margin = 1
 
-  val innerPar = 16
+  val innerPar = 8
   val outerPar = 2
 
   val tileSize = 384
@@ -1715,6 +1716,7 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
   def tpchq6[T:Type:Num](datesIn: Array[Int], quantsIn: Array[Int], disctsIn: Array[T], pricesIn: Array[T]): T = {
     val dataSize = ArgIn[Int]
     setArg(dataSize, datesIn.length)
+    bound(dataSize) = 96000000
 
     val dates  = DRAM[Int](dataSize)
     val quants = DRAM[Int](dataSize)
@@ -2012,9 +2014,7 @@ object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7
 }
 
 object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat
-  override val target = AWS_F1
-
-
+  override val target = targets.Default
  /*
   
   Smith-Waterman Genetic Alignment algorithm                                                  
@@ -2066,9 +2066,9 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     setArg(dash,d)
     val underscore = argon.lang.String.char2num("_")
 
-    val par_load = 16
-    val par_store = 16
-    val row_par = 2 (1 -> 1 -> 8)
+    val par_load = 16 (1 -> 1 -> 64)
+    val par_store = 16 (1 -> 1 -> 64)
+    val row_par = 2 (1 -> 1 -> 256)
 
     val SKIPB = 0
     val SKIPA = 1
@@ -2081,6 +2081,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     val seqa_string = args(0).to[MString] //"tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc"
     val seqb_string = args(1).to[MString] //"ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"
     val measured_length = seqa_string.length
+    bound(measured_length) = 160
     val length = ArgIn[Int]
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
@@ -2237,8 +2238,7 @@ object SW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
 }
 
 object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
-
-
+  override val target = targets.Default
   val Kh = 3
   val Kw = 3
   val Cmax = 160
@@ -2251,11 +2251,12 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
     val C = ArgIn[Int]
     setArg(R, image.rows)
     setArg(C, image.cols)
-
+    bound(R) = 256
+    bound(C) = 160
 
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
-    val row_stride = 10 (100 -> 100 -> 500)
+    val row_stride = 10 (3 -> 3 -> 500)
     val row_par = 2 (1 -> 1 -> 16)
     val par_Kh = 3 (1 -> 1 -> 3)
     val par_Kw = 3 (1 -> 1 -> 3)
@@ -2288,22 +2289,19 @@ object Sobel extends SpatialApp { // Regression (Dense) // Args: 200 160
 
             Foreach(0 until Kh par Kh){i => sr(i, *) <<= lb(i, c) }
             
-            val horz = Reduce(Reg[T])(Kh by 1 par par_Kh){i =>
-              Reduce(Reg[T])(Kw by 1 par par_Kw){j => 
-              // val number = mux((r < 2) || (c < 2) , 0.to[T], sr(i,j))
-              // number * kh(i,j) 
-                sr(i,j) * kh(i,j)
-              }{_+_}
-            }{_+_}
-            val vert = Reduce(Reg[T])(Kh by 1 par par_Kh){i => 
-              Reduce(Reg[T])(Kw by 1 par par_Kw){j => 
-              // val number = mux((r < 2) || (c < 2) , 0.to[T], sr(i,j))
-              // number * kv(i,j) 
-                sr(i,j) * kv(i,j)
-              }{_+_}
-            }{_+_}
+            // val accum = Reg[Tup2[T,T]](pack(0.to[T], 0.to[T]))
 
-            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index] || r.to[Index] + rr.to[Index] >= R-2, 0.to[T], abs(horz.value) + abs(vert.value))// Technically should be sqrt(horz**2 + vert**2)
+            // Reduce(accum)(Kh by 1, Kh by 1 par 3) {(i,j) => 
+            //   val pxl = sr(i,j)
+            //   pack(pxl * kh(i,j), pxl * kv(i,j))
+            // }{(a,b) => pack(a._1 + b._1, a._2 + b._2)}
+
+            val accum = List.tabulate(Kh){i => List.tabulate(Kh){j => 
+              val pxl = sr(i,j)
+              pack(pxl * kh(i,j), pxl * kv(i,j))
+            }}.flatten.reduce{(a,b) => pack(a._1 + b._1, a._2 + b._2)}
+
+            lineOut(c) = mux(r.to[Index] + rr.to[Index] < 2.to[Index] || r.to[Index] + rr.to[Index] >= R-2, 0.to[T], abs(accum._1) + abs(accum._2))// Technically should be sqrt(horz**2 + vert**2)
             // println("lineout c = " + mux(r.to[Index] + rr.to[Index] < 2.to[Index], 0.to[T], abs(horz.value) + abs(vert.value)))
           }
 
@@ -2399,7 +2397,7 @@ object PageRank_Bulk extends SpatialApp { // Regression (Sparse) // Args: 50 0.1
 
   @virtualize
   def main() {
-    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val sparse_data = loadCSV2D[Int](sys.env("SPATIAL_HOME") + "/apps/data/pagerank/pagerank_chesapeake.csv", " ", "\n").transpose
     val rows = sparse_data(0,0)
     val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
     val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
