@@ -154,7 +154,7 @@ object OneBurstOneStoreArgs extends SpatialApp {
 }
 
 // Want to check if it's the sram writes that's not getting correct or the burst. If sram writes, then there should be 2 zeros. If burst, then should be one.
-object OneBurstTwoStore extends SpatialApp {
+object OneBurstTwoStore extends SpatialApp { // Error: first burst missing...? // More: this is not supported for now.
   @virtualize
   def main() {
     type T = Int
