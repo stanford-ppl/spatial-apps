@@ -55,6 +55,7 @@ object Regression {
     dense ::= (GEMM_Blocked, Array(128))
     dense ::= (GEMM_NCubed, NoArgs)
     dense ::= (KMP, Array("the"))
+    dense ::= (PageBoundaryTest, Array(896))
     dense ::= (MD_Grid, NoArgs)
     dense ::= (MD_KNN, NoArgs)
     dense ::= (NW, Array("tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"))
