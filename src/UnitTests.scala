@@ -2164,12 +2164,8 @@ object PageBoundaryTest extends SpatialApp { // Regression (Unit) // Args: none
           // sram4(i) = 4
           sram0(i)
         }{_+_}
-        Foreach(3 by 1){_ =>
-          dram1(j::j+tileSize par 16) store sram1
-        }
-        Foreach(3 by 1){_ =>
-          dram2(j::j+tileSize par 16) store sram2
-        }
+        dram1(j::j+tileSize par 16) store sram1
+        dram2(j::j+tileSize par 16) store sram2
         // dram3(j::j+tileSize par 16) store sram3
         // dram4(j::j+tileSize par 16) store sram4
         minisum
@@ -2196,7 +2192,7 @@ object PageBoundaryTest extends SpatialApp { // Regression (Unit) // Args: none
 
     println("cksum0: " + cksum0)
     println("cksum1: " + cksum1)
-    println("cksum2: " + cksum2)
+    // println("cksum2: " + cksum2)
     // println("cksum3: " + cksum3)
     // println("cksum4: " + cksum4)
 
