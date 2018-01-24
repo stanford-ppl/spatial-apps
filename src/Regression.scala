@@ -18,6 +18,7 @@ object Regression {
   var ZYNQ_TIMEOUT = 11000
   var ZCU_TIMEOUT = 11000
   var AWS_TIMEOUT = 32400
+  var ARRIA10_TIMEOUT = 11000
 
   private final val NoArgs = Array[Any]()
 
@@ -352,6 +353,8 @@ object Regression {
     if (branch.contains("syncMem")) flags = flags :+ "--multifile=4" else flags = flags :+ "--multifile=5"
     if (branch.contains("pre-master")) flags = flags :+ "--instrument"
     if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
+    else if (args.contains("ZCU")) MAKE_TIMEOUT = ZCU_TIMEOUT
+    else if (args.contains("Arria10")) MAKE_TIMEOUT = ARRIA10_TIMEOUT
     else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
 
     backends ::= Backend(
@@ -377,6 +380,12 @@ object Regression {
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","zcu"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "ZCU", args), new java.io.File(genDir))
+    )
+    backends ::= Backend(
+      name = "Arria10",
+      stagingArgs = flags :+ "--synth" :+ "--retime",
+      make = genDir => Process(Seq("make","arria10"), new java.io.File(genDir)),
+      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Arria10", args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "AWS",
