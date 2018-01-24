@@ -175,7 +175,7 @@ object Regression {
       try {
         app.init(backend.stagingArgs)
         app.IR.config.verbosity = -2      // Won't see any of this output anyway
-        // app.IR.config.exitOnBug = false   // Never exit, even on errors
+        //app.IR.config.exitOnBug = false   // Never exit, even on errors
         app.IR.config.genDir = s"${app.IR.config.cwd}/gen/$backend/$cat/$name/"
         app.IR.config.logDir = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/"
         val consoleLog = argon.core.createLog(s"${app.IR.config.logDir}", "console.log")
@@ -278,7 +278,7 @@ object Regression {
         else if (failed) results.put(s"$backend.$cat.$name: Fail [Validation][newline]&nbsp;&nbsp;Cause: Application reported that it did not pass validation.")
         else if (passed) results.put(s"$backend.$cat.$name: Pass")
         else             results.put(s"$backend.$cat.$name: Indeterminate[newline]&nbsp;&nbsp;Cause: Application did not report validation result.")
-        code == 0 && cause == ""
+        code == 0 && cause == "" && !failed
       }
       catch {
         case e: TimeoutException =>
@@ -351,6 +351,8 @@ object Regression {
     if (branch.contains("syncMem")) flags = flags :+ "--syncMem"
     if (branch.contains("syncMem")) flags = flags :+ "--multifile=4" else flags = flags :+ "--multifile=5"
     if (branch.contains("pre-master")) flags = flags :+ "--instrument"
+    if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
+    else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
 
     backends ::= Backend(
       name = "Scala",
@@ -390,15 +392,24 @@ object Regression {
     )
 
     var testBackends = backends.filter{b => args.contains(b.name) }
-    if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
-    else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
     if (testBackends.isEmpty) testBackends = backends
+
     var testDomains = tests.filter{t => args.contains(t._1) }
     if (testDomains.isEmpty) testDomains = tests
 
-    val nPrograms = testDomains.map(_._2.length).sum
+    val allPrograms = testDomains.flatMap(_._2)
+    val programNames = args.filter{arg => allPrograms.exists{case (app,_) => app.name == arg }}
+    val restrictPrograms = programNames.nonEmpty
+
+    val allTests = testDomains.map{
+      case (domain,programs) if restrictPrograms => (domain,programs.filter{case (app,_) => programNames.contains(app.name) })
+      case (domain,programs) => (domain,programs)
+    }
+
+    val nPrograms = allTests.map(_._2.length).sum
+
     println(s"$nPrograms total tests to run:")
-    testDomains.foreach{case (cat, apps) =>
+    allTests.foreach{case (cat, apps) =>
       apps.foreach{case (app,_) => println(s"  $cat.${app.name}") }
     }
 
@@ -420,10 +431,10 @@ object Regression {
       val printerPool = Executors.newFixedThreadPool(1)
       printerPool.submit(Printer(regressionLog, resultQueue))
 
-      var testApps = testDomains.map{case (cat,apps) =>
+      var testApps = allTests.map{case (cat,apps) =>
         cat -> apps.filter{case (app,targs) => args.contains(app.name) }
       }
-      if (testApps.forall(_._2.isEmpty)) testApps = testDomains
+      if (testApps.forall(_._2.isEmpty)) testApps = allTests
 
       testApps.foreach{case (cat,apps) =>
         apps.foreach{case (app,targs) =>
