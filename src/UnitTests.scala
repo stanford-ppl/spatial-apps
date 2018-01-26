@@ -2390,7 +2390,7 @@ object ScatterGather extends SpatialApp { // Regression (Sparse) // Args: 160
   val P = param(1)
 
   @virtualize
-  def loadScatter[T:Type:Num](addrs: Array[Int], offchip_data: Array[T], numAddr: Int, numData: Int) = {
+  def loadScatter[T:Type:Num](addrs: Array[Int], offchip_data: Array[T], numAddr: Int, numData: Int, initData: Array[T]) = {
 
     val na = ArgIn[Int]
     setArg(na, numAddr)
@@ -2405,6 +2405,7 @@ object ScatterGather extends SpatialApp { // Regression (Sparse) // Args: 160
 
     setMem(srcAddrs, addrs)
     setMem(inData, offchip_data)
+    setMem(scatterResult, initData)
 
     Accel {
       val addrs = SRAM[Int](tileSize)
@@ -2454,8 +2455,9 @@ object ScatterGather extends SpatialApp { // Regression (Sparse) // Args: 160
     val na = numAddr
     val addrs = Array.tabulate(na) { i => i * mul }
     val offchip_data = Array.tabulate[Int](nd){ i => i * 10 }
+    val initData = Array.fill[Int](nd){ 0 }
 
-    val received = loadScatter(addrs, offchip_data, na,nd)
+    val received = loadScatter(addrs, offchip_data, na, nd, initData)
 
     def contains(a: Array[Int], elem: Int) = {
       a.map { e => e == elem }.reduce {_||_}
@@ -2470,7 +2472,7 @@ object ScatterGather extends SpatialApp { // Regression (Sparse) // Args: 160
 
     val gold = Array.tabulate(nd) { i =>
 //      if (contains(addrs, i)) offchip_data(indexOf(addrs, i)) else lift(0)
-      if (contains(addrs, i)) offchip_data(i) else lift(0)
+      if (contains(addrs, i)) offchip_data(i) else initData(i)
     }
 
     printArray(offchip_data, "data:")
