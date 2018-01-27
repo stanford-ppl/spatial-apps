@@ -1996,7 +1996,7 @@ object PageBoundaryTest extends SpatialApp { // Regression (Unit) // Args: none
 
   @virtualize
   def main() = {
-    type T = FixPt[TRUE,_16,_0]
+    type T = FixPt[TRUE,_32,_0]
     // val size = args(0).to[Int]
     val tileSize = 112
     val N = ArgIn[Int]
