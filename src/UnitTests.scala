@@ -430,19 +430,9 @@ object LUTTest extends SpatialApp { // Regression (Unit) // Args: 2
         12, 13, 14, -15
       )
       val red = Reduce(Reg[T](0))(3 by 1 par 3) {q =>
-        val x = lut(q,q)
-        println("" + q + "," + q + ": " + x)
-        x
+        lut(q,q)
       }{_^_}
-
-      val x13 = lut(1,3)
-      val x33 = lut(3,3)
-      val xi0 = lut(i,0)
-      println("1,3: " + x13)
-      println("3,3: " + x33)
-      println("i,0: " + xi0)
-
-      y := x13 ^ x33 ^ red ^ xi0
+      y := lut(1, 3) ^ lut(3, 3) ^ red ^ lut(i,0)
 
       val blut = LUT[Bit](4, 4)(
          true, true,  true, false,
@@ -468,7 +458,7 @@ object LUTTest extends SpatialApp { // Regression (Unit) // Args: 2
     println("bresult: " + bresult)
 
     val cksum = gold == result && bgold == bresult
-    println("PASS: " + cksum + " (LUTTest)")
+    println("PASS: " + cksum + " (InOutArg)")
   }
 }
 
@@ -704,13 +694,6 @@ object BubbledWriteTest extends SpatialApp { // Regression (Unit) // Args: none
       Sequential.Foreach(N by T){i =>
         wt load weights(i::i+T par 16)
         in load inputs(i::i+T par 16)
-
-        print("[i: " + i + "] in: ")
-        Foreach(T by 1){j =>
-          print(in(j) + " ")
-        }
-        println()
-
         val niter = Reg[Int]
         Pipe{niter.reset}
         Pipe{niter.reset} // Testing codegen for multiple resetters
@@ -720,11 +703,6 @@ object BubbledWriteTest extends SpatialApp { // Regression (Unit) // Args: none
           MemReduce(wt)(niter by 1){ k =>  // s0 write
             in
           }{_+_}
-          print("[x:" + x + "] wt: ")
-          Foreach(T by 1){i =>
-            print(wt(i) + " ")
-          }
-          println()
           val dummyReg1 = Reg[Int]
           val dummyReg2 = Reg[Int]
           val dummyReg3 = Reg[Int]
@@ -2149,9 +2127,9 @@ object PageBoundaryTest extends SpatialApp { // Regression (Unit) // Args: none
 
   @virtualize
   def main() = {
-    type T = Int
+    type T = FixPt[TRUE,_32,_0]
     // val size = args(0).to[Int]
-    val tileSize = 112
+    val tileSize = 48
     val N = ArgIn[Int]
     val size = args(0).to[Int]
     setArg(N, size)
@@ -2200,9 +2178,9 @@ object PageBoundaryTest extends SpatialApp { // Regression (Unit) // Args: none
     // val res3 = getMem(dram3)
     // val res4 = getMem(dram4)
 
-    val cksum0 = gotsum == size
-    val cksum1 = res1.map{_ == 1}.reduce{_&&_}
-    val cksum2 = res2.map{_ == 2}.reduce{_&&_}
+    val cksum0 = gotsum == size.to[T]
+    val cksum1 = res1.map{_ == 1.to[T]}.reduce{_&&_}
+    val cksum2 = res2.map{_ == 2.to[T]}.reduce{_&&_}
     // val cksum3 = res3.map{_ == 3}.reduce{_&&_}
     // val cksum4 = res4.map{_ == 4}.reduce{_&&_}
 
@@ -3240,6 +3218,141 @@ object FixPtMem extends SpatialApp {  // Regression (Unit) // Args: 5.25 2.125
   }
 }
 
+object LittleTypeTest extends SpatialApp {  
+
+  type T1 = FixPt[FALSE,_8,_8]
+  type T2 = FixPt[FALSE,_4,_4]
+
+  @virtualize
+  def main() {
+    // Declare SW-HW interface vals
+    val N = 256
+
+    val big_pt = ArgOut[T1]
+    val big_dst = DRAM[T1](N)
+    val big_src = DRAM[T1](N)
+    val little_pt = ArgOut[T2]
+    val little_dst = DRAM[T2](N)
+    val little_src = DRAM[T2](N)
+
+    val init_T1 = Array.tabulate(N){i => 0.5.to[T1] * (i % 4).to[T1]}
+    val init_T2 = Array.tabulate(N){i => 0.5.to[T2] * (i % 4).to[T2]}
+
+    setMem(big_src, init_T1)
+    setMem(little_src, init_T2)
+
+    Accel {
+      val big_sram_load = SRAM[T1](N)
+      val big_sram_store = SRAM[T1](N)
+      val little_sram_load = SRAM[T2](N)
+      val little_sram_store = SRAM[T2](N)
+
+      Foreach(N by 1){i => 
+        big_sram_store(i) = 0.5.to[T1] *& (i % 4).to[T1]
+        little_sram_store(i) = 0.5.to[T2] *& (i % 4).to[T2]
+      }
+
+      big_sram_load load big_src
+      little_sram_load load little_src
+
+      big_pt := big_sram_load(5)
+      little_pt := little_sram_load(5)
+      big_dst store big_sram_store
+      little_dst store little_sram_store
+    }
+
+
+    // Extract results from accelerator
+    val big_pt_res = getArg(big_pt)
+    val little_pt_res = getArg(little_pt)
+    val big_sram_store_res = getMem(big_dst)
+    val little_sram_store_res = getMem(little_dst)
+
+    printArray(big_sram_store_res, "Big store")
+    printArray(init_T1, "Big gold")
+    printArray(little_sram_store_res, "Little store")
+    printArray(init_T2, "Little gold")
+    println("big_pt: " + big_pt_res + " ( =?= " + init_T1(5) + " )")
+    println("little_pt: " + little_pt_res + " ( =?= " + init_T2(5) + " )")
+
+
+    val cksum = big_sram_store_res.zip(init_T1){_==_}.reduce{_&&_} && little_sram_store_res.zip(init_T2){_==_}.reduce{_&&_} && big_pt_res == init_T1(5) && little_pt_res == init_T2(5)
+
+    println("PASS: " + cksum + " (LittleTypeTest)")
+  }
+}
+
+
+object SpecialMathStripped extends SpatialApp { // Regression (Unit) // Args: 0.125 5.625 14 1.875 -3.4375 -5
+
+  type USGN = FixPt[FALSE,_4,_4]
+  type SGN = FixPt[TRUE,_4,_4]
+
+  @virtualize
+  def main() {
+    // Declare SW-HW interface vals
+    val a_usgn = args(0).to[USGN] //2.625.to[USGN]
+    val b_usgn = args(1).to[USGN] //5.625.to[USGN]
+    val a_sgn = args(2).to[SGN]
+    val b_sgn = args(3).to[SGN]
+    // assert(b_usgn.to[FltPt[_24,_8]] + c_usgn.to[FltPt[_24,_8]] > 15.to[FltPt[_24,_8]], "b_usgn + c_usgn must saturate (false,4,4) FP number")
+    // assert(b_sgn.to[FltPt[_24,_8]] + c_sgn.to[FltPt[_24,_8]] < -8.to[FltPt[_24,_8]], "b_sgn + c_sgn must saturate (true,4,4) FP number")
+    val A_usgn = ArgIn[USGN]
+    val B_usgn = ArgIn[USGN]
+    val A_sgn = ArgIn[SGN]
+    val B_sgn = ArgIn[SGN]
+    setArg(A_usgn, a_usgn)
+    setArg(B_usgn, b_usgn)
+    setArg(A_sgn, a_sgn)
+    setArg(B_sgn, b_sgn)
+    val N = 256
+
+    // Conditions we will check
+    val unbiased_mul_unsigned = DRAM[USGN](N) // 1
+    val unbiased_mul_signed = DRAM[SGN](N) // 2
+
+
+    Accel {
+      val usgn = SRAM[USGN](N)
+      val sgn = SRAM[SGN](N)
+      Foreach(N by 1) { i =>
+        usgn(i) = A_usgn *& B_usgn // Unbiased rounding, mean(yy) should be close to a*b
+        sgn(i) = A_sgn *& B_sgn
+      }
+      unbiased_mul_unsigned store usgn
+      unbiased_mul_signed store sgn
+    }
+
+
+    // Extract results from accelerator
+    val unbiased_mul_unsigned_res = getMem(unbiased_mul_unsigned)
+    val unbiased_mul_signed_res = getMem(unbiased_mul_signed)
+
+    // Create validation checks and debug code
+    val gold_unbiased_mul_unsigned = (a_usgn * b_usgn).to[FltPt[_24,_8]]
+    val gold_mean_unsigned = unbiased_mul_unsigned_res.map{_.to[FltPt[_24,_8]]}.reduce{_+_} / N
+    val gold_unbiased_mul_signed = (a_sgn * b_sgn).to[FltPt[_24,_8]]
+    val gold_mean_signed = unbiased_mul_signed_res.map{_.to[FltPt[_24,_8]]}.reduce{_+_} / N
+
+    // Get cksums
+    val margin = scala.math.pow(2,-4).to[FltPt[_24,_8]]
+    val cksum1 = (abs(gold_unbiased_mul_unsigned - gold_mean_unsigned).to[FltPt[_24,_8]] < margin)
+    val cksum2 = (abs(gold_unbiased_mul_signed - gold_mean_signed).to[FltPt[_24,_8]] < margin)
+    val cksum = cksum1 && cksum2 // && cksum3 && cksum4 && cksum5 && cksum6 && cksum7
+
+    // Helpful prints
+    println(cksum1 + " Unbiased Rounding Multiplication Unsigned: |" + gold_unbiased_mul_unsigned + " - " + gold_mean_unsigned + "| = " + abs(gold_unbiased_mul_unsigned-gold_mean_unsigned) + " <? " + margin)
+    printArray(unbiased_mul_unsigned_res, "Data:")
+    println(cksum2 + " Unbiased Rounding Multiplication Signed: |" + gold_unbiased_mul_signed + " - " + gold_mean_signed + "| = " + abs(gold_unbiased_mul_signed-gold_mean_signed) + " <? " + margin)
+    printArray(unbiased_mul_signed_res, "Data:")
+
+
+    println("PASS: " + cksum + " (SpecialMathStripped) * Need to check subtraction and division ")
+  }
+}
+
+
+
 object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.625 14 1.875 -3.4375 -5
 
   type USGN = FixPt[FALSE,_4,_4]
@@ -3334,7 +3447,9 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
 
     // Helpful prints
     println(cksum1 + " Unbiased Rounding Multiplication Unsigned: |" + gold_unbiased_mul_unsigned + " - " + gold_mean_unsigned + "| = " + abs(gold_unbiased_mul_unsigned-gold_mean_unsigned) + " <? " + margin)
+    printArray(unbiased_mul_unsigned_res, "Data:")
     println(cksum2 + " Unbiased Rounding Multiplication Signed: |" + gold_unbiased_mul_signed + " - " + gold_mean_signed + "| = " + abs(gold_unbiased_mul_signed-gold_mean_signed) + " <? " + margin)
+    printArray(unbiased_mul_signed_res, "Data:")
     println(cksum3 + " Saturating Addition Unsigned: " + satur_add_unsigned_res + " =?= " + gold_satur_add_unsigned.to[USGN])
     println(cksum4 + " Saturating Addition Signed: " + satur_add_signed_res + " =?= " + gold_satur_add_signed.to[SGN])
     println(cksum5 + " Unbiased Saturating Multiplication Unsigned: " + unbiased_sat_mul_unsigned_res + " =?= " + gold_unbiased_sat_mul_unsigned.to[SGN])
@@ -4471,16 +4586,24 @@ object SimpleRowStridedConv extends SpatialApp { // Regression (Unit) // Args: n
     val mat = (0::R,0::C){(i,j) => i }
 
     val img = DRAM[Int](R, C)
+    val imgeven = DRAM[Int](R, C)
+    val imgodd = DRAM[Int](R, C)
+    val imgtrodd = DRAM[Int](R, C)
     val out = DRAM[Int](R/2, C)
     val out2 = DRAM[Int](R/2-2, C)
-    setMem(img, mat)
+    val out3 = DRAM[Int](R, C)
+    setMem(imgeven, mat)
+    setMem(imgodd, mat)
+    setMem(imgtrodd, mat)
 
     Accel {
       // Test regular row strided lb
       val lb = LineBuffer.strided[Int](3, C, 2)
       Foreach(R/2 by 1){row =>
         val line = SRAM[Int](C)
-        lb load img(row*2::row*2+2, 0::C par 16)
+        if (row % 2 == 0) lb load imgeven(row*2::row*2+2, 0::C par 16)
+        else lb load imgodd(row*2::row*2+2, 0::C par 16)
+        // lb load img(row*2::row*2+2, 0::C par 16)
         Foreach(C by 1){col =>
           val conv = Reduce(0)(3 by 1, 3 by 1){(r,c) => if (row - 1 + r < 0) 0 else lb(r, (col + c)%C)}{_+_} / 9
           line(col) = conv
@@ -4491,11 +4614,13 @@ object SimpleRowStridedConv extends SpatialApp { // Regression (Unit) // Args: n
 
       // Test lb with transient load
       val lb2 = LineBuffer.strided[Int](5, C, 2)
-      lb2 load img(0::3, 0::C)
+      lb2 load imgeven(0::3, 0::C)
       Foreach(R/2-2 by 1){row =>
         val line = SRAM[Int](C)
         val rowstart = 3 + row*2
-        lb2 load img(rowstart::rowstart+2, 0::C)
+        if (row % 2 == 0) lb2 load imgeven(rowstart::rowstart+2, 0::C)
+        else lb2 load imgodd(rowstart::rowstart+2, 0::C)
+        // lb2 load img(rowstart::rowstart+2, 0::C)
         Foreach(C by 1){col =>
           val conv = Reduce(0)(5 by 1, 3 by 1){(r,c) => lb2(r, (col + c)%C)}{_+_} / 15
           line(col) = conv
@@ -4503,20 +4628,42 @@ object SimpleRowStridedConv extends SpatialApp { // Regression (Unit) // Args: n
         out2(row,0::C) store line
       }
 
+      // Test lb with muxed writer
+      val lb3 = LineBuffer[Int](3, C)
+      Foreach(R by 1){row =>
+        val line = SRAM[Int](C)
+        if (row % 3 == 0) lb3 load imgeven(row, 0::C)
+        else if (row % 3 == 1) lb3 load imgodd(row, 0::C)
+        else lb3 load imgtrodd(row, 0::C)
+        Foreach(C by 1){col =>
+          val conv = Reduce(0)(3 by 1, 3 by 1){(r,c) => if (row - (2-r) < 0.to[Int]) 0.to[Int] else lb3(r, (col + c)%C)}{_+_} / 9
+          line(col) = conv
+        }
+        out3(row,0::C) store line
+      }
+
     }
 
     val result = getMatrix(out)
     val result2 = getMatrix(out2)
+    val result3 = getMatrix(out3)
 
-    printMatrix(mat, "Input")
-    printMatrix(result, "Result")
-    printMatrix(result2, "Result2")
     val gold = (0::R/2, 0::C){(i,j) => 2*i}
     val gold2 = (0::R/2-2, 0::C){(i,j) => 2*i+2}
+    val gold3 = (0::R, 0::C){(i,j) => if (i < 2) 0.to[Int] else i-1}
+    printMatrix(mat, "Input")
+    printMatrix(result, "Result1")
+    printMatrix(gold, "Gold1")
+    printMatrix(result2, "Result2")
+    printMatrix(gold2, "Gold2")
+    printMatrix(result3, "Result3")
+    printMatrix(gold3, "Gold3")
 
     val cksum = result.zip(gold){_==_}.reduce{_&&_}
     val cksum2 = result2.zip(gold2){_==_}.reduce{_&&_}
-    println("PASS: " + {cksum && cksum2} + " (SimpleRowStridedConv)")
+    val cksum3 = result3.zip(gold3){_==_}.reduce{_&&_}
+    println("Cksums: " + cksum + " " + cksum2 + " " + cksum3)
+    println("PASS: " + {cksum && cksum2 && cksum3} + " (SimpleRowStridedConv)")
   }
 }
 
