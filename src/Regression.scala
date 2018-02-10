@@ -15,44 +15,41 @@ object Regression {
   // Times to wait for compilation and running, in seconds
   var MAKE_TIMEOUT = 2000
   var RUN_TIMEOUT = 2000
-  var ZYNQ_TIMEOUT = 11000
-  var ZCU_TIMEOUT = 11000
+  var ZYNQ_TIMEOUT = 13000
+  var ZCU_TIMEOUT = 13000
   var AWS_TIMEOUT = 32400
-  var ARRIA10_TIMEOUT = 11000
 
   private final val NoArgs = Array[Any]()
 
   lazy val tests = {
     var dense = List[(SpatialApp, Array[Any])]()
-    dense ::= (DotProduct, Array(640))
+    dense ::= (DotProduct, Array(640000))
     dense ::= (OuterProduct, Array(640, 640))
     dense ::= (SimpleRowStridedConv, NoArgs)
-    dense ::= (Convolutions, Array(16))
-    dense ::= (BasicBLAS, Array(0.2, 0.8, 64, 128, 96))
     dense ::= (TRSM, NoArgs)
     dense ::= (SYRK_col, Array(64))
-    dense ::= (MatMult_inner, Array(32, 128, 128))
-    dense ::= (MatMult_outer, Array(32, 128, 128))
+    dense ::= (MatMult_inner, Array(64, 64, 128))
+    dense ::= (MatMult_outer, Array(64, 64, 128))
     dense ::= (JPEG_Decompress, NoArgs)
     dense ::= (JPEG_Markers, NoArgs)
     dense ::= (SHA1, NoArgs)
-    dense ::= (Sobel, Array(200, 160))
+    dense ::= (Sobel, Array(256,128))
     dense ::= (SW, Array("tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"))
     dense ::= (BTC, Array("0100000081cd02ab7e569e8bcd9317e2fe99f2de44d49ab2b8851ba4a308000000000000e320b6c2fffc8d750423db8b1eb942ae710e951ed797f7affc8892b0f1fc122bc7f5d74df2b9441a42a14695"))
-    dense ::= (TPCHQ6, Array(3840))
+    dense ::= (TPCHQ6, Array(9600000))
     dense ::= (SGD_minibatch, Array(40, 64, 0.0001))
     dense ::= (SGD, Array(40, 64, 0.0001))
     dense ::= (Gibbs_Ising2D, Array(25, 0.3, 2))
-    dense ::= (GDA, Array(64))
+    dense ::= (GDA, Array(1024))
     dense ::= (Differentiator, NoArgs)
     dense ::= (EdgeDetector, NoArgs)
     dense ::= (Convolution_FPGA, NoArgs)
-    dense ::= (Kmeans, Array(3, 64))
+    dense ::= (Kmeans, Array(200, 320))
     dense ::= (FFT_Transpose, NoArgs)
     dense ::= (FFT_Strided, NoArgs)
     // dense ::= (Backprop, Array(5))
     dense ::= (Sort_Radix, NoArgs)
-    dense ::= (GEMM_Blocked, Array(128))
+    dense ::= (GEMM_Blocked, Array(256))
     dense ::= (GEMM_NCubed, NoArgs)
     dense ::= (KMP, Array("the"))
     dense ::= (MD_Grid, NoArgs)
@@ -62,12 +59,21 @@ object Regression {
     dense ::= (Stencil2D, NoArgs)
     dense ::= (Viterbi, NoArgs)
     dense ::= (Sort_Merge, NoArgs)
-    dense ::= (AES, Array(50))
-
+    dense ::= (AES, Array(2000))
+    dense ::= (MultiplexedWriteTest, NoArgs)
+    dense ::= (SpecialMath, Array(0.125, 5.625, 14, 1.875, -3.4375, -5))
+    dense ::= (FixPtMem, Array(5.25, 2.125))
+    dense ::= (Tensor3D, Array(32, 4, 4))
+    dense ::= (BlockReduce1D, Array(1920))
+    dense ::= (FloatBasics, Array(3.2752, -283.70))
+    dense ::= (Niter, Array(100))
+    dense ::= (Tensor5D, Array(32, 4, 4, 4, 4))
+    dense ::= (Tensor4D, Array(32, 4, 4, 4))
+    
     var sparse = List[(SpatialApp, Array[Any])]()
     sparse ::= (ScatterGather, Array(160))
     sparse ::= (GatherStore, NoArgs)
-    sparse ::= (PageRank_Bulk, Array(50, 0.125))
+    sparse ::= (PageRank_Bulk, Array(10000, 0.125))
     // sparse ::= (SPMV_DumbPack, Array(1536))
     sparse ::= (PageRank, Array(50, 0.125))
     sparse ::= (BFS_Queue, NoArgs)
@@ -79,14 +85,15 @@ object Regression {
     unit ::= (Breakpoint, NoArgs)
     unit ::= (ArbitraryLambda, Array(8))
     unit ::= (BubbledWriteTest, NoArgs)
-    unit ::= (MultiplexedWriteTest, NoArgs)
+
     unit ::= (MixedIOTest, NoArgs)
     unit ::= (LUTTest, Array(2, 3))
     unit ::= (RetimedFifoBranch, Array(13,25))
     unit ::= (SSV2D, NoArgs)
     unit ::= (SSV1D, NoArgs)
-    unit ::= (MultiWriteBuffer, NoArgs)
     unit ::= (PageBoundaryTest, Array(896))
+    unit ::= (MultiWriteBuffer, NoArgs)
+    unit ::= (LittleTypeTest, NoArgs)
     unit ::= (DiagBanking, NoArgs)
     unit ::= (SpecialMath, Array(0.125, 5.625, 14, 1.875, -3.4375, -5))
     unit ::= (FixPtMem, Array(5.25, 2.125))
@@ -129,6 +136,7 @@ object Regression {
     unit ::= (Tensor4D, Array(32, 4, 4, 4))
     unit ::= (IndirectLoad, NoArgs)
     unit ::= (SequentialWrites, Array(7))
+    unit ::= (UnalignedTileLoadStore, NoArgs)
 
     var fixme = List[(SpatialApp, Array[Any])]()
     // fixme ::= (KMP, Array("the"))
@@ -175,8 +183,7 @@ object Regression {
       app.__stagingArgs = backend.stagingArgs   // just in case the app refers to this
       try {
         app.init(backend.stagingArgs)
-        app.IR.config.verbosity = -2      // Won't see any of this output anyway
-        //app.IR.config.exitOnBug = false   // Never exit, even on errors
+        app.IR.config.verbosity = -2  // Won't see any of this output anyway
         app.IR.config.genDir = s"${app.IR.config.cwd}/gen/$backend/$cat/$name/"
         app.IR.config.logDir = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/"
         val consoleLog = argon.core.createLog(s"${app.IR.config.logDir}", "console.log")
@@ -279,7 +286,7 @@ object Regression {
         else if (failed) results.put(s"$backend.$cat.$name: Fail [Validation][newline]&nbsp;&nbsp;Cause: Application reported that it did not pass validation.")
         else if (passed) results.put(s"$backend.$cat.$name: Pass")
         else             results.put(s"$backend.$cat.$name: Indeterminate[newline]&nbsp;&nbsp;Cause: Application did not report validation result.")
-        code == 0 && cause == "" && !failed
+        code == 0 && cause == ""
       }
       catch {
         case e: TimeoutException =>
@@ -350,12 +357,8 @@ object Regression {
     var flags = Array[String]()
     if (branch.contains("retim")) flags = flags :+ "--retiming"
     if (branch.contains("syncMem")) flags = flags :+ "--syncMem"
-    if (branch.contains("syncMem")) flags = flags :+ "--multifile=4" else flags = flags :+ "--multifile=5"
+    flags = flags :+ "--multifile=4"
     if (branch.contains("pre-master")) flags = flags :+ "--instrument"
-    if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
-    else if (args.contains("ZCU")) MAKE_TIMEOUT = ZCU_TIMEOUT
-    else if (args.contains("Arria10")) MAKE_TIMEOUT = ARRIA10_TIMEOUT
-    else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
 
     backends ::= Backend(
       name = "Scala",
@@ -382,12 +385,6 @@ object Regression {
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "ZCU", args), new java.io.File(genDir))
     )
     backends ::= Backend(
-      name = "Arria10",
-      stagingArgs = flags :+ "--synth" :+ "--retime",
-      make = genDir => Process(Seq("make","arria10"), new java.io.File(genDir)),
-      run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Arria10", args), new java.io.File(genDir))
-    )
-    backends ::= Backend(
       name = "AWS",
       stagingArgs = flags :+ "--synth" :+ "--retime",
       make = genDir => Process(Seq("make","aws-F1-afi"), new java.io.File(genDir)),
@@ -400,27 +397,16 @@ object Regression {
       run  = (genDir,args) => Process(Seq("bash", "scripts/stats.sh"), new java.io.File(genDir))
     )
 
-    var testBackends = backends.filter{b => args.contains(b.name) }
-    if (testBackends.isEmpty) testBackends = backends
 
+    var testBackends = backends.filter{b => args.contains(b.name) }
+    if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
+    else if (args.contains("ZCU")) MAKE_TIMEOUT = ZCU_TIMEOUT
+    else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
+    if (testBackends.isEmpty) testBackends = backends
     var testDomains = tests.filter{t => args.contains(t._1) }
     if (testDomains.isEmpty) testDomains = tests
 
-    val allPrograms = testDomains.flatMap(_._2)
-    val programNames = args.filter{arg => allPrograms.exists{case (app,_) => app.name == arg }}
-    val restrictPrograms = programNames.nonEmpty
-
-    val allTests = testDomains.map{
-      case (domain,programs) if restrictPrograms => (domain,programs.filter{case (app,_) => programNames.contains(app.name) })
-      case (domain,programs) => (domain,programs)
-    }
-
-    val nPrograms = allTests.map(_._2.length).sum
-
-    println(s"$nPrograms total tests to run:")
-    allTests.foreach{case (cat, apps) =>
-      apps.foreach{case (app,_) => println(s"  $cat.${app.name}") }
-    }
+    val nPrograms = testDomains.map(_._2.length).sum
 
     val regressionLog = new PrintStream(s"regression_$timestamp.log")
     val flagsLog = new PrintStream(s"flags_$timestamp.log")
@@ -440,10 +426,10 @@ object Regression {
       val printerPool = Executors.newFixedThreadPool(1)
       printerPool.submit(Printer(regressionLog, resultQueue))
 
-      var testApps = allTests.map{case (cat,apps) =>
+      var testApps = testDomains.map{case (cat,apps) =>
         cat -> apps.filter{case (app,targs) => args.contains(app.name) }
       }
-      if (testApps.forall(_._2.isEmpty)) testApps = allTests
+      if (testApps.forall(_._2.isEmpty)) testApps = testDomains
 
       testApps.foreach{case (cat,apps) =>
         apps.foreach{case (app,targs) =>

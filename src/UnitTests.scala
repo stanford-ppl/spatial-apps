@@ -537,6 +537,16 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
     println("expected: " + g1 + ", " + g2 + ", " + g3 + ", " + g4 + ", "+ g6 + ", " + g7 + ", " + g8)
     println("received: " + r1 + ", " + r2 + ", " + r3 + ", " + r4 + ", "+ r6 + ", " + r7 + ", " + r8)
     printArray(r5, "Mem: ")
+    println("Check 1: " + {r1 == g1})
+    println("Check 2: " + {r2 == g2})
+    println("Check 3: " + {r3 == g3})
+    println("Check 4: " + {r4 == g4})
+    println("Check 5: " + {data.zip(r5){_==_}.reduce{_&&_}})
+    println("Check 6: " + {r6 == g6})
+    println("Check 7: " + {r7 == g7})
+    println("Check 8: " + {r8 == g8})
+    println("Check 1: " + {r1 == g1})
+
     val cksum = r1 == g1 && r2 == g2 && r3 == g3 && r4 == g4 && r6 == g6 && data.zip(r5){_==_}.reduce{_&&_} && r7 == g7 && r8 == g8
     println("PASS: " + cksum + " (MixedIOTest) ")
   }
@@ -1136,6 +1146,93 @@ object SimpleTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 10
 
     val cksum = dst.zip(gold){_ == _}.reduce{_&&_}
     println("PASS: " + cksum + " (SimpleTileLoadStore)")
+  }
+}
+
+object UnalignedTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 100
+
+
+  val M = 10
+  val N = 10
+
+  @virtualize
+  def main() {
+    type T1 = Int
+    type T2 = FixPt[TRUE, _16, _0]
+
+    val srcT1 = Array.tabulate[T1](10) { i => (i % 10).to[T1] }
+    val initT1 = (0::10, 0::20){(i,j) => -1.to[T1]}
+    val srcT2 = Array.tabulate[T2](10) { i => (i % 10).to[T2] }
+    val initT2 = (0::10, 0::20){(i,j) => -1.to[T2]}
+
+    val srcFPGAT1 = DRAM[T1](10)
+    val srcFPGAT2 = DRAM[T2](10)
+    val dstFPGA1 = DRAM[T1](10,20)
+    val dstFPGA2 = DRAM[T1](10,20)
+    val dstFPGA3 = DRAM[T2](10,20)
+    val dstFPGA4 = DRAM[T2](10,20)
+    setMem(srcFPGAT1, srcT1)
+    setMem(srcFPGAT2, srcT2)
+    setMem(dstFPGA1, initT1)    
+    setMem(dstFPGA2, initT1)    
+    setMem(dstFPGA3, initT2)    
+    setMem(dstFPGA4, initT2)    
+
+
+    Accel {
+      val tile1 = SRAM[T1](16)
+      Foreach(10 by 1){i => 
+        tile1 load srcFPGAT1(0::10)
+        dstFPGA1(i, i::i+10) store tile1
+      }
+
+      val tile2 = SRAM[T1](16)
+      Foreach(10 by 1){i => 
+        tile2 load srcFPGAT1(0::10 par 8)
+        dstFPGA2(i, i::i+10 par 8) store tile2
+      }
+
+      val tile3 = SRAM[T2](16)
+      Foreach(10 by 1){i => 
+        tile3 load srcFPGAT2(0::10)
+        dstFPGA3(i, i::i+10) store tile3
+      }
+
+      val tile4 = SRAM[T2](16)
+      Foreach(10 by 1){i => 
+        tile4 load srcFPGAT2(0::10 par 8)
+        dstFPGA4(i, i::i+10 par 8) store tile4
+      }
+    }
+
+    val gold1 = (0::10, 0::20){(i,j) => if (j < i || j >= i + 10) -1.to[T1] else srcT1(j-i) }
+    val gold2 = (0::10, 0::20){(i,j) => if (j < i || j >= i + 10) -1.to[T1] else srcT1(j-i) }
+    val gold3 = (0::10, 0::20){(i,j) => if (j < i || j >= i + 10) -1.to[T2] else srcT2(j-i) }
+    val gold4 = (0::10, 0::20){(i,j) => if (j < i || j >= i + 10) -1.to[T2] else srcT2(j-i) }
+    val got1 = getMatrix(dstFPGA1)
+    val got2 = getMatrix(dstFPGA2)
+    val got3 = getMatrix(dstFPGA3)
+    val got4 = getMatrix(dstFPGA4)
+
+    printMatrix(gold1, "Wanted1:")
+    printMatrix(got1, "Got1:")
+    printMatrix(gold2, "Wanted2:")
+    printMatrix(got2, "Got2:")
+    printMatrix(gold3, "Wanted3:")
+    printMatrix(got3, "Got3:")
+    printMatrix(gold4, "Wanted4:")
+    printMatrix(got4, "Got4:")
+
+    val cksum1 = got1.zip(gold1){_ == _}.reduce{_&&_}
+    val cksum2 = got2.zip(gold2){_ == _}.reduce{_&&_}
+    val cksum3 = got3.zip(gold3){_ == _}.reduce{_&&_}
+    val cksum4 = got4.zip(gold4){_ == _}.reduce{_&&_}
+    println("cksum1: " + cksum1)
+    println("cksum2: " + cksum2)
+    println("cksum3: " + cksum3)
+    println("cksum4: " + cksum4)
+    val cksum = cksum1 && cksum2 && cksum3 && cksum4
+    println("PASS: " + cksum + " (UnalignedTileLoadStore)")
   }
 }
 
