@@ -76,8 +76,8 @@ object Regression {
     // sparse ::= (PageRank_Bulk, Array(10000, 0.125))
     // // sparse ::= (SPMV_DumbPack, Array(1536))
     // sparse ::= (PageRank, Array(50, 0.125))
-    // sparse ::= (BFS_Queue, NoArgs)
-    // sparse ::= (BFS_Bulk, NoArgs)
+    sparse ::= (BFS_Queue, NoArgs)
+    sparse ::= (BFS_Bulk, NoArgs)
     // sparse ::= (SPMV_ELL, NoArgs)
     // sparse ::= (SPMV_CRS, NoArgs)
 
@@ -146,8 +146,6 @@ object Regression {
     fixme ::= (GatherStore, NoArgs)
     fixme ::= (PageRank_Bulk, Array(10000, 0.125))
     fixme ::= (PageRank, Array(50, 0.125))
-    fixme ::= (BFS_Queue, NoArgs)
-    fixme ::= (BFS_Bulk, NoArgs)
     fixme ::= (SPMV_ELL, NoArgs)
     fixme ::= (SPMV_CRS, NoArgs)
 

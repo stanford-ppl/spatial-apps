@@ -3372,6 +3372,10 @@ object LittleTypeTest extends SpatialApp {
     println("big_pt: " + big_pt_res + " ( =?= " + init_T1(5) + " )")
     println("little_pt: " + little_pt_res + " ( =?= " + init_T2(5) + " )")
 
+    println("Big Store: " + big_sram_store_res.zip(init_T1){_==_}.reduce{_&&_})
+    println("Little Store: " + little_sram_store_res.zip(init_T2){_==_}.reduce{_&&_})
+    println("BigPt: " + {big_pt_res == init_T1(5)})
+    println("LittlePt: " + {little_pt_res == init_T2(5)})
 
     val cksum = big_sram_store_res.zip(init_T1){_==_}.reduce{_&&_} && little_sram_store_res.zip(init_T2){_==_}.reduce{_&&_} && big_pt_res == init_T1(5) && little_pt_res == init_T2(5)
 
