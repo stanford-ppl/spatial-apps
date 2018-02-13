@@ -78,8 +78,8 @@ object Regression {
     sparse ::= (PageRank, Array(50, 0.125))
     sparse ::= (BFS_Queue, NoArgs)
     sparse ::= (BFS_Bulk, NoArgs)
-    sparse ::= (SPMV_ELL, NoArgs)
-    sparse ::= (SPMV_CRS, NoArgs)
+    // sparse ::= (SPMV_ELL, NoArgs)
+    // sparse ::= (SPMV_CRS, NoArgs)
 
     var unit = List[(SpatialApp, Array[Any])]()
     unit ::= (Breakpoint, NoArgs)
@@ -91,7 +91,7 @@ object Regression {
     unit ::= (RetimedFifoBranch, Array(13,25))
     unit ::= (SSV2D, NoArgs)
     unit ::= (SSV1D, NoArgs)
-    unit ::= (PageBoundaryTest, Array(896))
+    unit ::= (PageBoundaryTest, Array(912))
     unit ::= (MultiWriteBuffer, NoArgs)
     unit ::= (LittleTypeTest, NoArgs)
     unit ::= (DiagBanking, NoArgs)
@@ -136,11 +136,18 @@ object Regression {
     unit ::= (Tensor4D, Array(32, 4, 4, 4))
     unit ::= (IndirectLoad, NoArgs)
     unit ::= (SequentialWrites, Array(7))
+    unit ::= (UnalignedTileLoadStore, NoArgs)
 
     var fixme = List[(SpatialApp, Array[Any])]()
     // fixme ::= (KMP, Array("the"))
     fixme ::= (SPMV_DumbPack, Array(1536))
     fixme ::= (Backprop, Array(5))
+    fixme ::= (ScatterGather, Array(160))
+    fixme ::= (GatherStore, NoArgs)
+    fixme ::= (PageRank_Bulk, Array(10000, 0.125))
+    fixme ::= (PageRank, Array(50, 0.125))
+    fixme ::= (SPMV_ELL, NoArgs)
+    fixme ::= (SPMV_CRS, NoArgs)
 
 
 
@@ -182,7 +189,8 @@ object Regression {
       app.__stagingArgs = backend.stagingArgs   // just in case the app refers to this
       try {
         app.init(backend.stagingArgs)
-        app.IR.config.verbosity = -2  // Won't see any of this output anyway
+        app.IR.config.verbosity = -2      // Won't see any of this output anyway
+        app.IR.config.exitOnBug = false   // Never exit, even on errors
         app.IR.config.genDir = s"${app.IR.config.cwd}/gen/$backend/$cat/$name/"
         app.IR.config.logDir = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/"
         val consoleLog = argon.core.createLog(s"${app.IR.config.logDir}", "console.log")
@@ -373,13 +381,13 @@ object Regression {
     )
     backends ::= Backend(
       name = "Zynq",
-      stagingArgs = flags :+ "--synth" :+ "--retime",
+      stagingArgs = flags :+ "--synth" :+ "--retime" :+ "--instrument",
       make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Zynq", args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "ZCU",
-      stagingArgs = flags :+ "--synth" :+ "--retime",
+      stagingArgs = flags :+ "--synth" :+ "--retime" :+ "--instrument",
       make = genDir => Process(Seq("make","zcu"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "ZCU", args), new java.io.File(genDir))
     )
