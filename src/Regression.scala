@@ -15,43 +15,41 @@ object Regression {
   // Times to wait for compilation and running, in seconds
   var MAKE_TIMEOUT = 2000
   var RUN_TIMEOUT = 2000
-  var ZYNQ_TIMEOUT = 11000
-  var ZCU_TIMEOUT = 11000
+  var ZYNQ_TIMEOUT = 13000
+  var ZCU_TIMEOUT = 13000
   var AWS_TIMEOUT = 32400
 
   private final val NoArgs = Array[Any]()
 
   lazy val tests = {
     var dense = List[(SpatialApp, Array[Any])]()
-    dense ::= (DotProduct, Array(640))
+    dense ::= (DotProduct, Array(640000))
     dense ::= (OuterProduct, Array(640, 640))
     dense ::= (SimpleRowStridedConv, NoArgs)
-    dense ::= (Convolutions, Array(16))
-    dense ::= (BasicBLAS, Array(0.2, 0.8, 64, 128, 96))
     dense ::= (TRSM, NoArgs)
     dense ::= (SYRK_col, Array(64))
-    dense ::= (MatMult_inner, Array(32, 128, 128))
-    dense ::= (MatMult_outer, Array(32, 128, 128))
+    dense ::= (MatMult_inner, Array(64, 64, 128))
+    dense ::= (MatMult_outer, Array(64, 64, 128))
     dense ::= (JPEG_Decompress, NoArgs)
     dense ::= (JPEG_Markers, NoArgs)
     dense ::= (SHA1, NoArgs)
-    dense ::= (Sobel, Array(200, 160))
+    dense ::= (Sobel, Array(256,128))
     dense ::= (SW, Array("tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"))
     dense ::= (BTC, Array("0100000081cd02ab7e569e8bcd9317e2fe99f2de44d49ab2b8851ba4a308000000000000e320b6c2fffc8d750423db8b1eb942ae710e951ed797f7affc8892b0f1fc122bc7f5d74df2b9441a42a14695"))
-    dense ::= (TPCHQ6, Array(3840))
+    dense ::= (TPCHQ6, Array(9600000))
     dense ::= (SGD_minibatch, Array(40, 64, 0.0001))
     dense ::= (SGD, Array(40, 64, 0.0001))
     dense ::= (Gibbs_Ising2D, Array(25, 0.3, 2))
-    dense ::= (GDA, Array(64))
+    dense ::= (GDA, Array(1024))
     dense ::= (Differentiator, NoArgs)
     dense ::= (EdgeDetector, NoArgs)
     dense ::= (Convolution_FPGA, NoArgs)
-    dense ::= (Kmeans, Array(3, 64))
+    dense ::= (Kmeans, Array(200, 320))
     dense ::= (FFT_Transpose, NoArgs)
     dense ::= (FFT_Strided, NoArgs)
     // dense ::= (Backprop, Array(5))
     dense ::= (Sort_Radix, NoArgs)
-    dense ::= (GEMM_Blocked, Array(128))
+    dense ::= (GEMM_Blocked, Array(256))
     dense ::= (GEMM_NCubed, NoArgs)
     dense ::= (KMP, Array("the"))
     dense ::= (MD_Grid, NoArgs)
@@ -61,30 +59,41 @@ object Regression {
     dense ::= (Stencil2D, NoArgs)
     dense ::= (Viterbi, NoArgs)
     dense ::= (Sort_Merge, NoArgs)
-    dense ::= (AES, Array(50))
-
+    dense ::= (AES, Array(2000))
+    dense ::= (MultiplexedWriteTest, NoArgs)
+    dense ::= (SpecialMath, Array(0.125, 5.625, 14, 1.875, -3.4375, -5))
+    dense ::= (FixPtMem, Array(5.25, 2.125))
+    dense ::= (Tensor3D, Array(32, 4, 4))
+    dense ::= (BlockReduce1D, Array(1920))
+    dense ::= (FloatBasics, Array(3.2752, -283.70))
+    dense ::= (Niter, Array(100))
+    dense ::= (Tensor5D, Array(32, 4, 4, 4, 4))
+    dense ::= (Tensor4D, Array(32, 4, 4, 4))
+    
     var sparse = List[(SpatialApp, Array[Any])]()
     sparse ::= (ScatterGather, Array(160))
     sparse ::= (GatherStore, NoArgs)
-    sparse ::= (PageRank_Bulk, Array(50, 0.125))
+    sparse ::= (PageRank_Bulk, Array(10000, 0.125))
     // sparse ::= (SPMV_DumbPack, Array(1536))
     sparse ::= (PageRank, Array(50, 0.125))
     sparse ::= (BFS_Queue, NoArgs)
     sparse ::= (BFS_Bulk, NoArgs)
-    sparse ::= (SPMV_ELL, NoArgs)
-    sparse ::= (SPMV_CRS, NoArgs)
+    // sparse ::= (SPMV_ELL, NoArgs)
+    // sparse ::= (SPMV_CRS, NoArgs)
 
     var unit = List[(SpatialApp, Array[Any])]()
     unit ::= (Breakpoint, NoArgs)
     unit ::= (ArbitraryLambda, Array(8))
     unit ::= (BubbledWriteTest, NoArgs)
-    unit ::= (MultiplexedWriteTest, NoArgs)
+
     unit ::= (MixedIOTest, NoArgs)
     unit ::= (LUTTest, Array(2, 3))
     unit ::= (RetimedFifoBranch, Array(13,25))
     unit ::= (SSV2D, NoArgs)
     unit ::= (SSV1D, NoArgs)
+    unit ::= (PageBoundaryTest, Array(912))
     unit ::= (MultiWriteBuffer, NoArgs)
+    unit ::= (LittleTypeTest, NoArgs)
     unit ::= (DiagBanking, NoArgs)
     unit ::= (SpecialMath, Array(0.125, 5.625, 14, 1.875, -3.4375, -5))
     unit ::= (FixPtMem, Array(5.25, 2.125))
@@ -127,11 +136,18 @@ object Regression {
     unit ::= (Tensor4D, Array(32, 4, 4, 4))
     unit ::= (IndirectLoad, NoArgs)
     unit ::= (SequentialWrites, Array(7))
+    unit ::= (UnalignedTileLoadStore, NoArgs)
 
     var fixme = List[(SpatialApp, Array[Any])]()
     // fixme ::= (KMP, Array("the"))
     fixme ::= (SPMV_DumbPack, Array(1536))
     fixme ::= (Backprop, Array(5))
+    fixme ::= (ScatterGather, Array(160))
+    fixme ::= (GatherStore, NoArgs)
+    fixme ::= (PageRank_Bulk, Array(10000, 0.125))
+    fixme ::= (PageRank, Array(50, 0.125))
+    fixme ::= (SPMV_ELL, NoArgs)
+    fixme ::= (SPMV_CRS, NoArgs)
 
 
 
@@ -173,7 +189,8 @@ object Regression {
       app.__stagingArgs = backend.stagingArgs   // just in case the app refers to this
       try {
         app.init(backend.stagingArgs)
-        app.IR.config.verbosity = -2  // Won't see any of this output anyway
+        app.IR.config.verbosity = -2      // Won't see any of this output anyway
+        app.IR.config.exitOnBug = false   // Never exit, even on errors
         app.IR.config.genDir = s"${app.IR.config.cwd}/gen/$backend/$cat/$name/"
         app.IR.config.logDir = s"${app.IR.config.cwd}/logs/$backend/$cat/$name/"
         val consoleLog = argon.core.createLog(s"${app.IR.config.logDir}", "console.log")
@@ -364,13 +381,13 @@ object Regression {
     )
     backends ::= Backend(
       name = "Zynq",
-      stagingArgs = flags :+ "--synth" :+ "--retime",
+      stagingArgs = flags :+ "--synth" :+ "--retime" :+ "--instrument",
       make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Zynq", args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "ZCU",
-      stagingArgs = flags :+ "--synth" :+ "--retime",
+      stagingArgs = flags :+ "--synth" :+ "--retime" :+ "--instrument",
       make = genDir => Process(Seq("make","zcu"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "ZCU", args), new java.io.File(genDir))
     )
@@ -390,6 +407,7 @@ object Regression {
 
     var testBackends = backends.filter{b => args.contains(b.name) }
     if (args.contains("Zynq")) MAKE_TIMEOUT = ZYNQ_TIMEOUT
+    else if (args.contains("ZCU")) MAKE_TIMEOUT = ZCU_TIMEOUT
     else if (args.contains("AWS")) MAKE_TIMEOUT = AWS_TIMEOUT
     if (testBackends.isEmpty) testBackends = backends
     var testDomains = tests.filter{t => args.contains(t._1) }

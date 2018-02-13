@@ -624,7 +624,7 @@ object Stencil2D extends SpatialApp { // Regression (Dense) // Args: none
 	  		lb load data_dram(i, 0::COLS par par_lb_load)
 				Foreach(COLS by 1) {j => 
 					Foreach(3 by 1 par 3) {k => sr(k,*) <<= lb(k,j)}
-					val temp = Reduce(Reg[Int](0))(3 by 1, 3 by 1){(r,c) => sr(r,c) * filter(r,c)}{_+_}
+					val temp = Reduce(Reg[Int](0))(3 by 1, 3 by 1 par 3){(r,c) => sr(r,c) * filter(r,c)}{_+_}
 					val wr_col = (j-2)%COLS
 					if (i >= 2 && j >= 2) {result_sram(wr_row,wr_col) = temp}
 					else {result_sram(wr_row,wr_col) = 0}
@@ -729,7 +729,7 @@ object Stencil3D extends SpatialApp { // Regression (Dense) // Args: none
             Foreach(ROWS+1 by 1 par PX) {j => 
               val sr = RegFile[Int](3,3)
               Foreach(3 by 1 par 3) {k => sr(k,*) <<= lb(k,j%ROWS)}
-              val temp = Reduce(Reg[Int](0))(3 by 1, 3 by 1){(r,c) => sr(r,c) * filter(slice+1,r,c)}{_+_}
+              val temp = Reduce(Reg[Int](0))(3 by 1, 3 by 1 par 3){(r,c) => sr(r,c) * filter(slice+1,r,c)}{_+_}
               // For final version, make wr_value a Mux1H instead of a unique writer per val
               if (i == 0 || j == 0) {Pipe{}/*do nothing*/}
               else if (i == 1 || i == COLS || j == 1 || j == ROWS) {
@@ -819,11 +819,11 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     setArg(dash,d)
     val underscore = argon.lang.String.char2num("_")
 
-    val par_load = 16
-    val par_store = 16
-    val row_par = 2 (1 -> 1 -> 8)
+    val par_load = 1
+    val par_store = 1
+    val row_par = 1 (1 -> 1 -> 8)
 
-    val SKIPB = 0
+      val SKIPB = 0
     val SKIPA = 1
     val ALIGN = 2
     val MATCH_SCORE = 1
@@ -838,7 +838,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 512
+    val max_length = 160
     assert(max_length >= length, "Cannot have string longer than 512 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
