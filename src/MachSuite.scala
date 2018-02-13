@@ -823,7 +823,7 @@ object NW extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatgac
     val par_store = 1
     val row_par = 1 (1 -> 1 -> 8)
 
-    val SKIPB = 0
+      val SKIPB = 0
     val SKIPA = 1
     val ALIGN = 2
     val MATCH_SCORE = 1
