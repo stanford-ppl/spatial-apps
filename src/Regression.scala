@@ -44,7 +44,7 @@ object Regression {
     dense ::= (Differentiator, NoArgs)
     dense ::= (EdgeDetector, NoArgs)
     dense ::= (Convolution_FPGA, NoArgs)
-    dense ::= (Kmeans, Array(200, 320))
+    dense ::= (Kmeans, Array(4, 64))
     dense ::= (FFT_Transpose, NoArgs)
     dense ::= (FFT_Strided, NoArgs)
     // dense ::= (Backprop, Array(5))
