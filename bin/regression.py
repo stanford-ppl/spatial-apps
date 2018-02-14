@@ -32,19 +32,25 @@ def regression():
         apps.append("DotProduct")
         apps.append("OuterProduct")
         apps.append("TPCHQ6")
+        apps.append("GDA")
+        apps.append("BlackScholes")
+        apps.append("SGD")
+        apps.append("SPMV_CRS")
+        apps.append("Gibbs_Ising2D")
+        apps.append("GEMM_Blocked")
+        apps.append("GEMM_NCubed")
+        apps.append("AES")
+        apps.append("Differentiator")
+        apps.append("BFS")
+        apps.append("TRSM")
+        apps.append("SimpleIf")
+        # apps.append("Backprop")
 
         # pirgen working
-        apps.append("BlackScholes")
-        apps.append("GDA")
 
         # not working 
-        apps.append("SimpleIf")
-        apps.append("Backprop")
-        apps.append("Gibbs_Ising2D")
-        # apps.append("SPMV_CRS")
         # apps.append("Kmeans_plasticine")
         # apps.append("PageRank_plasticine")
-        apps.append("GEMM_Blocked")
 
 
         # apps.append("AES")
@@ -60,7 +66,8 @@ def regression():
     else:
         apps = [opts.app]
 
-    opts.torun = "GEN_PIR,MAP_PIR"
+    # opts.torun = "GEN_PIR,MAP_PIR"
+    opts.torun = "GEN_PIR"
     for app in apps:
         target(app, [], {})
 

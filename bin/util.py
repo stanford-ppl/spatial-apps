@@ -191,7 +191,7 @@ def write(log, msg):
         f.write(msg)
 
 parser = argparse.ArgumentParser(description='Run experiments')
-parser.add_argument('--parallel', dest='parallel', nargs='?', default=5, type=int)
+parser.add_argument('--parallel', dest='parallel', nargs='?', default=1, type=int)
 parser.add_argument('--single', dest='single', action='store_true', default=False) 
 parser.add_argument('--run', dest='run', action='store_true', default=False) 
 parser.add_argument('--status', dest='status', action='store_true', default=False) 
