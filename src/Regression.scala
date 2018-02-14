@@ -23,7 +23,7 @@ object Regression {
 
   lazy val tests = {
     var dense = List[(SpatialApp, Array[Any])]()
-    dense ::= (DotProduct, Array(640000))
+    dense ::= (DotProduct, Array(6400))
     dense ::= (OuterProduct, Array(640, 640))
     dense ::= (SimpleRowStridedConv, NoArgs)
     dense ::= (TRSM, NoArgs)
