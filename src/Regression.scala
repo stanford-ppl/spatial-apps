@@ -142,7 +142,7 @@ object Regression {
     var fixme = List[(SpatialApp, Array[Any])]()
     // fixme ::= (KMP, Array("the"))
     fixme ::= (Backprop, Array(5))
-    fixme ::= (ScatterGather, Array(160))
+    // fixme ::= (ScatterGather, Array(160))
 
 
 
