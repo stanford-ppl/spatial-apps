@@ -68,6 +68,8 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
     val gold = Array.tabulate(M){i => Array.tabulate(N){j => a(i) * b(j) }}.flatten
     val gold_cksum = gold.map(a => a).reduce{_+_}
     val result_cksum = result.map(a => a).reduce{_+_}
+    // printMatrix(gold.reshape(M,N), "Gold:")
+    // printMatrix(result.reshape(M,N), "Got:")
     println("expected cksum: " + gold_cksum)
     println("result cksum:   " + result_cksum)
     // (0 until M*N) foreach { i => assert(result(i) == gold(i)) }
