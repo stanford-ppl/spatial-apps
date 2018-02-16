@@ -1590,9 +1590,9 @@ object ParFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
       val f3 = FIFO[T](tileSize)
       Foreach(N by tileSize) { i =>
         Parallel {
-          f1 load src1FPGA(i::i+tileSize par P1)
-          f2 load src2FPGA(i::i+tileSize par P1)
-          f3 load src3FPGA(i::i+tileSize par P1)
+          Pipe{f1 load src1FPGA(i::i+tileSize par P1)}
+          Pipe{f2 load src2FPGA(i::i+tileSize par P1)}
+          Pipe{f3 load src3FPGA(i::i+tileSize par P1)}
         }
         val accum = Reduce(Reg[T](0.to[T]))(tileSize by 1){i =>
           f1.deq() * f2.deq() * f3.deq()
@@ -1653,8 +1653,68 @@ object EfficiencyTest extends SpatialApp {
   }
 }
 
-object FifoLoadStore extends SpatialApp { // Regression (Unit) // Args: none
+object SmallTensorLoad extends SpatialApp { // This test stresses the unaligned load similar to a multichannel convolution which used to fail because the unaligned fifo in the accel
+  type T = FixPt[TRUE,_16,_0]
 
+  @virtualize
+  def main() {
+
+    val debug:scala.Boolean = false
+
+    // Scalar params
+    val INPUT_CHANS = ArgIn[Int]
+    val OUTPUT_CHANS = ArgIn[Int]
+
+    // Shadow params (input args)
+    val input_chans = args(0).to[Int]
+    val output_chans = args(1).to[Int]
+
+    // Set args
+    setArg(INPUT_CHANS, input_chans)
+    setArg(OUTPUT_CHANS, output_chans)
+
+    // HW Design properties
+    val INPUT_CHANS_MAX = 64
+    val OUTPUT_CHANS_MAX = 64
+
+    // Memories
+    val KERNEL_DATA = DRAM[T](OUTPUT_CHANS, INPUT_CHANS, 3, 3)
+
+    // Load data (placeholder)
+    val kernel = (0::OUTPUT_CHANS, 0::INPUT_CHANS, 0::3, 0::3) {(i,j,k,l) => (l + k * 3 + j * 3 * 3 + i * 3 * 3 * INPUT_CHANS).to[T]} //if (random[Int](10) > 8) 1.to[T] else 0.to[T]}
+
+    // Debug hooks
+    val KERNEL_COPY = DRAM[T](OUTPUT_CHANS * INPUT_CHANS * 3 * 3)
+    val KERNEL_COPY_CPU = DRAM[T](OUTPUT_CHANS, INPUT_CHANS, 3, 3)
+
+    // Set data
+    setMem(KERNEL_DATA, kernel)
+
+    setMem(KERNEL_COPY_CPU, kernel)
+
+    Accel{
+      val kernel_sram = SRAM[T](OUTPUT_CHANS_MAX, INPUT_CHANS_MAX, 3, 3)
+      kernel_sram load KERNEL_DATA(0::OUTPUT_CHANS, 0::INPUT_CHANS, 0::3, 0::3)
+
+      // Debug - Dump kernel back out to see if it was read correctly
+      val kernel_flat = SRAM[T](OUTPUT_CHANS_MAX * INPUT_CHANS_MAX * 3 * 3)
+      Foreach(OUTPUT_CHANS by 1){i => Foreach(INPUT_CHANS by 1){j => Foreach(3 by 1){k => Foreach(3 by 1){l =>
+        kernel_flat(i * INPUT_CHANS * 3 * 3 + j * 3 * 3 + k * 3 + l) = kernel_sram(i,j,k,l)
+      }}}}
+      KERNEL_COPY(0::OUTPUT_CHANS * INPUT_CHANS * 3 * 3) store kernel_flat
+    }
+    printTensor4(kernel, "Kernel")
+    val cksum = getTensor4(KERNEL_DATA).flatten.zip(getMem(KERNEL_COPY)){_==_}.reduce{_&&_}    
+
+    printTensor4(getMem(KERNEL_COPY).reshape(OUTPUT_CHANS, INPUT_CHANS, 3, 3), "Kernel copied from fpga:")
+    printTensor4(getTensor4(KERNEL_COPY_CPU), "Kernel copied from CPU:")
+
+    println("PASS: " + cksum + " (SmallTensorLoad)")
+
+  }
+}
+
+object FifoLoadStore extends SpatialApp { // Regression (Unit) // Args: none
 
   val N = 32
 
