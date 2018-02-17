@@ -73,7 +73,7 @@ object Regression {
     var sparse = List[(SpatialApp, Array[Any])]()
     sparse ::= (ScatterGather, Array(160))
     sparse ::= (GatherStore, NoArgs)
-    sparse ::= (PageRank_Bulk, Array(10000, 0.125))
+    sparse ::= (PageRank_Bulk, Array(100, 0.125))
     // sparse ::= (SPMV_DumbPack, Array(1536))
     sparse ::= (PageRank, Array(50, 0.125))
     sparse ::= (BFS_Queue, NoArgs)
@@ -140,9 +140,7 @@ object Regression {
     unit ::= (UnalignedTileLoadStore, NoArgs)
 
     var fixme = List[(SpatialApp, Array[Any])]()
-    // fixme ::= (KMP, Array("the"))
     fixme ::= (Backprop, Array(5))
-    // fixme ::= (ScatterGather, Array(160))
 
 
 
