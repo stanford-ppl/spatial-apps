@@ -31,6 +31,9 @@ object SHA1 extends SpatialApp { // Regression (Dense) // Args: none
     val text_dram = DRAM[Int8](len)
     val hash_dram = DRAM[ULong](16)//(5)
 
+    val zeros = Array.fill(16)(0.to[ULong])
+    setMem(hash_dram, zeros)
+
     // println("Hashing: " + argon.lang.String.num2string(data_text) + " (len: " + data_text.length + ")")
     println("Hashing: " + raw_text + " (len: " + data_text.length + ")")
     // printArray(data_text, "text as data: ")
