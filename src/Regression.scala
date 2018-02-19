@@ -75,12 +75,12 @@ object Regression {
     sparse ::= (ScatterGather, Array(160))
     sparse ::= (GatherStore, NoArgs)
     sparse ::= (PageRank_Bulk, Array(10000, 0.125))
-    // sparse ::= (SPMV_DumbPack, Array(1536))
+    sparse ::= (SPMV_DumbPack, Array(1536))
     sparse ::= (PageRank, Array(50, 0.125))
     sparse ::= (BFS_Queue, NoArgs)
     sparse ::= (BFS_Bulk, NoArgs)
-    // sparse ::= (SPMV_ELL, NoArgs)
-    // sparse ::= (SPMV_CRS, NoArgs)
+    sparse ::= (SPMV_ELL, NoArgs)
+    sparse ::= (SPMV_CRS, NoArgs)
 
     var unit = List[(SpatialApp, Array[Any])]()
     unit ::= (Breakpoint, NoArgs)
@@ -140,15 +140,8 @@ object Regression {
     unit ::= (UnalignedTileLoadStore, NoArgs)
 
     var fixme = List[(SpatialApp, Array[Any])]()
-    // fixme ::= (KMP, Array("the"))
-    fixme ::= (SPMV_DumbPack, Array(1536))
     fixme ::= (Backprop, Array(5))
-    fixme ::= (ScatterGather, Array(160))
-    fixme ::= (GatherStore, NoArgs)
-    fixme ::= (PageRank_Bulk, Array(10000, 0.125))
-    fixme ::= (PageRank, Array(50, 0.125))
-    fixme ::= (SPMV_ELL, NoArgs)
-    fixme ::= (SPMV_CRS, NoArgs)
+
 
 
 
