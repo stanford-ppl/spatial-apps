@@ -458,7 +458,7 @@ object LUTTest extends SpatialApp { // Regression (Unit) // Args: 2
     println("bresult: " + bresult)
 
     val cksum = gold == result && bgold == bresult
-    println("PASS: " + cksum + " (InOutArg)")
+    println("PASS: " + cksum + " (LUTTest)")
   }
 }
 
@@ -1684,7 +1684,7 @@ object SmallTensorLoad extends SpatialApp { // This test stresses the unaligned 
     val kernel = (0::OUTPUT_CHANS, 0::INPUT_CHANS, 0::3, 0::3) {(i,j,k,l) => (l + k * 3 + j * 3 * 3 + i * 3 * 3 * INPUT_CHANS).to[T]} //if (random[Int](10) > 8) 1.to[T] else 0.to[T]}
 
     // Debug hooks
-    val KERNEL_COPY = DRAM[T](OUTPUT_CHANS * INPUT_CHANS * 3 * 3)
+    val KERNEL_COPY = DRAM[T](OUTPUT_CHANS, INPUT_CHANS, 3, 3)
     val KERNEL_COPY_CPU = DRAM[T](OUTPUT_CHANS, INPUT_CHANS, 3, 3)
 
     // Set data
@@ -1696,17 +1696,12 @@ object SmallTensorLoad extends SpatialApp { // This test stresses the unaligned 
       val kernel_sram = SRAM[T](OUTPUT_CHANS_MAX, INPUT_CHANS_MAX, 3, 3)
       kernel_sram load KERNEL_DATA(0::OUTPUT_CHANS, 0::INPUT_CHANS, 0::3, 0::3)
 
-      // Debug - Dump kernel back out to see if it was read correctly
-      val kernel_flat = SRAM[T](OUTPUT_CHANS_MAX * INPUT_CHANS_MAX * 3 * 3)
-      Foreach(OUTPUT_CHANS by 1){i => Foreach(INPUT_CHANS by 1){j => Foreach(3 by 1){k => Foreach(3 by 1){l =>
-        kernel_flat(i * INPUT_CHANS * 3 * 3 + j * 3 * 3 + k * 3 + l) = kernel_sram(i,j,k,l)
-      }}}}
-      KERNEL_COPY(0::OUTPUT_CHANS * INPUT_CHANS * 3 * 3) store kernel_flat
+      KERNEL_COPY(0::OUTPUT_CHANS, 0::INPUT_CHANS, 0::3, 0::3) store kernel_sram
     }
     printTensor4(kernel, "Kernel")
     val cksum = getTensor4(KERNEL_DATA).flatten.zip(getMem(KERNEL_COPY)){_==_}.reduce{_&&_}    
 
-    printTensor4(getMem(KERNEL_COPY).reshape(OUTPUT_CHANS, INPUT_CHANS, 3, 3), "Kernel copied from fpga:")
+    printTensor4(getTensor4(KERNEL_COPY), "Kernel copied from fpga:")
     printTensor4(getTensor4(KERNEL_COPY_CPU), "Kernel copied from CPU:")
 
     println("PASS: " + cksum + " (SmallTensorLoad)")
