@@ -268,9 +268,10 @@ object SVRG extends SpatialApp {
     val epochs = args(0).to[Int] // Epochs
     val len_epoch = args(1).to[Int] // Epoch Length
     val points = args(2).to[Int] // Total Points
-    val alpha = args(3).to[TM] // Step size
+    val alpha1 = args(3).to[TM] // Step size
+    val alpha2 = args(4).to[TM] // Step size
     val D = modelSize
-    val debug = args(4).to[Int]
+    val bump_epoch = args(5).to[Int]
 
     val noise_num = 2
     val noise_denom = 10
@@ -283,13 +284,16 @@ object SVRG extends SpatialApp {
     val N = ArgIn[Int]
     val T = ArgIn[Int]
     val DBG = ArgIn[Int]
-    val A = ArgIn[TM]
+    val BUMP_EPOCH = ArgIn[Int]
+    val A1 = ArgIn[TM]
+    val A2 = ArgIn[TM]
 
     setArg(E, epochs)
     setArg(N, points)
     setArg(T, len_epoch)
-    setArg(A, alpha)
-    setArg(DBG, debug)
+    setArg(A1, alpha1)
+    setArg(A2, alpha2)
+    setArg(BUMP_EPOCH, bump_epoch)
 
 
     val num_to_track = 512
@@ -312,6 +316,7 @@ object SVRG extends SpatialApp {
       Foreach(num_to_track by 1) {i => debug_err(i) = 0.to[TM]}
       Pipe(D by 1) { i => w_k(i) = 0.to[TM] }
       Sequential.Foreach(E by 1) { e =>
+        val A = mux(e < BUMP_EPOCH, A1.value, A2.value)
       	// Compute g_k and w_k
       	val avg_err = Reg[TM](0.to[TM])
       	avg_err.reset
@@ -361,10 +366,12 @@ object SVRG extends SpatialApp {
     val w_result = getMem(result)
     val err_result = getMem(err)
 
-    val cksum = W_gold.zip(w_result) { case (a, b) => abs(a - b) < margin }.reduce{_&&_}
+    val cksum = W_gold.zip(w_result) { case (a, b) => (a - b) * (a - b) }.reduce{_+_} < margin
     printArray(err_result, "Error per update")
     printArray(w_result, "result: ")
     printArray(W_gold, "gold: ")
-    println("PASS: " + cksum + " (SGD)")
+    println("Cartesian Distance From W_gold: " + { W_gold.zip(w_result) { case (a, b) => (a - b).to[TM] * (a - b).to[TM] }.reduce{_+_}.to[TM] } + " <? " + {margin.to[Int]})
+
+    println("PASS: " + cksum + " (SVRG)")
   }
 }

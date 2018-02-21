@@ -39,6 +39,7 @@ object Regression {
     dense ::= (TPCHQ6, Array(640))
     dense ::= (SGD_minibatch, Array(40, 64, 0.0001))
     dense ::= (SGD, Array(40, 64, 0.0001))
+    dense ::= (SVRG, Array(25, 30, 256, 0.0001, 0.0009, 10))
     dense ::= (Gibbs_Ising2D, Array(25, 0.3, 2))
     dense ::= (GDA, Array(128))
     dense ::= (Differentiator, NoArgs)
