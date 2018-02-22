@@ -37,7 +37,7 @@ import spatial.targets._
 */
 
 
-object SGD extends SpatialApp { // Regression (Dense) // Args: 40 64 0.0001
+object SGD extends SpatialApp { // Test Args: 40 64 0.0001
 
 
   type TM = FixPt[TRUE, _16, _16]
@@ -78,7 +78,7 @@ object SGD extends SpatialApp { // Regression (Dense) // Args: 40 64 0.0001
       Sequential.Foreach(E by 1) { e =>
         Sequential.Foreach(N by tileSize) { b =>
           y_tile load y(b :: b + tileSize par ip)
-          Sequential.Foreach(tileSize by 1) { i =>
+          Foreach(tileSize by 1) { i =>
             val y_err = Reg[TX]
             val x_tile = SRAM[TX](D)
             Parallel {
@@ -131,16 +131,6 @@ object SGD extends SpatialApp { // Regression (Dense) // Args: 40 64 0.0001
 
     val result = sgd_onept(sX.flatten, sY, A, E, N)
 
-
-    // (0 until E) foreach { i =>
-    //   (0 until N) foreach { j =>
-    //     val y_hat = sX.apply(j).zip(gold) {_*_}.reduce{_+_}
-    //     val y_err = sY.apply(j) - y_hat
-    //     val update = sX.apply(j).zip(gold){case (x,g) => g + x*A*y_err}
-    //     (0 until D) foreach { q => gold(q) = update(q) }
-    //   }
-    // }
-
     val cksum = ideal_model.zip(result) { case (a, b) => abs(a - b) < margin }.reduce{_&&_}
     printArr(result, "result: ")
     printArr(ideal_model, "gold: ")
@@ -149,7 +139,7 @@ object SGD extends SpatialApp { // Regression (Dense) // Args: 40 64 0.0001
 }
 
 
-object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0.0001
+object SGD_minibatch extends SpatialApp { // Test Args: 40 64 0.0001
 
 
   type TM = FixPt[TRUE,_16,_16]
@@ -192,12 +182,12 @@ object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0
           y_tile load y(b::b+tileSize par ip)
           x_tile load x(b::b+tileSize, 0::D)
           val y_err = SRAM[TX](tileSize)
-          Sequential.Foreach(tileSize by 1) {i => 
+          Foreach(tileSize by 1) {i => 
             val y_hat = Reg[TX]
             Reduce(y_hat)(D by 1 par ip){ j => x_tile(i,j) * sgdmodel(j).to[TX] }{_+_}
             y_err(i) = y_tile(i) - y_hat.value
           }
-          Sequential.Foreach(D by 1) { i =>
+          Foreach(D by 1) { i =>
             val raw_update = Reg[TX]
             Reduce(raw_update)(tileSize by 1 par ip){ j => x_tile(j,i) * y_err(j) }{_+_}
             sgdmodel(i) = sgdmodel(i) + raw_update.value.to[TM]*A
@@ -233,16 +223,6 @@ object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0
 
     val result = sgdminibatch(sX.flatten, sY, A, E, N)
 
-
-    // (0 until E) foreach { i =>
-    //   (0 until N) foreach { j =>
-    //     val y_hat = sX.apply(j).zip(gold) {_*_}.reduce{_+_}
-    //     val y_err = sY.apply(j) - y_hat
-    //     val update = sX.apply(j).zip(gold){case (x,g) => g + x*A*y_err}
-    //     (0 until D) foreach { q => gold(q) = update(q) }
-    //   }
-    // }
-
     val cksum = ideal_model.zip(result){ case (a,b) => abs(a - b) < margin }.reduce{_&&_}
     printArr(result, "result: ")
     printArr(ideal_model, "gold: ")
@@ -250,10 +230,10 @@ object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0
   }
 }
 
-object SVRG extends SpatialApp { 
+object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
 
   type TM = FixPt[TRUE, _16, _48]
-  // type TX = FixPt[TRUE, _16, _16]
+  type TX = FixPt[TRUE, _16, _16]
   val modelSize = 16
   val margin = 1
 
@@ -262,6 +242,18 @@ object SVRG extends SpatialApp {
 
   val tileSize = 16 
 
+  val P1 = 2
+  val P2 = 2
+  val P3 = 2
+  val P4 = 2
+  val P5 = 2
+  val P6 = 2
+  val P7 = 2
+  val P8 = 2
+  val P9 = 2
+  val P10 = 2
+  val P11 = 2
+  val PX = 1
 
   @virtualize
   def main() {
@@ -276,14 +268,13 @@ object SVRG extends SpatialApp {
     val noise_num = 2
     val noise_denom = 10
     // Generate some test data
-    val sX = (0::points, 0::D){(i,j) => random[TM](3.to[TM]) + 1.to[TM]}
+    val sX = (0::points, 0::D){(i,j) => random[TX](3.to[TX]) + 1.to[TX]}
     val W_gold = Array.tabulate(D) { i => random[TM](3.to[TM]) / 2.to[TM]}
-    val sY = Array.tabulate(points) { i => (random[TM](noise_num.to[TM]) / noise_denom - noise_num/2) + Array.tabulate(D){j => W_gold(j) * sX(i,j)}.reduce{_+_} }
+    val sY = Array.tabulate(points) { i => (random[TX](noise_num.to[TX]) / noise_denom - noise_num/2) + Array.tabulate(D){j => W_gold(j) * sX(i,j).to[TM]}.reduce{_+_}.to[TX] }
 
     val E = ArgIn[Int]
     val N = ArgIn[Int]
     val T = ArgIn[Int]
-    val DBG = ArgIn[Int]
     val BUMP_EPOCH = ArgIn[Int]
     val A1 = ArgIn[TM]
     val A2 = ArgIn[TM]
@@ -299,8 +290,8 @@ object SVRG extends SpatialApp {
     val num_to_track = 512
     val init = Array.fill[TM](num_to_track)(0)
 
-    val x = DRAM[TM](N, D)
-    val y = DRAM[TM](N)
+    val x = DRAM[TX](N, D)
+    val y = DRAM[TX](N)
     val err = DRAM[TM](num_to_track)
     val result = DRAM[TM](D)
 
@@ -310,54 +301,90 @@ object SVRG extends SpatialApp {
 
 
     Accel {
+      // Create model and gradient memories
       val w_k = SRAM[TM](D)
       val g_k = SRAM[TM](D)
       val debug_err = SRAM[TM](num_to_track)
-      Foreach(num_to_track by 1) {i => debug_err(i) = 0.to[TM]}
-      Pipe(D by 1) { i => w_k(i) = 0.to[TM] }
-      Sequential.Foreach(E by 1) { e =>
+      val y_cache = SRAM[TX](tileSize)
+      val y_cache_base = Reg[Int](0)
+
+      // Initialize error debug memory, weights, and warm y_cache
+      Foreach(num_to_track by 1 par P1) {i => debug_err(i) = 0.to[TM]}
+      Pipe(D by 1 par P2) { i => w_k(i) = 0.to[TM] }
+      y_cache load y(0::tileSize par loadPar)
+
+      // Outer loop (epochs)
+      Sequential.Foreach(E by 1 par PX) { e =>
+        // Choose correct step for this epoch
         val A = mux(e < BUMP_EPOCH, A1.value, A2.value)
-      	// Compute g_k and w_k
+
+        // Debug register for tracking total RMSE for this iter
       	val avg_err = Reg[TM](0.to[TM])
       	avg_err.reset
-      	MemReduce(g_k)(N by tileSize){i => 
-      	  val y_tile = SRAM[TM](tileSize)
-      	  val x_tile = SRAM[TM](tileSize,D)
+
+        // Do full update over all points to get g_k and w_k (outer loop)
+      	MemReduce(g_k par P3)(N by tileSize par P4){i => 
+      	  val y_tile = SRAM[TX](tileSize)
+      	  val x_tile = SRAM[TX](tileSize,D)
       	  y_tile load y(i::i + tileSize par loadPar)
       	  x_tile load x(i::i + tileSize, 0::D par loadPar)
       	  val g_k_partial = SRAM[TM](D)
-      	  MemReduce(g_k_partial)(tileSize by 1){ii =>
+          // Full update tile (inner loop)
+      	  MemReduce(g_k_partial par P5)(tileSize by 1 par P6){ii =>
       	  	val g_k_local = SRAM[TM](D)
-      	  	val y_err = Reduce(Reg[TM](0.to[TM]))(D by 1){j => w_k(j) * x_tile(ii, j)}{_+_} - y_tile(ii)
-      	  	avg_err := avg_err + (y_err * y_err / N.value.to[TM])
-      	  	Foreach(D by 1){j => g_k_local(j) =  -A * y_err * x_tile(ii, j)}
+      	  	val y_err = Reduce(Reg[TX](0.to[TX]))(D by 1){j => (w_k(j) * x_tile(ii, j).to[TM]).to[TX]}{_+_} - y_tile(ii)
+      	  	avg_err := avg_err + ((y_err * y_err).to[TM] / N.value.to[TM])
+      	  	Foreach(D by 1 par P7){j => g_k_local(j) =  -A * y_err.to[TM] * x_tile(ii, j).to[TM]}
       	  	g_k_local
       	  }{_+_}
       	}{(a,b) => a + b/tileSize.to[TM]}
-      	if ((e == 0 && DBG.value == 1) || DBG.value == 0) {
-      	  MemFold(w_k)(1 by 1){_ => g_k}{_+_}
-      	  ()
-      	}
+
+        // Accumulate g_k into w_k
+      	MemFold(w_k par P8)(1 by 1){_ => g_k}{_+_}
+
+        // Track error
       	debug_err(e) = avg_err.value
+
       	// Do SGD
       	val w_k_t = SRAM[TM](D)
-      	Foreach(D by 1){i => w_k_t(i) = w_k(i)}
-      	Foreach(T by 1){t => 
-      	  val i = random[Int](1024) % N
-      	  val x_point = SRAM[TM](D)
-      	  val y_point = RegFile[TM](1) // Incredibly wasteful for now
-      	  x_point load x(i, 0::D par loadPar)
-      	  y_point load y(i::i+1 par loadPar)
-      	  val y_err_t = Reduce(Reg[TM](0.to[TM]))(D by 1){j => w_k_t(j) * x_point(j)}{_+_} - y_point(0)
-      	  val y_err_k = Reduce(Reg[TM](0.to[TM]))(D by 1){j => w_k(j) * x_point(j)}{_+_} - y_point(0)
-      	  Foreach(D by 1){i => w_k_t(i) = w_k_t(i) - A * (y_err_t * x_point(i) + y_err_k * x_point(i) - g_k(i))}
 
-      	  // Debug
-      	  // if (e * T + t + (e+1)< num_to_track) debug_err(e*T + t + (e+1)) = y_err_t * y_err_t
+        // Copy w_k to w_k_t
+      	Foreach(D by 1 par P9){i => w_k_t(i) = w_k(i)}
+
+        // Run len_epoch number of SGD points
+      	Foreach(T by 1 par PX){t => 
+          // Choose random point
+      	  val i = random[Int](1024) % N
+
+          // Get y for this point
+          val y_point = Reg[TX](0)
+          if (i - y_cache_base >= 0 && i - y_cache_base < tileSize) {
+            y_point := y_cache(i-y_cache_base)
+          } else {
+            y_cache_base := i - (i % tileSize)
+            y_cache load y(y_cache_base::y_cache_base + tileSize par loadPar)
+            y_point := y_cache(i % tileSize)
+          }
+
+          // Get x for this point
+      	  val x_point = SRAM[TX](D)
+      	  x_point load x(i, 0::D par loadPar)
+
+          // Compute gradient against w_k_t
+      	  val y_err_t = Reduce(Reg[TX](0.to[TX]))(D by 1){j => (w_k_t(j) * x_point(j).to[TM]).to[TX]}{_+_} - y_point
+
+          // Compute gradient against w_k
+      	  val y_err_k = Reduce(Reg[TX](0.to[TX]))(D by 1){j => (w_k(j) * x_point(j).to[TM]).to[TX]}{_+_} - y_point
+
+          // Update w_k_t with reduced variance update
+      	  Foreach(D by 1 par P10){i => w_k_t(i) = w_k_t(i) - A * ((y_err_t * x_point(i)).to[TM] + (y_err_k * x_point(i)).to[TM] - g_k(i))}
+
       	}
       	// Copy w_k_t to w_k
-      	Foreach(D by 1){i => w_k(i) = w_k_t(i)}
+      	Foreach(D by 1 par P11){i => w_k(i) = w_k_t(i)}
       }
+
+      // Store back values
       result(0 :: D par storePar) store w_k
       err(0 :: num_to_track par storePar) store debug_err
     }

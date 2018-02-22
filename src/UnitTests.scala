@@ -91,10 +91,14 @@ object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
     setArg(x, N)
 
     // Create HW accelerator
-    Accel {
-      println("hi")
-      Pipe { y := x + 4 }
-      assert(x.value != -99.to[Int], "Thou shalt not input -99 to this app")
+    for (i <- 0 until 5) {
+      Accel {
+        println("hi")
+        Pipe { y := x + 1 }
+        assert(x.value != -99.to[Int], "Thou shalt not not input -99 to this app")
+      }
+      println("argout is " + getArg(y))
+      setArg(x, getArg(y))
     }
 
 
@@ -102,7 +106,7 @@ object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
     val result = getArg(y)
 
     // Create validation checks and debug code
-    val gold = N + 4
+    val gold = N + 5
     println("expected: " + gold)
     println("result: " + result)
 
@@ -468,7 +472,7 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
   @virtualize
   def main(): Unit = {
     val cst1 = 32
-    val cst2 = 23;
+    val cst2 = 23
     val cst3 = 11
     val cst4 = 7
     val io1 = HostIO[Int]
@@ -1568,21 +1572,36 @@ object ParFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
 
 
   val tileSize = 64
+
+  case class DRAMHolder[T:Type:Num](kernel: DRAM1[T])
+  case class DRAMMaker[T:Type:Num](N: scala.Int) { // Testing arg mapping when multiple drams have the same "name"
+    val freshDRAM = DRAM[T](N)
+  }
+
+  @virtualize
+  def loadFifo[T:Type:Num](fifo: FIFO[T], holder: DRAMHolder[T], i: Index, P1: scala.Int): Unit = {
+    val kernel = holder.kernel
+    Pipe{fifo load kernel(i::i+tileSize par P1)}
+  }
+
   @virtualize
   def parFifoLoad[T:Type:Num](src1: Array[T], src2: Array[T], src3: Array[T], in: Int) = {
 
-    val P1 = 1 (16 -> 16)
+    val P1 = 1
 
-    val N = ArgIn[Int]
-    setArg(N, in)
-
-    val src1FPGA = DRAM[T](N)
-    val src2FPGA = DRAM[T](N)
-    val src3FPGA = DRAM[T](N)
+    val N = 640 //ArgIn[Int]
+    // setArg(N, in)
+    
+    val makerInstance1 = DRAMMaker[T](N)
+    val holderInstance1 = DRAMHolder[T](makerInstance1.freshDRAM)
+    val makerInstance2 = DRAMMaker[T](N)
+    val holderInstance2 = DRAMHolder[T](makerInstance2.freshDRAM)
+    val makerInstance3 = DRAMMaker[T](N)
+    val holderInstance3 = DRAMHolder[T](makerInstance3.freshDRAM)
     val out = ArgOut[T]
-    setMem(src1FPGA, src1)
-    setMem(src2FPGA, src2)
-    setMem(src3FPGA, src3)
+    setMem(holderInstance1.kernel, src1)
+    setMem(holderInstance2.kernel, src2)
+    setMem(holderInstance3.kernel, src3)
 
     Accel {
       val f1 = FIFO[T](tileSize)
@@ -1590,9 +1609,9 @@ object ParFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
       val f3 = FIFO[T](tileSize)
       Foreach(N by tileSize) { i =>
         Parallel {
-          Pipe{f1 load src1FPGA(i::i+tileSize par P1)}
-          Pipe{f2 load src2FPGA(i::i+tileSize par P1)}
-          Pipe{f3 load src3FPGA(i::i+tileSize par P1)}
+          loadFifo(f1, holderInstance1, i, P1)
+          loadFifo(f2, holderInstance2, i, P1)
+          loadFifo(f3, holderInstance3, i, P1)
         }
         val accum = Reduce(Reg[T](0.to[T]))(tileSize by 1){i =>
           f1.deq() * f2.deq() * f3.deq()
@@ -1606,7 +1625,7 @@ object ParFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
 
   @virtualize
   def main() {
-    val arraySize = args(0).to[Int]
+    val arraySize = 640 //args(0).to[Int]
 
     val src1 = Array.tabulate(arraySize) { i => i % 4 }
     val src2 = Array.tabulate(arraySize) { i => i % 4 + 16}
