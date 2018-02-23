@@ -381,19 +381,19 @@ object Regression {
     )
     backends ::= Backend(
       name = "Zynq",
-      stagingArgs = flags :+ "--synth" :+ "--retime" :+ "--instrument",
+      stagingArgs = flags :+ "--synth" :+ "--syncMem" :+ "--instrument",
       make = genDir => Process(Seq("make","zynq"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "Zynq", args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "ZCU",
-      stagingArgs = flags :+ "--synth" :+ "--retime" :+ "--instrument",
+      stagingArgs = flags :+ "--synth" :+ "--syncMem" :+ "--instrument",
       make = genDir => Process(Seq("make","zcu"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "ZCU", args), new java.io.File(genDir))
     )
     backends ::= Backend(
       name = "AWS",
-      stagingArgs = flags :+ "--synth" :+ "--retime",
+      stagingArgs = flags :+ "--synth" :+ "--syncMem",
       make = genDir => Process(Seq("make","aws-F1-afi"), new java.io.File(genDir)),
       run  = (genDir,args) => Process(Seq("bash", "scripts/scrape.sh", "AWS"), new java.io.File(genDir))
     )
