@@ -5,8 +5,8 @@ import spatial.targets._
 
 object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
 
-  type TM = FixPt[TRUE, _16, _48]
-  type TX = FixPt[TRUE, _16, _16]
+  type TM = FixPt[TRUE, _8, _24]
+  type TX = FixPt[TRUE, _8, _8]
   val margin = 1 // Maximum distance between gold weights and computed weights to consider the app "passing"
 
   val tileSize = 16 (16 -> 128)
@@ -57,30 +57,21 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
     setArg(A2, alpha2)
     setArg(BUMP_EPOCH, bump_epoch)
 
-
-    val num_to_track = 512
-    val init = Array.fill[TM](num_to_track)(0)
-
     val x = DRAM[TX](N, D)
     val y = DRAM[TX](N)
-    val err = DRAM[TM](num_to_track)
     val result = DRAM[TM](D)
 
     setMem(x, sX)
     setMem(y, sY)
-    setMem(err, init)
 
 
     Accel {
       // Create model and gradient memories
       val w_k = SRAM[TM](D)
       val g_k = SRAM[TM](D)
-      val debug_err = SRAM[TM](num_to_track)
       val y_cache = SRAM[TX](tileSize)
       val y_cache_base = Reg[Int](0)
 
-      // Initialize error debug memory, weights, and warm y_cache
-      Foreach(num_to_track by 1 par P1) {i => debug_err(i) = 0.to[TM]}
       Pipe(D by 1 par P2) { i => w_k(i) = 0.to[TM] }
       y_cache load y(0::tileSize par loadPar)
 
@@ -88,10 +79,6 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
       Sequential.Foreach(E by 1 par PX) { e =>
         // Choose correct step for this epoch
         val A = mux(e < BUMP_EPOCH, A1.value, A2.value)
-
-        // Debug register for tracking total RMSE for this iter
-        val avg_err = Reg[TM](0.to[TM])
-        avg_err.reset
 
         // Do full update over all points to get g_k and w_k (outer loop)
         MemReduce(g_k par P3)(N by tileSize par P4){i => 
@@ -103,19 +90,14 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
           // Full update tile (inner loop)
           MemReduce(g_k_partial par P5)(tileSize by 1 par P6){ii =>
             val g_k_local = SRAM[TM](D)
-            val y_err = Reduce(Reg[TX](0.to[TX]))(D by 1){j => (w_k(j) * x_tile(ii, j).to[TM]).to[TX]}{_+_} - y_tile(ii)
-            avg_err := avg_err + ((y_err * y_err).to[TM] / N.value.to[TM])
-            Foreach(D by 1 par P7){j => g_k_local(j) =  -A * y_err.to[TM] * x_tile(ii, j).to[TM]}
+            val y_err = Reduce(Reg[TX](0.to[TX]))(D by 1){j => (w_k(j) *&! x_tile(ii, j).to[TM]).to[TX]}{_+!_} -! y_tile(ii)
+            Foreach(D by 1 par P7){j => g_k_local(j) =  -A *&! y_err.to[TM] *&! x_tile(ii, j).to[TM]}
             g_k_local
-          }{_+_}
-        }{(a,b) => a + b/tileSize.to[TM]}
+          }{_+!_}
+        }{(a,b) => a +! b/tileSize.to[TM]}
 
         // Accumulate g_k into w_k
-        MemFold(w_k par P8)(1 by 1){_ => g_k}{_+_}
-
-        // Track error
-        debug_err(e) = avg_err.value
-
+        MemFold(w_k par P8)(1 by 1){_ => g_k}{_+!_}
         // Do SGD
         val w_k_t = SRAM[TM](D)
 
@@ -142,13 +124,13 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
           x_point load x(i, 0::D par loadPar)
 
           // Compute gradient against w_k_t
-          val y_err_t = Reduce(Reg[TX](0.to[TX]))(D by 1){j => (w_k_t(j) * x_point(j).to[TM]).to[TX]}{_+_} - y_point
+          val y_err_t = Reduce(Reg[TX](0.to[TX]))(D by 1){j => (w_k_t(j) *&! x_point(j).to[TM]).to[TX]}{_+!_} -! y_point
 
           // Compute gradient against w_k
-          val y_err_k = Reduce(Reg[TX](0.to[TX]))(D by 1){j => (w_k(j) * x_point(j).to[TM]).to[TX]}{_+_} - y_point
+          val y_err_k = Reduce(Reg[TX](0.to[TX]))(D by 1){j => (w_k(j) *&! x_point(j).to[TM]).to[TX]}{_+!_} -! y_point
 
           // Update w_k_t with reduced variance update
-          Foreach(D by 1 par P10){i => w_k_t(i) = w_k_t(i) - A * ((y_err_t * x_point(i)).to[TM] + (y_err_k * x_point(i)).to[TM] - g_k(i))}
+          Foreach(D by 1 par P10){i => w_k_t(i) = w_k_t(i) -! (A *&! ((y_err_t *&! x_point(i)).to[TM] +! (y_err_k *&! x_point(i)).to[TM] -! g_k(i)))}
 
         }
         // Copy w_k_t to w_k
@@ -157,15 +139,12 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
 
       // Store back values
       result(0 :: D par storePar) store w_k
-      err(0 :: num_to_track par storePar) store debug_err
     }
 
     
     val w_result = getMem(result)
-    val err_result = getMem(err)
 
     val cksum = W_gold.zip(w_result) { case (a, b) => (a - b) * (a - b) }.reduce{_+_} < margin
-    printArray(err_result, "Error per update")
     printArray(w_result, "result: ")
     printArray(W_gold, "gold: ")
     println("Cartesian Distance From W_gold: " + { W_gold.zip(w_result) { case (a, b) => (a - b).to[TM] * (a - b).to[TM] }.reduce{_+_}.to[TM] } + " <? " + {margin.to[Int]})
