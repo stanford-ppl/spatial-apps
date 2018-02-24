@@ -3498,7 +3498,7 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val unbiased_upper_sat_mul_signed = ArgOut[SGN] // 7
     val regular_add_signed = ArgOut[SGN] // 8
     val a_sgn_passthru = ArgOut[SGN] // 9
-    val normal = ArgOut[SGN]
+    // val normal = ArgOut[SGN]
 
     Accel {
       val usgn = SRAM[USGN](N)
@@ -3514,9 +3514,9 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
       Pipe{ unbiased_sat_mul_unsigned := B_usgn *&! C_usgn}
       Pipe{ unbiased_lower_sat_mul_signed := C_sgn *&! A_sgn}
       Pipe{ unbiased_upper_sat_mul_signed := C_sgn *&! (-1.to[SGN]*A_sgn)}
-      Pipe{ regular_add_signed := C_sgn * A_sgn }
+      Pipe{ regular_add_signed := C_sgn + A_sgn }
       Pipe{ a_sgn_passthru := A_sgn }
-      Pipe{ normal := C_sgn *! -0.5.to[SGN] }
+      // Pipe{ normal := C_sgn *! -0.5.to[SGN] }
     }
 
 
@@ -3528,7 +3528,7 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val unbiased_sat_mul_unsigned_res = getArg(unbiased_sat_mul_unsigned)
     val unbiased_lower_sat_mul_signed_res = getArg(unbiased_lower_sat_mul_signed)
     val unbiased_upper_sat_mul_signed_res = getArg(unbiased_upper_sat_mul_signed)
-    val normal_res = getArg(normal)
+    // val normal_res = getArg(normal)
 
     // Create validation checks and debug code
     val gold_unbiased_mul_unsigned = (a_usgn * b_usgn).to[FltPt[_24,_8]]
@@ -3551,8 +3551,8 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val cksum5 = unbiased_sat_mul_unsigned_res == gold_unbiased_sat_mul_unsigned.to[USGN]
     val cksum6 = unbiased_lower_sat_mul_signed_res == gold_unbiased_lower_sat_mul_signed.to[SGN]
     val cksum7 = unbiased_upper_sat_mul_signed_res == gold_unbiased_upper_sat_mul_signed.to[SGN]
-    val cksum8 = normal_res == gold_normal.to[SGN]
-    val cksum = cksum1 && cksum2 && cksum3 && cksum4 && cksum5 && cksum6 && cksum7 && cksum8
+    // val cksum8 = normal_res == gold_normal.to[SGN]
+    val cksum = cksum1 && cksum2 && cksum3 && cksum4 && cksum5 && cksum6 && cksum7 //&& cksum8
 
     // Helpful prints
     println(cksum1 + " Unbiased Rounding Multiplication Unsigned: |" + gold_unbiased_mul_unsigned + " - " + gold_mean_unsigned + "| = " + abs(gold_unbiased_mul_unsigned-gold_mean_unsigned) + " <? " + margin)
@@ -3564,8 +3564,8 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     println(cksum5 + " Unbiased Saturating Multiplication Unsigned: " + unbiased_sat_mul_unsigned_res + " =?= " + gold_unbiased_sat_mul_unsigned.to[SGN])
     println(cksum6 + " Unbiased (lower) Saturating Multiplication Signed: " + unbiased_lower_sat_mul_signed_res + " =?= " + gold_unbiased_lower_sat_mul_signed.to[SGN])
     println(cksum6 + " Unbiased (upper) Saturating Multiplication Signed: " + unbiased_upper_sat_mul_signed_res + " =?= " + gold_unbiased_upper_sat_mul_signed.to[SGN])
-    println(" Regular Multiplication Signed: " + getArg(regular_add_signed) + " =?= " + (a_sgn * c_sgn).to[SGN])
-    println(" Normal: " + getArg(normal) + " =?= " + gold_normal)
+    println(" Regular Multiplication Signed: " + getArg(regular_add_signed) + " =?= " + (a_sgn + c_sgn).to[SGN])
+    // println(" Normal: " + getArg(normal) + " =?= " + gold_normal)
     println(" A_sgn Passthru: " + getArg(a_sgn_passthru) + " =?= " + a_sgn)
 
 
