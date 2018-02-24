@@ -62,7 +62,6 @@ object Regression {
     dense ::= (Sort_Merge, NoArgs)
     dense ::= (AES, Array(20))
     dense ::= (MultiplexedWriteTest, NoArgs)
-    dense ::= (SpecialMath, Array(0.125, 5.625, 14, 1.875, -3.4375, -5))
     dense ::= (FixPtMem, Array(5.25, 2.125))
     dense ::= (Tensor3D, Array(32, 4, 4))
     dense ::= (BlockReduce1D, Array(1920))
