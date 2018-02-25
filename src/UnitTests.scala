@@ -3507,11 +3507,11 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
       }
       unbiased_mul_unsigned store usgn
       unbiased_mul_signed store sgn
-      Pipe{ satur_add_unsigned := C_usgn <+> B_usgn}
-      Pipe{ satur_add_signed := C_sgn <+> B_sgn}
-      Pipe{ unbiased_sat_mul_unsigned := B_usgn <*&> C_usgn}
-      Pipe{ unbiased_lower_sat_mul_signed := C_sgn <*&> A_sgn}
-      Pipe{ unbiased_upper_sat_mul_signed := C_sgn <*&> (-1.to[SGN]*A_sgn)}
+      Pipe{ satur_add_unsigned := C_usgn +! B_usgn}
+      Pipe{ satur_add_signed := C_sgn +! B_sgn}
+      Pipe{ unbiased_sat_mul_unsigned := B_usgn *&! C_usgn}
+      Pipe{ unbiased_lower_sat_mul_signed := C_sgn *&! A_sgn}
+      Pipe{ unbiased_upper_sat_mul_signed := C_sgn *&! (-1.to[SGN]*A_sgn)}
       Pipe{ regular_add_signed := C_sgn * A_sgn }
       Pipe{ a_sgn_passthru := A_sgn }
     }
