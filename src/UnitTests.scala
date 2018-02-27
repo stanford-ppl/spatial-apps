@@ -3458,7 +3458,7 @@ object LittleTypeTest extends SpatialApp {
 }
 
 
-object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.625 14 1.875 -3.4375 -5
+object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.625 14 1.875 -3.4375 -5 0.25 -8
 
   type USGN = FixPt[FALSE,_4,_4]
   type SGN = FixPt[TRUE,_4,_4]
@@ -3472,6 +3472,8 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val a_sgn = args(3).to[SGN]
     val b_sgn = args(4).to[SGN]
     val c_sgn = args(5).to[SGN]
+    val d_sgn = args(6).to[SGN]
+    val e_sgn = args(7).to[SGN]
     // assert(b_usgn.to[FltPt[_24,_8]] + c_usgn.to[FltPt[_24,_8]] > 15.to[FltPt[_24,_8]], "b_usgn + c_usgn must saturate (false,4,4) FP number")
     // assert(b_sgn.to[FltPt[_24,_8]] + c_sgn.to[FltPt[_24,_8]] < -8.to[FltPt[_24,_8]], "b_sgn + c_sgn must saturate (true,4,4) FP number")
     val A_usgn = ArgIn[USGN]
@@ -3480,12 +3482,16 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val A_sgn = ArgIn[SGN]
     val B_sgn = ArgIn[SGN]
     val C_sgn = ArgIn[SGN]
+    val D_sgn = ArgIn[SGN]
+    val E_sgn = ArgIn[SGN]
     setArg(A_usgn, a_usgn)
     setArg(B_usgn, b_usgn)
     setArg(C_usgn, c_usgn)
     setArg(A_sgn, a_sgn)
     setArg(B_sgn, b_sgn)
     setArg(C_sgn, c_sgn)
+    setArg(D_sgn, d_sgn)
+    setArg(E_sgn, e_sgn)
     val N = 256
 
     // Conditions we will check
@@ -3497,6 +3503,7 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val unbiased_lower_sat_mul_signed = ArgOut[SGN] // 6
     val unbiased_upper_sat_mul_signed = ArgOut[SGN] // 7
     val regular_add_signed = ArgOut[SGN] // 8
+    val satur_add_pos_ov = ArgOut[SGN]
     val a_sgn_passthru = ArgOut[SGN] // 9
     // val normal = ArgOut[SGN]
 
@@ -3516,6 +3523,7 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
       Pipe{ unbiased_upper_sat_mul_signed := C_sgn *&! (-1.to[SGN]*A_sgn)}
       Pipe{ regular_add_signed := C_sgn + A_sgn }
       Pipe{ a_sgn_passthru := A_sgn }
+      Pipe{satur_add_pos_ov := D_sgn -! E_sgn}
       // Pipe{ normal := C_sgn *! -0.5.to[SGN] }
     }
 
@@ -3528,6 +3536,7 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val unbiased_sat_mul_unsigned_res = getArg(unbiased_sat_mul_unsigned)
     val unbiased_lower_sat_mul_signed_res = getArg(unbiased_lower_sat_mul_signed)
     val unbiased_upper_sat_mul_signed_res = getArg(unbiased_upper_sat_mul_signed)
+    val satur_add_pos_ov_res = getArg(satur_add_pos_ov)
     // val normal_res = getArg(normal)
 
     // Create validation checks and debug code
@@ -3541,6 +3550,7 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val gold_unbiased_lower_sat_mul_signed = (-8).to[Float]
     val gold_unbiased_upper_sat_mul_signed = (7.9375).to[Float]
     val gold_normal = (c_sgn * 0.5.to[SGN]).to[Float]
+    val gold_satur_add_pos_ov = 7.9375.to[Float]
 
     // Get cksums
     val margin = scala.math.pow(2,-4).to[FltPt[_24,_8]]
@@ -3551,8 +3561,9 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val cksum5 = unbiased_sat_mul_unsigned_res == gold_unbiased_sat_mul_unsigned.to[USGN]
     val cksum6 = unbiased_lower_sat_mul_signed_res == gold_unbiased_lower_sat_mul_signed.to[SGN]
     val cksum7 = unbiased_upper_sat_mul_signed_res == gold_unbiased_upper_sat_mul_signed.to[SGN]
+    val cksum8 = satur_add_pos_ov_res == gold_satur_add_pos_ov.to[SGN]
     // val cksum8 = normal_res == gold_normal.to[SGN]
-    val cksum = cksum1 && cksum2 && cksum3 && cksum4 && cksum5 && cksum6 && cksum7 //&& cksum8
+    val cksum = cksum1 && cksum2 && cksum3 && cksum4 && cksum5 && cksum6 && cksum7 && cksum8
 
     // Helpful prints
     println(cksum1 + " Unbiased Rounding Multiplication Unsigned: |" + gold_unbiased_mul_unsigned + " - " + gold_mean_unsigned + "| = " + abs(gold_unbiased_mul_unsigned-gold_mean_unsigned) + " <? " + margin)
@@ -3565,6 +3576,7 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     println(cksum6 + " Unbiased (lower) Saturating Multiplication Signed: " + unbiased_lower_sat_mul_signed_res + " =?= " + gold_unbiased_lower_sat_mul_signed.to[SGN])
     println(cksum6 + " Unbiased (upper) Saturating Multiplication Signed: " + unbiased_upper_sat_mul_signed_res + " =?= " + gold_unbiased_upper_sat_mul_signed.to[SGN])
     println(" Regular Multiplication Signed: " + getArg(regular_add_signed) + " =?= " + (a_sgn + c_sgn).to[SGN])
+    println(" Saturation Adding Pos Overflow: " + getArg(satur_add_pos_ov) + " =?= " + (gold_satur_add_pos_ov).to[SGN])
     // println(" Normal: " + getArg(normal) + " =?= " + gold_normal)
     println(" A_sgn Passthru: " + getArg(a_sgn_passthru) + " =?= " + a_sgn)
 

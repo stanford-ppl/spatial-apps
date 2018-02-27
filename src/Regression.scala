@@ -95,7 +95,7 @@ object Regression {
     unit ::= (MultiWriteBuffer, NoArgs)
     unit ::= (LittleTypeTest, NoArgs)
     unit ::= (DiagBanking, NoArgs)
-    unit ::= (SpecialMath, Array(0.125, 5.625, 14, 1.875, -3.4375, -5))
+    unit ::= (SpecialMath, Array(0.125, 5.625, 14, 1.875, -3.4375, -5, 0.25, -8))
     unit ::= (FixPtMem, Array(5.25, 2.125))
     unit ::= (MaskedWrite, Array(5))
     unit ::= (FixPtInOutArg, Array(-1.5))

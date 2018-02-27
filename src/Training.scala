@@ -61,6 +61,9 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
     val y = DRAM[TX](N)
     val result = DRAM[TM](D)
 
+    printMatrix(sX, "X Data")
+    printArray(sY, "Y Data")
+    printArray(W_gold, "W Gold")
     setMem(x, sX)
     setMem(y, sY)
 
