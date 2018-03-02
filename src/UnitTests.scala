@@ -91,10 +91,14 @@ object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
     setArg(x, N)
 
     // Create HW accelerator
-    Accel {
-      println("hi")
-      Pipe { y := x + 4 }
-      assert(x.value != -99.to[Int], "Thou shalt not input -99 to this app")
+    for (i <- 0 until 5) {
+      Accel {
+        println("hi")
+        Pipe { y := x + 1 }
+        assert(x.value != -99.to[Int], "Thou shalt not not input -99 to this app")
+      }
+      println("argout is " + getArg(y))
+      setArg(x, getArg(y))
     }
 
 
@@ -102,7 +106,7 @@ object InOutArg extends SpatialApp { // Regression (Unit) // Args: 32
     val result = getArg(y)
 
     // Create validation checks and debug code
-    val gold = N + 4
+    val gold = N + 5
     println("expected: " + gold)
     println("result: " + result)
 
@@ -458,7 +462,7 @@ object LUTTest extends SpatialApp { // Regression (Unit) // Args: 2
     println("bresult: " + bresult)
 
     val cksum = gold == result && bgold == bresult
-    println("PASS: " + cksum + " (InOutArg)")
+    println("PASS: " + cksum + " (LUTTest)")
   }
 }
 
@@ -468,7 +472,7 @@ object MixedIOTest extends SpatialApp { // Regression (Unit) // Args: none
   @virtualize
   def main(): Unit = {
     val cst1 = 32
-    val cst2 = 23;
+    val cst2 = 23
     val cst3 = 11
     val cst4 = 7
     val io1 = HostIO[Int]
@@ -1236,7 +1240,7 @@ object UnalignedTileLoadStore extends SpatialApp { // Regression (Unit) // Args:
   }
 }
 
-object OneTileLoad extends SpatialApp { // Regression (Unit) // Args: 100
+object HugeTileLoad extends SpatialApp { // Regression (Unit) // Args: 100
 
 
 
@@ -1244,7 +1248,7 @@ object OneTileLoad extends SpatialApp { // Regression (Unit) // Args: 100
   def onetileload(srcHost: Array[Int], value: Int) = {
     val loadPar  = 1 (1 -> 1)
     val storePar = 1 (1 -> 1)
-    val tileSize = 16 (16 -> 16)
+    val tileSize = 6144
 
 
     val N = ArgIn[Int]
@@ -1273,7 +1277,7 @@ object OneTileLoad extends SpatialApp { // Regression (Unit) // Args: 100
   def main() {
     val arraySize = args(0).to[Int]
 
-    val src = Array.tabulate[Int](arraySize) { i => i % 256 }
+    val src = Array.tabulate[Int](arraySize) { i => i }
     val dst = onetileload(src, arraySize)
     println("got " + dst)
 
@@ -1282,6 +1286,84 @@ object OneTileLoad extends SpatialApp { // Regression (Unit) // Args: 100
   }
 }
 
+object HugeTileStore extends SpatialApp { // Regression (Unit) // Args: 100
+
+  @virtualize
+  def onetilestore(srcHost: Array[Int], value: Int) = {
+    val loadPar  = 1 (1 -> 1)
+    val storePar = 1 (1 -> 1)
+    val tileSize = 6144
+
+
+    val N = ArgIn[Int]
+    setArg(N, value)
+    val srcFPGA = DRAM[Int](N)
+    Accel {
+      Sequential.Foreach(N.value by tileSize par 1) { i =>
+        val b1 = SRAM[Int](tileSize)
+
+        Foreach(tileSize by 1){j =>
+          b1(j) = (i+j)
+        }
+
+        srcFPGA(i::i+tileSize par 1) store b1
+      }
+    }
+    getMem(srcFPGA)
+  }
+
+  @virtualize
+  def main() {
+    val arraySize = args(0).to[Int]
+
+    val src = Array.tabulate[Int](arraySize) { i => i }
+    val dst = onetilestore(src, arraySize)
+    printArray(dst, "got ")
+
+    val cksum = src.zip(dst){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (OneTileStore)")
+  }
+}
+
+object HugeTileLoadStore extends SpatialApp { 
+
+  val rows = 4
+  
+  @virtualize
+  def onetilestore(srcHost: Array[Int], value: Int) = {
+    val loadPar  = 16 (1 -> 1)
+    val storePar = 16 (1 -> 1)
+    val tileSize = 6144
+
+    val N = ArgIn[Int]
+    setArg(N, value)
+    val src = DRAM[Int](rows,N)
+    val dst = DRAM[Int](rows,N)
+    setMem(src, srcHost)
+    setMem(dst, Array.fill[Int](rows*value)(0))
+
+    Accel {
+      Sequential.Foreach(N.value by tileSize par 1) { i =>
+        val b1 = SRAM[Int](rows,tileSize)
+        b1 load src(0::rows, i::i+tileSize par loadPar)
+        dst(0::rows, i::i+tileSize par storePar) store b1
+      }
+    }
+    getMem(dst)
+  }
+
+  @virtualize
+  def main() {
+    val arraySize = args(0).to[Int]
+
+    val src = Array.tabulate[Int](rows*arraySize) { i => i }
+    val dst = onetilestore(src, arraySize)
+    printArray(dst, "got ")
+
+    val cksum = src.zip(dst){_==_}.reduce{_&&_}
+    println("PASS: " + cksum + " (OneTileStore)")
+  }
+}
 object OneTileLoadv2 extends SpatialApp { // Regression (Unit) // Args: 100
 
 
@@ -1568,21 +1650,36 @@ object ParFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
 
 
   val tileSize = 64
+
+  case class DRAMHolder[T:Type:Num](kernel: DRAM1[T])
+  case class DRAMMaker[T:Type:Num](N: scala.Int) { // Testing arg mapping when multiple drams have the same "name"
+    val freshDRAM = DRAM[T](N)
+  }
+
+  @virtualize
+  def loadFifo[T:Type:Num](fifo: FIFO[T], holder: DRAMHolder[T], i: Index, P1: scala.Int): Unit = {
+    val kernel = holder.kernel
+    Pipe{fifo load kernel(i::i+tileSize par P1)}
+  }
+
   @virtualize
   def parFifoLoad[T:Type:Num](src1: Array[T], src2: Array[T], src3: Array[T], in: Int) = {
 
-    val P1 = 1 (16 -> 16)
+    val P1 = 1
 
-    val N = ArgIn[Int]
-    setArg(N, in)
-
-    val src1FPGA = DRAM[T](N)
-    val src2FPGA = DRAM[T](N)
-    val src3FPGA = DRAM[T](N)
+    val N = 640 //ArgIn[Int]
+    // setArg(N, in)
+    
+    val makerInstance1 = DRAMMaker[T](N)
+    val holderInstance1 = DRAMHolder[T](makerInstance1.freshDRAM)
+    val makerInstance2 = DRAMMaker[T](N)
+    val holderInstance2 = DRAMHolder[T](makerInstance2.freshDRAM)
+    val makerInstance3 = DRAMMaker[T](N)
+    val holderInstance3 = DRAMHolder[T](makerInstance3.freshDRAM)
     val out = ArgOut[T]
-    setMem(src1FPGA, src1)
-    setMem(src2FPGA, src2)
-    setMem(src3FPGA, src3)
+    setMem(holderInstance1.kernel, src1)
+    setMem(holderInstance2.kernel, src2)
+    setMem(holderInstance3.kernel, src3)
 
     Accel {
       val f1 = FIFO[T](tileSize)
@@ -1590,9 +1687,9 @@ object ParFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
       val f3 = FIFO[T](tileSize)
       Foreach(N by tileSize) { i =>
         Parallel {
-          f1 load src1FPGA(i::i+tileSize par P1)
-          f2 load src2FPGA(i::i+tileSize par P1)
-          f3 load src3FPGA(i::i+tileSize par P1)
+          loadFifo(f1, holderInstance1, i, P1)
+          loadFifo(f2, holderInstance2, i, P1)
+          loadFifo(f3, holderInstance3, i, P1)
         }
         val accum = Reduce(Reg[T](0.to[T]))(tileSize by 1){i =>
           f1.deq() * f2.deq() * f3.deq()
@@ -1606,7 +1703,7 @@ object ParFifoLoad extends SpatialApp { // Regression (Unit) // Args: 384
 
   @virtualize
   def main() {
-    val arraySize = args(0).to[Int]
+    val arraySize = 640 //args(0).to[Int]
 
     val src1 = Array.tabulate(arraySize) { i => i % 4 }
     val src2 = Array.tabulate(arraySize) { i => i % 4 + 16}
@@ -1653,8 +1750,63 @@ object EfficiencyTest extends SpatialApp {
   }
 }
 
-object FifoLoadStore extends SpatialApp { // Regression (Unit) // Args: none
+object SmallTensorLoad extends SpatialApp { // This test stresses the unaligned load similar to a multichannel convolution which used to fail because the unaligned fifo in the accel
+  type T = FixPt[TRUE,_16,_0]
 
+  @virtualize
+  def main() {
+
+    val debug:scala.Boolean = false
+
+    // Scalar params
+    val INPUT_CHANS = ArgIn[Int]
+    val OUTPUT_CHANS = ArgIn[Int]
+
+    // Shadow params (input args)
+    val input_chans = args(0).to[Int]
+    val output_chans = args(1).to[Int]
+
+    // Set args
+    setArg(INPUT_CHANS, input_chans)
+    setArg(OUTPUT_CHANS, output_chans)
+
+    // HW Design properties
+    val INPUT_CHANS_MAX = 64
+    val OUTPUT_CHANS_MAX = 64
+
+    // Memories
+    val KERNEL_DATA = DRAM[T](OUTPUT_CHANS, INPUT_CHANS, 3, 3)
+
+    // Load data (placeholder)
+    val kernel = (0::OUTPUT_CHANS, 0::INPUT_CHANS, 0::3, 0::3) {(i,j,k,l) => (l + k * 3 + j * 3 * 3 + i * 3 * 3 * INPUT_CHANS).to[T]} //if (random[Int](10) > 8) 1.to[T] else 0.to[T]}
+
+    // Debug hooks
+    val KERNEL_COPY = DRAM[T](OUTPUT_CHANS, INPUT_CHANS, 3, 3)
+    val KERNEL_COPY_CPU = DRAM[T](OUTPUT_CHANS, INPUT_CHANS, 3, 3)
+
+    // Set data
+    setMem(KERNEL_DATA, kernel)
+
+    setMem(KERNEL_COPY_CPU, kernel)
+
+    Accel{
+      val kernel_sram = SRAM[T](OUTPUT_CHANS_MAX, INPUT_CHANS_MAX, 3, 3)
+      kernel_sram load KERNEL_DATA(0::OUTPUT_CHANS, 0::INPUT_CHANS, 0::3, 0::3)
+
+      KERNEL_COPY(0::OUTPUT_CHANS, 0::INPUT_CHANS, 0::3, 0::3) store kernel_sram
+    }
+    printTensor4(kernel, "Kernel")
+    val cksum = getTensor4(KERNEL_DATA).flatten.zip(getMem(KERNEL_COPY)){_==_}.reduce{_&&_}    
+
+    printTensor4(getTensor4(KERNEL_COPY), "Kernel copied from fpga:")
+    printTensor4(getTensor4(KERNEL_COPY_CPU), "Kernel copied from CPU:")
+
+    println("PASS: " + cksum + " (SmallTensorLoad)")
+
+  }
+}
+
+object FifoLoadStore extends SpatialApp { // Regression (Unit) // Args: none
 
   val N = 32
 
@@ -3384,77 +3536,7 @@ object LittleTypeTest extends SpatialApp {
 }
 
 
-object SpecialMathStripped extends SpatialApp { // Regression (Unit) // Args: 0.125 5.625 14 1.875 -3.4375 -5
-
-  type USGN = FixPt[FALSE,_4,_4]
-  type SGN = FixPt[TRUE,_4,_4]
-
-  @virtualize
-  def main() {
-    // Declare SW-HW interface vals
-    val a_usgn = args(0).to[USGN] //2.625.to[USGN]
-    val b_usgn = args(1).to[USGN] //5.625.to[USGN]
-    val a_sgn = args(2).to[SGN]
-    val b_sgn = args(3).to[SGN]
-    // assert(b_usgn.to[FltPt[_24,_8]] + c_usgn.to[FltPt[_24,_8]] > 15.to[FltPt[_24,_8]], "b_usgn + c_usgn must saturate (false,4,4) FP number")
-    // assert(b_sgn.to[FltPt[_24,_8]] + c_sgn.to[FltPt[_24,_8]] < -8.to[FltPt[_24,_8]], "b_sgn + c_sgn must saturate (true,4,4) FP number")
-    val A_usgn = ArgIn[USGN]
-    val B_usgn = ArgIn[USGN]
-    val A_sgn = ArgIn[SGN]
-    val B_sgn = ArgIn[SGN]
-    setArg(A_usgn, a_usgn)
-    setArg(B_usgn, b_usgn)
-    setArg(A_sgn, a_sgn)
-    setArg(B_sgn, b_sgn)
-    val N = 256
-
-    // Conditions we will check
-    val unbiased_mul_unsigned = DRAM[USGN](N) // 1
-    val unbiased_mul_signed = DRAM[SGN](N) // 2
-
-
-    Accel {
-      val usgn = SRAM[USGN](N)
-      val sgn = SRAM[SGN](N)
-      Foreach(N by 1) { i =>
-        usgn(i) = A_usgn *& B_usgn // Unbiased rounding, mean(yy) should be close to a*b
-        sgn(i) = A_sgn *& B_sgn
-      }
-      unbiased_mul_unsigned store usgn
-      unbiased_mul_signed store sgn
-    }
-
-
-    // Extract results from accelerator
-    val unbiased_mul_unsigned_res = getMem(unbiased_mul_unsigned)
-    val unbiased_mul_signed_res = getMem(unbiased_mul_signed)
-
-    // Create validation checks and debug code
-    val gold_unbiased_mul_unsigned = (a_usgn * b_usgn).to[FltPt[_24,_8]]
-    val gold_mean_unsigned = unbiased_mul_unsigned_res.map{_.to[FltPt[_24,_8]]}.reduce{_+_} / N
-    val gold_unbiased_mul_signed = (a_sgn * b_sgn).to[FltPt[_24,_8]]
-    val gold_mean_signed = unbiased_mul_signed_res.map{_.to[FltPt[_24,_8]]}.reduce{_+_} / N
-
-    // Get cksums
-    val margin = scala.math.pow(2,-4).to[FltPt[_24,_8]]
-    val cksum1 = (abs(gold_unbiased_mul_unsigned - gold_mean_unsigned).to[FltPt[_24,_8]] < margin)
-    val cksum2 = (abs(gold_unbiased_mul_signed - gold_mean_signed).to[FltPt[_24,_8]] < margin)
-    val cksum = cksum1 && cksum2 // && cksum3 && cksum4 && cksum5 && cksum6 && cksum7
-
-    // Helpful prints
-    println(cksum1 + " Unbiased Rounding Multiplication Unsigned: |" + gold_unbiased_mul_unsigned + " - " + gold_mean_unsigned + "| = " + abs(gold_unbiased_mul_unsigned-gold_mean_unsigned) + " <? " + margin)
-    printArray(unbiased_mul_unsigned_res, "Data:")
-    println(cksum2 + " Unbiased Rounding Multiplication Signed: |" + gold_unbiased_mul_signed + " - " + gold_mean_signed + "| = " + abs(gold_unbiased_mul_signed-gold_mean_signed) + " <? " + margin)
-    printArray(unbiased_mul_signed_res, "Data:")
-
-
-    println("PASS: " + cksum + " (SpecialMathStripped) * Need to check subtraction and division ")
-  }
-}
-
-
-
-object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.625 14 1.875 -3.4375 -5
+object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.625 14 1.875 -3.4375 -5 0.25 -8
 
   type USGN = FixPt[FALSE,_4,_4]
   type SGN = FixPt[TRUE,_4,_4]
@@ -3468,6 +3550,8 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val a_sgn = args(3).to[SGN]
     val b_sgn = args(4).to[SGN]
     val c_sgn = args(5).to[SGN]
+    val d_sgn = args(6).to[SGN]
+    val e_sgn = args(7).to[SGN]
     // assert(b_usgn.to[FltPt[_24,_8]] + c_usgn.to[FltPt[_24,_8]] > 15.to[FltPt[_24,_8]], "b_usgn + c_usgn must saturate (false,4,4) FP number")
     // assert(b_sgn.to[FltPt[_24,_8]] + c_sgn.to[FltPt[_24,_8]] < -8.to[FltPt[_24,_8]], "b_sgn + c_sgn must saturate (true,4,4) FP number")
     val A_usgn = ArgIn[USGN]
@@ -3476,12 +3560,16 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val A_sgn = ArgIn[SGN]
     val B_sgn = ArgIn[SGN]
     val C_sgn = ArgIn[SGN]
+    val D_sgn = ArgIn[SGN]
+    val E_sgn = ArgIn[SGN]
     setArg(A_usgn, a_usgn)
     setArg(B_usgn, b_usgn)
     setArg(C_usgn, c_usgn)
     setArg(A_sgn, a_sgn)
     setArg(B_sgn, b_sgn)
     setArg(C_sgn, c_sgn)
+    setArg(D_sgn, d_sgn)
+    setArg(E_sgn, e_sgn)
     val N = 256
 
     // Conditions we will check
@@ -3493,8 +3581,9 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val unbiased_lower_sat_mul_signed = ArgOut[SGN] // 6
     val unbiased_upper_sat_mul_signed = ArgOut[SGN] // 7
     val regular_add_signed = ArgOut[SGN] // 8
+    val satur_add_pos_ov = ArgOut[SGN]
     val a_sgn_passthru = ArgOut[SGN] // 9
-
+    // val normal = ArgOut[SGN]
 
     Accel {
       val usgn = SRAM[USGN](N)
@@ -3510,8 +3599,10 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
       Pipe{ unbiased_sat_mul_unsigned := B_usgn *&! C_usgn}
       Pipe{ unbiased_lower_sat_mul_signed := C_sgn *&! A_sgn}
       Pipe{ unbiased_upper_sat_mul_signed := C_sgn *&! (-1.to[SGN]*A_sgn)}
-      Pipe{ regular_add_signed := C_sgn * A_sgn }
+      Pipe{ regular_add_signed := C_sgn + A_sgn }
       Pipe{ a_sgn_passthru := A_sgn }
+      Pipe{satur_add_pos_ov := D_sgn -! E_sgn}
+      // Pipe{ normal := C_sgn *! -0.5.to[SGN] }
     }
 
 
@@ -3523,6 +3614,8 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val unbiased_sat_mul_unsigned_res = getArg(unbiased_sat_mul_unsigned)
     val unbiased_lower_sat_mul_signed_res = getArg(unbiased_lower_sat_mul_signed)
     val unbiased_upper_sat_mul_signed_res = getArg(unbiased_upper_sat_mul_signed)
+    val satur_add_pos_ov_res = getArg(satur_add_pos_ov)
+    // val normal_res = getArg(normal)
 
     // Create validation checks and debug code
     val gold_unbiased_mul_unsigned = (a_usgn * b_usgn).to[FltPt[_24,_8]]
@@ -3534,6 +3627,8 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val gold_unbiased_sat_mul_unsigned = (15.9375).to[Float]
     val gold_unbiased_lower_sat_mul_signed = (-8).to[Float]
     val gold_unbiased_upper_sat_mul_signed = (7.9375).to[Float]
+    val gold_normal = (c_sgn * 0.5.to[SGN]).to[Float]
+    val gold_satur_add_pos_ov = 7.9375.to[Float]
 
     // Get cksums
     val margin = scala.math.pow(2,-4).to[FltPt[_24,_8]]
@@ -3544,7 +3639,9 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val cksum5 = unbiased_sat_mul_unsigned_res == gold_unbiased_sat_mul_unsigned.to[USGN]
     val cksum6 = unbiased_lower_sat_mul_signed_res == gold_unbiased_lower_sat_mul_signed.to[SGN]
     val cksum7 = unbiased_upper_sat_mul_signed_res == gold_unbiased_upper_sat_mul_signed.to[SGN]
-    val cksum = cksum1 && cksum2 && cksum3 && cksum4 && cksum5 && cksum6 && cksum7
+    val cksum8 = satur_add_pos_ov_res == gold_satur_add_pos_ov.to[SGN]
+    // val cksum8 = normal_res == gold_normal.to[SGN]
+    val cksum = cksum1 && cksum2 && cksum3 && cksum4 && cksum5 && cksum6 && cksum7 && cksum8
 
     // Helpful prints
     println(cksum1 + " Unbiased Rounding Multiplication Unsigned: |" + gold_unbiased_mul_unsigned + " - " + gold_mean_unsigned + "| = " + abs(gold_unbiased_mul_unsigned-gold_mean_unsigned) + " <? " + margin)
@@ -3556,7 +3653,9 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     println(cksum5 + " Unbiased Saturating Multiplication Unsigned: " + unbiased_sat_mul_unsigned_res + " =?= " + gold_unbiased_sat_mul_unsigned.to[SGN])
     println(cksum6 + " Unbiased (lower) Saturating Multiplication Signed: " + unbiased_lower_sat_mul_signed_res + " =?= " + gold_unbiased_lower_sat_mul_signed.to[SGN])
     println(cksum6 + " Unbiased (upper) Saturating Multiplication Signed: " + unbiased_upper_sat_mul_signed_res + " =?= " + gold_unbiased_upper_sat_mul_signed.to[SGN])
-    println(" Regular Multiplication Signed: " + getArg(regular_add_signed) + " =?= " + (a_sgn * c_sgn).to[SGN])
+    println(" Regular Multiplication Signed: " + getArg(regular_add_signed) + " =?= " + (a_sgn + c_sgn).to[SGN])
+    println(" Saturation Adding Pos Overflow: " + getArg(satur_add_pos_ov) + " =?= " + (gold_satur_add_pos_ov).to[SGN])
+    // println(" Normal: " + getArg(normal) + " =?= " + gold_normal)
     println(" A_sgn Passthru: " + getArg(a_sgn_passthru) + " =?= " + a_sgn)
 
 
@@ -4505,12 +4604,12 @@ object Convolutions extends SpatialApp { // Regression (Dense) // Args: 16
       val filter7 = LUT[T](3,3,3)(filter5_data.map{_+1}:_*)
 
       // Use stdlib defs
-     // Pipe{Convolution.ConvolutionSlideFast[T](dram1, image, filter, col_stride1, row_stride1, 16, 16)}
-    //  Pipe{Convolution.ConvolutionSlideFast[T](dram2, image, filter, col_stride2, row_stride2, 16, 16)}
+      Pipe{Convolution.ConvolutionSlide[T](dram1, image, filter, col_stride1, row_stride1, 16, 16)}
+      Pipe{Convolution.ConvolutionSlide[T](dram2, image, filter, col_stride2, row_stride2, 16, 16)}
       Pipe{Convolution.ConvolutionGEMM[T](dram3, flatimg, filter3)}
       Pipe{Convolution.ConvolutionGEMM[T](dram4, flatimg4, filter4)}
       Pipe{Convolution.MCConvolutionSlide(dram5, image3d, filter5, col_stride5, row_stride5, 16, 16, 3)}
-     // Pipe{Convolution.MFConvolutionSlideFast[T](dram6, image, List(filter, filter6), col_stride6, row_stride6, 16, 16)}
+      Pipe{Convolution.MFConvolutionSlide[T](dram6, image, List(filter, filter6), col_stride6, row_stride6, 16, 16)}
       Pipe{Convolution.MCMFConvolutionSlide[T](dram7, image3d, List(filter5, filter7), col_stride7, row_stride7, 16, 16, 3)}
 
       // // Use defs in this app
