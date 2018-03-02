@@ -87,7 +87,7 @@ object Regression {
     unit ::= (Breakpoint, NoArgs)
     unit ::= (ArbitraryLambda, Array(8))
     unit ::= (BubbledWriteTest, NoArgs)
-
+    unit ::= (HugeTileLoadStore, Args(12288))
     unit ::= (MixedIOTest, NoArgs)
     unit ::= (LUTTest, Array(2, 3))
     unit ::= (RetimedFifoBranch, Array(13,25))
