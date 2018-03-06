@@ -159,7 +159,7 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
   }
 }
 
-object LP_SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
+object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
 
   val margin = 2 // Maximum distance between gold weights and computed weights to consider the app "passing"
 
