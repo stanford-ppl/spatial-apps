@@ -181,11 +181,13 @@ object LP_SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
   val P12 = 1 (1 -> 8)
   val PX = 1
 
-  val bits = 8
+  val shift_factor = 16
+
   type B = Int8
   type BB = Int16
   type BBBB = Int32
 
+  val debug = false
   /*
 
     Basic type relationships:
@@ -194,16 +196,16 @@ object LP_SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
       Y ->  (DM*DX, BB)
       GR -> (DG,    BBBB)   -> (DM*DX*DX*DA, BBBB)
 
-      ... Choose DA so that DG is off by a power of 2 from DM.  I.E.- DM = DG*2^8 ...
+      ... Choose DA so that DG is off by a power of 2 from DM.  I.E.- DM = DG*2^8 if shift_factor=8 ...
 
       A ->  (DA,    B)      -> (1/(2^8*DX*DX), B)
 
   */
 
   @virtualize
-  def toDM(in: BBBB): B = { ((in + random[UInt8](255).as[BBBB]) >> 8).to[B] }
+  def toDM(in: BBBB): B = { ((in + random[BBBB](scala.math.pow(2.0,shift_factor).to[BBBB])) >> shift_factor).to[B] }
   @virtualize
-  def toDG(in: B): BBBB = { in.to[BBBB] << 8 }
+  def toDG(in: B): BBBB = { in.to[BBBB] << shift_factor }
 
   @virtualize 
   def FloatToLP[T:Type:Num](in: Float, delta: Float, precision: scala.Int): T = {
@@ -224,10 +226,10 @@ object LP_SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
     val points = args(2).to[Int] // Total Points
     val dm = args(3).to[Float] // delta for model
     val dx = args(4).to[Float] // delta for data
-    val da = 1/(256*dx*dx)
+    val da = 1/(scala.math.pow(2.0,shift_factor).to[Float]*dx*dx)
     // val da = args(5).to[Float] // delta for step (alpha)
     val alpha1 = args(5).to[Float] // Step size
-    val D = 16
+    val D = 6
 
     val noise_num = 2
     val noise_denom = 10
@@ -247,8 +249,13 @@ object LP_SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
     // Debug
     val W_recompute = Array.tabulate(D) { i => LPToFloat[B](W_bits(i), dm, 8)}
     printArray(W_gold, "W_gold")
+    printArray(W_bits, "W_bits")
     printArray(W_recompute, "W_gold Reconstructed")
-    println(dm + " = dm, " + dx + " = dx, " + da + " = da, " + dm*dx + " = dm*dx, " + dm*dx*dx*da + " = dm*dx*dx*da, ")
+    println("dm = " + dm)
+    println("dx = " + dx)
+    println("da = " + da)
+    println("dm*dx = " + dm*dx)
+    println("dm*dx*dx*da = " + dm*dx*dx*da)
     println("Alpha bits: " + alpha1_bits)
     printMatrix(X_bits, "X_bits")
     printArray(Y_bits, "Y_bits")
@@ -312,7 +319,9 @@ object LP_SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
             val y_hat = Reg[BB](0.to[BB]) // DM*DX
             Reduce(y_hat)(D by 1 par P12){j => w_k(j).to[BB] *! x_tile(ii, j).to[BB]}{_+!_} // DM*DX
             val y_err = y_hat.value -! y_tile(ii) // DM*DX
-            Foreach(D by 1 par P7){j => g_k_local(j) =  -A.to[BBBB] *! y_err.to[BBBB] *! x_tile(ii, j).to[BBBB]} // DG
+            Foreach(D by 1 par P7){j => 
+              g_k_local(j) =  -A.to[BBBB] *! y_err.to[BBBB] *! x_tile(ii, j).to[BBBB]
+            } // DG
             g_k_local
           }{_+!_}
         }{(a,b) => a +! b/tileSize.to[BBBB]}
@@ -347,22 +356,43 @@ object LP_SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
           x_point load x(i, 0::D par loadPar)
 
           // Compute gradient against w_k_t
-          val y_err_t = Reg[BB](0.to[BB])
-          Reduce(y_err_t)(D by 1){j => (w_k_t(j).to[BB] *&! x_point(j).to[BB])}{_+!_} -! y_point
+          val y_hat_t = Reg[BB](0.to[BB])
+          Reduce(y_hat_t)(D by 1){j => (w_k_t(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
+          val y_err_t = y_hat_t.value -! y_point
 
           // Compute gradient against w_k
-          val y_err_k = Reg[BB](0.to[BB])
-          Reduce(y_err_k)(D by 1){j => (w_k(j).to[BB] *&! x_point(j).to[BB])}{_+!_} -! y_point
+          val y_hat_k = Reg[BB](0.to[BB])
+          Reduce(y_hat_k)(D by 1){j => (w_k(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
+          val y_err_k = y_hat_k.value -! y_point
 
           // Update w_k_t with reduced variance update
           Foreach(D by 1 par P10){i => w_k_t(i) = toDM(toDG(w_k_t(i)) -! 
                                                     A.to[BBBB] *! (
-                                                      (y_err_t.value.to[BBBB] *! x_point(i).to[BBBB]) +! 
-                                                      (y_err_k.value.to[BBBB] *&! x_point(i).to[BBBB]) -! 
+                                                      (y_err_t.to[BBBB] *! x_point(i).to[BBBB]) +! 
+                                                      (y_err_k.to[BBBB] *&! x_point(i).to[BBBB]) -! 
                                                       g_k(i)
                                                     )
                                                   )
                                                 }
+
+          if (debug) {
+            println("*** Step " + {t + e*T} + ": ")
+            println("y_err_t = " + y_err_t + " ( = " + y_hat_t.value + " - " + y_point + ")")
+            Foreach(D by 1) { i => 
+              val gradientLP = A.to[BBBB] *! (
+                               (y_err_t.to[BBBB] *! x_point(i).to[BBBB]) +! 
+                               (y_err_k.to[BBBB] *&! x_point(i).to[BBBB]) -! 
+                               g_k(i)
+                             )
+
+              print(" " + gradientLP)
+            }
+            println("\nWeights: ")
+            Foreach(D by 1) { i => 
+              print(" " + w_k_t(i))
+            }
+            println("\n")
+          }
 
         }
         // Copy w_k_t to w_k
