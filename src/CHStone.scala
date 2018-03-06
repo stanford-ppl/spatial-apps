@@ -1,5 +1,5 @@
 import spatial.dsl._
-import org.virtualized._
+import virtualized._
 import spatial.targets._
 
 object SHA1 extends SpatialApp { // Regression (Dense) // Args: none

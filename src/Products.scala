@@ -1,5 +1,5 @@
 import spatial.dsl._
-import org.virtualized._
+import virtualized._
 
 object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
   override val target = targets.Default

@@ -1,6 +1,6 @@
 
 import spatial.dsl._
-import org.virtualized._
+import virtualized._
 
 object MultiWriteTest extends SpatialApp {
   val R = 32; val C = 16

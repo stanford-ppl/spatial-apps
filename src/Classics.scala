@@ -1,6 +1,6 @@
 import spatial.dsl._
 import spatial.targets._
-import org.virtualized._
+import virtualized._
 
 object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
   override val target = targets.Default

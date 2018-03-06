@@ -1,5 +1,5 @@
 import spatial.dsl._
-import org.virtualized._
+import virtualized._
 
 object MatMult_outer extends SpatialApp { // Regression (Dense) // Args: 32 128 128
   type X = FixPt[TRUE,_16,_16]
