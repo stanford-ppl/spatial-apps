@@ -159,7 +159,7 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
   }
 }
 
-object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
+object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
 
   val margin = 2 // Maximum distance between gold weights and computed weights to consider the app "passing"
 
@@ -378,7 +378,7 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
                                                   )
                                                 }
 
-          if (debug) {
+          if (debug) { 
             println("*** Step " + {t + e*T} + ": ")
             println("y_err_t = " + y_err_t + " ( = " + y_hat_t.value + " - " + y_point + ")")
             Foreach(D by 1) { i => 
