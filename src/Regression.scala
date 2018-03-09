@@ -126,6 +126,7 @@ object Regression {
     unit ::= (UnalignedFifoLoad, Array(400))
     unit ::= (OHM, Array(400))
     unit ::= (SimpleTileLoadStore, Array(100))
+    unit ::= (PartialTileLoadStore, Array(100))
     unit ::= (DeviceMemcpy, Array(50))
     unit ::= (SimpleSequential, Array(5, 8))
     unit ::= (FifoLoadSRAMStore, Array(192))

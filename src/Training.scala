@@ -187,7 +187,7 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
   type BB = Int16
   type BBBB = Int32
 
-  val debug = false
+  val debug = true
   /*
 
     Basic type relationships:
@@ -231,17 +231,19 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
     val alpha1 = args(5).to[Float] // Step size
     val D = 6
 
-    val noise_num = 2
+    val noise_num = 3
     val noise_denom = 10
     
     // Generate some test data
-    val sX = (0::points, 0::D){(i,j) => (random[Float](4) + 1.to[Float])}
+    val sX = (0::points, 0::D){(i,j) => (random[Float](6) - 2.to[Float])}
     val W_gold = Array.tabulate(D) { i => (random[Float](3) / 2)}
-    val sY = Array.tabulate(points) { i => (random[Float](noise_num) / noise_denom.to[Float] - (noise_num/2).to[Float]) + Array.tabulate(D){j => (W_gold(j) * sX(i,j))}.reduce{_+_} }
+    val Y_noise = Array.tabulate(points) { i => (random[Float](noise_num) - (noise_num/2).to[Float]) / noise_denom.to[Float] }
+    val sY = Array.tabulate(points) { i => Array.tabulate(D){j => (W_gold(j) * sX(i,j))}.reduce{_+_} + Y_noise(i) }
 
     // Convert data to LP
     val W_bits = Array.tabulate(D) { i => FloatToLP[B](W_gold(i), dm, 8)}
 
+    val Y_noise_bits = Array.tabulate(points) {i => FloatToLP[BB](Y_noise(i), dx*dm, 16)}
     val X_bits = (0::points, 0::D){(i,j) => FloatToLP[B](sX(i,j), dx, 8)}
     val Y_bits = Array.tabulate(points){ i => FloatToLP[BB](sY(i), dx*dm, 16)}
     val alpha1_bits = FloatToLP[B](alpha1, da, 8)
@@ -260,6 +262,7 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
     printMatrix(X_bits, "X_bits")
     printArray(Y_bits, "Y_bits")
     printArray(W_bits, "W_bits")
+    printArray(Y_noise_bits, "Y_noise_bits")
 
 
     val E = ArgIn[Int]
@@ -417,6 +420,291 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
   }
 }
 
+
+object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
+
+  val margin = 2 // Maximum distance between gold weights and computed weights to consider the app "passing"
+
+  val tileSize = 16 (16 -> 128)
+
+  val loadPar = 1
+  val storePar = 1
+  val P1 =  1 (1 -> 8)
+  val P2 =  1 (1 -> 8)
+  val P3 =  1 (1 -> 8)
+  val P4 =  1 (1 -> 8)
+  val P5 =  1 (1 -> 8)
+  val P6 =  1 (1 -> 8)
+  val P7 =  1 (1 -> 8)
+  val P8 =  1 (1 -> 8)
+  val P9 =  1 (1 -> 8)
+  val P10 = 1 (1 -> 8)
+  val P11 = 1 (1 -> 8)
+  val P12 = 1 (1 -> 8)
+  val PX = 1
+
+  val shift_factor = 16
+
+  type B = Int8
+  type BB = Int16
+  type BBBB = Int32
+
+  val debug = false
+  /*
+
+    Basic type relationships:
+      X ->  (DX,    B)
+      W ->  (DM,    B)
+      Y ->  (DM*DX, BB)
+      GR -> (DG,    BBBB)   -> (DM*DX*DX*DA, BBBB)
+
+      ... Choose DA so that DG is off by a power of 2 from DM.  I.E.- DM = DG*2^8 if shift_factor=8 ...
+
+      A ->  (DA,    B)      -> (1/(2^8*DX*DX), B)
+
+
+    We choose:
+      DX
+      DM
+      shift_factor
+
+    We derive:
+      DY = DM*DX
+      DA = 2^-shift_factor / DX / DX
+      DG = DM*DX*DX*DA
+
+    We try rescale:
+      DG to keep gradients in range
+      ? DM to keep model well resolved ?
+  */
+
+  @virtualize
+  def toDM(in: BBBB): B = { ((in + random[BBBB](scala.math.pow(2.0,shift_factor).to[BBBB])) >> shift_factor).to[B] }
+  @virtualize
+  def toDG(in: B): BBBB = { in.to[BBBB] << shift_factor }
+
+  @virtualize 
+  def FloatToLP[T:Type:Num](in: Float, delta: Float, precision: scala.Int): T = {
+    val exact = in / delta
+    
+    if (exact < -scala.math.pow(2,(precision-1))) -(scala.math.pow(2,(precision-1))).to[T]
+    else if (exact > scala.math.pow(2, (precision-1)-1)) scala.math.pow(2, (precision-1)-1).to[T]
+    else (exact + random[Float](1)).to[T]
+  }
+
+  @virtualize 
+  def LPToFloat[T:Type:Num](in: T, delta: Float, precision: scala.Int): Float = {delta * in.to[Float]}
+
+  @virtualize
+  def main() {
+    val epochs = args(0).to[Int] // Epochs
+    val len_epoch = args(1).to[Int] // Epoch Length
+    val points = args(2).to[Int] // Total Points
+    val dm = args(3).to[Float] // delta for model
+    val dx = args(4).to[Float] // delta for data
+    val da = 1/(scala.math.pow(2.0,shift_factor).to[Float]*dx*dx)
+    // val da = args(5).to[Float] // delta for step (alpha)
+    val alpha1 = args(5).to[Float] // Step size
+    val D = 6
+
+    val noise_num = 3
+    val noise_denom = 10
+    
+    // Generate some test data
+    val sX = (0::points, 0::D){(i,j) => (random[Float](6) - 2.to[Float])}
+    val W_gold = Array.tabulate(D) { i => (random[Float](3) / 2)}
+    val Y_noise = Array.tabulate(points) { i => (random[Float](noise_num) - (noise_num/2).to[Float]) / noise_denom.to[Float] }
+    val sY = Array.tabulate(points) { i => Array.tabulate(D){j => (W_gold(j) * sX(i,j))}.reduce{_+_} + Y_noise(i) }
+
+    // Convert data to LP
+    val W_bits = Array.tabulate(D) { i => FloatToLP[B](W_gold(i), dm, 8)}
+
+    val Y_noise_bits = Array.tabulate(points) {i => FloatToLP[BB](Y_noise(i), dx*dm, 16)}
+    val X_bits = (0::points, 0::D){(i,j) => FloatToLP[B](sX(i,j), dx, 8)}
+    val Y_bits = Array.tabulate(points){ i => FloatToLP[BB](sY(i), dx*dm, 16)}
+    val alpha1_bits = FloatToLP[B](alpha1, da, 8)
+
+    // Debug
+    val W_recompute = Array.tabulate(D) { i => LPToFloat[B](W_bits(i), dm, 8)}
+    printArray(W_gold, "W_gold")
+    printArray(W_bits, "W_bits")
+    printArray(W_recompute, "W_gold Reconstructed")
+    println("dm = " + dm)
+    println("dx = " + dx)
+    println("da = " + da)
+    println("dm*dx = " + dm*dx)
+    println("dm*dx*dx*da = " + dm*dx*dx*da)
+    println("Alpha bits: " + alpha1_bits)
+    printMatrix(X_bits, "X_bits")
+    printArray(Y_bits, "Y_bits")
+    printArray(W_bits, "W_bits")
+    printArray(Y_noise_bits, "Y_noise_bits")
+
+ 
+    val E = ArgIn[Int] // current epoch
+    val N = ArgIn[Int]
+    val T = ArgIn[Int]
+    val DM = HostIO[Float]
+    val DX = HostIO[Float]
+    val DMDX = HostIO[Float]
+    val DG = HostIO[Float]
+    val DA = HostIO[Float]
+    val A = ArgIn[B]
+    val PHASE = ArgIn[Int]
+
+    setArg(N, points)
+    setArg(T, len_epoch)
+    setArg(A, alpha1_bits)
+    setArg(DM,   dm)
+    setArg(DX,   dx)
+    setArg(DA,   da)
+    setArg(DMDX, dm*dx)
+    setArg(DG,   dm*dx*dx*da)
+
+
+    val x = DRAM[B](N, D)
+    val y = DRAM[BB](N)
+    val w = DRAM[B](D)
+    val g = DRAM[BBBB](D)
+
+    setMem(x, X_bits)
+    setMem(y, Y_bits)
+    setMem(w, Array.tabulate[B](D){i => 0})
+
+    val gradient_phase = 0
+    val update_phase = 1
+
+    for (e <- 0 until epochs*2) {
+      // Set phase (hack until multi-accel works)
+      val phase = e % 2
+      setArg(PHASE, phase)
+
+      // Set epoch info
+      setArg(E, e)
+
+      // Center gradient and model
+
+
+      Accel {
+
+        // Create model and gradient memories
+        val w_k = SRAM[B](D) // DM
+        val g_k = SRAM[BBBB](D) // DG
+        val y_cache = SRAM[BB](tileSize) // DM*DX
+        val y_cache_base = Reg[Int](0) 
+        val w_k_t = SRAM[B](D) // DM
+
+        Parallel{
+          w_k load w(0 :: D par storePar)
+          w_k_t load w(0 :: D par storePar)
+        }
+
+        if (PHASE.value == gradient_phase) {
+          // Do full update over all points to get g_k and w_k (outer loop)
+          MemReduce(g_k par P3)(N by tileSize par P4){i => 
+            val y_tile = SRAM[BB](tileSize)   // DM*DX
+            val x_tile = SRAM[B](tileSize,D) // DX
+            Parallel{
+              y_cache load y(i::i + tileSize par loadPar)
+              y_cache_base := i
+              x_tile load x(i::i + tileSize, 0::D par loadPar)              
+            }
+            val g_k_partial = SRAM[BBBB](D)    // DG
+            // Full update tile (inner loop)
+            MemReduce(g_k_partial par P5)(tileSize by 1 par P6){ii =>
+              val g_k_local = SRAM[BBBB](D)  // DG
+              val y_hat = Reg[BB](0.to[BB]) // DM*DX
+              Reduce(y_hat)(D by 1 par P12){j => w_k(j).to[BB] *! x_tile(ii, j).to[BB]}{_+!_} // DM*DX
+              val y_err = y_hat.value -! y_tile(ii) // DM*DX
+              Foreach(D by 1 par P7){j => 
+                g_k_local(j) =  -A.value.to[BBBB] *! y_err.to[BBBB] *! x_tile(ii, j).to[BBBB]
+              } // DG
+              g_k_local
+            }{_+!_}
+          }{(a,b) => a +! b/tileSize}
+          g(0::D par storePar) store g_k
+        } else if (PHASE.value == update_phase) {
+          // Run len_epoch number of SGD points
+          Foreach(T by 1 par PX){t => 
+            // Choose random point
+            val i = random[Int](1024) % N
+
+            // Get y for this point
+            val y_point = Reg[BB](0) // DM*DX
+            if (i - y_cache_base >= 0 && i - y_cache_base < tileSize) {
+              y_point := y_cache(i-y_cache_base)
+            } else {
+              y_cache_base := i - (i % tileSize)
+              y_cache load y(y_cache_base::y_cache_base + tileSize par loadPar)
+              y_point := y_cache(i % tileSize)
+            }
+
+            // Get x for this point
+            val x_point = SRAM[B](D) // DX
+            x_point load x(i, 0::D par loadPar)
+
+            // Compute gradient against w_k_t
+            val y_hat_t = Reg[BB](0.to[BB])
+            Reduce(y_hat_t)(D by 1){j => (w_k_t(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
+            val y_err_t = y_hat_t.value -! y_point
+
+            // Compute gradient against w_k
+            val y_hat_k = Reg[BB](0.to[BB])
+            Reduce(y_hat_k)(D by 1){j => (w_k(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
+            val y_err_k = y_hat_k.value -! y_point
+
+            // Update w_k_t with reduced variance update
+            Foreach(D by 1 par P10){i => w_k_t(i) = toDM(toDG(w_k_t(i)) -! 
+                                                      A.value.to[BBBB] *! (
+                                                        (y_err_t.to[BBBB] *! x_point(i).to[BBBB]) +! 
+                                                        (y_err_k.to[BBBB] *&! x_point(i).to[BBBB]) -! 
+                                                        g_k(i)
+                                                      )
+                                                    )
+                                                  }
+
+            if (debug) {
+              println("*** Step " + {t + e*T} + ": ")
+              println("y_err_t = " + y_err_t + " ( = " + y_hat_t.value + " - " + y_point + ")")
+              println("Gradient in BBBB")
+              Foreach(D by 1) { i => 
+                val gradientLP = A.value.to[BBBB] *! (
+                                 (y_err_t.to[BBBB] *! x_point(i).to[BBBB]) +! 
+                                 (y_err_k.to[BBBB] *&! x_point(i).to[BBBB]) -! 
+                                 g_k(i)
+                               )
+
+                print(" " + gradientLP)
+              }
+              println("\nWeights: ")
+              Foreach(D by 1) { i => 
+                print(" " + w_k_t(i))
+              }
+              println("\n")
+            }
+          }
+          // Store back values
+          w(0 :: D par storePar) store w_k_t
+
+        }
+
+      }
+
+    }
+
+    
+    val w_result = getMem(w)
+
+    val w_result_fullprecision = Array.tabulate(D){i => LPToFloat[B](w_result(i), dm, 8)}
+    val cartesian_dist = W_gold.zip(w_result_fullprecision) { case (a, b) => (a - b) * (a - b) }.reduce{_+_}
+    val cksum =  cartesian_dist < margin
+    printArray(w_result_fullprecision, "result: ")
+    printArray(W_gold, "gold: ")
+    println("Cartesian Distance From W_gold: " + cartesian_dist + " <? " + {margin.to[Float]})
+
+    println("PASS: " + cksum + " (HALP)")
+  }
+}
 
 /*
 
