@@ -239,7 +239,7 @@ object Lab1Part7FoldExample extends SpatialApp {
       Sequential.Fold(accum)(N by tileSize) { i =>
         val b1 = SRAM[T](tileSize)
         b1 load srcFPGA(i::i+tileSize)
-        Reduce(0)(tileSize by 1) { ii => b1(ii) }{_+_}
+        Fold(0)(tileSize by 1) { ii => b1(ii) }{_+_}
       }{_+_}
 
 
@@ -256,44 +256,3 @@ object Lab1Part7FoldExample extends SpatialApp {
     println("PASS: " + cksum)
   }
 }
-
-
-object Lab1Part8MemReduceExample extends Spatialapp {
-  val N = 32
-  val tileSize = 16
-  type T = Int
-
-  @virtualize
-  def main() {
-    val arraySize = N
-    val srcFPGA = DRAM[T](N)
-    val src = Array.tabulate[Int](arraySize) { i => i % 256 }
-    setMem(srcFPGA, src)
-    val destArg = ArgOut[T]
-
-    Accel {
-      val accumMem = SRAM[T](N)
-      Sequential.Fold(accum)(N by tileSize) { i =>
-        val b1 = SRAM[T](tileSize)
-        b1 load srcFPGA(i::i+tileSize)
-        Reduce(0)(tileSize by 1) { ii => b1(ii) }{_+_}
-      }{_+_}
-
-
-      destArg := accum.value
-    }
-
-    val result = getArg(destArg)
-    val gold = src.reduce{_+_}
-    println("Gold: " + gold)
-    println("Result: : " + result)
-    println("")
-
-    val cksum = gold == result
-    println("PASS: " + cksum)
-  }
-}
-
-// object Lab1Part9MemFoldExample extends SpatialApp {
-
-// }
