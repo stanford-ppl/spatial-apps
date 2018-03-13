@@ -40,6 +40,8 @@ object Regression {
     dense ::= (SGD_minibatch, Array(40, 64, 0.0001))
     dense ::= (SGD, Array(40, 64, 0.0001))
     dense ::= (SVRG, Array(25, 30, 256, 0.0001, 0.0009, 10))
+    dense ::= (LP_SVRG, Array(40,5,256,0.05,1,0.00005))
+    dense ::= (HALP, Array(30,3,256,0.05,1,0.00003,0.4))
     dense ::= (Gibbs_Ising2D, Array(25, 0.3, 2))
     dense ::= (GDA, Array(1024))
     dense ::= (Differentiator, NoArgs)
@@ -56,6 +58,7 @@ object Regression {
     dense ::= (MD_Grid, NoArgs)
     dense ::= (MD_KNN, NoArgs)
     dense ::= (NW, Array("tcgacgaaataggatgacagcacgttctcgtattagagggccgcggtacaaaccaaatgctgcggcgtacagggcacggggcgctgttcgggagatcgggggaatcgtggcgtgggtgattcgccggc ttcgagggcgcgtgtcgcggtccatcgacatgcccggtcggtgggacgtgggcgcctgatatagaggaatgcgattggaaggtcggacgggtcggcgagttgggcccggtgaatctgccatggtcgat"))
+    dense ::= (PageBoundaryTest, Array(912))
     dense ::= (Stencil3D, NoArgs)
     dense ::= (Stencil2D, NoArgs)
     dense ::= (Viterbi, NoArgs)
@@ -75,12 +78,12 @@ object Regression {
     sparse ::= (ScatterGather, Array(160))
     sparse ::= (GatherStore, NoArgs)
     sparse ::= (PageRank_Bulk, Array(10000, 0.125))
-    // sparse ::= (SPMV_DumbPack, Array(1536))
+    sparse ::= (SPMV_DumbPack, Array(1536))
     sparse ::= (PageRank, Array(50, 0.125))
     sparse ::= (BFS_Queue, NoArgs)
     sparse ::= (BFS_Bulk, NoArgs)
-    // sparse ::= (SPMV_ELL, NoArgs)
-    // sparse ::= (SPMV_CRS, NoArgs)
+    sparse ::= (SPMV_ELL, NoArgs)
+    sparse ::= (SPMV_CRS, NoArgs)
 
     var unit = List[(SpatialApp, Array[Any])]()
     unit ::= (Breakpoint, NoArgs)
@@ -140,15 +143,8 @@ object Regression {
     unit ::= (UnalignedTileLoadStore, NoArgs)
 
     var fixme = List[(SpatialApp, Array[Any])]()
-    // fixme ::= (KMP, Array("the"))
-    fixme ::= (SPMV_DumbPack, Array(1536))
     fixme ::= (Backprop, Array(5))
-    fixme ::= (ScatterGather, Array(160))
-    fixme ::= (GatherStore, NoArgs)
-    fixme ::= (PageRank_Bulk, Array(10000, 0.125))
-    fixme ::= (PageRank, Array(50, 0.125))
-    fixme ::= (SPMV_ELL, NoArgs)
-    fixme ::= (SPMV_CRS, NoArgs)
+
 
 
 
@@ -458,3 +454,4 @@ object Regression {
     regressionLog.close()
   }
 }
+                                                                                                                                                                    
