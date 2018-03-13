@@ -60,24 +60,24 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
 
     val x = DRAM[TX](N, D)
     val y = DRAM[TX](N)
-    val result = DRAM[TM](D)
+    val w = DRAM[TM](D)
 
     printMatrix(sX, "X Data")
     printArray(sY, "Y Data")
     printArray(W_gold, "W Gold")
     setMem(x, sX)
     setMem(y, sY)
+    setMem(w, Array.fill(D)(0.to[TM]))
 
 
-    Accel {
+    Accel { Sequential{
       // Create model and gradient memories
       val w_k = SRAM[TM](D)
       val g_k = SRAM[TM](D)
       val y_cache = SRAM[TX](tileSize)
-      val y_cache_base = Reg[Int](0)
+      val y_cache_base = Reg[Int](-1)
 
-      Pipe(D by 1 par P2) { i => w_k(i) = 0.to[TM] }
-      y_cache load y(0::tileSize par loadPar)
+      w_k load w(0::D par loadPar)
 
       // Outer loop (epochs)
       Sequential.Foreach(E by 1 par PX) { e =>
@@ -88,8 +88,10 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
         MemReduce(g_k par P3)(N by tileSize par P4){i => 
           val y_tile = SRAM[TX](tileSize)
           val x_tile = SRAM[TX](tileSize,D)
-          y_tile load y(i::i + tileSize par loadPar)
-          x_tile load x(i::i + tileSize, 0::D par loadPar)
+          Parallel{
+            y_tile load y(i::i + tileSize)
+            x_tile load x(i::i + tileSize, 0::D par loadPar)            
+          }
           val g_k_partial = SRAM[TM](D)
           // Full update tile (inner loop)
           MemReduce(g_k_partial par P5)(tileSize by 1 par P6){ii =>
@@ -120,7 +122,7 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
             y_point := y_cache(i-y_cache_base)
           } else {
             y_cache_base := i - (i % tileSize)
-            y_cache load y(y_cache_base::y_cache_base + tileSize par loadPar)
+            y_cache load y(y_cache_base::y_cache_base + tileSize)
             y_point := y_cache(i % tileSize)
           }
 
@@ -143,11 +145,11 @@ object SVRG extends SpatialApp {  // Test Args: 25 30 256 0.0001 0.0009 10
       }
 
       // Store back values
-      result(0 :: D par storePar) store w_k
-    }
+      w(0 :: D par storePar) store w_k
+    }} // Close accel
 
     
-    val w_result = getMem(result)
+    val w_result = getMem(w)
     val cartesian_dist = W_gold.zip(w_result) { case (a, b) => (a - b) * (a - b) }.reduce{_+_}
 
     val cksum = cartesian_dist < margin
@@ -288,10 +290,11 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
 
     val x = DRAM[B](N, D)
     val y = DRAM[BB](N)
-    val result = DRAM[B](D)
+    val w = DRAM[B](D)
 
     setMem(x, X_bits)
     setMem(y, Y_bits)
+    setMem(w, Array.fill(D)(0.to[B]))
 
 
     Accel {
@@ -301,8 +304,7 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
       val y_cache = SRAM[BB](tileSize) // DM*DX
       val y_cache_base = Reg[Int](0) 
 
-      Pipe(D by 1 par P2) { i => w_k(i) = 0.to[B] }
-      y_cache load y(0::tileSize par loadPar)
+      w_k load w(0::D par loadPar)
 
       // Outer loop (epochs)
       Sequential.Foreach(E by 1 par PX) { e =>
@@ -311,17 +313,19 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
 
         // Do full update over all points to get g_k and w_k (outer loop)
         MemReduce(g_k par P3)(N by tileSize par P4){i => 
-          val y_tile = SRAM[BB](tileSize)   // DM*DX
           val x_tile = SRAM[B](tileSize,D) // DX
-          y_tile load y(i::i + tileSize par loadPar)
-          x_tile load x(i::i + tileSize, 0::D par loadPar)
+          Parallel{
+            y_cache load y(i::i + tileSize par loadPar)
+            y_cache_base := i
+            x_tile load x(i::i + tileSize, 0::D par loadPar)            
+          }
           val g_k_partial = SRAM[BBBB](D)    // DG
           // Full update tile (inner loop)
           MemReduce(g_k_partial par P5)(tileSize by 1 par P6){ii =>
             val g_k_local = SRAM[BBBB](D)  // DG
             val y_hat = Reg[BB](0.to[BB]) // DM*DX
             Reduce(y_hat)(D by 1 par P12){j => w_k(j).to[BB] *! x_tile(ii, j).to[BB]}{_+!_} // DM*DX
-            val y_err = y_hat.value -! y_tile(ii) // DM*DX
+            val y_err = y_hat.value -! y_cache(ii) // DM*DX
             Foreach(D by 1 par P7){j => 
               g_k_local(j) =  -A.to[BBBB] *! y_err.to[BBBB] *! x_tile(ii, j).to[BBBB]
             } // DG
@@ -403,11 +407,11 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
       }
 
       // Store back values
-      result(0 :: D par storePar) store w_k
+      w(0 :: D par storePar) store w_k
     }
 
     
-    val w_result = getMem(result)
+    val w_result = getMem(w)
 
     val w_result_fullprecision = Array.tabulate(D){i => LPToFloat[B](w_result(i), dm, 8)}
     val cartesian_dist = W_gold.zip(w_result_fullprecision) { case (a, b) => (a - b) * (a - b) }.reduce{_+_}
@@ -421,7 +425,7 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
 }
 
 
-object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
+object HALP extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 0.4
 
   val margin = 2 // Maximum distance between gold weights and computed weights to consider the app "passing"
 
@@ -443,7 +447,8 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
   val P12 = 1 (1 -> 8)
   val PX = 1
 
-  val shift_factor = 16
+  val shift_factor_lower_bound = 15
+  val shift_factor_upper_bound = 25
 
   type B = Int8
   type BB = Int16
@@ -479,16 +484,47 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
   */
 
   @virtualize
-  def toDM(in: BBBB): B = { ((in + random[BBBB](scala.math.pow(2.0,shift_factor).to[BBBB])) >> shift_factor).to[B] }
+  def toDM(in: BBBB, sf: Int): B = { 
+    val shift_factor_range = shift_factor_upper_bound - shift_factor_lower_bound
+    val options = List.tabulate(shift_factor_range){i => 
+      ((in + random[BBBB](scala.math.pow(2.0,(i+shift_factor_lower_bound)).to[BBBB])) >> (i+shift_factor_lower_bound)).to[B]   
+    }
+    if (sf == shift_factor_lower_bound) options(0)
+    else if (sf == (shift_factor_lower_bound + 1)) options(1)
+    else if (sf == (shift_factor_lower_bound + 2)) options(2)
+    else if (sf == (shift_factor_lower_bound + 3)) options(3)
+    else if (sf == (shift_factor_lower_bound + 4)) options(4)
+    else if (sf == (shift_factor_lower_bound + 5)) options(5)
+    else if (sf == (shift_factor_lower_bound + 6)) options(6)
+    else if (sf == (shift_factor_lower_bound + 7)) options(7)
+    else if (sf == (shift_factor_lower_bound + 8)) options(8)
+    else options(9)
+  }
   @virtualize
-  def toDG(in: B): BBBB = { in.to[BBBB] << shift_factor }
+  def toDG(in: B, sf: Int): BBBB = { 
+    val options = List.tabulate(shift_factor_upper_bound - shift_factor_lower_bound){i => 
+      in.to[BBBB] << (i+shift_factor_lower_bound)
+    }
+    val selects = List.tabulate(shift_factor_upper_bound - shift_factor_lower_bound){i => (sf-shift_factor_lower_bound) == i}
+    if (sf == shift_factor_lower_bound) options(0)
+    else if (sf == (shift_factor_lower_bound + 1)) options(1)
+    else if (sf == (shift_factor_lower_bound + 2)) options(2)
+    else if (sf == (shift_factor_lower_bound + 3)) options(3)
+    else if (sf == (shift_factor_lower_bound + 4)) options(4)
+    else if (sf == (shift_factor_lower_bound + 5)) options(5)
+    else if (sf == (shift_factor_lower_bound + 6)) options(6)
+    else if (sf == (shift_factor_lower_bound + 7)) options(7)
+    else if (sf == (shift_factor_lower_bound + 8)) options(8)
+    else options(9)
+
+  }
 
   @virtualize 
   def FloatToLP[T:Type:Num](in: Float, delta: Float, precision: scala.Int): T = {
     val exact = in / delta
     
     if (exact < -scala.math.pow(2,(precision-1))) -(scala.math.pow(2,(precision-1))).to[T]
-    else if (exact > scala.math.pow(2, (precision-1)-1)) scala.math.pow(2, (precision-1)-1).to[T]
+    else if (exact > scala.math.pow(2, (precision-1))-1) (scala.math.pow(2, (precision-1))-1).to[T]
     else (exact + random[Float](1)).to[T]
   }
 
@@ -497,14 +533,14 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
 
   @virtualize
   def main() {
+    val init_shift_factor = 16
     val epochs = args(0).to[Int] // Epochs
     val len_epoch = args(1).to[Int] // Epoch Length
     val points = args(2).to[Int] // Total Points
     val dm = args(3).to[Float] // delta for model
     val dx = args(4).to[Float] // delta for data
-    val da = 1/(scala.math.pow(2.0,shift_factor).to[Float]*dx*dx)
-    // val da = args(5).to[Float] // delta for step (alpha)
     val alpha1 = args(5).to[Float] // Step size
+    val mu = args(6).to[Float] // Set point (0 to 1) for gradient radius 
     val D = 6
 
     val noise_num = 3
@@ -522,6 +558,7 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
     val Y_noise_bits = Array.tabulate(points) {i => FloatToLP[BB](Y_noise(i), dx*dm, 16)}
     val X_bits = (0::points, 0::D){(i,j) => FloatToLP[B](sX(i,j), dx, 8)}
     val Y_bits = Array.tabulate(points){ i => FloatToLP[BB](sY(i), dx*dm, 16)}
+    val da = 1/(scala.math.pow(2.0,init_shift_factor).to[Float]*dx*dx)
     val alpha1_bits = FloatToLP[B](alpha1, da, 8)
 
     // Debug
@@ -531,10 +568,7 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
     printArray(W_recompute, "W_gold Reconstructed")
     println("dm = " + dm)
     println("dx = " + dx)
-    println("da = " + da)
     println("dm*dx = " + dm*dx)
-    println("dm*dx*dx*da = " + dm*dx*dx*da)
-    println("Alpha bits: " + alpha1_bits)
     printMatrix(X_bits, "X_bits")
     printArray(Y_bits, "Y_bits")
     printArray(W_bits, "W_bits")
@@ -550,16 +584,19 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
     val DG = HostIO[Float]
     val DA = HostIO[Float]
     val A = ArgIn[B]
+    val MU = ArgIn[Float]
     val PHASE = ArgIn[Int]
+    val SF = ArgIn[Int]
 
     setArg(N, points)
     setArg(T, len_epoch)
-    setArg(A, alpha1_bits)
     setArg(DM,   dm)
     setArg(DX,   dx)
-    setArg(DA,   da)
     setArg(DMDX, dm*dx)
-    setArg(DG,   dm*dx*dx*da)
+    setArg(MU, mu)
+    setArg(SF, init_shift_factor)
+    setArg(A, alpha1_bits)
+    setArg(DA, da)
 
 
     val x = DRAM[B](N, D)
@@ -582,8 +619,39 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
       // Set epoch info
       setArg(E, e)
 
-      // Center gradient and model
+      // Recenter gradient and model
+      if (e > 2 && phase == update_phase) {
+        val gradient_LP = getMem(g)
+        val gradient_mag = Array.tabulate(D){i => gradient_LP(i) * gradient_LP(i) / D}.reduce{_+_}
+        val current_gradient_mu = gradient_mag.to[Float] / (scala.math.pow(2,31) - 1).to[Float]
+        val ratio = current_gradient_mu / mu
+        if (debug) println(" Gradients magnitude = " + gradient_mag + ", DG = " + DG.value)
+        if ((1/ratio >= 2 || ratio >= 2) && getArg(SF) < shift_factor_upper_bound && getArg(SF) > shift_factor_lower_bound) { // Apply recentering
+          val sf_old = getArg(SF)
+          if (debug) println(" Old SF: " + sf_old)
+          val new_dg = if (1/ratio >= 2) { // Delta too small
+            setArg(SF, sf_old + 1)
+            DG.value * 2
+          } else { // Delta too large
+            setArg(SF, sf_old - 1)
+            DG.value / 2
+          }
+          if (debug) println(" New SF: " + getArg(SF))
+          // Set DA and DG after recentering
+          val da = 1/(pow(2.to[Float],SF.value.to[Float]).to[Float]*dx*dx)
+          val alpha1_bits = FloatToLP[B](alpha1, da, 8)
 
+          if (debug) println(" Gradient mu = " + current_gradient_mu + " (ratio = " + {1/ratio} + ")")
+          if (debug) println("da = " + da)
+          if (debug) println("dm*dx*dx*da = " + dm*dx*dx*da)
+          if (debug) println("Alpha bits: " + alpha1_bits)
+          println("\nRecentering on iter : " + getArg(E)/2 + " (SHIFT_FACTOR: " + sf_old + " -> " + getArg(SF) + ", alpha bits: " + alpha1_bits + ")")
+          setArg(DA, da)
+          setArg(A, alpha1_bits)
+          setArg(DG, new_dg)
+
+        }
+      }
 
       Accel {
 
@@ -591,22 +659,21 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
         val w_k = SRAM[B](D) // DM
         val g_k = SRAM[BBBB](D) // DG
         val y_cache = SRAM[BB](tileSize) // DM*DX
-        val y_cache_base = Reg[Int](0) 
+        val y_cache_base = Reg[Int](-1) 
         val w_k_t = SRAM[B](D) // DM
 
         Parallel{
-          w_k load w(0 :: D par storePar)
-          w_k_t load w(0 :: D par storePar)
+          w_k load w(0 :: D par loadPar)
+          g_k load g(0 :: D par loadPar)
+          w_k_t load w(0 :: D par loadPar)
         }
 
         if (PHASE.value == gradient_phase) {
           // Do full update over all points to get g_k and w_k (outer loop)
           MemReduce(g_k par P3)(N by tileSize par P4){i => 
-            val y_tile = SRAM[BB](tileSize)   // DM*DX
             val x_tile = SRAM[B](tileSize,D) // DX
             Parallel{
               y_cache load y(i::i + tileSize par loadPar)
-              y_cache_base := i
               x_tile load x(i::i + tileSize, 0::D par loadPar)              
             }
             val g_k_partial = SRAM[BBBB](D)    // DG
@@ -615,7 +682,7 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
               val g_k_local = SRAM[BBBB](D)  // DG
               val y_hat = Reg[BB](0.to[BB]) // DM*DX
               Reduce(y_hat)(D by 1 par P12){j => w_k(j).to[BB] *! x_tile(ii, j).to[BB]}{_+!_} // DM*DX
-              val y_err = y_hat.value -! y_tile(ii) // DM*DX
+              val y_err = y_hat.value -! y_cache(ii) // DM*DX
               Foreach(D by 1 par P7){j => 
                 g_k_local(j) =  -A.value.to[BBBB] *! y_err.to[BBBB] *! x_tile(ii, j).to[BBBB]
               } // DG
@@ -624,6 +691,8 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
           }{(a,b) => a +! b/tileSize}
           g(0::D par storePar) store g_k
         } else if (PHASE.value == update_phase) {
+          val g_k_t = SRAM[BBBB](D)
+
           // Run len_epoch number of SGD points
           Foreach(T by 1 par PX){t => 
             // Choose random point
@@ -631,7 +700,7 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
 
             // Get y for this point
             val y_point = Reg[BB](0) // DM*DX
-            if (i - y_cache_base >= 0 && i - y_cache_base < tileSize) {
+            if (i - y_cache_base >= 0 && i - y_cache_base < tileSize && y_cache_base >= 0) {
               y_point := y_cache(i-y_cache_base)
             } else {
               y_cache_base := i - (i % tileSize)
@@ -654,21 +723,22 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
             val y_err_k = y_hat_k.value -! y_point
 
             // Update w_k_t with reduced variance update
-            Foreach(D by 1 par P10){i => w_k_t(i) = toDM(toDG(w_k_t(i)) -! 
-                                                      A.value.to[BBBB] *! (
-                                                        (y_err_t.to[BBBB] *! x_point(i).to[BBBB]) +! 
-                                                        (y_err_k.to[BBBB] *&! x_point(i).to[BBBB]) -! 
-                                                        g_k(i)
-                                                      )
-                                                    )
-                                                  }
+            Foreach(D by 1 par P10){i => 
+              val gradient = - A.value.to[BBBB] *! (
+                                (y_err_t.to[BBBB] *! x_point(i).to[BBBB]) +! 
+                                (y_err_k.to[BBBB] *&! x_point(i).to[BBBB]) -! 
+                                g_k(i)
+                              )
+              g_k_t(i) = gradient
+              w_k_t(i) = toDM(toDG(w_k_t(i), SF.value) +! gradient, SF.value)
+            }
 
             if (debug) {
-              println("*** Step " + {t + e*T} + ": ")
+              println("*** Step " + {t + E.value/2*T} + ": ")
               println("y_err_t = " + y_err_t + " ( = " + y_hat_t.value + " - " + y_point + ")")
               println("Gradient in BBBB")
               Foreach(D by 1) { i => 
-                val gradientLP = A.value.to[BBBB] *! (
+                val gradientLP = - A.value.to[BBBB] *! (
                                  (y_err_t.to[BBBB] *! x_point(i).to[BBBB]) +! 
                                  (y_err_k.to[BBBB] *&! x_point(i).to[BBBB]) -! 
                                  g_k(i)
@@ -684,10 +754,24 @@ object HALP extends SpatialApp {  // Test Args: 40 5 256 0.01 1 0.0001
             }
           }
           // Store back values
-          w(0 :: D par storePar) store w_k_t
+          Parallel{
+            w(0 :: D par storePar) store w_k_t
+            g(0 :: D par storePar) store g_k_t
+          }
 
         }
 
+      } // close Accel
+
+      // Debug hooks
+      if (debug) {
+        if (phase == gradient_phase) {
+          println("Post gradient phase: ")
+          printArray(getMem(g), "Gradients: ")
+        } else {
+          println("Post update phase: ")
+          printArray(getMem(w), "Weights: ")
+        }
       }
 
     }

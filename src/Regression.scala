@@ -41,6 +41,7 @@ object Regression {
     dense ::= (SGD, Array(40, 64, 0.0001))
     dense ::= (SVRG, Array(25, 30, 256, 0.0001, 0.0009, 10))
     dense ::= (LP_SVRG, Array(40,5,256,0.05,1,0.00005))
+    dense ::= (HALP, Array(30,3,256,0.05,1,0.00003,0.4))
     dense ::= (Gibbs_Ising2D, Array(25, 0.3, 2))
     dense ::= (GDA, Array(128))
     dense ::= (Differentiator, NoArgs)
