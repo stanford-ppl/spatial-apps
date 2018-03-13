@@ -1,6 +1,6 @@
 import java.util.concurrent.{BlockingQueue, Executors, LinkedBlockingQueue, TimeUnit}
 
-import org.virtualized._
+import virtualized._
 import spatial.SpatialCompiler
 import argon.core._
 import spatial.aliases._
