@@ -171,8 +171,8 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
   val storePar = 1
   val P1 =  1 (1 -> 8)
   val P2 =  1 (1 -> 8)
-  val P3 =  1 (1 -> 8)
-  val P4 =  1 (1 -> 8)
+  val P3 =  2 (1 -> 8)
+  val P4 =  2 (1 -> 8)
   val P5 =  1 (1 -> 8)
   val P6 =  1 (1 -> 8)
   val P7 =  1 (1 -> 8)
