@@ -165,22 +165,22 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
 
   val margin = 2 // Maximum distance between gold weights and computed weights to consider the app "passing"
 
-  val tileSize = 16 (16 -> 128)
+  val tileSize = 64 (16 -> 128)
 
   val loadPar = 1
   val storePar = 1
-  val P1 =  1 (1 -> 8)
-  val P2 =  1 (1 -> 8)
   val P3 =  2 (1 -> 8)
   val P4 =  2 (1 -> 8)
-  val P5 =  1 (1 -> 8)
-  val P6 =  1 (1 -> 8)
+  val P5 =  2 (1 -> 8)
+  val P6 =  2 (1 -> 8)
   val P7 =  1 (1 -> 8)
-  val P8 =  1 (1 -> 8)
+  val P8 =  2 (1 -> 8)
   val P9 =  1 (1 -> 8)
   val P10 = 1 (1 -> 8)
   val P11 = 1 (1 -> 8)
   val P12 = 1 (1 -> 8)
+  val P13 = 1 (1 -> 8)
+  val P14 = 1 (1 -> 8)
   val PX = 1
 
   val shift_factor = 16
@@ -302,7 +302,7 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
       val w_k = SRAM[B](D) // DM
       val g_k = SRAM[BBBB](D) // DG
       val y_cache = SRAM[BB](tileSize) // DM*DX
-      val y_cache_base = Reg[Int](0) 
+      val y_cache_base = Reg[Int](-1) 
 
       w_k load w(0::D par loadPar)
 
@@ -313,21 +313,19 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
 
         // Do full update over all points to get g_k and w_k (outer loop)
         MemReduce(g_k par P3)(N by tileSize par P4){i => 
-          val x_tile = SRAM[B](tileSize,D) // DX
-          Parallel{
-            y_cache load y(i::i + tileSize par loadPar)
-            y_cache_base := i
-            x_tile load x(i::i + tileSize, 0::D par loadPar)            
-          }
+          val y_tile = SRAM[BB](tileSize) // DM*DX
+          y_tile load y(i::i + tileSize par loadPar)
           val g_k_partial = SRAM[BBBB](D)    // DG
           // Full update tile (inner loop)
           MemReduce(g_k_partial par P5)(tileSize by 1 par P6){ii =>
+            val x_tile = SRAM[B](D) // DX
+            x_tile load x(i+ii, 0::D par loadPar)            
             val g_k_local = SRAM[BBBB](D)  // DG
             val y_hat = Reg[BB](0.to[BB]) // DM*DX
-            Reduce(y_hat)(D by 1 par P12){j => w_k(j).to[BB] *! x_tile(ii, j).to[BB]}{_+!_} // DM*DX
-            val y_err = y_hat.value -! y_cache(ii) // DM*DX
+            Reduce(y_hat)(D by 1 par P12){j => w_k(j).to[BB] *! x_tile(j).to[BB]}{_+!_} // DM*DX
+            val y_err = y_hat.value -! y_tile(ii) // DM*DX
             Foreach(D by 1 par P7){j => 
-              g_k_local(j) =  -A.to[BBBB] *! y_err.to[BBBB] *! x_tile(ii, j).to[BBBB]
+              g_k_local(j) =  -A.to[BBBB] *! y_err.to[BBBB] *! x_tile(j).to[BBBB]
             } // DG
             g_k_local
           }{_+!_}
@@ -364,12 +362,12 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
 
           // Compute gradient against w_k_t
           val y_hat_t = Reg[BB](0.to[BB])
-          Reduce(y_hat_t)(D by 1){j => (w_k_t(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
+          Reduce(y_hat_t)(D by 1 par P13){j => (w_k_t(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
           val y_err_t = y_hat_t.value -! y_point
 
           // Compute gradient against w_k
           val y_hat_k = Reg[BB](0.to[BB])
-          Reduce(y_hat_k)(D by 1){j => (w_k(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
+          Reduce(y_hat_k)(D by 1 par P14){j => (w_k(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
           val y_err_k = y_hat_k.value -! y_point
 
           // Update w_k_t with reduced variance update
@@ -425,7 +423,7 @@ object LP_SVRG extends SpatialApp {  // Test Args: 40 5 256 0.05 1 0.00005
 }
 
 
-object HALP extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 0.4
+object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
 
   val margin = 2 // Maximum distance between gold weights and computed weights to consider the app "passing"
 
@@ -433,18 +431,18 @@ object HALP extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 0.4
 
   val loadPar = 1
   val storePar = 1
-  val P1 =  1 (1 -> 8)
-  val P2 =  1 (1 -> 8)
-  val P3 =  1 (1 -> 8)
-  val P4 =  1 (1 -> 8)
-  val P5 =  1 (1 -> 8)
-  val P6 =  1 (1 -> 8)
-  val P7 =  1 (1 -> 8)
-  val P8 =  1 (1 -> 8)
+  val P3 =  2 (1 -> 8)
+  val P4 =  2 (1 -> 8)
+  val P5 =  2 (1 -> 8)
+  val P6 =  2 (1 -> 8)
+  val P7 =  2 (1 -> 8)
+  val P8 =  2 (1 -> 8)
   val P9 =  1 (1 -> 8)
   val P10 = 1 (1 -> 8)
   val P11 = 1 (1 -> 8)
   val P12 = 1 (1 -> 8)
+  val P13 = 1 (1 -> 8)
+  val P14 = 1 (1 -> 8)
   val PX = 1
 
   val shift_factor_lower_bound = 15
@@ -671,9 +669,10 @@ object HALP extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 0.4
         if (PHASE.value == gradient_phase) {
           // Do full update over all points to get g_k and w_k (outer loop)
           MemReduce(g_k par P3)(N by tileSize par P4){i => 
+            val y_tile = SRAM[BB](tileSize) // DM*DX
             val x_tile = SRAM[B](tileSize,D) // DX
             Parallel{
-              y_cache load y(i::i + tileSize par loadPar)
+              y_tile load y(i::i + tileSize par loadPar)
               x_tile load x(i::i + tileSize, 0::D par loadPar)              
             }
             val g_k_partial = SRAM[BBBB](D)    // DG
@@ -682,7 +681,7 @@ object HALP extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 0.4
               val g_k_local = SRAM[BBBB](D)  // DG
               val y_hat = Reg[BB](0.to[BB]) // DM*DX
               Reduce(y_hat)(D by 1 par P12){j => w_k(j).to[BB] *! x_tile(ii, j).to[BB]}{_+!_} // DM*DX
-              val y_err = y_hat.value -! y_cache(ii) // DM*DX
+              val y_err = y_hat.value -! y_tile(ii) // DM*DX
               Foreach(D by 1 par P7){j => 
                 g_k_local(j) =  -A.value.to[BBBB] *! y_err.to[BBBB] *! x_tile(ii, j).to[BBBB]
               } // DG
@@ -714,12 +713,12 @@ object HALP extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 0.4
 
             // Compute gradient against w_k_t
             val y_hat_t = Reg[BB](0.to[BB])
-            Reduce(y_hat_t)(D by 1){j => (w_k_t(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
+            Reduce(y_hat_t)(D by 1 par P13){j => (w_k_t(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
             val y_err_t = y_hat_t.value -! y_point
 
             // Compute gradient against w_k
             val y_hat_k = Reg[BB](0.to[BB])
-            Reduce(y_hat_k)(D by 1){j => (w_k(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
+            Reduce(y_hat_k)(D by 1 par P14){j => (w_k(j).to[BB] *&! x_point(j).to[BB])}{_+!_}
             val y_err_k = y_hat_k.value -! y_point
 
             // Update w_k_t with reduced variance update
