@@ -1137,7 +1137,9 @@ object SimpleTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 10
     val arraySize = N
     val value = args(0).to[Int]
 
-    val src = Array.tabulate[Int](arraySize) { i => i % 256 }
+    val src_p1 = Array.tabulate[Int](arraySize-10) { i => i % 256 }
+    val src_p2 = Array.tabulate[Int](10) { i => (i+arraySize-10) % 256 }
+    val src = src_p1 ++ src_p2
     val dst = simpleLoadStore(src, value)
 
     val gold = src.map { _ * value }
@@ -1148,7 +1150,7 @@ object SimpleTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 10
     (0 until arraySize) foreach { i => print(dst(i) + " ") }
     println("")
 
-    val cksum = dst.zip(gold){_ == _}.reduce{_&&_}
+    val cksum = dst == gold
     println("PASS: " + cksum + " (SimpleTileLoadStore)")
   }
 }
@@ -1197,7 +1199,7 @@ object PartialTileLoadStore extends SpatialApp { // Regression (Unit) // Args: 1
     printMatrix(gold, "Gold")
     printMatrix(dst, "got")
 
-    val cksum = dst.zip(gold){_ == _}.reduce{_&&_}
+    val cksum = dst == gold
     println("PASS: " + cksum + " (SimpleTileLoadStore)")
   }
 }
@@ -1276,10 +1278,10 @@ object UnalignedTileLoadStore extends SpatialApp { // Regression (Unit) // Args:
     printMatrix(gold4, "Wanted4:")
     printMatrix(got4, "Got4:")
 
-    val cksum1 = got1.zip(gold1){_ == _}.reduce{_&&_}
-    val cksum2 = got2.zip(gold2){_ == _}.reduce{_&&_}
-    val cksum3 = got3.zip(gold3){_ == _}.reduce{_&&_}
-    val cksum4 = got4.zip(gold4){_ == _}.reduce{_&&_}
+    val cksum1 = got1 == gold1
+    val cksum2 = got2 == gold2
+    val cksum3 = got3 == gold3
+    val cksum4 = got4 == gold4
     println("cksum1: " + cksum1)
     println("cksum2: " + cksum2)
     println("cksum3: " + cksum3)
@@ -3085,9 +3087,13 @@ object CtrlEnable extends SpatialApp { // Regression (Unit) // Args: 9
 
   @virtualize
   def main() {
-    val vectorA = Array.fill[Int](128) {
+    val vectorA_p1 = Array.fill[Int](64) {
       4 // Please don't change this to random
     }
+    val vectorA_p2 = Array.fill[Int](64) {
+      4 // Please don't change this to random
+    }
+    val vectorA = vectorA_p1 ++ vectorA_p2
     val vectorB = Array.fill[Int](128) {
       8 // Please don't change this to random
     }
