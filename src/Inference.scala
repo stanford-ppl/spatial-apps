@@ -18,8 +18,8 @@ object SingleLayerConv_RCIO extends SpatialApp {
     val P3 = 1
     val P4 = 1
     val P5 = 1
-    val loadPar = 32 (1 -> 16)
-    val storePar = 32 (1 -> 16)
+    val loadPar = 4 (1 -> 16)
+    val storePar = 4 (1 -> 16)
     // Scalar params
     val INPUT_ROWS = ArgIn[Int]
     val INPUT_COLS = ArgIn[Int]
