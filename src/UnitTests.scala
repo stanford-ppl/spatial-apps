@@ -3677,13 +3677,13 @@ object SpecialMath extends SpatialApp { // Regression (Unit) // Args: 0.125 5.62
     val gold_mean_unsigned = unbiased_mul_unsigned_res.map{_.to[FltPt[_24,_8]]}.reduce{_+_} / N
     val gold_unbiased_mul_signed = (a_sgn * b_sgn).to[FltPt[_24,_8]]
     val gold_mean_signed = unbiased_mul_signed_res.map{_.to[FltPt[_24,_8]]}.reduce{_+_} / N
-    val gold_satur_add_signed = (-8).to[Float]
-    val gold_satur_add_unsigned = (15.9375).to[Float]
-    val gold_unbiased_sat_mul_unsigned = (15.9375).to[Float]
-    val gold_unbiased_lower_sat_mul_signed = (-8).to[Float]
-    val gold_unbiased_upper_sat_mul_signed = (7.9375).to[Float]
+    val gold_satur_add_signed = minValue[SGN].to[Float]
+    val gold_satur_add_unsigned = maxValue[USGN].to[Float]
+    val gold_unbiased_sat_mul_unsigned = maxValue[USGN].to[Float]
+    val gold_unbiased_lower_sat_mul_signed = minValue[SGN].to[Float]
+    val gold_unbiased_upper_sat_mul_signed = maxValue[SGN].to[Float]
     val gold_normal = (c_sgn * 0.5.to[SGN]).to[Float]
-    val gold_satur_add_pos_ov = 7.9375.to[Float]
+    val gold_satur_add_pos_ov = maxValue[SGN].to[Float]
 
     // Get cksums
     val margin = scala.math.pow(2,-4).to[FltPt[_24,_8]]
