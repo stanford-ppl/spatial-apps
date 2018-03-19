@@ -13,14 +13,14 @@ object SVRG extends SpatialApp {  // Test Args: 20 3 256 0.0001 0.0009 10 1 2
   val loadPar = 16
   val storePar = 16
   val max_history = 256
-  val P1 = 2 (1 -> 8)
-  val P2 = 2 (1 -> 8)
-  val P3 = 2 (1 -> 8)
-  val P4 = 2 (1 -> 8)
-  val P5 = 2 (1 -> 8)
-  val P6 = 2 (1 -> 8)
-  val P7 = 2 (1 -> 8)
-  val P8 = 2 (1 -> 8)
+  val P1 = 1 (1 -> 8)
+  val P2 = 1 (1 -> 8)
+  val P3 = 1 (1 -> 8)
+  val P4 = 1 (1 -> 8)
+  val P5 = 1 (1 -> 8)
+  val P6 = 1 (1 -> 8)
+  val P7 = 1 (1 -> 8)
+  val P8 = 1 (1 -> 8)
   val P9 = 1 (1 -> 8)
   val P10 = 1 (1 -> 8)
   val P11 = 1 (1 -> 8)
@@ -207,12 +207,12 @@ object LP_SVRG extends SpatialApp {  // Test Args:
   val loadPar = 16
   val storePar = 16
   val max_history = 256
-  val P3 =  2 (1 -> 8)
-  val P4 =  2 (1 -> 8)
-  val P5 =  2 (1 -> 8)
-  val P6 =  2 (1 -> 8)
+  val P3 =  1 (1 -> 8)
+  val P4 =  1 (1 -> 8)
+  val P5 =  1 (1 -> 8)
+  val P6 =  1 (1 -> 8)
   val P7 =  1 (1 -> 8)
-  val P8 =  2 (1 -> 8)
+  val P8 =  1 (1 -> 8)
   val P9 =  1 (1 -> 8)
   val P10 = 1 (1 -> 8)
   val P11 = 1 (1 -> 8)
@@ -1147,12 +1147,12 @@ object LP_SGD extends SpatialApp {  // Test Args:
   val loadPar = 16
   val storePar = 16
   val max_history = 256
-  val P3 =  2 (1 -> 8)
-  val P4 =  2 (1 -> 8)
-  val P5 =  2 (1 -> 8)
-  val P6 =  2 (1 -> 8)
+  val P3 =  1 (1 -> 8)
+  val P4 =  1 (1 -> 8)
+  val P5 =  1 (1 -> 8)
+  val P6 =  1 (1 -> 8)
   val P7 =  1 (1 -> 8)
-  val P8 =  2 (1 -> 8)
+  val P8 =  1 (1 -> 8)
   val P9 =  1 (1 -> 8)
   val P10 = 1 (1 -> 8)
   val P11 = 1 (1 -> 8)
@@ -1432,7 +1432,7 @@ object SGD_minibatch extends SpatialApp { // Test Args: 40 64 0.0001
   val tileSize = 16
   val innerPar = 4
   val outerPar = 1 // Not used right now?
-  val margin = 1
+  val margin = 1.5
 
   @virtualize
   def sgdminibatch(x_in: Array[TX], y_in: Array[TX], alpha: TM, epochs: Int, nn: Int) = {
@@ -1505,7 +1505,7 @@ object SGD_minibatch extends SpatialApp { // Test Args: 40 64 0.0001
 
     val result = sgdminibatch(sX.flatten, sY, A, E, N)
 
-    val cksum = ideal_model.zip(result){ case (a,b) => abs(a - b) < margin }.reduce{_&&_}
+    val cksum = ideal_model.zip(result){ case (a,b) => abs(a - b) < margin.to[TM] }.reduce{_&&_}
     printArr(result, "result: ")
     printArr(ideal_model, "gold: ")
     println("PASS: " + cksum  + " (SGD_minibatch)")
