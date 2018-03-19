@@ -234,11 +234,12 @@ object Regression {
 
       try {
         val f = Future(blocking(p.exitValue()))
-        val code = Await.result(f, duration.Duration(MAKE_TIMEOUT, "sec"))
+        var code = Await.result(f, duration.Duration(MAKE_TIMEOUT, "sec"))
 
         if (code != 0)   {
           val expl = if (cause == "") s"Non-zero exit code[newline]&nbsp;&nbsp;&nbsp;&nbsp;See ${app.IR.config.logDir}make.log" else cause
           results.put(s"$backend.$cat.$name: Fail [Execution][newline]&nbsp;&nbsp;Cause: $expl")
+          if (cause.contains("Placer could not place all instances")) code = 0 // Allow synth regression to proceed so it stamps utilization estimates
         }
 
         code == 0
