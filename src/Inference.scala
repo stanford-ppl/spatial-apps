@@ -167,7 +167,7 @@ object SingleLayerConv_IRCO extends SpatialApp {
     val debug:scala.Boolean = false
 
     val PX = 1
-    val P1 = 2
+    val P1 = 1
     val P2 = 1
     val P3 = 1 // Not working
     val loadPar = 32 (1 -> 16)
