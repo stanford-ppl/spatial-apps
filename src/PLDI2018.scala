@@ -1,5 +1,5 @@
 import spatial.dsl._
-import org.virtualized._
+import virtualized._
 import spatial.targets._
 
 object MatMult_inner1 extends SpatialApp { // Regression (Dense) // Args: 32 128 128
@@ -456,6 +456,7 @@ object SW1 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     val par_load = 4
     val par_store = 4
     val row_par = 1 (1 -> 1 -> 8)
+    val max_length = 160
 
     val SKIPB = 0
     val SKIPA = 1
@@ -472,7 +473,6 @@ object SW1 extends SpatialApp { // Regression (Dense) // Args: tcgacgaaataggatga
     val lengthx2 = ArgIn[Int]
     setArg(length, measured_length)
     setArg(lengthx2, 2*measured_length)
-    val max_length = 160
     assert(max_length >= length, "Cannot have string longer than 256 elements")
 
     val seqa_bin = argon.lang.String.string2num(seqa_string)
@@ -2127,6 +2127,7 @@ object GEMM_Blocked1 extends SpatialApp { // Regression (Dense) // Args: none
     val reduce_col = 4 (1 -> 1 -> 16)
     val reduce_tmp = 4 (1 -> 1 -> 16)
 
+
     // val a_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_a.csv", "\n").reshape(dim,dim)
     // val b_data = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_b.csv", "\n").reshape(dim,dim)
     val a_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
@@ -2506,11 +2507,11 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
     printArray(edgeLens, "edgeLens: ")
     printArray(edgeIds, "edgeIds: ")
 
-    val tileSize = 16 (16 -> 16 -> 128)
-    val par_load = 16
-    val par_store = 16
-    val tile_par = 2 (1 -> 1 -> 12)
-    val page_par = 2 (1 -> 1 -> 16)
+    val tileSize = 32 (16 -> 16 -> 128)
+    val par_load = 8
+    val par_store = 8
+    val tile_par = 1 (1 -> 1 -> 12)
+    val page_par = 4 (1 -> 1 -> 16)
 
     // Arguments
     val itersIN = args(0).to[Int]
@@ -3080,155 +3081,155 @@ object BlackScholes3 extends SpatialApp {
 
   }
 }
-object BlackScholes4 extends SpatialApp {
-  override val target = AWS_F1
+// object BlackScholes4 extends SpatialApp {
+//   override val target = AWS_F1
 
-  type T = Float//FixPt[TRUE,_32,_32]
-  val margin = 0.2f // Validates true if within +/- margin
+//   type T = Float//FixPt[TRUE,_32,_32]
+//   val margin = 0.2f // Validates true if within +/- margin
 
-  final val inv_sqrt_2xPI = 0.39894228040143270286f.to[T]
+//   final val inv_sqrt_2xPI = 0.39894228040143270286f.to[T]
 
-  @virtualize
-  def CNDF(x: T): T = {
-    val ax = abs(x)
+//   @virtualize
+//   def CNDF(x: T): T = {
+//     val ax = abs(x)
 
-    val xNPrimeofX = exp_taylor((ax ** 2) * -0.05f.to[T]) * inv_sqrt_2xPI
-    val xK2 = 1.to[T] / ((ax * 0.2316419f.to[T]) + 1.0f.to[T])
+//     val xNPrimeofX = exp_taylor((ax ** 2) * -0.05f.to[T]) * inv_sqrt_2xPI
+//     val xK2 = 1.to[T] / ((ax * 0.2316419f.to[T]) + 1.0f.to[T])
 
-    val xK2_2 = xK2 ** 2
-    val xK2_3 = xK2_2 * xK2
-    val xK2_4 = xK2_3 * xK2
-    val xK2_5 = xK2_4 * xK2
+//     val xK2_2 = xK2 ** 2
+//     val xK2_3 = xK2_2 * xK2
+//     val xK2_4 = xK2_3 * xK2
+//     val xK2_5 = xK2_4 * xK2
 
-    val xLocal_10 = xK2 * 0.319381530f.to[T]
-    val xLocal_20 = xK2_2 * -0.356563782f.to[T]
-    val xLocal_30 = xK2_3 * 1.781477937f.to[T]
-    val xLocal_31 = xK2_4 * -1.821255978f.to[T]
-    val xLocal_32 = xK2_5 * 1.330274429f.to[T]
+//     val xLocal_10 = xK2 * 0.319381530f.to[T]
+//     val xLocal_20 = xK2_2 * -0.356563782f.to[T]
+//     val xLocal_30 = xK2_3 * 1.781477937f.to[T]
+//     val xLocal_31 = xK2_4 * -1.821255978f.to[T]
+//     val xLocal_32 = xK2_5 * 1.330274429f.to[T]
 
-    val xLocal_21 = xLocal_20 + xLocal_30
-    val xLocal_22 = xLocal_21 + xLocal_31
-    val xLocal_23 = xLocal_22 + xLocal_32
-    val xLocal_1 = xLocal_23 + xLocal_10
+//     val xLocal_21 = xLocal_20 + xLocal_30
+//     val xLocal_22 = xLocal_21 + xLocal_31
+//     val xLocal_23 = xLocal_22 + xLocal_32
+//     val xLocal_1 = xLocal_23 + xLocal_10
 
-    val xLocal0 = xLocal_1 * xNPrimeofX
-    val xLocal  = -xLocal0 + 1.0f.to[T]
+//     val xLocal0 = xLocal_1 * xNPrimeofX
+//     val xLocal  = -xLocal0 + 1.0f.to[T]
 
-    mux(x < 0.0f.to[T], xLocal0, xLocal)
-  }
+//     mux(x < 0.0f.to[T], xLocal0, xLocal)
+//   }
 
-  @virtualize
-  def BlkSchlsEqEuroNoDiv(sptprice: T, strike: T, rate: T,
-    volatility: T, time: T, otype: Int): T = {
+//   @virtualize
+//   def BlkSchlsEqEuroNoDiv(sptprice: T, strike: T, rate: T,
+//     volatility: T, time: T, otype: Int): T = {
 
-    val xLogTerm = log_taylor( sptprice / strike )
-    sptprice*strike
-    val xPowerTerm = (volatility ** 2) * 0.5f.to[T]
-    val xNum = (rate + xPowerTerm) * time + xLogTerm
-    val xDen = volatility * sqrt_approx(time)
+//     val xLogTerm = log_taylor( sptprice / strike )
+//     sptprice*strike
+//     val xPowerTerm = (volatility ** 2) * 0.5f.to[T]
+//     val xNum = (rate + xPowerTerm) * time + xLogTerm
+//     val xDen = volatility * sqrt_approx(time)
 
-    val xDiv = xNum / (xDen ** 2)
-    val nofXd1 = CNDF(xDiv)
-    val nofXd2 = CNDF(xDiv - xDen)
+//     val xDiv = xNum / (xDen ** 2)
+//     val nofXd1 = CNDF(xDiv)
+//     val nofXd2 = CNDF(xDiv - xDen)
 
-    val futureValueX = strike * exp_taylor(-rate * time)
+//     val futureValueX = strike * exp_taylor(-rate * time)
 
-    val negNofXd1 = -nofXd1 + 1.0f.to[T]
-    val negNofXd2 = -nofXd2 + 1.0f.to[T]
+//     val negNofXd1 = -nofXd1 + 1.0f.to[T]
+//     val negNofXd2 = -nofXd2 + 1.0f.to[T]
 
-    val optionPrice1 = (sptprice * nofXd1) - (futureValueX * nofXd2)
-    val optionPrice2 = (futureValueX * negNofXd2) - (sptprice * negNofXd1)
-    mux(otype == 0, optionPrice2, optionPrice1)
-  }
+//     val optionPrice1 = (sptprice * nofXd1) - (futureValueX * nofXd2)
+//     val optionPrice2 = (futureValueX * negNofXd2) - (sptprice * negNofXd1)
+//     mux(otype == 0, optionPrice2, optionPrice1)
+//   }
 
-  @virtualize
-  def blackscholes(
-    stypes:      Array[Int],
-    sprices:     Array[T],
-    sstrike:     Array[T],
-    srate:       Array[T],
-    svolatility: Array[T],
-    stimes:      Array[T]
-  ): Array[T] = {
-    val B  = 768 (32 -> 96 -> 19200)
-    val OP = 1 (1 -> 2)
-    val IP = 3 (1 -> 96)
-    val par_load = 16
-    val par_store = 16
+//   @virtualize
+//   def blackscholes(
+//     stypes:      Array[Int],
+//     sprices:     Array[T],
+//     sstrike:     Array[T],
+//     srate:       Array[T],
+//     svolatility: Array[T],
+//     stimes:      Array[T]
+//   ): Array[T] = {
+//     val B  = 768 (32 -> 96 -> 19200)
+//     val OP = 1 (1 -> 2)
+//     val IP = 3 (1 -> 96)
+//     val par_load = 16
+//     val par_store = 16
 
-    val size = stypes.length; bound(size) = 9995328
+//     val size = stypes.length; bound(size) = 9995328
 
-    val N = ArgIn[Int]
-    setArg(N, size)
+//     val N = ArgIn[Int]
+//     setArg(N, size)
 
-    val types    = DRAM[Int](N)
-    val prices   = DRAM[T](N)
-    val strike   = DRAM[T](N)
-    val rate     = DRAM[T](N)
-    val vol      = DRAM[T](N)
-    val times    = DRAM[T](N)
-    val optprice = DRAM[T](N)
-    setMem(types, stypes)
-    setMem(prices, sprices)
-    setMem(strike, sstrike)
-    setMem(rate, srate)
-    setMem(vol, svolatility)
-    setMem(times, stimes)
+//     val types    = DRAM[Int](N)
+//     val prices   = DRAM[T](N)
+//     val strike   = DRAM[T](N)
+//     val rate     = DRAM[T](N)
+//     val vol      = DRAM[T](N)
+//     val times    = DRAM[T](N)
+//     val optprice = DRAM[T](N)
+//     setMem(types, stypes)
+//     setMem(prices, sprices)
+//     setMem(strike, sstrike)
+//     setMem(rate, srate)
+//     setMem(vol, svolatility)
+//     setMem(times, stimes)
 
-    Accel {
-      Foreach(N by B par OP) { i =>
-        val typeBlk   = SRAM[Int](B)
-        val priceBlk  = SRAM[T](B)
-        val strikeBlk = SRAM[T](B)
-        val rateBlk   = SRAM[T](B)
-        val volBlk    = SRAM[T](B)
-        val timeBlk   = SRAM[T](B)
-        val optpriceBlk = SRAM[T](B)
+//     Accel {
+//       Foreach(N by B par OP) { i =>
+//         val typeBlk   = SRAM[Int](B)
+//         val priceBlk  = SRAM[T](B)
+//         val strikeBlk = SRAM[T](B)
+//         val rateBlk   = SRAM[T](B)
+//         val volBlk    = SRAM[T](B)
+//         val timeBlk   = SRAM[T](B)
+//         val optpriceBlk = SRAM[T](B)
 
-        Parallel {
-          typeBlk   load types(i::i+B par par_load)
-          priceBlk  load prices(i::i+B par par_load)
-          strikeBlk load strike(i::i+B par par_load)
-          rateBlk   load rate(i::i+B par par_load)
-          volBlk    load vol(i::i+B par par_load)
-          timeBlk   load times(i::i+B par par_load)
-        }
+//         Parallel {
+//           typeBlk   load types(i::i+B par par_load)
+//           priceBlk  load prices(i::i+B par par_load)
+//           strikeBlk load strike(i::i+B par par_load)
+//           rateBlk   load rate(i::i+B par par_load)
+//           volBlk    load vol(i::i+B par par_load)
+//           timeBlk   load times(i::i+B par par_load)
+//         }
 
-        Foreach(B par IP){ j =>
-          val price = BlkSchlsEqEuroNoDiv(priceBlk(j), strikeBlk(j), rateBlk(j), volBlk(j), timeBlk(j), typeBlk(j))
-          optpriceBlk(j) = price
-        }
-        optprice(i::i+B par par_store) store optpriceBlk
-      }
-    }
-    getMem(optprice)
-  }
+//         Foreach(B par IP){ j =>
+//           val price = BlkSchlsEqEuroNoDiv(priceBlk(j), strikeBlk(j), rateBlk(j), volBlk(j), timeBlk(j), typeBlk(j))
+//           optpriceBlk(j) = price
+//         }
+//         optprice(i::i+B par par_store) store optpriceBlk
+//       }
+//     }
+//     getMem(optprice)
+//   }
 
-  @virtualize
-  def main(): Unit = {
-    val N = args(0).to[Int]
+//   @virtualize
+//   def main(): Unit = {
+//     val N = args(0).to[Int]
 
-    val types  = Array.fill(N)(1 + random[Int](2))
-    val prices = Array.fill(N)(1 + random[T])
-    val strike = Array.fill(N)(1 + random[T])
-    val rate   = Array.fill(N)(1 + random[T])
-    val vol    = Array.fill(N)(1 + random[T])
-    val time   = Array.fill(N)(1 + random[T])
+//     val types  = Array.fill(N)(1 + random[Int](2))
+//     val prices = Array.fill(N)(1 + random[T])
+//     val strike = Array.fill(N)(1 + random[T])
+//     val rate   = Array.fill(N)(1 + random[T])
+//     val vol    = Array.fill(N)(1 + random[T])
+//     val time   = Array.fill(N)(1 + random[T])
 
-    val out = blackscholes(types, prices, strike, rate, vol, time)
+//     val out = blackscholes(types, prices, strike, rate, vol, time)
 
-    val gold = Array.tabulate(N){i => 
-      BlkSchlsEqEuroNoDiv(prices(i), strike(i), rate(i), vol(i), time(i), types(i))
-    }
-    printArray(out, "result: ")
-    printArray(gold, "gold: ")
+//     val gold = Array.tabulate(N){i => 
+//       BlkSchlsEqEuroNoDiv(prices(i), strike(i), rate(i), vol(i), time(i), types(i))
+//     }
+//     printArray(out, "result: ")
+//     printArray(gold, "gold: ")
 
-    val cksum = out.zip(gold){ case (o, g) => (g < (o + margin.to[T])) && g > (o - margin.to[T])}.reduce{_&&_}
-    println("PASS: " + cksum + " (BlackSholes)")
+//     val cksum = out.zip(gold){ case (o, g) => (g < (o + margin.to[T])) && g > (o - margin.to[T])}.reduce{_&&_}
+//     println("PASS: " + cksum + " (BlackSholes)")
 
 
-  }
-}
+//   }
+// }
 
 object BlackScholes4 extends SpatialApp {
   override val target = AWS_F1
@@ -4818,6 +4819,7 @@ object AES1 extends SpatialApp { // Regression (Dense) // Args: 50
     val par_store = 2
     val outer_par = 1 (1 -> 1 -> 4) // This may crash GC
 
+
     // Setup
     val num_bytes = ArgIn[Int]
     setArg(num_bytes, 16*args(0).to[Int])
@@ -5595,7 +5597,7 @@ object Kmeans1 extends SpatialApp { // Regression (Dense) // Args: 3 64
     bound(numCents) = MAXK
     bound(numDims) = MAXD
 
-    val BN = 1 (96 -> 96 -> 9600)
+    val BN = pts_per_ld (96 -> 96 -> 9600)
     val BD = MAXD
     val par_load = 16
     val par_store = 16
@@ -5604,6 +5606,7 @@ object Kmeans1 extends SpatialApp { // Regression (Dense) // Args: 3 64
     val P1 = 4 (1 -> 2 -> dim)
     val P2 = 6 (1 -> 2 -> dim)
     val P3 = 16 (1 -> 2 -> numcents)
+
 
     val iters = ArgIn[Int]
     val N     = ArgIn[Int]
@@ -6542,9 +6545,9 @@ object Sobel4 extends SpatialApp { // Regression (Dense) // Args: none
     val lb_par = 16 (1 -> 1 -> 16)
     val par_store = 16
     val row_stride = 100 (100 -> 100 -> 500)
-    val row_par = 2 (1 -> 1 -> 16)
-    val par_Kh = 3 (1 -> 1 -> 3)
-    val par_Kw = 3 (1 -> 1 -> 3)
+    val row_par = 4 (1 -> 1 -> 16)
+    val par_Kh = 1 (1 -> 1 -> 3)
+    val par_Kw = 1 (1 -> 1 -> 3)
 
     val img = DRAM[T](R, C)
     val imgOut = DRAM[T](R, C)
