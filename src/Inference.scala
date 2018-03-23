@@ -13,7 +13,7 @@ object SingleLayerConv_RCIO extends SpatialApp {
     val debug:scala.Boolean = false
 
     val PX = 1
-    val P1 = 1 // Unsafe parallelization if OC < 1 burst (16)
+    val P1 = 2 // Unsafe parallelization if OC < 1 burst (16)
     val P2 = 1 // Unsafe parallelization if OC < 1 burst (16)
     val P3 = 1
     val P4 = 1
