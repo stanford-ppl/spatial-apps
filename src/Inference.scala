@@ -14,10 +14,10 @@ object SingleLayerConv_RCIO extends SpatialApp {
 
     val PX = 1
     val P1 = 2 // Unsafe parallelization if OC < 1 burst (16)
-    val P2 = 1 // Unsafe parallelization if OC < 1 burst (16)
-    val P3 = 1
-    val P4 = 1
-    val P5 = 1
+    val P2 = 2 // Unsafe parallelization if OC < 1 burst (16)
+    val P3 = 2
+    val P4 = 2
+    val P5 = 4
     val loadPar = 4 (1 -> 16)
     val storePar = 4 (1 -> 16)
     // Scalar params
