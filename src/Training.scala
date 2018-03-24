@@ -590,9 +590,12 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
   val P14 = 1 (1 -> 8)
   val PX = 1
 
-  val init_shift_factor = 16
-  val shift_factor_lower_bound = 16
-  val shift_factor_upper_bound = 26
+  val init_SF = 16
+  val SF_lower_bound = 16
+  val SF_upper_bound = 26
+  val init_SFE = 2
+  val SFE_lower_bound = 1
+  val SFE_upper_bound = 11
 
   type B = Int8
   type BB = Int16
@@ -619,46 +622,48 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
 
     We derive:
       DY = DM*DX
+      DYE = DM*2^-SFE*DX
       DA = 2^-shift_factor / DX / DX
       DG = DM*DX*DX*DA
+      DME = DM*2^-SFE
 
     We try rescale:
       DG to keep gradients in range
-      ? DM to keep model well resolved ?
+      DME to keep model well resolved
   */
 
   @virtualize
   def toDM(in: BBBB, sf: Int): B = { 
-    val shift_factor_range = shift_factor_upper_bound - shift_factor_lower_bound
+    val shift_factor_range = SF_upper_bound - SF_lower_bound
     val options = List.tabulate(shift_factor_range){i => 
-      ((in + random[BBBB](scala.math.pow(2.0,(i+shift_factor_lower_bound)).to[BBBB])) >> (i+shift_factor_lower_bound)).to[B]   
+      ((in + random[BBBB](scala.math.pow(2.0,(i+SF_lower_bound)).to[BBBB])) >> (i+SF_lower_bound)).to[B]   
     }
-    if (sf == shift_factor_lower_bound) options(0)
-    else if (sf == (shift_factor_lower_bound + 1)) options(1)
-    else if (sf == (shift_factor_lower_bound + 2)) options(2)
-    else if (sf == (shift_factor_lower_bound + 3)) options(3)
-    else if (sf == (shift_factor_lower_bound + 4)) options(4)
-    else if (sf == (shift_factor_lower_bound + 5)) options(5)
-    else if (sf == (shift_factor_lower_bound + 6)) options(6)
-    else if (sf == (shift_factor_lower_bound + 7)) options(7)
-    else if (sf == (shift_factor_lower_bound + 8)) options(8)
+    if (sf == SF_lower_bound) options(0)
+    else if (sf == (SF_lower_bound + 1)) options(1)
+    else if (sf == (SF_lower_bound + 2)) options(2)
+    else if (sf == (SF_lower_bound + 3)) options(3)
+    else if (sf == (SF_lower_bound + 4)) options(4)
+    else if (sf == (SF_lower_bound + 5)) options(5)
+    else if (sf == (SF_lower_bound + 6)) options(6)
+    else if (sf == (SF_lower_bound + 7)) options(7)
+    else if (sf == (SF_lower_bound + 8)) options(8)
     else options(9)
   }
   @virtualize
   def toDG(in: B, sf: Int): BBBB = { 
-    val options = List.tabulate(shift_factor_upper_bound - shift_factor_lower_bound){i => 
-      in.to[BBBB] << (i+shift_factor_lower_bound)
+    val options = List.tabulate(SF_upper_bound - SF_lower_bound){i => 
+      in.to[BBBB] << (i+SF_lower_bound)
     }
-    val selects = List.tabulate(shift_factor_upper_bound - shift_factor_lower_bound){i => (sf-shift_factor_lower_bound) == i}
-    if (sf == shift_factor_lower_bound) options(0)
-    else if (sf == (shift_factor_lower_bound + 1)) options(1)
-    else if (sf == (shift_factor_lower_bound + 2)) options(2)
-    else if (sf == (shift_factor_lower_bound + 3)) options(3)
-    else if (sf == (shift_factor_lower_bound + 4)) options(4)
-    else if (sf == (shift_factor_lower_bound + 5)) options(5)
-    else if (sf == (shift_factor_lower_bound + 6)) options(6)
-    else if (sf == (shift_factor_lower_bound + 7)) options(7)
-    else if (sf == (shift_factor_lower_bound + 8)) options(8)
+    val selects = List.tabulate(SF_upper_bound - SF_lower_bound){i => (sf-SF_lower_bound) == i}
+    if (sf == SF_lower_bound) options(0)
+    else if (sf == (SF_lower_bound + 1)) options(1)
+    else if (sf == (SF_lower_bound + 2)) options(2)
+    else if (sf == (SF_lower_bound + 3)) options(3)
+    else if (sf == (SF_lower_bound + 4)) options(4)
+    else if (sf == (SF_lower_bound + 5)) options(5)
+    else if (sf == (SF_lower_bound + 6)) options(6)
+    else if (sf == (SF_lower_bound + 7)) options(7)
+    else if (sf == (SF_lower_bound + 8)) options(8)
     else options(9)
 
   }
@@ -702,7 +707,7 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
     val warmup = getValue(config, "warmup").to[Int]
     val allow_recenter = getValue(config, "allow_recenter").to[Int]
 
-    val da = 1/(scala.math.pow(2.0,init_shift_factor).to[Float]*dx*dx)
+    val da = 1/(scala.math.pow(2.0,init_SF).to[Float]*dx*dx)
     val maxX = 6
     val D = 128
 
@@ -751,7 +756,7 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
     val N = ArgIn[Int]
     val T = ArgIn[Int]
     val DM = HostIO[Float]
-    val DM_EXTRA = HostIO[Float]
+    val DME = HostIO[Float]
     val DX = HostIO[Float]
     val DMDX = HostIO[Float]
     val DG = HostIO[Float]
@@ -779,8 +784,9 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
     setArg(DMDX, dm*dx)
     setArg(MU, mu)
     setArg(MU_SETPOINT, mu_setpoint)
-    setArg(SF, init_shift_factor)
-    setArg(INIT_SF, init_shift_factor)
+    setArg(SF, init_SF)
+    setArg(INIT_SF, init_SF)
+    setArg(SF_EXTRA, init_SFE)
     setArg(A1, alpha1_bits)
     setArg(A2, alpha2_bits)
     setArg(BUMP_EPOCH, bump_epoch)
@@ -796,7 +802,7 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
     val true_w = DRAM[B](D)
     val g = DRAM[BBBB](D)
     val cost = DRAM[BB](max_history)
-    val recenter_hist = DRAM[Int](shift_factor_upper_bound - shift_factor_lower_bound + 1)
+    val recenter_hist = DRAM[Int](SF_upper_bound - SF_lower_bound + 1)
 
     setMem(x, X_bits)
     setMem(y, Y_bits)
@@ -807,7 +813,7 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
 
       // Create model and gradient memories
       val w_k = SRAM[B](D) // DM
-      val w_k_extra = SRAM[B](D) // DM_EXTRA
+      val w_k_extra = SRAM[B](D) // DME
       val g_k = SRAM[BBBB](D) // DG
       val y_cache = SRAM[BB](tileSize) // DM*DX
       val y_cache_base = Reg[Int](-1) 
@@ -815,14 +821,14 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
       val w_k_t_extra = SRAM[B](D)
       val cost_sram = SRAM[BB](max_history)
       val true_w_sram = SRAM[B](D)
-      val recenter_hist_sram = SRAM[Int](shift_factor_upper_bound - shift_factor_lower_bound + 1)
+      val recenter_hist_sram = SRAM[Int](SF_upper_bound - SF_lower_bound + 1)
       val recenter_hist_ptr = Reg[Int](0)
 
       Parallel{
         w_k load w(0 :: D par loadPar)
         g_k load g(0 :: D par loadPar)
         w_k_t load w(0 :: D par loadPar)
-        Foreach(shift_factor_upper_bound - shift_factor_lower_bound + 1 by 1){i => recenter_hist_sram(i) = 999}
+        Foreach(SF_upper_bound - SF_lower_bound + 1 by 1){i => recenter_hist_sram(i) = 999}
         Pipe{if (TRACK.value == 1) {
           true_w_sram load true_w(0::D)
         }}
@@ -847,8 +853,8 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
               val y_hat = Reg[BB](0.to[BB]) // DM*DX
               Reduce(y_hat)(D by 1 par P12){j => w_k(j).to[BB] *! x_tile(j).to[BB]}{_+!_} // DM*DX
               val y_hat_extra = Reg[BB](0.to[BB])
-              Reduce(y_hat_extra)(D by 1 par P12){j => w_k_extra(j).to[BB] *! x_tile(j).to[BB]}{_+!_} // DM*DX
-              val y_err = y_hat.value -! y_tile(ii) // DM*DX
+              Reduce(y_hat_extra)(D by 1 par P12){j => w_k_extra(j).to[BB] *! x_tile(j).to[BB]}{_+!_} // DME*DX
+              val y_err = y_hat.value -! y_tile(ii) // DME*DX
               Foreach(D by 1 par P7){j => 
                 g_k_local(j) =  y_err.to[BBBB] *! x_tile(j).to[BBBB] /& N.value.to[BBBB]
               } // DG
@@ -866,7 +872,7 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
             gradient_mag := gradient_mag.value / D
           } 
           if (debug) println("Gradient magnitude: " + gradient_mag.value + " <?> " + MU_SETPOINT.value)
-          if (gradient_mag.value >> 1 <= MU_SETPOINT && gradient_mag.value <= MU_SETPOINT && SF.value < shift_factor_upper_bound) {
+          if (gradient_mag.value >> 1 <= MU_SETPOINT && gradient_mag.value <= MU_SETPOINT && SF.value < SF_upper_bound) {
             if (A1.value < 0x4000.to[BB]) A1 := A1.value << 1
             if (A2.value < 0x4000.to[BB]) A2 := A2.value << 1
             SF := SF.value + 1
@@ -874,7 +880,7 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
             Pipe{recenter_hist_sram(recenter_hist_ptr) = e; recenter_hist_ptr :+= 1}
             ()
           }
-          else if (gradient_mag.value << 1 >= MU_SETPOINT && gradient_mag.value >= MU_SETPOINT  && SF.value > shift_factor_lower_bound) {
+          else if (gradient_mag.value << 1 >= MU_SETPOINT && gradient_mag.value >= MU_SETPOINT  && SF.value > SF_lower_bound) {
             if (A1.value != 1.to[BB]) A1 := A1.value >> 1
             if (A2.value != 1.to[BB]) A2 := A2.value >> 1
             SF := SF.value - 1
@@ -1000,7 +1006,7 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
         } else {
           0
         }}.reduce{_+_}
-        (init_shift_factor + adjustment).to[BB]
+        (init_SF + adjustment).to[BB]
 
       }
       val relevent_history_LP = shift_factors ++ 
@@ -1604,8 +1610,8 @@ object HALP_handoff extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 
   val P12 = 1 (1 -> 8)
   val PX = 1
 
-  val shift_factor_lower_bound = 15
-  val shift_factor_upper_bound = 25
+  val SF_lower_bound = 15
+  val SF_upper_bound = 25
 
   type B = Int8
   type BB = Int16
@@ -1635,36 +1641,36 @@ object HALP_handoff extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 
 
   @virtualize
   def toDM(in: BBBB, sf: Int): B = { 
-    val shift_factor_range = shift_factor_upper_bound - shift_factor_lower_bound
+    val shift_factor_range = SF_upper_bound - SF_lower_bound
     val options = List.tabulate(shift_factor_range){i => 
-      ((in + random[BBBB](scala.math.pow(2.0,(i+shift_factor_lower_bound)).to[BBBB])) >> (i+shift_factor_lower_bound)).to[B]   
+      ((in + random[BBBB](scala.math.pow(2.0,(i+SF_lower_bound)).to[BBBB])) >> (i+SF_lower_bound)).to[B]   
     }
-    if (sf == shift_factor_lower_bound) options(0)
-    else if (sf == (shift_factor_lower_bound + 1)) options(1)
-    else if (sf == (shift_factor_lower_bound + 2)) options(2)
-    else if (sf == (shift_factor_lower_bound + 3)) options(3)
-    else if (sf == (shift_factor_lower_bound + 4)) options(4)
-    else if (sf == (shift_factor_lower_bound + 5)) options(5)
-    else if (sf == (shift_factor_lower_bound + 6)) options(6)
-    else if (sf == (shift_factor_lower_bound + 7)) options(7)
-    else if (sf == (shift_factor_lower_bound + 8)) options(8)
+    if (sf == SF_lower_bound) options(0)
+    else if (sf == (SF_lower_bound + 1)) options(1)
+    else if (sf == (SF_lower_bound + 2)) options(2)
+    else if (sf == (SF_lower_bound + 3)) options(3)
+    else if (sf == (SF_lower_bound + 4)) options(4)
+    else if (sf == (SF_lower_bound + 5)) options(5)
+    else if (sf == (SF_lower_bound + 6)) options(6)
+    else if (sf == (SF_lower_bound + 7)) options(7)
+    else if (sf == (SF_lower_bound + 8)) options(8)
     else options(9)
   }
   @virtualize
   def toDG(in: B, sf: Int): BBBB = { 
-    val options = List.tabulate(shift_factor_upper_bound - shift_factor_lower_bound){i => 
-      in.to[BBBB] << (i+shift_factor_lower_bound)
+    val options = List.tabulate(SF_upper_bound - SF_lower_bound){i => 
+      in.to[BBBB] << (i+SF_lower_bound)
     }
-    val selects = List.tabulate(shift_factor_upper_bound - shift_factor_lower_bound){i => (sf-shift_factor_lower_bound) == i}
-    if (sf == shift_factor_lower_bound) options(0)
-    else if (sf == (shift_factor_lower_bound + 1)) options(1)
-    else if (sf == (shift_factor_lower_bound + 2)) options(2)
-    else if (sf == (shift_factor_lower_bound + 3)) options(3)
-    else if (sf == (shift_factor_lower_bound + 4)) options(4)
-    else if (sf == (shift_factor_lower_bound + 5)) options(5)
-    else if (sf == (shift_factor_lower_bound + 6)) options(6)
-    else if (sf == (shift_factor_lower_bound + 7)) options(7)
-    else if (sf == (shift_factor_lower_bound + 8)) options(8)
+    val selects = List.tabulate(SF_upper_bound - SF_lower_bound){i => (sf-SF_lower_bound) == i}
+    if (sf == SF_lower_bound) options(0)
+    else if (sf == (SF_lower_bound + 1)) options(1)
+    else if (sf == (SF_lower_bound + 2)) options(2)
+    else if (sf == (SF_lower_bound + 3)) options(3)
+    else if (sf == (SF_lower_bound + 4)) options(4)
+    else if (sf == (SF_lower_bound + 5)) options(5)
+    else if (sf == (SF_lower_bound + 6)) options(6)
+    else if (sf == (SF_lower_bound + 7)) options(7)
+    else if (sf == (SF_lower_bound + 8)) options(8)
     else options(9)
 
   }
@@ -1683,7 +1689,7 @@ object HALP_handoff extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 
 
   @virtualize
   def main() {
-    val init_shift_factor = 16
+    val init_SF = 16
     val epochs = args(0).to[Int] // Epochs
     val len_epoch = args(1).to[Int] // Epoch Length
     val points = args(2).to[Int] // Total Points
@@ -1708,7 +1714,7 @@ object HALP_handoff extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 
     val Y_noise_bits = Array.tabulate(points) {i => FloatToLP[BB](Y_noise(i), dx*dm, 16)}
     val X_bits = (0::points, 0::D){(i,j) => FloatToLP[B](sX(i,j), dx, 8)}
     val Y_bits = Array.tabulate(points){ i => FloatToLP[BB](sY(i), dx*dm, 16)}
-    val da = 1/(scala.math.pow(2.0,init_shift_factor).to[Float]*dx*dx)
+    val da = 1/(scala.math.pow(2.0,init_SF).to[Float]*dx*dx)
     val alpha1_bits = FloatToLP[B](alpha1, da, 8)
 
     // Debug
@@ -1748,7 +1754,7 @@ object HALP_handoff extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 
     setArg(DX,   dx)
     setArg(DMDX, dm*dx)
     setArg(MU, mu)
-    setArg(SF, init_shift_factor)
+    setArg(SF, init_SF)
     setArg(A, alpha1_bits)
     setArg(DA, da)
 
@@ -1780,7 +1786,7 @@ object HALP_handoff extends SpatialApp {  // Test Args: 40 3 256 0.05 1 0.00003 
         val current_gradient_mu = gradient_mag.to[Float] / (scala.math.pow(2,31) - 1).to[Float]
         val ratio = current_gradient_mu / mu
         if (debug) println(" Gradients magnitude = " + gradient_mag + ", DG = " + DG.value)
-        if ((1/ratio >= 2 || ratio >= 2) && getArg(SF) < shift_factor_upper_bound && getArg(SF) > shift_factor_lower_bound) { // Apply recentering
+        if ((1/ratio >= 2 || ratio >= 2) && getArg(SF) < SF_upper_bound && getArg(SF) > SF_lower_bound) { // Apply recentering
           val sf_old = getArg(SF)
           if (debug) println(" Old SF: " + sf_old)
           val new_dg = if (1/ratio >= 2) { // Delta too small
