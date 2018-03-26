@@ -1,6 +1,8 @@
 import spatial.dsl._
 import org.virtualized._
 
+
+// Register
 object Lab1Part1RegExample extends SpatialApp {
   type T = Int
 
@@ -26,11 +28,12 @@ object Lab1Part1RegExample extends SpatialApp {
     val gold = M + N
     println("Gold = " + gold)
     val cksum = gold == argRegOutResult
-    println("PASS = " + cksum)
+    println("PASS = " + cksum + "(Lab1Part1RegExample)")
   }
 }
 
 
+// DRAM/SRAM
 object Lab1Part2DramSramExample extends SpatialApp {
 
   val N = 32
@@ -78,10 +81,12 @@ object Lab1Part2DramSramExample extends SpatialApp {
     println("")
 
     val cksum = dst.zip(gold){_ == _}.reduce{_&&_}
-    println("PASS: " + cksum)
+    println("PASS: " + cksum + "(Lab1Part2DramSramExample)")
   }
 }
 
+
+// FIFO
 object Lab1Part4FIFOExample extends SpatialApp {
   val N = 32
 
@@ -128,11 +133,12 @@ object Lab1Part4FIFOExample extends SpatialApp {
     println("")
 
     val cksum = dst.zip(gold){_ == _}.reduce{_&&_}
-    println("PASS: " + cksum)
+    println("PASS: " + cksum + "(Lab1Part4FIFOExample)")
   }
 }
 
 
+// FILO
 object Lab1Part5FILOExample extends SpatialApp {
   val N = 32
 
@@ -179,11 +185,12 @@ object Lab1Part5FILOExample extends SpatialApp {
     println("")
 
     val cksum = dst.zip(gold){_ == _}.reduce{_&&_}
-    println("PASS: " + cksum)
+    println("PASS: " + cksum + "(Lab1Part5FILOExample)")
   }
 }
 
 
+// Reduce
 object Lab1Part6ReduceExample extends SpatialApp {
   val N = 32
   val tileSize = 16
@@ -216,11 +223,12 @@ object Lab1Part6ReduceExample extends SpatialApp {
     println("")
 
     val cksum = gold == result
-    println("PASS: " + cksum)
+    println("PASS: " + cksum + "(Lab1Part6ReduceExample)")
   }
 }
 
 
+// Fold
 object Lab1Part7FoldExample extends SpatialApp {
   val N = 32
   val tileSize = 16
@@ -253,6 +261,6 @@ object Lab1Part7FoldExample extends SpatialApp {
     println("")
 
     val cksum = gold == result
-    println("PASS: " + cksum)
+    println("PASS: " + cksum + "(Lab1Part7FoldExample)")
   }
 }
