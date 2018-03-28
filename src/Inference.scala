@@ -1046,3 +1046,110 @@ object NOTUCHY extends SpatialApp {
 
   }
 }
+
+
+object Debug_RCIO extends SpatialApp {
+  type T = FixPt[TRUE,_16,_0]
+  type T2 = FixPt[TRUE,_32,_0]
+  type REALT = FixPt[TRUE,_4,_12]
+  type REALT2 = FixPt[TRUE,_8,_24]
+
+  @virtualize
+  def main() {
+
+    val debug:scala.Boolean = false
+
+    val PX = 1 //1
+    val P1 = 2 //2 // Unsafe parallelization if OC < 1 burst (16)
+    val P2 = 2 //2 // Unsafe parallelization if OC < 1 burst (16)
+    val P3 = 2 //2
+    val P4 = 2 //2
+    val P5 = 4 //4
+    val P6 = 2 //16
+    val loadPar = 4 (1 -> 16)
+    val storePar = 4 (1 -> 16)
+    // Scalar params
+    val INPUT_ROWS = ArgIn[Int]
+    val INPUT_COLS = ArgIn[Int]
+    val INPUT_CHANS = ArgIn[Int]
+    val OUTPUT_CHANS = ArgIn[Int]
+    val STRIDE = ArgIn[Int] // Assume horiz and vert stride match
+    val KERNEL_ROWS = 3
+    val KERNEL_COLS = 3
+
+    // Shadow params (input args)
+    val input_rows = args(0).to[Int]
+    val input_cols = args(1).to[Int]
+    val input_chans = args(2).to[Int]
+    val output_chans = args(3).to[Int]
+    val stride = args(4).to[Int]
+    val print_data = args(5).to[Bit]
+
+    // Set args
+    setArg(INPUT_ROWS, input_rows)
+    setArg(INPUT_COLS, input_cols)
+    setArg(INPUT_CHANS, input_chans)
+    setArg(OUTPUT_CHANS, output_chans)
+    setArg(STRIDE, stride)
+
+    // HW Design properties
+    val INPUT_COLS_MAX = 640
+    val INPUT_CHANS_MAX = 64
+    val OUTPUT_CHANS_MAX = 64
+
+    // Memories
+    val INPUT_DATA = DRAM[T](INPUT_ROWS, INPUT_COLS, INPUT_CHANS)
+    val OUTPUT_DATA = DRAM[T]((INPUT_ROWS-(KERNEL_ROWS-STRIDE))/STRIDE, (INPUT_COLS-(KERNEL_COLS-STRIDE))/STRIDE, OUTPUT_CHANS)
+    val KERNEL_DATA = DRAM[T](OUTPUT_CHANS, KERNEL_ROWS, KERNEL_COLS, INPUT_CHANS)
+    val BIAS_DATA =   DRAM[T](OUTPUT_CHANS)
+
+    // Load data (placeholder)
+    val input = (0::INPUT_ROWS, 0::INPUT_COLS, 0::INPUT_CHANS) {(i,j,k) => ((i + j + k) % 64 - 8).to[T]}
+    val output = (0::(INPUT_ROWS-(KERNEL_ROWS-STRIDE))/STRIDE, 0::(INPUT_COLS-(KERNEL_COLS-STRIDE))/STRIDE, 0::OUTPUT_CHANS){(i,j,k) => 0.to[T]}
+    val kernel = (0::OUTPUT_CHANS, 0::KERNEL_ROWS, 0::KERNEL_COLS, 0::INPUT_CHANS) {(i,j,k,l) => if (random[Int](10) > 7) 64.to[T] else 0.to[T]}
+    val bias =   Array.tabulate(OUTPUT_CHANS){i => 1.to[T]}
+
+    printTensor3(input, "Input")
+    printTensor4(kernel, "Kernel")
+    printArray(bias, "Bias")
+
+    // Set data
+    setMem(INPUT_DATA, input)
+    setMem(OUTPUT_DATA, output)
+    setMem(KERNEL_DATA, kernel)
+    setMem(BIAS_DATA, bias)
+
+    // Debug mems
+    val INPUT_CWH_CORNER = DRAM[T](INPUT_CHANS, 16, 16)
+    val KERNEL_NCWH_CORNER = DRAM[T](OUTPUT_CHANS, INPUT_CHANS, 3, 3)
+
+    // setMem(KERNEL_COPY_CPU, kernel)
+    // println("MANUALLY COPY KERNEL_DATA PTR TO ME!")
+
+    Accel{
+      val kernel_sram = SRAM[T](OUTPUT_CHANS_MAX, KERNEL_ROWS, KERNEL_COLS, INPUT_CHANS_MAX)
+      kernel_sram load KERNEL_DATA(0::OUTPUT_CHANS, 0::KERNEL_ROWS, 0::KERNEL_COLS, 0::INPUT_CHANS)
+      val input_corner = SRAM[T](INPUT_CHANS_MAX, 16, 16)
+      val kernel_corner = SRAM[T](OUTPUT_CHANS_MAX, INPUT_CHANS_MAX, 3, 3)
+      val local_data = SRAM[T](3,3,INPUT_CHANS_MAX)
+      Foreach(16 by 1){ R =>
+        Foreach(16 by 1){ C => 
+          local_data load INPUT_DATA(R::R+3, C::C+3, 0::INPUT_CHANS par loadPar)
+          Foreach(INPUT_CHANS by 1){ ic => input_corner(ic,R,C) = local_data(0,0,lic) }
+        }
+      }
+      Foreach(OUTPUT_CHANS by 1, INPUT_CHANS by 1, 3 by 1, 3 by 1){case (a,b,c,d) => kernel_corner(a,b,c,d) = kernel_sram(a,c,d,b)}
+
+      KERNEL_NCWH_CORNER store kernel_corner
+      INPUT_CWH_CORNER store input_corner
+    }
+
+    // Get results
+    val input_corner_result = getTensor3(INPUT_CWH_CORNER)
+    val kernel_corner_result = getTensor4(KERNEL_NCWH_CORNER)
+
+    printTensor4(kernel_corner_result, "Kernel in OCxICxRxC")
+    printTensor3(input_corner_result, "Input in ICxRxC")
+
+  }
+}
