@@ -16914,7 +16914,7 @@ object Kmeans22 extends SpatialApp { // Regression (Dense) // Args: 3 64
     val P1 = 8//16 (1 -> 2 -> dim)
     val P2 = 8//8 (1 -> 2 -> dim)
 
-    val P3 = 16
+    val P3 = 8 
     val P4 = 4
     val P5 = 8
 
