@@ -1135,10 +1135,12 @@ object Debug_RCIO extends SpatialApp {
       Foreach(16 by 1){ R =>
         Foreach(16 by 1){ C => 
           local_data load INPUT_DATA(R::R+3, C::C+3, 0::INPUT_CHANS par loadPar)
-          Foreach(INPUT_CHANS by 1){ ic => input_corner(ic,R,C) = local_data(0,0,lic) }
+          Foreach(INPUT_CHANS by 1){ ic => input_corner(ic,R,C) = local_data(0,0,ic) }
         }
       }
-      Foreach(OUTPUT_CHANS by 1, INPUT_CHANS by 1, 3 by 1, 3 by 1){case (a,b,c,d) => kernel_corner(a,b,c,d) = kernel_sram(a,c,d,b)}
+      Foreach(OUTPUT_CHANS by 1){a => 
+        Foreach(INPUT_CHANS by 1, 3 by 1, 3 by 1){(b,c,d) => kernel_corner(a,b,c,d) = kernel_sram(a,c,d,b)}
+      }
 
       KERNEL_NCWH_CORNER store kernel_corner
       INPUT_CWH_CORNER store input_corner
