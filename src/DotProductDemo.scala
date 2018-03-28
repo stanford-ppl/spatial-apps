@@ -2,11 +2,8 @@ import spatial.dsl._
 import org.virtualized._
 
 
-
 trait DotProductBaseDesign extends SpatialApp {
-  @virtualize
-  def DPBase[T:Type:Num](size: Int, innerPar: Int, outerPar: Int, tileSize: Int, aIn: Array[T], bIn: Array[T]) (implicit convert : Cast[spatial.dsl.Int, T]) = {
-
+  def DPBase[T:Type:Num](size: Int, innerPar: Int, outerPar: Int, tileSize: Int, aIn: Array[T], bIn: Array[T]) = {
     val a = DRAM[T](size)
     val b = DRAM[T](size)
     setMem(a, aIn)
@@ -14,7 +11,7 @@ trait DotProductBaseDesign extends SpatialApp {
     val result = ArgOut[T]
     Accel {
       val accum = Reg[T](0.to[T])
-      Reduce(accum)(size by tileSize par outerPar) { i => 
+      Reduce(accum)(size by tileSize par outerPar) { i =>
         val aTile = SRAM[T](tileSize)
         val bTile = SRAM[T](tileSize)
 
@@ -22,14 +19,12 @@ trait DotProductBaseDesign extends SpatialApp {
           aTile load a(i::i+tileSize par innerPar)
           bTile load b(i::i+tileSize par innerPar)
         }
-        
-        val innerAccum = Reg[T](0.to[T])
-        Reduce(innerAccum)(tileSize by 1 par innerPar){ ii => 
-          aTile(ii) * bTile(ii)
-        }{_+_}
 
-        innerAccum
-      }
+        Foreach (tileSize by 1 par innerPar) { ii =>
+          accum := accum.value + aTile(ii) * bTile(ii)
+        }
+//        Reduce(0)(tileSize by 1 par innerPar){ ii => aTile(ii) * bTile(ii) }{_+_}
+      }{_+_}
 
       result := accum.value
     }
@@ -41,11 +36,10 @@ trait DotProductBaseDesign extends SpatialApp {
 
 
 // Try various design parameters
-// object DotProduct_1_1_16_Int extends SpatialApp with DotProductBaseDesign {
-object DotProduct_1_1_16_Int extends SpatialApp {
+object DotProduct_1_1_16_Int extends SpatialApp with DotProductBaseDesign {
   type T = Int
 
-  @virtualize 
+  @virtualize
   def main() {
     val size = 32
     val aIn = Array.fill(size){ random[T](size) }
@@ -62,27 +56,10 @@ object DotProduct_1_1_16_Int extends SpatialApp {
     setMem(b, bIn)
     val result = ArgOut[T]
 
-    Accel {
-      val accum = Reg[T](0)
-      Reduce(accum)(size by tileSize par outerPar) { i =>
-        val aTile = SRAM[T](tileSize)
-        val bTile = SRAM[T](tileSize)
 
-        Parallel {
-          aTile load a(i::i+tileSize par innerPar)
-          bTile load b(i::i+tileSize par innerPar)
-        }
-
-        Reduce(0)(tileSize by 1 par innerPar) { ii => aTile(ii) * bTile(ii) }{_+_}
-      }{_+_}
-
-
-      result := accum.value
-    }
-
-    val accelResult = getArg(result)
+    val accelResult = DPBase[T](size, innerPar, outerPar, tileSize, aIn, bIn)
     val gold = aIn.zip(bIn){_*_}.reduce{_+_}
-    val cksum = gold == accelResult 
+    val cksum = gold == accelResult
     println("PASS: " + cksum + "(DotProduct_1_1_16_Int)")
   }
 }
