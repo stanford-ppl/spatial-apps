@@ -16,12 +16,12 @@ object SingleLayerConv_RCIO extends SpatialApp {
     val debug:scala.Boolean = false
 
     val PX = 1 //1
-    val P1 = 1 //2 // Unsafe parallelization if OC < 1 burst (16)
-    val P2 = 1 //2 // Unsafe parallelization if OC < 1 burst (16)
-    val P3 = 1 //2
-    val P4 = 1 //2
-    val P5 = 1 //4
-    val P6 = 1 //16
+    val P1 = 2 //2 // Unsafe parallelization if OC < 1 burst (16)
+    val P2 = 2 //2 // Unsafe parallelization if OC < 1 burst (16)
+    val P3 = 2 //2
+    val P4 = 2 //2
+    val P5 = 4 //4
+    val P6 = 2 //16
     val loadPar = 4 (1 -> 16)
     val storePar = 4 (1 -> 16)
     // Scalar params
@@ -56,13 +56,13 @@ object SingleLayerConv_RCIO extends SpatialApp {
     // Memories
     val INPUT_DATA = DRAM[T](INPUT_ROWS, INPUT_COLS, INPUT_CHANS)
     val OUTPUT_DATA = DRAM[T]((INPUT_ROWS-(KERNEL_ROWS-STRIDE))/STRIDE, (INPUT_COLS-(KERNEL_COLS-STRIDE))/STRIDE, OUTPUT_CHANS)
-    val KERNEL_DATA = DRAM[T](KERNEL_ROWS, KERNEL_COLS, INPUT_CHANS, OUTPUT_CHANS)
+    val KERNEL_DATA = DRAM[T](OUTPUT_CHANS, KERNEL_ROWS, KERNEL_COLS, INPUT_CHANS)
     val BIAS_DATA =   DRAM[T](OUTPUT_CHANS)
 
     // Load data (placeholder)
     val input = (0::INPUT_ROWS, 0::INPUT_COLS, 0::INPUT_CHANS) {(i,j,k) => ((i + j + k) % 64 - 8).to[T]}
     val output = (0::(INPUT_ROWS-(KERNEL_ROWS-STRIDE))/STRIDE, 0::(INPUT_COLS-(KERNEL_COLS-STRIDE))/STRIDE, 0::OUTPUT_CHANS){(i,j,k) => 0.to[T]}
-    val kernel = (0::KERNEL_ROWS, 0::KERNEL_COLS, 0::INPUT_CHANS, 0::OUTPUT_CHANS) {(i,j,k,l) => if (random[Int](10) > 7) 5.to[T] else 0.to[T]}
+    val kernel = (0::OUTPUT_CHANS, 0::KERNEL_ROWS, 0::KERNEL_COLS, 0::INPUT_CHANS) {(i,j,k,l) => if (random[Int](10) > 7) 64.to[T] else 0.to[T]}
     val bias =   Array.tabulate(OUTPUT_CHANS){i => 1.to[T]}
 
     printTensor3(input, "Input")
@@ -79,18 +79,18 @@ object SingleLayerConv_RCIO extends SpatialApp {
     // println("MANUALLY COPY KERNEL_DATA PTR TO ME!")
 
     Accel{
-      val kernel_sram = SRAM[T](KERNEL_ROWS, KERNEL_COLS, INPUT_CHANS_MAX, OUTPUT_CHANS_MAX)
+      val kernel_sram = SRAM[T](OUTPUT_CHANS_MAX, KERNEL_ROWS, KERNEL_COLS, INPUT_CHANS_MAX)
       val bias_sram = SRAM[T](OUTPUT_CHANS_MAX)
       Parallel{
-        kernel_sram load KERNEL_DATA(0::KERNEL_ROWS, 0::KERNEL_COLS, 0::INPUT_CHANS, 0::OUTPUT_CHANS)
+        kernel_sram load KERNEL_DATA(0::OUTPUT_CHANS, 0::KERNEL_ROWS, 0::KERNEL_COLS, 0::INPUT_CHANS)
         bias_sram load BIAS_DATA(0::OUTPUT_CHANS)        
       }
       val rowspan = if (STRIDE.value == 1) INPUT_ROWS-(KERNEL_ROWS-STRIDE) else (INPUT_ROWS-(KERNEL_ROWS-STRIDE) >> 1)
       val colspan = if (STRIDE.value == 1) INPUT_COLS-(KERNEL_COLS-STRIDE) else (INPUT_COLS-(KERNEL_COLS-STRIDE) >> 1)
       Foreach(rowspan par P1){ R =>
-        val row = R*2 
+        val row = R*STRIDE.value
         Foreach(colspan par P2){ C =>
-          val col = C*2
+          val col = C*STRIDE.value
           val local_data = SRAM[T](3,3,INPUT_CHANS_MAX)
           val accum_line_upcast = SRAM.buffer[T2](OUTPUT_CHANS_MAX)
           val accum_line = SRAM[T](OUTPUT_CHANS_MAX)
@@ -99,7 +99,7 @@ object SingleLayerConv_RCIO extends SpatialApp {
             val local_accum_line = SRAM[T2](OUTPUT_CHANS_MAX)
             Foreach(OUTPUT_CHANS by 1 par P4){ oc =>
               val filter_elements = List.tabulate(3){i => List.tabulate(3){j => 
-                kernel_sram(i,j,ic,oc).to[T2]
+                kernel_sram(oc,i,j,ic).to[T2]
               }}.flatten
               val data_elements = List.tabulate(3){i => List.tabulate(3){j => 
                 local_data(i,j,ic).to[T2]
@@ -147,7 +147,7 @@ object SingleLayerConv_RCIO extends SpatialApp {
 
         Array.tabulate(KERNEL_ROWS){ii => Array.tabulate(KERNEL_COLS){jj => 
           val pxl = input(i*STRIDE+ii,j*STRIDE+jj, page)
-          val f = kernel(ii, jj, page, k)
+          val f = kernel(k, ii, jj, page)
           if (debug && print_data && f != 0.to[T]) println(" Partial is " + pxl + " * " + f + " @ " + ii + "," + jj)
           pxl.to[T2] * f.to[T2]
         }}.flatten.reduce{_+_}
