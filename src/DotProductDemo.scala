@@ -2,6 +2,95 @@ import spatial.dsl._
 import org.virtualized._
 
 
+object DotProduct_2_32_128_Int extends SpatialApp {
+  type T = Int
+
+  @virtualize
+  def main() {
+    val size = 256
+    val aIn = Array.fill(size){ random[T](size) }
+    val bIn = Array.fill(size){ random[T](size) }
+
+    val innerPar = 32
+    val outerPar = 2
+    val tileSize = 128
+
+
+    val a = DRAM[T](size)
+    val b = DRAM[T](size)
+    setMem(a, aIn)
+    setMem(b, bIn)
+    val result = ArgOut[T]
+
+    Accel {
+      val accum = Reg[T](0.to[T])
+      Reduce(accum)(size by tileSize par outerPar) { i =>
+        val aTile = SRAM[T](tileSize)
+        val bTile = SRAM[T](tileSize)
+
+        Parallel {
+          aTile load a(i::i+tileSize)
+          bTile load b(i::i+tileSize)
+        }
+
+        Reduce(0)(tileSize by 1 par innerPar){ ii => aTile(ii) * bTile(ii) }{_+_}
+      }{_+_}
+
+      result := accum.value
+    }
+
+    val accelResult = getArg(result)
+    val gold = aIn.zip(bIn){_*_}.reduce{_+_}
+    val cksum = gold == accelResult
+    println("PASS: " + cksum + "(DotProduct_2_4_16_Int)")
+  }
+}
+
+
+object DotProduct_2_4_16_Int extends SpatialApp {
+  type T = Int
+
+  @virtualize
+  def main() {
+    val size = 256
+    val aIn = Array.fill(size){ random[T](size) }
+    val bIn = Array.fill(size){ random[T](size) }
+
+    val innerPar = 4
+    val outerPar = 2
+    val tileSize = 16
+
+
+    val a = DRAM[T](size)
+    val b = DRAM[T](size)
+    setMem(a, aIn)
+    setMem(b, bIn)
+    val result = ArgOut[T]
+
+    Accel {
+      val accum = Reg[T](0.to[T])
+      Reduce(accum)(size by tileSize par outerPar) { i =>
+        val aTile = SRAM[T](tileSize)
+        val bTile = SRAM[T](tileSize)
+
+        Parallel {
+          aTile load a(i::i+tileSize)
+          bTile load b(i::i+tileSize)
+        }
+
+        Reduce(0)(tileSize by 1 par innerPar){ ii => aTile(ii) * bTile(ii) }{_+_}
+      }{_+_}
+
+      result := accum.value
+    }
+
+    val accelResult = getArg(result)
+    val gold = aIn.zip(bIn){_*_}.reduce{_+_}
+    val cksum = gold == accelResult
+    println("PASS: " + cksum + "(DotProduct_2_4_16_Int)")
+  }
+}
+
 
 object DotProduct_1_1_16_Int_Foreach extends SpatialApp {
   type T = Int
