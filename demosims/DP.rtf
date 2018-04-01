@@ -1,0 +1,21 @@
+{\rtf1\ansi\deff0{\fonttbl{\f0\fmodern\fprq1\fcharset0;}}{\colortbl;\red136\green136\blue136;\red186\green33\blue33;\red0\green68\blue221;\red102\green102\blue102;\red64\green128\blue128;\red160\green160\blue0;\red25\green23\blue124;\red0\green128\blue0;\red187\green102\blue136;\red187\green102\blue34;\red136\green0\blue0;\red170\green34\blue255;\red153\green153\blue153;\red0\green160\blue0;\red160\green0\blue0;\red255\green0\blue0;\red128\green0\blue128;\red176\green0\blue64;\red0\green0\blue255;\red187\green187\blue187;\red188\green122\blue0;\red0\green0\blue128;\red125\green144\blue41;\red210\green65\blue58;}\f0{\cf2\i """\par
+This little program simulates a dot product\par
+between two randomly generated vectors\par
+"""}\par
+{\cf8\b import} {\cf19\b numpy} {\cf8\b as} {\cf19\b np}\par
+\par
+{\cf5\i # Set up the data}\par
+size {\cf4 =} {\cf4 256}\par
+aIn {\cf4 =} np{\cf4 .}random{\cf4 .}randint({\cf4 0}, size, size{\cf4 =}size)\par
+bIn {\cf4 =} np{\cf4 .}random{\cf4 .}randint({\cf4 0}, size, size{\cf4 =}size)\par
+\par
+{\cf5\i # Perform DP}\par
+accum {\cf4 =} {\cf4 0}\par
+{\cf8\b for} a, b {\cf12\b in} {\cf8 zip}(aIn, bIn):\par
+    accum {\cf4 +}{\cf4 =} a {\cf4 *} b\par
+\par
+{\cf5\i # Check if the results match}\par
+gold {\cf4 =} np{\cf4 .}dot(aIn, bIn)\par
+cksum {\cf4 =} gold {\cf4 ==} accum\par
+{\cf8\b print}({\cf2 "}{\cf2 PASS: }{\cf2 "}, cksum, {\cf2 "}{\cf2 (DotProduct)}{\cf2 "})\par
+}
