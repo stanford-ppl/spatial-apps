@@ -1,15 +1,15 @@
 import spatial.dsl._
-import org.virtualized._
+import virtualized._
 
 object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
   override val target = targets.Default
   type X = FixPt[TRUE,_32,_0]
 
-  val ip = 4
-  val op = 1
+  val ip = 8
+  val op = 2
 
-  val tileSize1 = 64
-  val tileSize2 = 64
+  val tileSize1 = 7680
+  val tileSize2 = 176
 
   @virtualize
   def outerproduct[T:Type:Num](a: Array[T], b: Array[T]) = {
@@ -83,17 +83,17 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
   override val target = targets.Default
   type X = FixPt[TRUE,_32,_0]
 
-  val innerPar = 4
+  val innerPar = 8
   val outerPar = 2
 
   val tileSize = 64
 
   @virtualize
   def dotproduct[T:Type:Num](aIn: Array[T], bIn: Array[T]): T = {
-    val B  = tileSize (64 -> 64 -> 9600) // 150
-    val P1 = outerPar (1 -> 6) // 6
-    val P2 = innerPar (1 -> 256) // 256
-    val P3 = innerPar (1 -> 256) // 256
+    val B  = 7680 (64 -> 64 -> 9600) // 150
+    val P1 = 2 (1 -> 6) // 6
+    val P2 = 176 (1 -> 256) // 256
+    val P3 = 8 (1 -> 256) // 256
 
     val size = aIn.length; bound(size) = 19200000
 
