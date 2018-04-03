@@ -1,4 +1,4 @@
-import org.virtualized._
+import virtualized._
 import spatial.dsl._
 
 

@@ -1,5 +1,5 @@
 import spatial.dsl._
-import org.virtualized._
+import virtualized._
 import spatial.stdlib._
 
 object SimpleIf extends SpatialApp {
