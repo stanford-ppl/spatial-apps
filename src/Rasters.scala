@@ -24,11 +24,6 @@ object MovingBoxArria10 extends SpatialApp {
         Foreach(0 until dwell) { _ =>
           Foreach(0 until Rmax, 0 until Cmax){ (r, c) =>
             val pixel = imgIn.value(r, c)
-            // val pixel1 = mux(r > 60 && r < 120 && c > 60 && c < 120, Pixel32(0,255,0,128), Pixel32(0,0,0,128))
-            // val pixel2 = mux(r > 120 && r < 180 && c > 60 && c < 120, Pixel32(255,0,0,128), Pixel32(0,0,0,128))
-            // val pixel3 = mux(r > 120 && r < 180 && c > 120 && c < 180, Pixel32(0,0,255,128), Pixel32(0,0,0,128))
-            // val pixel4 = mux(r > 60 && r < 120 && c > 120 && c < 180, Pixel32(255,0,0,128), Pixel32(0,0,0,128))
-            // val pixel = mux(i == 0, pixel1, mux( i == 1, pixel2, mux( i == 2, pixel3, mux(i == 3, pixel4, Pixel32(0,0,0)))))
             imgOut(r, c) = pixel
           }
         }
