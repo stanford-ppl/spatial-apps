@@ -1,5 +1,5 @@
 import spatial.dsl._
-import org.virtualized._
+import virtualized._
 import spatial.targets.DE1
 
 object MovingBox extends SpatialApp {

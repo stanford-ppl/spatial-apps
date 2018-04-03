@@ -1,5 +1,5 @@
 import spatial.dsl._
-import org.virtualized._
+import virtualized._
 
 object P4 extends SpatialApp {
   import spatial.targets.DE1

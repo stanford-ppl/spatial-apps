@@ -223,6 +223,21 @@ def Kmeans_plasticine():
 
     print('{} space: {}'.format(app, space))
 
+def Kmeans23():
+    app = 'Kmeans23'
+    space = 0
+    iter = 1
+    N = 320
+    dim = 32
+    args = [1, N]
+    addArgs(app, args)
+
+    # Finished 
+    params = OrderedDict()
+    space += dse(app, args, params)
+
+    print('{} space: {}'.format(app, space))
+
 # tucson
 def SPMV_CRS():
     app = 'SPMV_CRS'
@@ -259,6 +274,8 @@ def runExp():
         BlackScholes()
     if app in ['Kmeans_plasticine', 'ALL']:
         Kmeans_plasticine()
+    if app in ['Kmeans23', 'ALL']:
+        Kmeans23()
     if app in ['PageRank_plasticine', 'ALL']:
         PageRank_plasticine()
     if app in ['SPMV_CRS', 'ALL']:
