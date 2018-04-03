@@ -36,7 +36,7 @@ JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
 SUMMARY_PATH="{}/apps/summary.pickle".format(SPATIAL_HOME)
 SUMMARY_CSV_PATH="{}/apps/summary.csv".format(SPATIAL_HOME)
 BEST_SUMMARY_CSV_PATH="{}/apps/best.csv".format(SPATIAL_HOME)
-apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
+apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'Kmeans23', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
 passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
 progress_cache = {}
 cycle_cache = {}
@@ -485,7 +485,7 @@ def avgbw(app, args, params):
         lword += (tileSize) * (i_tileSize) * (dim / tileSize) * (dim / tileSize) * (dim / i_tileSize)
         # store c_col
         sword += i_tileSize * tileSize * (dim / tileSize) * (dim / i_tileSize)
-    elif 'Kmeans_plasticine' in app:
+    elif 'Kmeans_plasticine' in app or 'Kmeans23' in app:
         iters = 1
         D = 96
         K = 20
@@ -820,6 +820,21 @@ def Kmeans_plasticine():
 
     print('{} space: {}'.format(app, space))
 
+def Kmeans23():
+    app = 'Kmeans23'
+    space = 0
+    iter = 1
+    N = 320
+    dim = 32
+    args = [1, N]
+    addArgs(app, args)
+
+    # Finished 
+    params = OrderedDict()
+    space += dse(app, args, params)
+
+    print('{} space: {}'.format(app, space))
+
 # tucson
 def SPMV_CRS():
     app = 'SPMV_CRS'
@@ -856,6 +871,9 @@ def expRun():
         BlackScholes()
     if app in ['Kmeans_plasticine', 'ALL']:
         Kmeans_plasticine()
+    if app in ['Kmeans23', 'ALL']:
+        print("here")
+        Kmeans23()
     if app in ['PageRank_plasticine', 'ALL']:
         PageRank_plasticine()
     if app in ['SPMV_CRS', 'ALL']:

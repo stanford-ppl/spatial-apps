@@ -1,5 +1,5 @@
 import spatial.dsl._
-import virtualized._
+import org.virtualized._
 import spatial.targets._
 
 object Kmeans23 extends SpatialApp { // Regression (Dense) // Args: 3 64
@@ -9,7 +9,6 @@ object Kmeans23 extends SpatialApp { // Regression (Dense) // Args: 3 64
 
   val numcents = 16
   val dim = 32
-  val pts_per_ld = 1 // ???
 
   val element_max = 10
   val margin = (element_max * 0.2).to[X]
@@ -23,7 +22,6 @@ object Kmeans23 extends SpatialApp { // Regression (Dense) // Args: 3 64
     bound(numCents) = MAXK
     bound(numDims) = MAXD
 
-    val BN = 4 (96 -> 96 -> 9600)
     val BD = MAXD
     val par_load = 16
     val par_store = 16
@@ -75,17 +73,28 @@ object Kmeans23 extends SpatialApp { // Regression (Dense) // Args: 3 64
         Parallel{
           List.tabulate(P3){p => 
             Foreach(N by P3 par PX){i =>
-              val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
+              //val accum = Reg[Tup2[Int,T]]( pack(0.to[Int], 100000.to[T]) )
               val pts = SRAM[T](BD)
               pts load points(i+p, 0::BD par par_load)
 
               // Find the index of the closest centroid
-              Reduce(accum)(K par PX){ct =>
+              //Reduce(accum)(K par PX){ct =>
+                //val dist = Reg[T](0.to[T])
+                //Reduce(dist)(D par P2){d => (pts(d) - cts(ct,d)) ** 2 }{_+_}
+                //pack(ct, dist.value)
+              //}{(a,b) =>
+                //mux(a._2 < b._2, a, b)
+              //}
+              val minCent = Reg[Int]
+              val minDist = Reg[T](100000.to[T])
+              Sequential.Foreach(K by 1) { ct =>
                 val dist = Reg[T](0.to[T])
                 Reduce(dist)(D par P2){d => (pts(d) - cts(ct,d)) ** 2 }{_+_}
-                pack(ct, dist.value)
-              }{(a,b) =>
-                mux(a._2 < b._2, a, b)
+                Pipe {
+                  val d = dist.value
+                  minDist := min(minDist.value, d)
+                  minCent := mux(minDist.value == d, ct, minCent.value)
+                }
               }
 
               // println("mincent on " + i + " = idx " + accum.value._1 + " dist " + accum.value._2)
@@ -93,8 +102,8 @@ object Kmeans23 extends SpatialApp { // Regression (Dense) // Args: 3 64
               // Store this point to the set of accumulators
               Sequential{ // Sequential avoids centCounts being buffered
                 // println("pt " + {i + p} + " -> " + accum.value._1)
-                Foreach(D by 1 par P5){ d => newCents(p)(accum.value._1, d) = pts(d) + mux(centCounts(p)(accum.value._1) == 0.to[T], 0.to[T], newCents(p)(accum.value._1, d)) }
-                centCounts(p)(accum.value._1) = centCounts(p)(accum.value._1) + 1.to[T]
+                Foreach(D by 1 par P5){ d => newCents(p)(minCent.value, d) = pts(d) + mux(centCounts(p)(minCent.value) == 0.to[T], 0.to[T], newCents(p)(minCent.value, d)) }
+                centCounts(p)(minCent.value) = centCounts(p)(minCent.value) + 1.to[T]
               }
             }
           }
