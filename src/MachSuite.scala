@@ -1660,7 +1660,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
     val loop_kk    = 1 (1 -> 1 -> 8)
     val loop_i     = 1 (1 -> 1 -> 32)
     val loop_k     = 1 (1 -> 1 -> 16)
-    val loop_j     = 1 (1 -> 1 -> 16)
+    val loop_j     = 16 (1 -> 1 -> 16)
     val reduce_col = 1 (1 -> 1 -> 16)
     val reduce_tmp = 1 (1 -> 1 -> 16)
 
