@@ -31,7 +31,7 @@ def copyApp(app, args, params):
                     newapp.write(line.replace(app, fullname))
                     found = True
                 for param in params:
-                    if 'val {} = '.format(param) in line:
+                    if 'val {}'.format(param) in line:
                         newapp.write('val {} = {}\n'.format(param, params[param]))
                         paramFound[param] = True
                         found = True
