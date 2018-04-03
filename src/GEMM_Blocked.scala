@@ -129,7 +129,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
        .      A        .          .                 .           .               .          .                  .   
        .               .          .                 .           .           C   .          .                  .   
      i .               .          .                 .           .               .          .                  .   
-     ↳ .................__________...................           .................__________....................   
+     ↳ .................__________...............raw_values....           .................__________....................   
        .               |_O________|                 .           .               |__c_tmp___|                  .   
        .```````````````. ↑        .`````````````````.           .```````````````.          .``````````````````.
        .               . k  -->   .                 .           .               .          .                  .   
@@ -199,21 +199,20 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
     val dim_arg = args(0).to[Int]
     val dim = ArgIn[Int]
     setArg(dim, dim_arg)
+    val innerPar = 16
     val tileSize = 16 (16 -> 16 -> 128)
     val i_tileSize = 64 (64 -> 16 -> 128)
-    val par_load = 1
-    val par_store = 1
-    val loop_jj    = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
-    val loop_ii    = 1 // not sure if this one works
-    val loop_kk    = 1 (1 -> 1 -> 8)
-    val loop_i     = 1 (1 -> 1 -> 32)
-    val loop_k     = 1 (1 -> 1 -> 16)
-    val loop_j     = 1 (1 -> 1 -> 16)
-    val reduce_col = 1 (1 -> 1 -> 16)
-    val reduce_tmp = 1 (1 -> 1 -> 16)
+    val loop_jj = 1 // (1 -> 1 -> dim/tileSize) // THIS PAR DOES NOT WORK UNTIL BUG #205 IS FIXED
+    val loop_ii = 1 // not sure if this one works
+    val loop_kk = 2 (1 -> 1 -> 8)
+    val loop_i = 1 (1 -> 1 -> 32)
+    val loop_k = 1 (1 -> 1 -> 16)
+    val par_load = innerPar
+    val par_store = innerPar
+    val loop_j     = innerPar (1 -> 1 -> 16)
+    val reduce_col = innerPar (1 -> 1 -> 16)
+    val reduce_tmp = innerPar (1 -> 1 -> 16)
 
-    // val a_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/gemm/gemm_a.csv", "\n").reshape(dim,dim)
-    // val b_data = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/gemm/gemm_b.csv", "\n").reshape(dim,dim)
     val a_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
     val b_data = (0::dim_arg,0::dim_arg){(i,j) => random[T](5)}
     val c_init = (0::dim_arg, 0::dim_arg){(i,j) => 0.to[T]}
@@ -255,7 +254,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
       }
     }
 
-    // val c_gold = loadCSV1D[T](sys.env("SPATIAL_HOME") + "/apps/data/gemm/gemm_gold.csv", "\n").reshape(dim,dim)
+    // val c_gold = loadCSV1D[T]("/remote/regression/data/machsuite/gemm_gold.csv", "\n").reshape(dim,dim)
     val c_gold = (0::dim_arg,0::dim_arg){(i,j) => 
       Array.tabulate(dim_arg){k => a_data(i,k) * b_data(k,j)}.reduce{_+_}
     }
