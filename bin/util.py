@@ -1,18 +1,10 @@
-from os import listdir
-from os.path import isfile, isdir, join, splitext, basename, dirname 
 from collections import OrderedDict
 import os
 import argparse
 import subprocess
-import commands
 import time
 import pickle
-import signal
-import psutil
-import shutil
-import numpy as np
-import types
-import csv
+import os, sys
 
 import math
 
@@ -203,6 +195,4 @@ parser.add_argument('--plot', dest='plot', action='store_true', default=False)
 
 global opts
 (opts, args) = parser.parse_known_args()
-
-opts.apps = APPS if opts.app=='ALL' else app.split(",")
-
+opts.apps = APPS if opts.app=='ALL' else opts.app.split(",")
