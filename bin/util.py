@@ -28,7 +28,7 @@ dependency = {
         "GEN_CHISEL":[],
         "MAKE_VCS":["GEN_CHISEL"],
         "MAP_PIR":["GEN_PIR"],
-        "RUN_SIMUlATION":["MAKE_VCS"]
+        "RUN_SIMULATION":["MAKE_VCS"]
         }
 
 class bcolors:

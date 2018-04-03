@@ -82,18 +82,6 @@ def getUtil(line):
     total = int(total)
     return (used, total)
 
-def cycleOf(app):
-    if app in cycle_cache:
-        return cycle_cache[app]
-    log = logs(app, "RUN_SIMULATION")
-    line = grep(log, ["Design ran for"])[0]
-    if line is None:
-        return None
-    else:
-        cycle = int(line.split("Design ran for ")[1].split(" ")[0])
-        cycle_cache[app] = cycle
-        return cycle
-
 def avgbw(app, args, params):
     lword = 0
     sword = 0

@@ -180,6 +180,19 @@ def status(app, args, params):
         show(fullname)
         resp = raw_input("")
 
+def cycleOf(app):
+    if app in cycle_cache:
+        return cycle_cache[app]
+    log = logs(app, "RUN_SIMULATION")
+    print(log)
+    lines = grep(log, ["Design ran for"])
+    if len(lines)==0 :
+        return None
+    else:
+        cycle = int(lines[0].split("Design ran for ")[1].split(" ")[0])
+        cycle_cache[app] = cycle
+        return cycle
+
 # progress_cache = {}
 def progress(fullname, passName):
     # if (fullname, passName) in progress_cache:
@@ -192,7 +205,7 @@ def progress(fullname, passName):
 	    isFailed = (len(grep(log, ['error','Error','ERROR','No rule to make', 'Killed', 'KILLED'])) != 0)
             if passName=="RUN_SIMULATION":
 	        hasCycle=cycleOf(fullname) is not None
-	        timeOut = len(grep(log, 'Hardware timeout after') != 0)
+	        timeOut = len(grep(log, 'Hardware timeout after')) != 0
                 if not hasCycle or timeOut:
                     isFailed = True
             if isFailed: 

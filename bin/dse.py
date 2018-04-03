@@ -66,22 +66,22 @@ def TPCHQ6():
     addArgs(app, args)
 
     # FINISHED
-    params = OrderedDict()
-    params['outerPar'] = irange(1, 10, 2) 
-    params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
-    space += dse(app, args, params)
+    # params = OrderedDict()
+    # params['outerPar'] = irange(1, 10, 2) 
+    # params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
+    # space += dse(app, args, params)
 
     # Finished
     params = OrderedDict()
     params['outerPar'] = irange(6, 10, 2) 
-    params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 800)
+    params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 1600)
     space += dse(app, args, params)
 
     # Finished
-    params = OrderedDict()
-    params['outerPar'] = irange(2, 10, 2) 
-    params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
-    space += dse(app, args, params)
+    # params = OrderedDict()
+    # params['outerPar'] = irange(2, 10, 2) 
+    # params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
+    # space += dse(app, args, params)
 
     print('{} space: {}'.format(app, space))
 
@@ -130,12 +130,12 @@ def GDA():
     # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
     # space += dse(app, args, params)
 
-    R = 38400 
+    R = 1024*10
     MAXC = 96
     args = [R]
     addArgs(app, args)
     params = OrderedDict()
-    params['tileSize'] = 1600
+    params['tileSize'] = irange(512, bankSize*lanes/MAXC, 512) 
     params['outerPar'] = 6
     params['midPar'] = 1 
     space += dse(app, args, params)
@@ -150,15 +150,17 @@ def GEMM_Blocked():
     args = []
     addArgs(app, args)
 
-    params = OrderedDict()
-    params['tileSize']   = [16, 256] # irange(16, dim, 16)
-    params['i_tileSize'] = [16, 256] # irange(16, dim, 16)
-    params['loop_jj']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
-    params['loop_ii']    = lambda params: irange(1 , min(dim/params['i_tileSize'], 2), 1)
-    params['loop_kk']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
-    params['loop_i']     = lambda params: irange(1 , min(params['i_tileSize']    , 2), 1)
-    params['loop_k']     = lambda params: irange(1 , min(params['tileSize']      , 2), 1)
-    space += dse(app, args, params)
+    #best['GEMM_Blocked'] = ('GEMM_Blocked__tileSize_256_i_tileSize_256_loop_jj_1_loop_ii_1_loop_kk_1_loop_i_4_loop_k_3', '')
+
+    # params = OrderedDict()
+    # params['tileSize']   = [16, 256] # irange(16, dim, 16)
+    # params['i_tileSize'] = [16, 256] # irange(16, dim, 16)
+    # params['loop_jj']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
+    # params['loop_ii']    = lambda params: irange(1 , min(dim/params['i_tileSize'], 2), 1)
+    # params['loop_kk']    = lambda params: irange(1 , min(dim/params['tileSize']  , 2), 1)
+    # params['loop_i']     = lambda params: irange(1 , min(params['i_tileSize']    , 2), 1)
+    # params['loop_k']     = lambda params: irange(1 , min(params['tileSize']      , 2), 1)
+    # space += dse(app, args, params)
 
     params = OrderedDict()
     params['tileSize']   = [256] # irange(16, dim, 16)
@@ -166,8 +168,8 @@ def GEMM_Blocked():
     params['loop_jj']    = 1 
     params['loop_ii']    = 1
     params['loop_kk']    = 1
-    params['loop_i']     = [1,2,3,4,5]
-    params['loop_k']     = [1,2,3,4,5]
+    params['loop_i']     = [3,4,5]
+    params['loop_k']     = [3,4]
     space += dse(app, args, params)
     print('{} space: {}'.format(app, space))
 
@@ -175,15 +177,15 @@ def GEMM_Blocked():
 def BlackScholes():
     app = 'BlackScholes'
     space = 0
-    N = 1966080  
+    N = 960000
     args = [N]
     addArgs(app, args)
 
     # Finished
-    params = OrderedDict()
-    params['outerPar'] = irange(1, 4, 1) 
-    params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
-    space += dse(app, args, params)
+    # params = OrderedDict()
+    # params['outerPar'] = irange(1, 4, 1) 
+    # params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
+    # space += dse(app, args, params)
 
     params = OrderedDict()
     params['outerPar'] = 1 
