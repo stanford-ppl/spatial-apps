@@ -14,14 +14,6 @@ import numpy as np
 import types
 import csv
 
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib.ticker as ticker
-import os, sys
-import math
-import multiprocessing 
-
 from util import *
 
 def copyApp(app, args, params):
@@ -232,12 +224,3 @@ def regenerate(passName):
 
 def torun(passName):
     return passName in opts.torun or opts.torun == "ALL"
-
-def target(app, args, params):
-    if opts.run:
-        launchJob(app, args, params)
-    if opts.status:
-        status(app, args, params)
-    if opts.summary:
-        summarize(app, args, params)
-

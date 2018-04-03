@@ -23,6 +23,7 @@ import math
 
 from util import *
 from task import *
+from dse import *
 
 def regression():
     if opts.app=="ALL":

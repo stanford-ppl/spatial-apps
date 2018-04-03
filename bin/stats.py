@@ -1,4 +1,3 @@
-
 from os import listdir
 from os.path import isfile, isdir, join, splitext, basename, dirname 
 from collections import OrderedDict
@@ -23,6 +22,7 @@ import os, sys
 import math
 
 from util import *
+from task import *
 
 lanes = 16
 bankSize = 32 * 1024 / 4
@@ -34,7 +34,7 @@ summary_headers = ['App', 'cycle', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'sc
 
 def plot():
     cmap = matplotlib.cm.get_cmap('Oranges')
-    for app in apps:
+    for app in opts.apps:
         if app==opts.app or opts.app=='ALL':
             for args in summary[app]:
                 fig, ax = plt.subplots()
@@ -165,19 +165,16 @@ def avgbw(app, args, params):
     sgbps = sbyte / second / (10 ** 9)
     return (lgbps, sgbps)
 
-def load_summary():
-    global summary
-    if not os.path.exists(SUMMARY_PATH):
-        print("New app summary at {}".format(SUMMARY_PATH))
-        summary = OrderedDict()
-    else:
-        summary = pickle.load(open(SUMMARY_PATH, 'rb'))
-    for app in apps:
+def new_summary():
+    print("New app summary at {}".format(SUMMARY_PATH))
+    summary = OrderedDict()
+    for app in opts.apps:
         if app not in summary:
             summary[app] = OrderedDict()
+    opts.summary = summary
 
 def summarize(app, args, params):
-    global summary
+    summary = opts.summary
     fullname = getFullName(app, args, params)
     # for p in passes:
         # print(p, progress(fullname,p))
@@ -228,8 +225,7 @@ def bestSummary():
             writer.writerow(dict)
 
 def summaryToCsv():
-    global summary
-
+    summary = opts.summary
     pickle.dump(summary, open(SUMMARY_PATH, 'wb'))
 
     with open(SUMMARY_CSV_PATH, 'w') as csvfile:

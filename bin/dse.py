@@ -23,9 +23,11 @@ import math
 
 from util import *
 from task import *
+from stats import *
 
 def addArgs(app, args):
-    if opts.summary:
+    if opts.summarize:
+        summary = opts.summary
         if sargs(args) not in summary[app]: 
             summary[app][sargs(args)] = OrderedDict()
 
@@ -264,21 +266,27 @@ def runExp():
     #################################################################################################################
 
     ### TO RUN        ######################################################################################################
-    app = opts.app
-
-    if app in ['TPCHQ6', 'ALL']:
+    if "TPCHQ6" in opts.apps:
         TPCHQ6()
-    if app in ['GDA', 'ALL']:
+    if "GDA" in opts.apps:
         GDA()
-    if app in ['GEMM_Blocked', 'ALL']:
+    if "GEMM_Blocked" in opts.apps:
         GEMM_Blocked()
-    if app in ['BlackScholes', 'ALL']:
+    if "BlackScholes" in opts.apps:
         BlackScholes()
-    if app in ['Kmeans_plasticine', 'ALL']:
+    if "Kmeans_plasticine" in opts.apps:
         Kmeans_plasticine()
-    if app in ['Kmeans23', 'ALL']:
+    if "Kmeans23" in opts.apps:
         Kmeans23()
-    if app in ['PageRank_plasticine', 'ALL']:
+    if "PageRank_plasticine" in opts.apps:
         PageRank_plasticine()
-    if app in ['SPMV_CRS', 'ALL']:
+    if "SPMV_CRS" in opts.apps:
         SPMV_CRS()
+
+def target(app, args, params):
+    if opts.run:
+        launchJob(app, args, params)
+    if opts.status:
+        status(app, args, params)
+    if opts.summarize:
+        summarize(app, args, params)

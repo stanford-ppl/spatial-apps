@@ -24,7 +24,7 @@ import os, sys
 import math
 
 from util import *
-from stat import *
+from stats import *
 from task import *
 from dse import *
 from regression import *
@@ -32,15 +32,15 @@ from regression import *
 def main():
     mkdir('{}/gen'.format(SPATIAL_HOME))
 
-    if opts.summary or opts.plot or opts.best:
-        load_summary()
-    elif opts.dse:
+    if opts.summarize:
+        new_summary()
+    if opts.dse:
         runExp()
     else:
         opts.regression = True
         regression()
 
-    if opts.summary:
+    if opts.summarize:
         summaryToCsv()
 
     if opts.best:
