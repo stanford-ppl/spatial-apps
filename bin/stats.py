@@ -26,6 +26,7 @@ from task import *
 
 lanes = 16
 bankSize = 32 * 1024 / 4
+scratchpadCapacity = 256 * 1024 / 4 # words
 max_bw = 12.8*4
 
 summary_headers = ['App', 'cycle', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'scuUtil', 'ocuUtil', 'mcUtil', 'ocuUtil', 'mcUtil',

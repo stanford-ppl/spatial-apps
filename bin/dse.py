@@ -189,7 +189,8 @@ def BlackScholes():
 
     params = OrderedDict()
     params['outerPar'] = 1 
-    params['tileSize'] = lambda params: irange(1024*16, min(bankSize*lanes,N/params['outerPar']),1024*16)
+    # params['tileSize'] = lambda params: irange(1024*16, min(scratchpadCapacity,N/params['outerPar']),1024*16)
+    params['tileSize'] = scratchpadCapacity 
     space += dse(app, args, params)
 
     print('{} space: {}'.format(app, space))
