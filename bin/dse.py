@@ -54,6 +54,8 @@ def dse(app, args, params):
             continue
     print('{}{} args={} and params=[{}]{}'.format(bcolors.UNDERLINE, app, str(args),
         ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
+    fullname = getFullName(app, args, params)
+    print(fullname)
     target(app, args, params)
     return 1
 
@@ -137,7 +139,6 @@ def GDA():
     params = OrderedDict()
     params['tileSize'] = irange(512, bankSize*lanes/MAXC, 512) 
     params['outerPar'] = 6
-    params['midPar'] = 1 
     space += dse(app, args, params)
     print('{} space: {}'.format(app, space))
 
@@ -146,8 +147,7 @@ def GEMM_Blocked():
     app = 'GEMM_Blocked'
     space = 0
     dim = 512
-    # args += [dim]
-    args = []
+    args = [dim]
     addArgs(app, args)
 
     #best['GEMM_Blocked'] = ('GEMM_Blocked__tileSize_256_i_tileSize_256_loop_jj_1_loop_ii_1_loop_kk_1_loop_i_4_loop_k_3', '')

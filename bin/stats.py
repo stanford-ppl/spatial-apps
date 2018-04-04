@@ -164,8 +164,6 @@ def new_summary():
 def summarize(app, args, params):
     summary = opts.summary
     fullname = getFullName(app, args, params)
-    # for p in passes:
-        # print(p, progress(fullname,p))
     if success(fullname, "MAP_PIR") and success(fullname, "RUN_SIMULATION"):
         if fullname not in summary[app][sargs(args)]:
             print('summarize:{}'.format(fullname))

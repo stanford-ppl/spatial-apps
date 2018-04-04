@@ -11,7 +11,7 @@ import math
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 
-passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
+PASSES=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
 APPS = ['TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans23', 'GEMM_Blocked']
 
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
@@ -172,6 +172,7 @@ def logs(app, passName):
         return '{}/gen/{}/sim.log'.format(SPATIAL_HOME, app)
     elif passName=="Utilization":
         return '{}/out/{}/ResourceAnalysis.log'.format(PIR_HOME, app)
+    else: return None
 
 def write(log, msg):
     with open(log, 'a') as f:
@@ -196,3 +197,4 @@ parser.add_argument('--plot', dest='plot', action='store_true', default=False)
 global opts
 (opts, args) = parser.parse_known_args()
 opts.apps = APPS if opts.app=='ALL' else opts.app.split(",")
+opts.passes = PASSES if opts.torun=='ALL' else opts.torun.split(",")

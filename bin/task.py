@@ -31,7 +31,7 @@ def copyApp(app, args, params):
                     newapp.write(line.replace(app, fullname))
                     found = True
                 for param in params:
-                    if 'val {}'.format(param) in line:
+                    if 'val {} '.format(param) in line or 'val {}\t'.format(param) in line:
                         newapp.write('val {} = {}\n'.format(param, params[param]))
                         paramFound[param] = True
                         found = True
@@ -42,43 +42,53 @@ def copyApp(app, args, params):
             print('Param {} not found !!!'.format(param))
             exit()
 
-def getCommand(passName, fullapp):
-    log = logs(fullapp, passName)
+def getCommand(passName, fullapp, args):
     if passName=="GEN_PIR":
+        log = logs(fullapp, passName)
         command = "{}/apps/bin/gen_pir {} {}".format(SPATIAL_HOME, fullapp, log)
         if opts.regression:
             command += ' {}/pir/apps/src'.format(PIR_HOME)
     elif passName=="FIT_PIR":
+        log = logs(fullapp, passName)
         command = "{}/apps/bin/fit_pir {} {}".format(SPATIAL_HOME, fullapp, log)
     elif passName=="GEN_CHISEL":
+        log = logs(fullapp, passName)
         command = "{}/apps/bin/gen_chisel {} {}".format(SPATIAL_HOME, fullapp, log)
     elif passName=="MAKE_VCS":
+        log = logs(fullapp, passName)
         command = "{}/apps/bin/make_vcs {} {}".format(SPATIAL_HOME, fullapp, log)
     elif passName=="MAP_PIR":
+        log = logs(fullapp, passName)
         command = "{}/apps/bin/map_pir {} {}".format(SPATIAL_HOME, fullapp, log)
     elif passName=="RUN_SIMULATION":
-        command = "{}/apps/bin/run_sim {} {}".format(SPATIAL_HOME, fullapp, log)
-
+        log = logs(fullapp, passName)
+        command = "{}/apps/bin/run_sim {} {} {}".format(SPATIAL_HOME, fullapp, log, 
+                ' '.join([str(a) for a in args]))
+    elif passName=="copy":
+        frompath = '{}/spatial/core/resources/chiselgen/template-level/fringeVCS/Top-harness.sv'.format(SPATIAL_HOME)
+        topath = '{}/gen/{}/verilog-vcs/Top-harness.sv'.format(SPATIAL_HOME, fullapp)
+        command = "cp {} {}".format(frompath, topath)
     return command
     
-def runPass(fullname, passName):
+def runPass(fullname, passName, args):
     if not torun(passName):
         return
     if success(fullname, passName) and not regenerate(passName):
         return
     if running(fullname, passName):
         return
-    for dep in dependency[passName]:
+    dependencies = dependency[passName] if passName in dependency else []
+    for dep in dependencies:
         if not success(fullname, dep):
-            print("{} {} not ran due to {} not succeeded".format(fullname, passName, dep))
+            # print("{} {} not ran due to {} not succeeded".format(fullname, passName, dep))
             return
 
-    # print("runPass {} {}".format(fullname, passName))
     # clean log
     log = logs(fullname, passName)
-    rm(log)
+    if log: rm(log)
 
-    command = getCommand(passName, fullname)
+    command = getCommand(passName, fullname, args)
+    print("command={}".format(command))
 
     proc = subprocess.Popen(command.split(" "))
     setpid(fullname, passName, proc.pid)
@@ -88,8 +98,8 @@ def runJob(app, args, params):
     if args or params:
         copyApp(app, args, params)
     fullname = getFullName(app, args, params)
-    for passName in passes:
-        runPass(fullname, passName)
+    for passName in opts.passes:
+        runPass(fullname, passName, args)
 
 def launchJob(app, args, params):
     if opts.parallel > 1:
@@ -107,7 +117,7 @@ def launchJob(app, args, params):
         runJob(app, args, params)
 
 def kill(fullname, passName):
-    for passName in passes:
+    for passName in opts.passes:
         pid = getpid(fullname, passName)
         log = logs(fullname, passName)
         if pid is None:
@@ -121,7 +131,7 @@ def kill(fullname, passName):
 
 def act(fullname, resp):
     def removeLog():
-        for passName in passes:
+        for passName in opts.passes:
             if passName in resp:
                 log = logs(fullname, passName)
                 rm(log)
@@ -140,20 +150,20 @@ def act(fullname, resp):
     elif "r" in resp:
         removeLog()
     elif resp == "s":
-        for passName in passes:
+        for passName in opts.passes:
             if running(fullname, passName) or failed(fullname, passName): printlog(passName); break
     elif "s " in resp:
-        for passName in passes:
+        for passName in opts.passes:
             if passName in resp: printlog(passName);
     elif resp == "o":
-        for passName in passes:
+        for passName in opts.passes:
             if running(fullname, passName) or failed(fullname, passName): open(passName); break
     elif "o " in resp :
-        for passName in passes:
+        for passName in opts.passes:
             if passName in resp: open(passName)
 
 def show(fullname):
-    for passName in passes:
+    for passName in opts.passes:
         if passName=="GEN_PIR":
             keywords = ["Except"]
         elif passName=="MAP_PIR":
@@ -163,7 +173,12 @@ def show(fullname):
 
         log = logs(fullname, passName)
         prog = progress(fullname, passName)
-        print("{}{}({}){} {}".format(colors[prog], passName, prog, bcolors.NC, log))
+        if passName=="RUN_SIMULATION" and success(fullname, passName):
+            info = "cycle={}".format(cycleOf(fullname))
+        else:
+            info = ""
+        
+        print("{}{}({}){} {} {}".format(colors[prog], passName, prog, bcolors.NC, log, info))
         if failed(fullname, passName):
             lines = grep(log, keywords)
             for line in lines:
@@ -184,7 +199,6 @@ def cycleOf(app):
     if app in cycle_cache:
         return cycle_cache[app]
     log = logs(app, "RUN_SIMULATION")
-    print(log)
     lines = grep(log, ["Design ran for"])
     if len(lines)==0 :
         return None
@@ -198,6 +212,7 @@ def progress(fullname, passName):
     # if (fullname, passName) in progress_cache:
         # return progress_cache[(fullname, passName)]
     log = logs(fullname, passName)
+    if not log: return "NOTFUN"
     prog = "NONE"
     if os.path.exists(log):
         isDone = (len(grep(log,"PASS (DONE)".format(passName))) != 0)
