@@ -100,18 +100,7 @@ object Lab1Part4FIFOExample extends SpatialApp {
     val x = ArgIn[T]
     setArg(x, value)
     Accel {
-      Sequential.Foreach(N by tileSize) { i =>
-        val b1 = FIFO[T](tileSize)
-
-        b1 load srcFPGA(i::i+tileSize)
-
-        val b2 = SRAM[T](tileSize)
-        Foreach(tileSize by 1) { ii =>
-          b2(ii) = b1.deq() * x
-        }
-
-        dstFPGA(i::i+tileSize) store b2
-      }
+      // Your code here
     }
     getMem(dstFPGA)
   }
@@ -152,18 +141,7 @@ object Lab1Part5FILOExample extends SpatialApp {
     val x = ArgIn[T]
     setArg(x, value)
     Accel {
-      Sequential.Foreach(N by tileSize) { i =>
-        val b1 = FILO[T](tileSize)
-
-        b1 load srcFPGA(i::i+tileSize)
-
-        val b2 = SRAM[T](tileSize)
-        Foreach(tileSize by 1) { ii =>
-          b2(tileSize - ii - 1) = b1.pop() * x
-        }
-
-        dstFPGA(i::i+tileSize) store b2
-      }
+      // Your code here
     }
     getMem(dstFPGA)
   }
@@ -243,15 +221,7 @@ object Lab1Part7FoldExample extends SpatialApp {
     val destArg = ArgOut[T]
 
     Accel {
-      val accum = Reg[T](0)
-      Sequential.Fold(accum)(N by tileSize) { i =>
-        val b1 = SRAM[T](tileSize)
-        b1 load srcFPGA(i::i+tileSize)
-        Fold(0)(tileSize by 1) { ii => b1(ii) }{_+_}
-      }{_+_}
-
-
-      destArg := accum.value
+      // Your code here
     }
 
     val result = getArg(destArg)
