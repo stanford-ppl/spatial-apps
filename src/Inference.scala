@@ -21,7 +21,7 @@ object SingleLayerConv_RCIO extends SpatialApp {
     val P3 = 2 //2
     val P4 = 2 //2
     val P5 = 4 //4
-    val P6 = 2 //16
+    val P6 = 16 //16
     val loadPar = 4 (1 -> 16)
     val storePar = 4 (1 -> 16)
     // Scalar params
@@ -50,8 +50,8 @@ object SingleLayerConv_RCIO extends SpatialApp {
 
     // HW Design properties
     val INPUT_COLS_MAX = 640
-    val INPUT_CHANS_MAX = 64
-    val OUTPUT_CHANS_MAX = 64
+    val INPUT_CHANS_MAX = 96
+    val OUTPUT_CHANS_MAX = 96
 
     // Memories
     val INPUT_DATA = DRAM[T](INPUT_ROWS, INPUT_COLS, INPUT_CHANS)
