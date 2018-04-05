@@ -13,6 +13,8 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
   val innerPar = 16
   val outerPar = 2
+  val accumPar1 = 16
+  val accumPar2 = 16
 
   val tileSize = 20
 
@@ -56,7 +58,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
       val sigmaOut = SRAM[T](MAXC, MAXC)
 
-      MemReduce(sigmaOut)(R by rTileSize par op){ r =>
+      MemReduce(sigmaOut par accumPar1)(R by rTileSize par op){ r =>
         val gdaYtile = SRAM[Int](rTileSize)
         val gdaXtile = SRAM[T](rTileSize, MAXC)
         val blk = Reg[Int]
@@ -70,7 +72,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
         val sigmaBlk = SRAM[T](MAXC, MAXC)
 
-        MemReduce(sigmaBlk)(blk par param(1)) { rr =>
+        MemReduce(sigmaBlk par accumPar2)(blk par param(1)) { rr =>
           val subTile = SRAM[T](MAXC)
           val sigmaTile = SRAM[T](MAXC, MAXC)
           Foreach(C par subLoopPar) { cc =>

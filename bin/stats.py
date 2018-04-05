@@ -22,11 +22,9 @@ import os, sys
 import math
 
 from util import *
-from task import *
 
 lanes = 16
-bankSize = 32 * 1024 / 4
-scratchpadCapacity = 256 * 1024 / 4 # words
+scratchpadCapacity = 256 * 1024 / 4 # 65536 words
 max_bw = 12.8*4
 
 summary_headers = ['App', 'cycle', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'scuUtil', 'ocuUtil', 'mcUtil', 'ocuUtil', 'mcUtil',
@@ -101,7 +99,7 @@ def avgbw(app, args, params):
         lword += N * 6 # load 6 data stucture
         sword += N # store optpriceBlk
     elif 'GEMM_Blocked' in app:
-        dim = 512
+        dim = args[0]
         tileSize = params['tileSize']
         i_tileSize = params['i_tileSize']
         # load b_sram
@@ -110,6 +108,16 @@ def avgbw(app, args, params):
         lword += (tileSize) * (i_tileSize) * (dim / tileSize) * (dim / tileSize) * (dim / i_tileSize)
         # store c_col
         sword += i_tileSize * tileSize * (dim / tileSize) * (dim / i_tileSize)
+    elif 'Kmeans23' in app:
+        iters = args[0]
+        D = 32
+        K = 16
+        N = args[1]
+        BD = D
+        P3 = params['P3']
+        lword += K * D # load orgCts
+        lword += BD * N / P3 * P3 * iters # pts
+        sword += (K * D) # store centroids
     elif 'Kmeans_plasticine' in app:
         iters = 1
         D = 96

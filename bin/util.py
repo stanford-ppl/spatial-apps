@@ -178,6 +178,64 @@ def write(log, msg):
     with open(log, 'a') as f:
         f.write(msg)
 
+def cycleOf(app):
+    if app in cycle_cache:
+        return cycle_cache[app]
+    log = logs(app, "RUN_SIMULATION")
+    lines = grep(log, ["Design ran for"])
+    if len(lines)==0 :
+        return None
+    else:
+        cycle = int(lines[0].split("Design ran for ")[1].split(" ")[0])
+        cycle_cache[app] = cycle
+        return cycle
+
+# progress_cache = {}
+def progress(fullname, passName):
+    # if (fullname, passName) in progress_cache:
+        # return progress_cache[(fullname, passName)]
+    log = logs(fullname, passName)
+    if not log: return "NOTFUN"
+    prog = "NONE"
+    if os.path.exists(log):
+        isDone = (len(grep(log,"PASS (DONE)".format(passName))) != 0)
+        if isDone:
+	    isFailed = (len(grep(log, ['error','Error','ERROR','No rule to make', 'Killed', 'KILLED'])) != 0)
+            if passName=="RUN_SIMULATION":
+	        hasCycle=cycleOf(fullname) is not None
+	        timeOut = len(grep(log, 'Hardware timeout after')) != 0
+                if not hasCycle or timeOut:
+                    isFailed = True
+            if isFailed: 
+	        prog = "FAILED"
+            else:
+	        prog = "SUCCESS"
+        else:
+            pid = getpid(fullname, passName)
+            if pid is not None:
+                prog = "RUNNING"
+            else:
+                prog = "NOTRUN"
+    else:
+        prog = "NOTRUN"
+    # progress_cache[(fullname,passName)] = prog
+    return prog
+
+def failed(fullname, passName):
+    return progress(fullname, passName)=="FAILED"
+
+def success(fullname, passName):
+    return progress(fullname, passName)=="SUCCESS"
+
+def running(fullname, passName):
+    return progress(fullname, passName)=="RUNNING"
+
+def regenerate(passName):
+    return passName in opts.regen or opts.regen == "ALL"
+
+def torun(passName):
+    return passName in opts.torun or opts.torun == "ALL"
+
 parser = argparse.ArgumentParser(description='Run experiments')
 parser.add_argument('--parallel', dest='parallel', nargs='?', default=1, type=int)
 parser.add_argument('--single', dest='single', action='store_true', default=False) 

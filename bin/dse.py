@@ -63,26 +63,28 @@ def dse(app, args, params):
 def TPCHQ6():
     app = 'TPCHQ6'
     space = 0
-    N = 96000
+    # N = 96000
+    N = 960000
     args = [N]
     addArgs(app, args)
 
     # FINISHED
     # params = OrderedDict()
     # params['outerPar'] = irange(1, 10, 2) 
-    # params['tileSize'] = lambda params: irange(3000, min(bankSize, N/params['outerPar']/4), 3000)
+    # params['tileSize'] = lambda params: irange(3000, min(scratchpadCapacity, N/params['outerPar']/4), 3000)
     # space += dse(app, args, params)
 
     # Finished
     params = OrderedDict()
-    params['outerPar'] = irange(6, 10, 2) 
-    params['tileSize'] = lambda params: irange(400, min(bankSize, N/params['outerPar']/4), 1600)
+    params['outerPar'] = 6#irange(6, 10, 2) 
+    # params['tileSize'] = 2000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
+    params['tileSize'] = 64000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
     space += dse(app, args, params)
 
     # Finished
     # params = OrderedDict()
     # params['outerPar'] = irange(2, 10, 2) 
-    # params['tileSize'] = lambda params: irange(16, min(bankSize, N/params['outerPar']/200), 16*2)
+    # params['tileSize'] = lambda params: irange(16, min(scratchpadCapacity, N/params['outerPar']/200), 16*2)
     # space += dse(app, args, params)
 
     print('{} space: {}'.format(app, space))
@@ -100,7 +102,7 @@ def GDA():
     # # Finished 
     # params = OrderedDict()
     # # params['tileSize'] = irange(16, 16*5, 16) 
-    # params['tileSize'] = irange(16, bankSize*lanes/MAXC, 512) 
+    # params['tileSize'] = irange(16, scratchpadCapacity/MAXC, 512) 
     # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
     # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
     # space += dse(app, args, params)
@@ -120,14 +122,14 @@ def GDA():
 
     # # Finished 
     # params = OrderedDict()
-    # params['tileSize'] = irange(1024, bankSize*lanes/MAXC, 1024) 
+    # params['tileSize'] = irange(1024, scratchpadCapacity/MAXC, 1024) 
     # params['outerPar'] = lambda params: irange(1, min(10, R/params['tileSize']), 3) 
     # params['midPar'] = lambda params: irange(1, min(8, params['tileSize']), 3) 
     # space += dse(app, args, params)
 
     # # Finished 
     # params = OrderedDict()
-    # params['tileSize'] = irange(1024, bankSize*lanes/MAXC, 1024) 
+    # params['tileSize'] = irange(1024, scratchpadCapacity/MAXC, 1024) 
     # params['outerPar'] = lambda params: irange(2, min(6, R/params['tileSize']), 2) 
     # params['midPar'] = lambda params: irange(2, min(6, params['tileSize']), 2) 
     # space += dse(app, args, params)
@@ -137,8 +139,8 @@ def GDA():
     args = [R]
     addArgs(app, args)
     params = OrderedDict()
-    params['tileSize'] = irange(512, bankSize*lanes/MAXC, 512) 
-    params['outerPar'] = 6
+    params['tileSize'] = irange(512, scratchpadCapacity/MAXC, 512) 
+    params['outerPar'] = [5,6]
     space += dse(app, args, params)
     print('{} space: {}'.format(app, space))
 
@@ -146,9 +148,13 @@ def GDA():
 def GEMM_Blocked():
     app = 'GEMM_Blocked'
     space = 0
+    # dim = 64
+    # dim = 128
     dim = 512
     args = [dim]
     addArgs(app, args)
+
+    # GEMM_Blocked_64_tileSize_64_i_tileSize_64_loop_jj_1_loop_ii_1_loop_kk_1_loop_i_4_loop_k_3 cycle=22496
 
     #best['GEMM_Blocked'] = ('GEMM_Blocked__tileSize_256_i_tileSize_256_loop_jj_1_loop_ii_1_loop_kk_1_loop_i_4_loop_k_3', '')
 
@@ -163,13 +169,17 @@ def GEMM_Blocked():
     # space += dse(app, args, params)
 
     params = OrderedDict()
-    params['tileSize']   = [256] # irange(16, dim, 16)
-    params['i_tileSize'] = [256] # irange(16, dim, 16)
+    params['tileSize']   = [min(dim, scratchpadCapacity)] # irange(16, dim, 16)
+    params['i_tileSize'] = [min(dim, scratchpadCapacity)] # irange(16, dim, 16)
     params['loop_jj']    = 1 
     params['loop_ii']    = 1
     params['loop_kk']    = 1
-    params['loop_i']     = [3,4,5]
-    params['loop_k']     = [3,4]
+    # params['loop_i']     = 4
+    # params['loop_k']     = 3
+    # params['loop_i']     = [4,5]
+    # params['loop_k']     = [3,4]
+    params['loop_i']     = 4
+    params['loop_k']     = 4
     space += dse(app, args, params)
     print('{} space: {}'.format(app, space))
 
@@ -177,20 +187,20 @@ def GEMM_Blocked():
 def BlackScholes():
     app = 'BlackScholes'
     space = 0
-    N = 960000
+    N = 96000
     args = [N]
     addArgs(app, args)
 
     # Finished
     # params = OrderedDict()
     # params['outerPar'] = irange(1, 4, 1) 
-    # params['tileSize'] = lambda params: irange(1024, min(bankSize, N/params['outerPar']), 1024)
+    # params['tileSize'] = lambda params: irange(1024, min(scratchpadCapacity, N/params['outerPar']), 1024)
     # space += dse(app, args, params)
 
     params = OrderedDict()
     params['outerPar'] = 1 
     # params['tileSize'] = lambda params: irange(1024*16, min(scratchpadCapacity,N/params['outerPar']),1024*16)
-    params['tileSize'] = scratchpadCapacity 
+    params['tileSize'] = 4000# scratchpadCapacity
     space += dse(app, args, params)
 
     print('{} space: {}'.format(app, space))
@@ -205,7 +215,7 @@ def PageRank_plasticine():
     addArgs(app, args)
 
     params = OrderedDict()
-    maxTile = min(bankSize*lanes,NP)
+    maxTile = min(scratchpadCapacity,NP)
     params['tileSize'] = [16, 1024, 1024*6, maxTile/4, maxTile/2, maxTile] 
     space += dse(app, args, params)
 
@@ -223,7 +233,7 @@ def Kmeans_plasticine():
 
     # Finished 
     params = OrderedDict()
-    params['tileSize'] = irange(16, 16, 1) + irange(128, 512, 128) + irange(1024,min(bankSize*lanes/dim, N), 1024)
+    params['tileSize'] = irange(16, 16, 1) + irange(128, 512, 128) + irange(1024,min(scratchpadCapacity/dim, N), 1024)
     space += dse(app, args, params)
 
     print('{} space: {}'.format(app, space))
@@ -239,8 +249,10 @@ def Kmeans23():
 
     # Finished 
     params = OrderedDict()
-    params['P3'] = [2, 4, 6, 8]
-    params['P4'] = [4, 8, 16]
+    params['P3'] = [4]
+    params['P4'] = [1]
+    # params['P3'] = [2, 4, 6, 8]
+    # params['P4'] = [4, 8, 16]
     space += dse(app, args, params)
 
     print('{} space: {}'.format(app, space))
@@ -254,7 +266,7 @@ def SPMV_CRS():
     addArgs(app, args)
 
     params = OrderedDict()
-    maxTile = min(bankSize*lanes, N)
+    maxTile = min(scratchpadCapacity, N)
     # Finished
     params['tileSize'] = irange(16, maxTile, 64) 
     params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 1)

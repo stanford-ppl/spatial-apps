@@ -4,7 +4,7 @@ app=$1
 log=$2
 
 cd $SPATIAL_HOME/gen/$app/
-export SBT_OPTS="-XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=2G -Xmx2048M -Xmx2G"
+export SBT_OPTS="-XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=2G -Xmx2048M -Xss2G"
 make vcs >> $log 2>&1
 
 echo "-------------PASS (DONE)------------" >> $log
