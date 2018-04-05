@@ -26,12 +26,12 @@ object Kmeans23 extends SpatialApp { // Regression (Dense) // Args: 3 64
     val par_load = 16
     val par_store = 16
     val PX = 1//1 (1 -> 1)
-    val P0 = 16//16 (1 -> 2 -> dim)
+    val P0 = 1//16 (1 -> 2 -> dim)
     val P1 = 16//16 (1 -> 2 -> dim)
     val P2 = 16//8 (1 -> 2 -> dim)
 
-    val P3 = 6 
-    val P4 = 4
+    val P3 = 4
+    val P4 = 1
     val P5 = 16
 
     val iters = ArgIn[Int]
