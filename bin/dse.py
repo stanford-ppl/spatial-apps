@@ -63,8 +63,8 @@ def dse(app, args, params):
 def TPCHQ6():
     app = 'TPCHQ6'
     space = 0
-    # N = 96000
-    N = 960000
+    N = 96000
+    # N = 960000
     args = [N]
     addArgs(app, args)
 
@@ -77,8 +77,8 @@ def TPCHQ6():
     # Finished
     params = OrderedDict()
     params['outerPar'] = 6#irange(6, 10, 2) 
-    # params['tileSize'] = 2000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
-    params['tileSize'] = 40000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
+    params['tileSize'] = 2000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
+    # params['tileSize'] = 40000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
     space += dse(app, args, params)
 
     # Finished
@@ -139,8 +139,9 @@ def GDA():
     args = [R]
     addArgs(app, args)
     params = OrderedDict()
-    params['tileSize'] = irange(512, scratchpadCapacity/MAXC, 512) 
-    params['outerPar'] = [5,6]
+    params['tileSize'] = 512#irange(512, scratchpadCapacity/MAXC, 512) 
+    # params['outerPar'] = [5,6]
+    params['outerPar'] = 5
     space += dse(app, args, params)
     print('{} space: {}'.format(app, space))
 
@@ -170,8 +171,10 @@ def GEMM_Blocked():
     # space += dse(app, args, params)
 
     params = OrderedDict()
-    params['tileSize']   = [64, 256, 512, 1024] #[min(dim, scratchpadCapacity)] # irange(16, dim, 16)
-    params['i_tileSize'] = lambda params: scratchpadCapacity / params['tileSize']
+    # params['tileSize']   = [64, 256, 512, 1024] #[min(dim, scratchpadCapacity)] # irange(16, dim, 16)
+    # params['i_tileSize'] = lambda params: scratchpadCapacity / params['tileSize']
+    params['tileSize']   = 512 #[min(dim, scratchpadCapacity)] # irange(16, dim, 16)
+    params['i_tileSize'] = 128 
     params['loop_jj']    = 1 
     params['loop_ii']    = 1
     params['loop_kk']    = 1
