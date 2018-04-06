@@ -63,8 +63,8 @@ def dse(app, args, params):
 def TPCHQ6():
     app = 'TPCHQ6'
     space = 0
-    N = 96000
-    # N = 960000
+    # N = 96000
+    N = 480000
     args = [N]
     addArgs(app, args)
 
@@ -76,9 +76,12 @@ def TPCHQ6():
 
     # Finished
     params = OrderedDict()
-    params['outerPar'] = 6#irange(6, 10, 2) 
-    params['tileSize'] = 2000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
+    # params['outerPar'] = [6,8]#irange(6, 10, 2) 
+    # params['tileSize'] = 2000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
     # params['tileSize'] = 40000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
+    # params['tileSize'] = [40000/8, 40000/4, 40000/2, 40000]
+    params['outerPar'] = 8#irange(6, 10, 2) 
+    params['tileSize'] = [40001/4]
     space += dse(app, args, params)
 
     # Finished
