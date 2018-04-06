@@ -78,7 +78,7 @@ def TPCHQ6():
     params = OrderedDict()
     params['outerPar'] = 6#irange(6, 10, 2) 
     # params['tileSize'] = 2000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
-    params['tileSize'] = 64000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
+    params['tileSize'] = 40000#lambda params: irange(400, min(scratchpadCapacity, N/params['outerPar']/4), 1600)
     space += dse(app, args, params)
 
     # Finished
@@ -150,7 +150,8 @@ def GEMM_Blocked():
     space = 0
     # dim = 64
     # dim = 128
-    dim = 512
+    # dim = 512
+    dim = 1024
     args = [dim]
     addArgs(app, args)
 
@@ -169,8 +170,8 @@ def GEMM_Blocked():
     # space += dse(app, args, params)
 
     params = OrderedDict()
-    params['tileSize']   = [min(dim, scratchpadCapacity)] # irange(16, dim, 16)
-    params['i_tileSize'] = [min(dim, scratchpadCapacity)] # irange(16, dim, 16)
+    params['tileSize']   = [64, 256, 512, 1024] #[min(dim, scratchpadCapacity)] # irange(16, dim, 16)
+    params['i_tileSize'] = lambda params: scratchpadCapacity / params['tileSize']
     params['loop_jj']    = 1 
     params['loop_ii']    = 1
     params['loop_kk']    = 1
@@ -178,7 +179,7 @@ def GEMM_Blocked():
     # params['loop_k']     = 3
     # params['loop_i']     = [4,5]
     # params['loop_k']     = [3,4]
-    params['loop_i']     = 4
+    params['loop_i']     = 2
     params['loop_k']     = 4
     space += dse(app, args, params)
     print('{} space: {}'.format(app, space))
