@@ -3,7 +3,7 @@ import org.virtualized._
 
 
 // MemReduce
-object Lab2Part1SimpleMemReduce extends SpatialApp { 
+object Lab2Part1SimpleMemReduce extends SpatialApp {
 
   val N = 16.to[Int]
 
@@ -32,7 +32,7 @@ object Lab2Part1SimpleMemReduce extends SpatialApp {
 
 
 // MemFold
-object Lab2Part2SimpleMemFold extends SpatialApp { 
+object Lab2Part2SimpleMemFold extends SpatialApp {
 
   val N = 16.to[Int]
 
