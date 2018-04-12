@@ -234,6 +234,8 @@ def Kmeans23():
 
     # Finished 
     params = OrderedDict()
+    params['P3'] = [2, 4, 6, 8]
+    params['P4'] = [4, 8, 16]
     space += dse(app, args, params)
 
     print('{} space: {}'.format(app, space))

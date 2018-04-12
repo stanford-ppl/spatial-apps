@@ -102,7 +102,8 @@ def runJob(app, args, params):
 def launchJob(app, args, params):
     if opts.parallel > 1:
         waitProcess()
-    print("Running app={}, args={}, params={} running ...".format(app, args, params))
+    print('Running {} args={} and params=[{}]'.format(app, str(args),
+        ' '.join(['{}={}'.format(p,params[p]) for p in params])))
     if opts.parallel > 1:
         pid = os.fork()
         if pid==0:
