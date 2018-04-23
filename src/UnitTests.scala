@@ -1494,7 +1494,8 @@ object OHM extends SpatialApp { // Regression (Unit) // Args: 400
 
   @virtualize
   def main() {
-
+    val N = ArgIn[Int]
+    setArg(N, args(0).to[Int])
     val src1 = (0::16,0::16){(i,j) => i}
     val dram1 = DRAM[Int](16,16)
     val dram2 = DRAM[Int](16,16)
@@ -1505,8 +1506,8 @@ object OHM extends SpatialApp { // Regression (Unit) // Args: 400
       val sram1 = SRAM[Int](16)
       Foreach(-5 until 15 by 1){i =>
         val ldrow = if ((i.to[Int] + 1.to[Int]) >= 0.to[Int] && (i.to[Int] + 1.to[Int]) <= 15) {i.to[Int] + 1.to[Int]} else 0
-        sram1 load dram1(ldrow,0::16)
-        dram2(ldrow,0::16) store sram1
+        sram1 load dram1(ldrow,0::N)
+        dram2(ldrow,0::N) store sram1
       }
     }
     val out = getMatrix(dram2)
@@ -3921,6 +3922,50 @@ object CSV1D extends SpatialApp {
     println("PASS: " + cksum + " (CSV1D)")
   }
 }
+
+
+object BinaryFileTest extends SpatialApp {
+
+  @virtualize
+  def main() {
+    type T = FixPt[TRUE, _16, _16]
+    val tilesize = 16
+    val data = loadBinary[T](sys.env("SPATIAL_HOME") + "/apps/data/unittests/data_in.bin")
+    val memsize = ArgIn[Int]
+    setArg(memsize, data.length.to[Int])
+    val srcmem = DRAM[T](memsize)
+    setMem(srcmem, data)
+    val result = ArgOut[T]
+
+    Accel {
+      val fpgamem = SRAM[T](tilesize)
+      result := Reduce(Reg[T](0.to[T]))(memsize.value by tilesize){ r =>
+        fpgamem load srcmem(r :: r + tilesize)
+        Reduce(Reg[T](0.to[T]))(tilesize by 1) { i =>
+          fpgamem(i)
+        }{_+_}
+      }{_+_}
+    }
+
+
+    val r = getArg(result)
+
+    val gold = data.reduce {_+_}
+
+    writeBinary[T](data, sys.env("SPATIAL_HOME") + "/apps/data/unittests/data_out.bin")
+    val data_doublecheck = loadBinary[T](sys.env("SPATIAL_HOME") + "/apps/data/unittests/data_out.bin")
+    println("Data: ")
+    printArray(data)
+    println("Data (doublecheck): ")
+    printArray(data_doublecheck)
+    println("Gold sum is " + gold)
+    println("Accel sum is " + r)
+
+    val cksum = (gold === r) && (data.zip(data_doublecheck){_==_}.reduce{_&&_})
+    println("PASS: " + cksum + " (CSV1D)")
+  }
+}
+
 
 object CSV2D extends SpatialApp {
 
