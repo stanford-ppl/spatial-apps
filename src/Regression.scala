@@ -98,6 +98,7 @@ object Regression {
     unit ::= (RetimedFifoBranch, Array(13,25))
     unit ::= (SSV2D, NoArgs)
     unit ::= (SSV1D, NoArgs)
+    unit ::= (BinaryFileTest, NoArgs)
     unit ::= (PageBoundaryTest, Array(896))
     unit ::= (MultiWriteBuffer, NoArgs)
     unit ::= (LittleTypeTest, NoArgs)

@@ -1021,6 +1021,342 @@ object HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
   }
 }
 
+// object LM_HALP extends SpatialApp {  // Test Args: 30 2 256 0.05 1 0.00003 0.4
+
+//   val tileSize = 64 (16 -> 128)
+
+//   val loadPar = 16
+//   val storePar = 16
+//   val max_history = 512
+//   val P3 =  1 (1 -> 8)
+//   val P4 =  1 (1 -> 8)
+//   val P5 =  1 (1 -> 8)
+//   val P6 =  1 (1 -> 8)
+//   val P7 =  1 (1 -> 8)
+//   val P8 =  1 (1 -> 8)
+//   val P9 =  1 (1 -> 8)
+//   val P10 = 1 (1 -> 8)
+//   val P11 = 1 (1 -> 8)
+//   val P12 = 1 (1 -> 8)
+//   val P13 = 1 (1 -> 8)
+//   val P14 = 1 (1 -> 8)
+//   val PX = 1
+
+//   val init_SF = 16
+//   val SF_lower_bound = 16
+//   val SF_upper_bound = 26
+//   val init_SFE = 2
+//   val SFE_lower_bound = 1
+//   val SFE_upper_bound = 11
+
+//   type XT = Int8
+//   type B = Int8
+//   type BB = Int16
+//   type BBBB = Int32
+
+//   val debug = true
+//   /*
+
+//     Basic type relationships:
+//       X ->  (DX,    B)
+//       W ->  (DM,    B)
+//       Y ->  (DM*DX, BB)
+//       GR -> (DG,    BBBB)   -> (DM*DX*DX*DA, BBBB)
+
+//       ... Choose DA so that DG is off by a power of 2 from DM.  I.E.- DM = DG*2^8 if shift_factor=8 ...
+
+//       A ->  (DA,    B)      -> (1/(2^8*DX*DX), B)
+
+
+//     We choose:
+//       DX
+//       DM
+//       shift_factor
+
+//     We derive:
+//       DY = DM*DX
+//       DYE = DM*2^-SFE*DX
+//       DA = 2^-shift_factor / DX / DX
+//       DG = DM*DX*DX*DA
+//       DME = DM*2^-SFE
+
+//     We try rescale:
+//       DG to keep gradients in range
+//       DME to keep model well resolved
+//   */
+
+//   @virtualize
+//   def toDM(in: BBBB, sf: Int): B = { 
+//     val shift_factor_range = SF_upper_bound - SF_lower_bound
+//     val options = List.tabulate(shift_factor_range){i => 
+//       ((in + random[BBBB](scala.math.pow(2.0,(i+SF_lower_bound)).to[BBBB])) >> (i+SF_lower_bound)).to[B]   
+//     }
+//     if (sf == SF_lower_bound) options(0)
+//     else if (sf == (SF_lower_bound + 1)) options(1)
+//     else if (sf == (SF_lower_bound + 2)) options(2)
+//     else if (sf == (SF_lower_bound + 3)) options(3)
+//     else if (sf == (SF_lower_bound + 4)) options(4)
+//     else if (sf == (SF_lower_bound + 5)) options(5)
+//     else if (sf == (SF_lower_bound + 6)) options(6)
+//     else if (sf == (SF_lower_bound + 7)) options(7)
+//     else if (sf == (SF_lower_bound + 8)) options(8)
+//     else options(9)
+//   }
+//   @virtualize
+//   def toDG(in: B, sf: Int): BBBB = { 
+//     val options = List.tabulate(SF_upper_bound - SF_lower_bound){i => 
+//       in.to[BBBB] << (i+SF_lower_bound)
+//     }
+//     val selects = List.tabulate(SF_upper_bound - SF_lower_bound){i => (sf-SF_lower_bound) == i}
+//     if (sf == SF_lower_bound) options(0)
+//     else if (sf == (SF_lower_bound + 1)) options(1)
+//     else if (sf == (SF_lower_bound + 2)) options(2)
+//     else if (sf == (SF_lower_bound + 3)) options(3)
+//     else if (sf == (SF_lower_bound + 4)) options(4)
+//     else if (sf == (SF_lower_bound + 5)) options(5)
+//     else if (sf == (SF_lower_bound + 6)) options(6)
+//     else if (sf == (SF_lower_bound + 7)) options(7)
+//     else if (sf == (SF_lower_bound + 8)) options(8)
+//     else options(9)
+
+//   }
+
+//   @virtualize 
+//   def FloatToLP[T:Type:Num](in: Float, delta: Float, precision: scala.Int): T = {
+//     val exact = in / delta
+    
+//     if (exact < -scala.math.pow(2,(precision-1))) -(scala.math.pow(2,(precision-1))).to[T]
+//     else if (exact > (scala.math.pow(2, (precision-1))-1).to[Float]) (scala.math.pow(2, (precision-1))-1).to[T]
+//     else (exact + random[Float](1)).to[T]
+//   }
+
+//   @virtualize 
+//   def LPToFloat[T:Type:Num](in: T, delta: Float, precision: scala.Int): Float = {delta * in.to[Float]}
+
+//   @virtualize
+//   def getValue(table: Matrix[MString], key: MString): Float = {
+//     val sum = Array.tabulate(table.rows){i => if (table(i,0) == key) table(i,1).to[Float] else 0.to[Float]}.reduce{_+_}
+//     if (sum == 0.to[Float]) println("WARN: Possibly could not find " + key)
+//     sum
+//   }
+
+//   @virtualize
+//   def main() {
+//     val config = loadCSV2D[MString](sys.env("SPATIAL_HOME") + "/apps/data/training/halp.config", ",", "\n")
+//     printMatrix(config, "Config")
+
+//     val epochs = getValue(config, "epochs").to[Int]
+//     val len_epoch = getValue(config, "len_epoch").to[Int] // Total Points
+//     val points = getValue(config, "points").to[Int] // Total Points
+//     val dm = getValue(config, "dm").to[Float]
+//     val dx = getValue(config, "dx").to[Float]
+//     val mu = getValue(config, "mu").to[Float]
+//     val alpha1 = getValue(config, "alpha1").to[Float] // Step size
+//     val alpha2 = getValue(config, "alpha2").to[Float]
+//     val bump_epoch = getValue(config, "bump_epoch").to[Int]
+//     val track = getValue(config, "track").to[Int] // Track cost vs time
+//     val threshold = getValue(config, "threshold").to[Float] // Cost at which to quit (only quits if track is on)
+//     val variance = getValue(config, "variance").to[Int] // numerator for noise
+//     val warmup = getValue(config, "warmup").to[Int]
+//     val allow_recenter = getValue(config, "allow_recenter").to[Int]
+
+//     val da = 1/(scala.math.pow(2.0,init_SF).to[Float]*dx*dx)
+//     val maxX = 6
+//     val D = 128
+
+//     val noise_num = variance
+//     val noise_denom = 10
+    
+//     // Generate some test data
+//     val sX = (0::points, 0::D){(i,j) => (random[Float](maxX) - (maxX/3).to[Float])}
+//     val W_gold = Array.tabulate(D) { i => (random[Float](3) / 2)}
+//     val Y_noise = Array.tabulate(points) { i => (random[Int](noise_num).to[Float] - (noise_num.to[Float]/2)) / noise_denom.to[Float] }
+//     val sY = Array.tabulate(points) { i => Array.tabulate(D){j => (W_gold(j) * sX(i,j))}.reduce{_+_} + Y_noise(i) }
+
+//     // Convert data to LP
+//     val W_bits = Array.tabulate(D) { i => FloatToLP[B](W_gold(i), dm, 8)}
+
+//     val Y_noise_bits = Array.tabulate(points) {i => FloatToLP[BB](Y_noise(i), dx*dm, 16)}
+//     val X_bits = (0::points, 0::D){(i,j) => FloatToLP[B](sX(i,j), dx, 8)}
+//     val Y_bits = Array.tabulate(points){ i => FloatToLP[BB](sY(i), dx*dm, 16)}
+//     val alpha1_bits = FloatToLP[BB](alpha1, da, 16)
+//     val alpha2_bits = FloatToLP[BB](alpha2, da, 16)
+//     val thresh_bits = FloatToLP[BB](threshold.to[Float], dm*dm, 16)
+
+//     // Debug
+//     val W_recompute = Array.tabulate(D) { i => LPToFloat[B](W_bits(i), dm, 8)}
+//     printArray(W_gold, "W_gold")
+//     printArray(W_bits, "W_bits")
+//     printArray(W_recompute, "W_gold Reconstructed")
+//     println("dm = " + dm)
+//     println("dx = " + dx)
+//     println("dm*dx = " + dm*dx)
+//     if (points < 10) printMatrix(X_bits, "X Data")
+//     else {
+//       printMatrix((0::10, 0::D){(i,j) => X_bits(i,j)}, "X Data")
+//       println("... Skipped last " + {points-10} + " rows")
+//     }
+//     printArray(Y_bits, "Y_bits")
+//     printArray(W_bits, "W_bits")
+//     printArray(Y_noise_bits, "Y_noise_bits")
+//     println("alpha1 = " + alpha1_bits)
+//     println("alpha2 = " + alpha2_bits)
+
+//     val mu_setpoint = (mu*(pow(2.0.to[Float],31.to[Float]) - 1)).to[BBBB]
+ 
+//     val E = ArgIn[Int] // current epoch
+//     val E_ACTUAL = HostIO[Int]
+//     val N = ArgIn[Int]
+//     val T = ArgIn[Int]
+//     val DM = HostIO[Float]
+//     val DME = HostIO[Float]
+//     val DX = HostIO[Float]
+//     val DMDX = HostIO[Float]
+//     val DG = HostIO[Float]
+//     val DA = HostIO[Float]
+//     val A1 = HostIO[BB]
+//     val A2 = HostIO[BB]
+//     val BUMP_EPOCH = ArgIn[Int]
+//     val MU = ArgIn[Float]
+//     val MU_SETPOINT = ArgIn[BBBB]
+//     val PHASE = ArgIn[Int]
+//     val TRACK = ArgIn[Int]
+//     val THRESH = ArgIn[BB]
+//     val SF = HostIO[Int]
+//     val SF_EXTRA = HostIO[Int]
+//     val INIT_SF = ArgIn[Int]
+//     val WARMUP = ArgIn[Int]
+//     val ALLOW_RECENTER = ArgIn[Int]
+
+//     setArg(E, epochs)
+//     setArg(N, points)
+//     setArg(E_ACTUAL, len_epoch * epochs-1)
+//     setArg(T, len_epoch)
+//     setArg(DM,   dm)
+//     setArg(DX,   dx)
+//     setArg(DMDX, dm*dx)
+//     setArg(MU, mu)
+//     setArg(MU_SETPOINT, mu_setpoint)
+//     setArg(SF, init_SF)
+//     setArg(INIT_SF, init_SF)
+//     setArg(SF_EXTRA, init_SFE)
+//     setArg(A1, alpha1_bits)
+//     setArg(A2, alpha2_bits)
+//     setArg(BUMP_EPOCH, bump_epoch)
+//     setArg(TRACK, track)
+//     setArg(THRESH, thresh_bits)
+//     setArg(DA, da)
+//     setArg(WARMUP, warmup-1)
+//     setArg(ALLOW_RECENTER, allow_recenter)
+
+//     val X_offchip = DRAM[B](N, D)
+//     val Y_offchip = DRAM[Float](N)
+//     val W_offchip = DRAM[Float](D)
+//     val PHI_offchip = DRAM[Float](N)
+//     val true_w = DRAM[B](D)
+//     val g = DRAM[BBBB](D)
+//     val cost = DRAM[BB](max_history)
+//     val recenter_hist = DRAM[Int](SF_upper_bound - SF_lower_bound + 1)
+
+//     setMem(X_offchip, X_bits)
+//     setMem(Y_offchip, Y_bits)
+//     setMem(W_offchip, Array.tabulate[Float](D){i => 0})
+//     setMem(true_w, W_bits)
+    
+//     def computePhi(w: SRAM1[Float], phi: SRAM1[Float]) {
+//       Foreach(N par P1) {i => 
+//         val phi = SRAM[Float](tileSize)
+//         val x = SRAM[XT](D)
+//         if (i % tileSize == 0) phi load PHI_offchip(i :: i + tileSize par loadPar)
+//         x load X_offchip(i, 0::D par loadPar)
+//         val pred = Reduce(Reg[Float](0))(D by 1 par P2) {j => 
+//           x(j).to[Float] * w(j)
+//         }{_+_}
+//         phi(i % tileSize) = pred
+//         if (i % tileSize == tileSize-1) PHI_offchip(i-tileSize+1 :: i + 1 par storePar) store phi
+//       }
+//     }
+
+//     def computeG(gtilde: SRAM1[Float], A: Float) {
+//       MemReduce(gtilde)(N par P3) {i => 
+//         val g_partial = SRAM[Float](D)
+//         val phi = SRAM[Float](tileSize)
+//         val y = SRAM[Float](tileSize)
+//         val x = SRAM[XT](D)
+//         if (i % tileSize == 0) {
+//           phi load PHI_offchip(i :: i + tileSize par loadPar)
+//           y load Y_offchip(i :: i + tileSize par loadPar)
+//         }
+//         x load X_offchip(i, 0::D par loadPar)
+//         val pt = i % tileSize
+//         val diff = phi(pt) - y(pt)
+//         Foreach(D by 1 par P4){j => p_partial(j) = diff * x(j).to[Float] * A / N}
+//         g_partial
+//       }{_+_}
+//     }
+
+//     def computeSk(gtilde: SRAM1[Float]): Float = {
+//       val norm = Reduce(Reg[Float])(D by 1){i => pow(gtilde(i), 2)}{_+_}
+//       norm / (MU * maxValue[USGN].to[Float])
+//     }
+
+//     Accel {
+//       // Create model and gradient memories
+//       val w = SRAM[Float](D) // DM
+//       val gtilde = SRAM[Float](D) // DG
+//       val phi = SRAM[Float](tileSize)
+//       val Sk = Reg[Float]
+
+//       w load W_offchip(0 :: D par loadPar)
+
+//       Sequential.Foreach(K by 1){k => 
+//         val A = if (k < BUMP_EPOCH) A1.value else A2.value
+//         computePhi(w)
+//         computeG(gtilde, A)
+//         Sk := computeSk(gtilde)
+//         recenterW()
+//       }
+
+
+
+//     } // close Accel
+    
+//     val w_result = getMem(W_offchip)
+
+//     val w_result_fullprecision = Array.tabulate(D){i => LPToFloat[B](w_result(i), dm, 8)}
+//     val cartesian_dist = W_gold.zip(w_result_fullprecision) { case (a, b) => (a - b) * (a - b) }.reduce{_+_}
+//     val cksum =  cartesian_dist < threshold.to[Float]
+//     printArray(w_result_fullprecision, "result: ")
+//     printArray(W_gold, "gold: ")
+//     println("Cartesian Distance From W_gold: " + cartesian_dist + " <? " + {threshold.to[Float]})
+
+//     if (track == 1) {
+//       val cost_result = getMem(cost)
+//       val sf_jumps = getMem(recenter_hist)
+//       val hist_len = min(getArg(E_ACTUAL), max_history.to[Int])
+//       printArray(sf_jumps, "Jumped at: ")
+//       val shift_factors = Array.tabulate[BB](hist_len){ i =>
+//         val adjustment = sf_jumps.map{ s => if (abs(s*len_epoch) <= i) {
+//           if (s > 0) 1
+//           else -1
+//         } else {
+//           0
+//         }}.reduce{_+_}
+//         (init_SF + adjustment).to[BB]
+
+//       }
+//       val relevent_history_LP = shift_factors ++ 
+//                                 Array.tabulate[BB](hist_len){i => i.to[BB]} ++ 
+//                                 Array.tabulate(hist_len){i => cost_result(i)}
+//       printMatrix(relevent_history_LP.reshape(3, hist_len).transpose, "Cost vs iter bits (shift factor, epoch, costLP):")
+//       val relevent_history = Array.tabulate(hist_len){i => LPToFloat[BB](cost_result(i), dm*dm, 16)}
+//       printMatrix(relevent_history.reshape(hist_len, 1), "Cost vs iter (Float):")
+//     }
+
+//     println("PASS: " + cksum + " (HALP)")
+//   }
+// }
+
 
 
 object SGD extends SpatialApp { // Test Args: 
