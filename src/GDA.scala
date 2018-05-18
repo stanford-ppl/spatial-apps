@@ -4,18 +4,16 @@ import virtualized._
 
 object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
-
   type X = Float
 
-  val MAXC = 96
-  val C = MAXC
   val margin = 1
+  val C = 96 // param
+  val R = 1024 // param
 
   val innerPar = 16 // param
   val midPar = 1 // param
   val outerPar = 1 // param
   val tileSize = 32 // param
-  val R = 1024 // param
 
   @virtualize
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
@@ -42,29 +40,29 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
     setMem(mu1, mu1CPU)
 
     Accel {
-      val mu0Tile = SRAM[T](MAXC)
-      val mu1Tile = SRAM[T](MAXC)
+      val mu0Tile = SRAM[T](C)
+      val mu1Tile = SRAM[T](C)
       Parallel {
         mu0Tile load mu0(0 :: C par 16) // Load mu0
         mu1Tile load mu1(0 :: C par 16) // Load mu1
       }
 
-      val sigmaOut = SRAM[T](MAXC, MAXC)
+      val sigmaOut = SRAM[T](C, C)
 
       MemReduce(sigmaOut)(R by rTileSize par op){ r =>
         val gdaYtile = SRAM[Int](rTileSize)
-        val gdaXtile = SRAM[T](rTileSize, MAXC)
+        val gdaXtile = SRAM[T](rTileSize, C)
         val blk = Reg[Int]
         Parallel {
           gdaYtile load y(r :: r + rTileSize par 16)
           gdaXtile load x(r :: r + rTileSize, 0 :: C par 16) // Load tile of x
         }
 
-        val sigmaBlk = SRAM[T](MAXC, MAXC)
+        val sigmaBlk = SRAM[T](C, C)
 
         MemReduce(sigmaBlk)(rTileSize par mp) { rr =>
-          val subTile = SRAM[T](MAXC)
-          val sigmaTile = SRAM[T](MAXC, MAXC)
+          val subTile = SRAM[T](C)
+          val sigmaTile = SRAM[T](C, C)
           Foreach(C par subLoopPar) { cc =>
             subTile(cc) = gdaXtile(rr, cc) - mux(gdaYtile(rr) == 1, mu1Tile(cc), mu0Tile(cc))
           }
