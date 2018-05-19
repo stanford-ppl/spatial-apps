@@ -8,14 +8,15 @@ object LogReg extends SpatialApp {
   type X = Float //FixPt[TRUE,_16,_16]
 
   val margin = 5
-  val dim = 192
-  val D = dim
+  val D = 192
   val A = 1
 
-  val innerPar = 16
-  val outerPar = 10
+  val iters = 1
+  val N = 1024
 
-  val tileSize = 64
+  val innerPar = 16
+  val outerPar = 1 // param
+  val tileSize = 64 // param
 
   def sigmoid[T:Type:Num](t:T) = 1.to[T]/(exp(-t) + 1.to[T])
 
@@ -77,8 +78,6 @@ object LogReg extends SpatialApp {
 
   @virtualize
   def main() {
-    val iters = args(0).to[Int]
-    val N = args(1).to[Int]
 
     val sX = Array.fill(N){ Array.fill(D){ random[X](10.to[X])} }
     val sY = Array.tabulate(N){ i => i.to[X]} //fill(N)( random[T](10.0) )
