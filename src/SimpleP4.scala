@@ -2,9 +2,8 @@ import spatial.dsl._
 import virtualized._
 
 object P4 extends SpatialApp {
-  import spatial.targets.DE1
-  override val target = targets.Default
-
+  override val target = targets.Plasticine
+  import target._
 
 
   /* Packet format:
@@ -100,56 +99,56 @@ object P4 extends SpatialApp {
 
 
 	// Setup streams
-	val stream_in0  = StreamIn[UInt32](BurstDataBus[UInt32])
-	val stream_in1  = StreamIn[UInt32](BurstDataBus[UInt32])
+	val stream_in0  = StreamIn[UInt32](GPInput1)
+	val stream_in1  = StreamIn[UInt32](GPInput2)
     
-	val stream_out0 = StreamOut[UInt32](BurstDataBus[UInt32])
-	val stream_out1 = StreamOut[UInt32](BurstDataBus[UInt32])
+	val stream_out0 = StreamOut[UInt32](GPOutput1)
+	val stream_out1 = StreamOut[UInt32](GPOutput2)
     
-    Accel(*) {
-	
-        val Parser_SRAM = SRAM[UInt16](Parser_SRAM_dim_X, Parser_SRAM_dim_Y)
-        val Deparser_SRAM = SRAM[UInt16](Parser_SRAM_dim_X, Parser_SRAM_dim_Y)
- 	
-	val pkt0 = Reg[UInt32](0) 
-	val pkt1 = Reg[UInt32](0) 
+  Accel(*) {
 
-	// Pipeline parser stages
+    val Parser_SRAM = SRAM[UInt16](Parser_SRAM_dim_X, Parser_SRAM_dim_Y)
+    val Deparser_SRAM = SRAM[UInt16](Parser_SRAM_dim_X, Parser_SRAM_dim_Y)
 
-	Foreach(0 until num_fields, 0 until num_pkts ){ (i,j) =>
-		val pkt0 = stream_in0.value
-		val pkt1 = stream_in1.value
-		//val pkt = if (j == 0) pkt0 else pkt1 
-    val pkt = mux(j == 0, pkt0, pkt1)
-		//val fld = pkt(i::i+16).as[UInt16]
-		//val fld = pkt >> (16.to[UInt32]*i.to[UInt32]) | 0.to[UInt16] 
-		//val fld = (pkt >> (i * 16.to[UInt32])).to[UInt16]
-		//val fld_opt0 = pkt(0::16)
-		//val fld_opt1 = pkt(16::16)
-		//val fld = mux(pkt(0::16).to[UInt16], pkt(16::16).to[UInt16], i)
-		val fld = mux(i == 0, pkt(0::16).as[UInt16], pkt(16::16).as[UInt16])
-		Parser_SRAM(i, j) = fld
-	}
+    val pkt0 = Reg[UInt32](0) 
+    val pkt1 = Reg[UInt32](0) 
 
-	// Match Action Table (Add 1 to Src Addr or 2 to Src Addr)
-  val num_matches = 2
-  val match_table = LUT[UInt16](num_matches)(0.to[UInt16], 1.to[UInt16])
-  val mask_table = SRAM[Boolean](max_streams, num_matches)
-  val action_table = LUT[UInt16](num_matches, max_actions)(0.to[UInt16], 1.to[UInt16])
-  
-  //val match_table = SRAM[UInt16](num_matches)
-  //val action_table = SRAM[UInt16](num_matches, max_actions)
+    // Pipeline parser stages
 
-  // Read all matches simultaneously
-  Foreach(0 until num_matches, 0 until max_streams) { (i, j) =>
-    // Hardcode field location in SRAM ???
-    mask_table(i, j) = Parser_SRAM(0, i) == match_table(j)
-  }
+    Foreach(0 until num_fields, 0 until num_pkts ){ (i,j) =>
+      val pkt0 = stream_in0.value
+      val pkt1 = stream_in1.value
+      //val pkt = if (j == 0) pkt0 else pkt1 
+      val pkt = mux(j == 0, pkt0, pkt1)
+      //val fld = pkt(i::i+16).as[UInt16]
+      //val fld = pkt >> (16.to[UInt32]*i.to[UInt32]) | 0.to[UInt16] 
+      //val fld = (pkt >> (i * 16.to[UInt32])).to[UInt16]
+      //val fld_opt0 = pkt(0::16)
+      //val fld_opt1 = pkt(16::16)
+      //val fld = mux(pkt(0::16).to[UInt16], pkt(16::16).to[UInt16], i)
+      val fld = mux(i == 0, pkt(0::15).as[UInt16], pkt(16::31).as[UInt16]) // Spatial range are inclusive on both side
+      Parser_SRAM(i, j) = fld
+    }
 
-  // Check mask table 
-  //Sequential.Foreach(0 until num_matches) {i=>
-  //	Foreach(0 until max_streams) {j=>
-  Foreach(0 until num_matches, 0 until max_streams) {(i,j)=>
+    // Match Action Table (Add 1 to Src Addr or 2 to Src Addr)
+    val num_matches = 2
+    val match_table = LUT[UInt16](num_matches)(0.to[UInt16], 1.to[UInt16])
+    val mask_table = SRAM[Boolean](max_streams, num_matches)
+    val action_table = LUT[UInt16](num_matches, max_actions)(0.to[UInt16], 1.to[UInt16])
+
+    //val match_table = SRAM[UInt16](num_matches)
+    //val action_table = SRAM[UInt16](num_matches, max_actions)
+
+    // Read all matches simultaneously
+    Foreach(0 until num_matches, 0 until max_streams) { (i, j) =>
+      // Hardcode field location in SRAM ???
+      mask_table(i, j) = Parser_SRAM(0, i) == match_table(j)
+    }
+
+    // Check mask table 
+    //Sequential.Foreach(0 until num_matches) {i=>
+    //	Foreach(0 until max_streams) {j=>
+    Foreach(0 until num_matches, 0 until max_streams) {(i,j)=>
       // Check if mask is 0 or 1 for a given match 
       val mask = mask_table(i, j)
       val header = Parser_SRAM(0, j)
@@ -160,20 +159,20 @@ object P4 extends SpatialApp {
       //val new_header =  if (!mask) header else if (action==0.to[UInt16]) header + 1 else if(action==1.to[UInt16]) header + 2 else header + 3
       //// Read result into deparser SRAM
       Deparser_SRAM(0, i) = new_header
-  }
-	
-  Foreach(0 until num_fields, 0 until num_pkts){ (i,j) =>
-    val fld = Deparser_SRAM(i, j)
-    val fld32 = fld.to[UInt32]
-    if (j == 0){
-      stream_out0 := fld32
-    } else{
-      stream_out1 := fld32
     }
-  }
-	
-   // End Accel
-   }
+
+    Foreach(0 until num_fields, 0 until num_pkts){ (i,j) =>
+      val fld = Deparser_SRAM(i, j)
+      val fld32 = fld.to[UInt32]
+      if (j == 0){
+        stream_out0 := fld32
+      } else{
+        stream_out1 := fld32
+      }
+    }
+
+    // End Accel
+    }
 
 
   // End Main
