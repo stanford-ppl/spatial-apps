@@ -42,7 +42,6 @@ object P4 extends SpatialApp {
 	 */
 	val num_fields = 2
 	val max_streams = 2
-	val num_pkts = 2
 
 	val Parser_SRAM_dim_X = max_streams
 	val Parser_SRAM_dim_Y = num_fields
@@ -115,7 +114,7 @@ object P4 extends SpatialApp {
 
     // Pipeline parser stages
 
-    Foreach(0 until num_fields, 0 until num_pkts ){ (i,j) =>
+    Foreach(0 until num_fields, 0 until max_streams){ (i,j) =>
       val pkt0 = stream_in0.value
       val pkt1 = stream_in1.value
       //val pkt = if (j == 0) pkt0 else pkt1 
@@ -161,7 +160,7 @@ object P4 extends SpatialApp {
       Deparser_SRAM(0, i) = new_header
     }
 
-    Foreach(0 until num_fields, 0 until num_pkts){ (i,j) =>
+    Foreach(0 until num_fields, 0 until max_streams){ (i,j) =>
       val fld = Deparser_SRAM(i, j)
       val fld32 = fld.to[UInt32]
       if (j == 0){
