@@ -78,7 +78,7 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
             values_sram load values_dram(start_id :: stop_id par par_segment_load)
           }
           vec_sram gather vec_dram(cols_sram, stop_id - start_id)
-          println("row " + {i + tile})
+          //println("row " + {i + tile})
           val element = Reduce(Reg[T](0))(stop_id - start_id by 1 par red_par) { j => 
             // println(" partial from " + j + " = " + {values_sram(j) * vec_sram(j)})
             values_sram(j) * vec_sram(j)
