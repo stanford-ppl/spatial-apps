@@ -1042,10 +1042,11 @@ object LogReg extends SpatialApp {
   val margin = 5
   val dim = 192
   val D = dim
-  val A = 1
+  val A = 0.0000001f
 
   val innerPar = 16
-  val outerPar = 10
+  val midPar = 2
+  val outerPar = 2
 
   val tileSize = 64
 
@@ -1061,7 +1062,7 @@ object LogReg extends SpatialApp {
     val BN = tileSize (96 -> 96 -> 9600)
     val PX = 1 (1 -> 1)
     val P1 = innerPar (1 -> 2)
-    val P2 = innerPar (1 -> 96)
+    val P2 = midPar (1 -> 10)
     val P3 = outerPar (1 -> 96)
 
     val x = DRAM[T](N, D)
@@ -1072,38 +1073,74 @@ object LogReg extends SpatialApp {
     setMem(y, yIn)
     setMem(theta, tt)
 
+    //Accel {
+      //val btheta = SRAM[T](D)
+
+      //Sequential.Foreach(iters by 1) { epoch =>
+
+        //Sequential.MemReduce(btheta)(1 by 1){ xx =>
+          //val gradAcc = SRAM[T](D)
+          //Foreach(N by BN){ i =>
+            //val logregX = SRAM[T](BN, D)
+            //val logregY = SRAM[T](BN)
+            //Parallel {
+              //logregX load x(i::i+BN, 0::D par P2)
+              //logregY load y(i::i+BN par P2)
+            //}
+            //MemReduce(gradAcc)(BN par P3){ ii =>
+              //val pipe2Res = Reg[T]
+              //val subRam   = SRAM[T](D)
+
+              //val dotAccum = Reduce(Reg[T])(D par P2){j => logregX(ii,j) * btheta(j) }{_+_}  // read
+              //Pipe { pipe2Res := (logregY(ii) - sigmoid(dotAccum.value)) }
+              //Foreach(D par P2) {j => subRam(j) = logregX(ii,j) - pipe2Res.value }
+              //subRam
+            //}{_+_}
+          //}
+          //gradAcc
+        //}{(b,g) => b+g*A.to[T]}
+
+        //// Flush gradAcc
+        ////Pipe(D by 1 par P2) { i => gradAcc(i) = 0.to[T]}
+      //}
+      //theta(0::D par P2) store btheta // read
+    //}
+    
     Accel {
       val btheta = SRAM[T](D)
 
+      btheta load theta(0::D par P1)
+
       Sequential.Foreach(iters by 1) { epoch =>
 
-        Sequential.MemReduce(btheta)(1 by 1){ xx =>
-          val gradAcc = SRAM[T](D)
-          Foreach(N by BN){ i =>
-            val logregX = SRAM[T](BN, D)
-            val logregY = SRAM[T](BN)
-            Parallel {
-              logregX load x(i::i+BN, 0::D par P2)
-              logregY load y(i::i+BN par P2)
-            }
-            MemReduce(gradAcc)(BN par P3){ ii =>
-              val pipe2Res = Reg[T]
-              val subRam   = SRAM[T](D)
-
-              val dotAccum = Reduce(Reg[T])(D par P2){j => logregX(ii,j) * btheta(j) }{_+_}  // read
-              Pipe { pipe2Res := (logregY(ii) - sigmoid(dotAccum.value)) }
-              Foreach(D par P2) {j => subRam(j) = logregX(ii,j) - pipe2Res.value }
-              subRam
-            }{_+_}
+        val grad = MemReduce(SRAM[T](D) par P1)(N by BN par P3){ i =>
+          val xTile = SRAM[T](BN, D)
+          val yTile = SRAM[T](BN)
+          Parallel {
+            xTile load x(i::i+BN, 0::D par P1)
+            yTile load y(i::i+BN par P1)
           }
-          gradAcc
-        }{(b,g) => b+g*A.to[T]}
+          MemReduce(SRAM[T](D) par P1)(BN by 1 par P2) { ii =>
+            val dot = Reduce(Reg[T])(D by 1) { d =>
+              xTile(ii,d) * btheta(d)
+            } { _ + _ }
+            val sub = Reg[T]
+            Pipe { 
+              sub := yTile(ii) - sigmoid[T](dot)
+            }
+            val gradRow = SRAM[T](D)
+            Foreach(D by 1 par P1) { d => gradRow(d) = xTile(ii, d) * sub.value }
+            gradRow
+          } { _ + _ }
+        } { _ + _ }
 
-        // Flush gradAcc
-        //Pipe(D by 1 par P2) { i => gradAcc(i) = 0.to[T]}
+        Foreach(D by 1) { d => btheta(d) = btheta(d) + grad(d) * A.to[T] }
+
       }
-      theta(0::D par P2) store btheta // read
+
+      theta(0::D par P1) store btheta // read
     }
+    
     getMem(theta)
   }
 
@@ -1131,10 +1168,10 @@ object LogReg extends SpatialApp {
           a*b}.reduce{_+_})
         row.map{a =>
           // println("subtraction for " + y + " is " + (a - sub))
-          a - sub}
+          a * sub}
       }.reduce{(a,b) => a.zip(b){_+_}}
       for (i <- 0 until D) {
-        gold(i) = gold(i) + next(i)
+        gold(i) = gold(i) + next(i) * A
       }
       // printArr(gold, "gold now")
     }
