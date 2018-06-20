@@ -34,7 +34,7 @@ summary_headers = ['App', 'cycle', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'sc
 
 def plot():
     cmap = matplotlib.cm.get_cmap('Oranges')
-    for app in apps:
+    for app in APPS:
         if app==opts.app or opts.app=='ALL':
             for args in summary[app]:
                 fig, ax = plt.subplots()

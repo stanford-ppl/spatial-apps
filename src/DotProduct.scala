@@ -8,16 +8,12 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
 
   val N = 1024 // param
 
-  val innerPar = 16
-  val outerPar = 1 // param
-  val tileSize = 32 // param
+  val ts = 32 // param (32, 1024, 64)
+  val op = 1 // param (1, <N> / <ts>, 4)
+  val ip = 16
 
   @virtualize
   def dotproduct[T:Type:Num](aIn: Array[T], bIn: Array[T]): T = {
-    val B  = tileSize (32 -> 64 -> 19200)
-    val P1 = outerPar (1 -> 6)
-    val P2 = innerPar (1 -> 192)
-    val P3 = innerPar (1 -> 192)
 
     bound(aIn.length) = N
 
@@ -31,18 +27,14 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
     setMem(b, bIn)
 
     Accel {
-      out := Reduce(Reg[T](0.to[T]))(size by B par P1){i =>
-        //val ts = Reg[Int](0)
-        //ts := min(B, size-i)
-        val aBlk = SRAM[T](B)
-        val bBlk = SRAM[T](B)
+      out := Reduce(Reg[T](0.to[T]))(size by ts par op){i =>
+        val aBlk = SRAM[T](ts)
+        val bBlk = SRAM[T](ts)
         Parallel {
-          //aBlk load a(i::i+ts.value par P3)
-          //bBlk load b(i::i+ts.value par P3)
-          aBlk load a(i::i+B par P3)
-          bBlk load b(i::i+B par P3)
+          aBlk load a(i::i+ts par ip)
+          bBlk load b(i::i+ts par ip)
         }
-        Reduce(Reg[T](0.to[T]))(B par P2){ii => aBlk(ii) * bBlk(ii) }{_+_}
+        Reduce(Reg[T](0.to[T]))(ts par ip){ii => aBlk(ii) * bBlk(ii) }{_+_}
       }{_+_}
     }
     getArg(out)

@@ -50,8 +50,8 @@ def dse(app, args, params):
             return dse(app, args, newParams)
         else:
             continue
-    print('{}{} args={} and params=[{}]{}'.format(bcolors.UNDERLINE, app, str(args),
-        ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
+    # print('{}{} params=[{}]{}'.format(bcolors.UNDERLINE, app,
+        # ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
     target(app, args, params)
     return 1
 
@@ -282,3 +282,41 @@ def runExp():
         PageRank_plasticine()
     if app in ['SPMV_CRS', 'ALL']:
         SPMV_CRS()
+
+def parseParams(app):
+    params = OrderedDict()
+    path = '{0}{1}.scala'.format(APP_DIR, app)
+
+    with open(path, 'r') as f:
+        for line in f:
+            if "// param" in line:
+                line = line.split("#")[0]
+                head, tail = line.split("// param")
+                param, value = head.split("val")[1].split("=")
+                param = param.strip()
+                value = value.strip()
+                range = tail.strip()
+                if range == "":
+                    range = "[{}]".format(value)
+                if (range.startswith("(")):
+                    range = "irange" + range
+                if ("<" in range):
+                    range = range.replace("<", "params[\"").replace(">", "\"]")
+                    range = "lambda params: " + range
+                assign = "params[\"{}\"] = {}".format(param, range)
+                exec(assign)
+
+    print("parsed params:")
+    for param in params:
+        print("{} = {}".format(param, params[param]))
+    return params
+
+def runExp():
+    for app in opts.apps:
+    
+        addArgs(app, args) # TODO: remove?
+
+        params = parseParams(app)
+        space = dse(app, args, params)
+        print("space size: {}".format(space))
+

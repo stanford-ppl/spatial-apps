@@ -25,7 +25,7 @@ SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 
 passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
-apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'Kmeans23', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
+APPS = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'Kmeans23', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
 
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
 JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
@@ -209,3 +209,4 @@ parser.add_argument('--plot', dest='plot', action='store_true', default=False)
 global opts
 (opts, args) = parser.parse_known_args()
 
+opts.apps = APPS if opts.app == "ALL" else [opts.app]

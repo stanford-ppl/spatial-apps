@@ -6,24 +6,18 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
   type X = Float
 
-  val margin = 1
   val C = 96 // param
   val R = 1024 // param
 
-  val innerPar = 16 // param
-  val midPar = 1 // param
-  val outerPar = 1 // param
-  val tileSize = 32 // param
+  val ts = 32 // param
+  val op = 1 // param (1, <R> / <ts>, 1)
+  val mp = 1 // param (1, 10, 1)
+
+  val ip = 16
+  val margin = 1
 
   @virtualize
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
-    val rTileSize = tileSize(96 -> 19200)
-    val op = outerPar(1 -> 8)
-    val mp = midPar(1 -> 4)
-    val ip = innerPar(1 -> 12)
-    val subLoopPar = innerPar(1 -> 16)
-    val prodLoopPar = innerPar(1 -> 96)
-    val outerAccumPar = innerPar(1 -> 1)
 
     val R = ArgIn[Int]
     setArg(R, yCPU.length); bound(yCPU.length) = GDA.R
@@ -49,21 +43,21 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
       val sigmaOut = SRAM[T](C, C)
 
-      MemReduce(sigmaOut)(R by rTileSize par op){ r =>
-        val gdaYtile = SRAM[Int](rTileSize)
-        val gdaXtile = SRAM[T](rTileSize, C)
+      MemReduce(sigmaOut)(R by ts par op){ r =>
+        val gdaYtile = SRAM[Int](ts)
+        val gdaXtile = SRAM[T](ts, C)
         val blk = Reg[Int]
         Parallel {
-          gdaYtile load y(r :: r + rTileSize par 16)
-          gdaXtile load x(r :: r + rTileSize, 0 :: C par 16) // Load tile of x
+          gdaYtile load y(r :: r + ts par 16)
+          gdaXtile load x(r :: r + ts, 0 :: C par 16) // Load tile of x
         }
 
         val sigmaBlk = SRAM[T](C, C)
 
-        MemReduce(sigmaBlk)(rTileSize par mp) { rr =>
+        MemReduce(sigmaBlk)(ts par mp) { rr =>
           val subTile = SRAM[T](C)
           val sigmaTile = SRAM[T](C, C)
-          Foreach(C par subLoopPar) { cc =>
+          Foreach(C par ip) { cc =>
             subTile(cc) = gdaXtile(rr, cc) - mux(gdaYtile(rr) == 1, mu1Tile(cc), mu0Tile(cc))
           }
           Foreach(C by 1, C par ip) { (ii, jj) =>

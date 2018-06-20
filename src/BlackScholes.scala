@@ -4,12 +4,12 @@ import virtualized._
 
 object BlackScholes extends SpatialApp {
 
-
-  val margin = 0.5f // Validates true if within +/- margin
-  val innerPar = 16 // param
-  val outerPar = 1 // param
-  val tileSize = 32 // param
   val N = 1024 // param
+  val ts = 32 // param
+  val op = 1 // param (1, <N> / <ts>, 4)
+
+  val ip = 16 
+  val margin = 0.5f // Validates true if within +/- margin
 
   final val inv_sqrt_2xPI = 0.39894228040143270286f
 
@@ -74,9 +74,6 @@ object BlackScholes extends SpatialApp {
     svolatility: Array[Float],
     stimes:      Array[Float]
   ): Array[Float] = {
-    val B  = tileSize (96 -> 96 -> 19200)
-    val OP = outerPar (1 -> 2)
-    val IP = innerPar (1 -> 96)
 
     val size = ArgIn[Int]
     setArg(size, stypes.length); bound(stypes.length) = N
@@ -96,29 +93,29 @@ object BlackScholes extends SpatialApp {
     setMem(times, stimes)
 
     Accel {
-      Foreach(size by B par OP) { i =>
-        val typeBlk   = SRAM[Int](B)
-        val priceBlk  = SRAM[Float](B)
-        val strikeBlk = SRAM[Float](B)
-        val rateBlk   = SRAM[Float](B)
-        val volBlk    = SRAM[Float](B)
-        val timeBlk   = SRAM[Float](B)
-        val optpriceBlk = SRAM[Float](B)
+      Foreach(size by ts par op) { i =>
+        val typeBlk   = SRAM[Int](ts)
+        val priceBlk  = SRAM[Float](ts)
+        val strikeBlk = SRAM[Float](ts)
+        val rateBlk   = SRAM[Float](ts)
+        val volBlk    = SRAM[Float](ts)
+        val timeBlk   = SRAM[Float](ts)
+        val optpriceBlk = SRAM[Float](ts)
 
         Parallel {
-          typeBlk   load types(i::i+B par IP)
-          priceBlk  load prices(i::i+B par IP)
-          strikeBlk load strike(i::i+B par IP)
-          rateBlk   load rate(i::i+B par IP)
-          volBlk    load vol(i::i+B par IP)
-          timeBlk   load times(i::i+B par IP)
+          typeBlk   load types(i::i+ts par ip)
+          priceBlk  load prices(i::i+ts par ip)
+          strikeBlk load strike(i::i+ts par ip)
+          rateBlk   load rate(i::i+ts par ip)
+          volBlk    load vol(i::i+ts par ip)
+          timeBlk   load times(i::i+ts par ip)
         }
 
-        Foreach(B par IP){ j =>
+        Foreach(ts par ip){ j =>
           val price = BlkSchlsEqEuroNoDiv(priceBlk(j), strikeBlk(j), rateBlk(j), volBlk(j), timeBlk(j), typeBlk(j))
           optpriceBlk(j) = price
         }
-        optprice(i::i+B par IP) store optpriceBlk
+        optprice(i::i+ts par ip) store optpriceBlk
       }
     }
     getMem(optprice)

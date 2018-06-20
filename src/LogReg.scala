@@ -14,8 +14,8 @@ object LogReg extends SpatialApp {
   val iters = 1
   val N = 1024
 
-  val innerPar = 16
-  val outerPar = 1 // param
+  val ip = 16
+  val op = 1 // param
   val tileSize = 64 // param
 
   def sigmoid[T:Type:Num](t:T) = 1.to[T]/(exp(-t) + 1.to[T])
@@ -29,9 +29,7 @@ object LogReg extends SpatialApp {
 
     val BN = tileSize (96 -> 96 -> 9600)
     val PX = 1 (1 -> 1)
-    val P1 = innerPar (1 -> 2)
-    val P2 = innerPar (1 -> 96)
-    val P3 = outerPar (1 -> 96)
+    val P3 = op (1 -> 96)
 
     val x = DRAM[T](N, D)
     val y = DRAM[T](N)
@@ -46,22 +44,22 @@ object LogReg extends SpatialApp {
 
       Sequential.Foreach(iters by 1) { epoch =>
 
-        Sequential.MemReduce(btheta)(1 by 1){ xx =>
+        Sequential.MemReduce(btheta par ip)(1 by 1){ xx =>
           val gradAcc = SRAM[T](D)
           Foreach(N by BN){ i =>
             val logregX = SRAM[T](BN, D)
             val logregY = SRAM[T](BN)
             Parallel {
-              logregX load x(i::i+BN, 0::D par P2)
-              logregY load y(i::i+BN par P2)
+              logregX load x(i::i+BN, 0::D par ip)
+              logregY load y(i::i+BN par ip)
             }
-            MemReduce(gradAcc)(BN par P3){ ii =>
+            MemReduce(gradAcc par ip)(BN par P3){ ii =>
               val pipe2Res = Reg[T]
               val subRam   = SRAM[T](D)
 
-              val dotAccum = Reduce(Reg[T])(D par P2){j => logregX(ii,j) * btheta(j) }{_+_}  // read
+              val dotAccum = Reduce(Reg[T])(D par ip){j => logregX(ii,j) * btheta(j) }{_+_}  // read
               Pipe { pipe2Res := (logregY(ii) - sigmoid(dotAccum.value)) }
-              Foreach(D par P2) {j => subRam(j) = logregX(ii,j) - pipe2Res.value }
+              Foreach(D par ip) {j => subRam(j) = logregX(ii,j) - pipe2Res.value }
               subRam
             }{_+_}
           }
@@ -69,9 +67,9 @@ object LogReg extends SpatialApp {
         }{(b,g) => b+g*A.to[T]}
 
         // Flush gradAcc
-        //Pipe(D by 1 par P2) { i => gradAcc(i) = 0.to[T]}
+        //Pipe(D by 1 par ip) { i => gradAcc(i) = 0.to[T]}
       }
-      theta(0::D par P2) store btheta // read
+      theta(0::D par ip) store btheta // read
     }
     getMem(theta)
   }
@@ -86,7 +84,6 @@ object LogReg extends SpatialApp {
     val result = logreg(sX.flatten,sY, theta, N, iters)
 
     val gold = Array.empty[X](D)
-    val ids = Array.tabulate(D){i => i}
     for (i <- 0 until D) {
       gold(i) = theta(i)
     }

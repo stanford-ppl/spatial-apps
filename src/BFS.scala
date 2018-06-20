@@ -3,7 +3,11 @@ import spatial.targets._
 import virtualized._
 
 object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
-  val tileSize = 8000 // param
+
+  val E = 9600000 // param
+  val ts = 8000 // param
+
+  val N = ts
   val edges_per_node = 6 // Will make this random later
 
   @virtualize
@@ -24,29 +28,27 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
     setArg(anpe, average_nodes_per_edge)
 
     Accel {
-      val frontierNodes = SRAM[Int](tileSize)
-      val frontierCounts = SRAM[Int](tileSize)
-      val frontierIds = SRAM[Int](tileSize)
-      val frontierLevels = SRAM[Int](tileSize)
-      val currentNodes = SRAM[Int](tileSize)
-      val pieceMem = SRAM[Int](tileSize)
+      val frontierNodes = SRAM[Int](ts)
+      val frontierCounts = SRAM[Int](ts)
+      val frontierIds = SRAM[Int](ts)
+      val frontierLevels = SRAM[Int](ts)
+      val currentNodes = SRAM[Int](ts)
+      val pieceMem = SRAM[Int](ts)
 
       val concatReg = Reg[Int](0)
       val numEdges = Reg[Int](1)
 
       // Flush first few for scatter safety
       Foreach(anpe by 1){i =>  //dummy read of anpe
-        Parallel{
-          frontierNodes(i) = 0.to[Int]
-          // frontierCounts(i) = 0.to[Int]
-          frontierLevels(i) = 0.to[Int]
-          currentNodes(i) = 0.to[Int]
-          pieceMem(i) = 0.to[Int]
-        }
+        frontierNodes(i) = 0
+        // frontierCounts(i) = 0.to[Int]
+        frontierLevels(i) = 0
+        currentNodes(i) = 0
+        pieceMem(i) = 0
       }
       Parallel {
-        frontierIds load ids(0 :: tileSize)
-        frontierCounts load counts(0 :: tileSize)
+        frontierIds load ids(0 :: ts)
+        frontierCounts load counts(0 :: ts)
       }
 
       Sequential.Foreach(depth.value by 1) { i => /* Loop 1 */
@@ -64,7 +66,7 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
           // pieceMem load edges(nextId :: nextId + nextLen)            
           pieceMem load edges(nextId :: nextId + nextLen)       
 
-          // val frontierAddr = SRAM[Int](tileSize)
+          // val frontierAddr = SRAM[Int](ts)
           Foreach(nextLen by 1) { kk =>
             /* Since Loop 2 is a metapipe and we read concatReg before
                we write to it, this means iter0 and iter1 both read
@@ -77,14 +79,14 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
             val frontierAddr = kk + concatReg.value
             frontierNodes(frontierAddr) = pieceMem(kk)
           }
-          concatReg := min(tileSize.to[Int], concatReg + nextLen)
+          concatReg := min(ts, concatReg + nextLen)
         }
 
         Foreach(concatReg by 1) { kk => currentNodes(kk) = frontierNodes(kk) }
         Foreach(concatReg by 1) { kk => frontierLevels(kk) = i + 1 }
         result(currentNodes, concatReg) scatter frontierLevels
         numEdges := concatReg
-        concatReg := 0.to[Int]
+        concatReg := 0
       }
     }
 
@@ -94,14 +96,11 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
   @virtualize
   def main() {
     /* NEW VERSION FOR PERFORMANCE MEASUREMENTS */
-    val E = 9600000
-    val N = tileSize
     val average_nodes_per_edge = args(0).to[Int]
     val spacing = 3 
-    val ed = E //args(1).to[SInt] // Set to roughly max_edges_per_node * N 
 
     val OCnodes = Array.tabulate(N) {i => 0.to[Int]}
-    val OCedges = Array.tabulate(ed){ i => i*2 % N}
+    val OCedges = Array.tabulate(E){ i => i*2 % N}
     val OCids = Array.tabulate(N)( i => average_nodes_per_edge*average_nodes_per_edge*i+1 % E)
     val OCcounts = Array.tabulate(N){ i => random[Int](average_nodes_per_edge-1)*2+1}
 

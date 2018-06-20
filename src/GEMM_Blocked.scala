@@ -5,21 +5,22 @@ import spatial.targets._
 object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
   override val target = AWS_F1
                                                                                                   
-  val DIM = 512
+  val DIM = 512 // param
 
-  val tileSize = 32 // param
-  val i_tileSize = 64 // param
-  val par_load = 16
-  val par_store = 16
-  val loop_jj    = 1 // param
-  val loop_ii    = 1 // param
-  val loop_kk    = 1 // param
-  val loop_i     = 1 // param
-  val loop_k     = 1 // param
-  val loop_j     = 16 // param
-  val reduce_col = 1 // param
-  val reduce_tmp = 1 // param
+  val ts = 32 // param
+  val its = 64 // param
+  val loop_ii    = 1 // param (1, <DIM> / <its>, 4)
+  val loop_jj    = 1 // param (1, <DIM> / <ts>, 4)
+  val loop_kk    = 1 // param (1, <DIM> / <ts>, 4)
+  val loop_i     = 1 // param (1, 5, 1)
+  val loop_k     = 1 // param (1, 5, 1)
 
+  val ip = 16
+  val loop_j     = ip
+  val par_load = ip
+  val par_store = ip
+  val reduce_col = ip
+  val reduce_tmp = ip
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 
 
@@ -205,7 +206,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
     CONCERNS: We need to figure out how HLS is actually managing the srams, or make our management better  
               We cannot do unaligned stores yet, so tilesize of 8 won't work unless we keep ts 16 of c_sram onchip                                                                                          
  */
-  type T = FixPt[TRUE,_16,_16] // Fatter type so that tileSize is burst aligned
+  type T = FixPt[TRUE,_16,_16] // Fatter type so that ts is burst aligned
 
   def gemm(a_data:Matrix[T], b_data:Matrix[T], c_init:Matrix[T]) = {
 
@@ -220,30 +221,30 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
     setMem(c_dram, c_init)
 
     Accel{
-      Foreach(dim by i_tileSize par loop_ii) { ii => // this loop defenitilely cant be parallelized right now
-        Foreach(dim by tileSize par loop_jj) { jj => 
-          val c_col = SRAM[T](i_tileSize,tileSize)
-          MemReduce(c_col par reduce_col)(dim by tileSize par loop_kk) { kk => 
-            val c_col_partial = SRAM[T](i_tileSize,tileSize)
-            val b_sram = SRAM[T](tileSize,tileSize)
-            b_sram load b_dram(kk::kk+tileSize, jj::jj+tileSize par par_load)
-            Foreach(i_tileSize by 1 par loop_i) { i => 
-              val a_sram = SRAM[T](tileSize)
-              a_sram load a_dram(ii+i, kk::kk+tileSize)
-              val c_tmp = SRAM[T](tileSize)
-              MemReduce(c_tmp par reduce_tmp)(tileSize by 1 par loop_k) { k => 
-                val c_tmp_partial = SRAM[T](tileSize)
+      Foreach(dim by its par loop_ii) { ii => // this loop defenitilely cant be parallelized right now
+        Foreach(dim by ts par loop_jj) { jj => 
+          val c_col = SRAM[T](its,ts)
+          MemReduce(c_col par reduce_col)(dim by ts par loop_kk) { kk => 
+            val c_col_partial = SRAM[T](its,ts)
+            val b_sram = SRAM[T](ts,ts)
+            b_sram load b_dram(kk::kk+ts, jj::jj+ts par par_load)
+            Foreach(its by 1 par loop_i) { i => 
+              val a_sram = SRAM[T](ts)
+              a_sram load a_dram(ii+i, kk::kk+ts)
+              val c_tmp = SRAM[T](ts)
+              MemReduce(c_tmp par reduce_tmp)(ts by 1 par loop_k) { k => 
+                val c_tmp_partial = SRAM[T](ts)
                 val temp_a = a_sram(k)
-                Foreach(tileSize by 1 par loop_j) { j => 
+                Foreach(ts by 1 par loop_j) { j => 
                   c_tmp_partial(j) = b_sram(k, j) * temp_a
                 }
                 c_tmp_partial
               }{_+_}
-            Foreach(tileSize by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
+            Foreach(ts by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
             }
           c_col_partial
           }{_+_}
-          c_dram(ii::ii+i_tileSize, jj::jj+tileSize par par_store) store c_col
+          c_dram(ii::ii+its, jj::jj+ts par par_store) store c_col
         }
       }
     }

@@ -2,39 +2,6 @@ import spatial.dsl._
 import spatial.targets._
 import virtualized._
 
-/*
-
-optiQL
-trait TPCHQ6Trait extends TPCHBaseTrait {
-  val queryName = "Q6"
-
-  def query() = {
-    val lineItems = loadLineItems()
-    tic(lineItems.size)
-
-    //FIXME: infix_&& fails to resolve automatically
-    val q = lineItems Where (l => infix_&&(l.l_shipdate >= Date("1994-01-01"), infix_&&(l.l_shipdate < Date("1995-01-01"), infix_&&(l.l_discount >= 0.05, infix_&&(l.l_discount <= 0.07, l.l_quantity < 24)))))
-    val revenue = q.Sum(l => l.l_extendedprice * l.l_discount)
-
-    toc(revenue)
-    println(revenue)
-  }
-}
-
-
-SQL:
-SELECT
-    sum(l_extendedprice * l_discount) as revenue
-FROM
-    lineitem
-WHERE
-    l_shipdate >= date '1994-01-01'
-    AND l_shipdate < date '1994-01-01' + interval '1' year
-    AND l_discount between 0.06 - 0.01 AND 0.06 + 0.01
-    AND l_quantity < 24;
-
-*/
-
 object BTC extends SpatialApp { // Regression (Dense) // Args: 0100000081cd02ab7e569e8bcd9317e2fe99f2de44d49ab2b8851ba4a308000000000000e320b6c2fffc8d750423db8b1eb942ae710e951ed797f7affc8892b0f1fc122bc7f5d74df2b9441a42a14695
   /*
     According to https://en.bitcoin.it/wiki/Block_hashing_algorithm
