@@ -4,6 +4,13 @@ import virtualized._
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 
+  val tileSize = 16 // param
+
+  val par_load = 1 // Do not change
+  val par_store = 1 // Do not change
+  val tile_par = 1 // Do not change
+  val page_par = 2 // (1 -> 1 -> tileSize)
+
   type Elem = FixPt[TRUE,_16,_16] // Float
   type X = FixPt[TRUE,_16,_16] // Float
 
@@ -15,7 +22,6 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 
   @virtualize
   def main() {
-    val tileSize = 16
     val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
     val rows = sparse_data(0,0)
     val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
@@ -38,11 +44,6 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
     // printArray(node2_list, "node2_list:")
     printArray(edgeLens, "edgeLens: ")
     printArray(edgeIds, "edgeIds: ")
-
-    val par_load = 1 // Do not change
-    val par_store = 1 // Do not change
-    val tile_par = 1 // Do not change
-    val page_par = 2 (1 -> 1 -> tileSize)
 
     // Arguments
     val itersIN = args(0).to[Int]

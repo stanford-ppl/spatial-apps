@@ -6,9 +6,9 @@ object LogReg extends SpatialApp {
 
   val iters = 1 // param
   val N = 1024 // param
-  val tileSize = 64 // param
+  val ts = 64 // param
   val op = 1 // param (1, <N> / <ts>, 4)
-  val mp = 1 // param (1, 5, 1)
+  val mp = 1 // param (1, min(ts, 5), 1)
 
   type X = Float //FixPt[TRUE,_16,_16]
 
@@ -27,7 +27,7 @@ object LogReg extends SpatialApp {
     setArg(iters, it)
     setArg(N, n)
 
-    val BN = tileSize (96 -> 96 -> 9600)
+    val BN = ts (96 -> 96 -> 9600)
     val PX = 1 (1 -> 1)
     val P3 = op (1 -> 96)
 
