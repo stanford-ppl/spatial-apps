@@ -4,19 +4,19 @@ import virtualized._
 
 object LogReg extends SpatialApp {
 
+  val iters = 1 // param
+  val N = 1024 // param
+  val tileSize = 64 // param
+  val op = 1 // param (1, <N> / <ts>, 4)
+  val mp = 1 // param (1, 5, 1)
 
   type X = Float //FixPt[TRUE,_16,_16]
 
   val margin = 5
   val D = 192
-  val A = 1
-
-  val iters = 1
-  val N = 1024
+  val A = 0.0000001f
 
   val ip = 16
-  val op = 1 // param
-  val tileSize = 64 // param
 
   def sigmoid[T:Type:Num](t:T) = 1.to[T]/(exp(-t) + 1.to[T])
 
@@ -39,38 +39,74 @@ object LogReg extends SpatialApp {
     setMem(y, yIn)
     setMem(theta, tt)
 
+    //Accel {
+      //val btheta = SRAM[T](D)
+
+      //Sequential.Foreach(iters by 1) { epoch =>
+
+        //Sequential.MemReduce(btheta par ip)(1 by 1){ xx =>
+          //val gradAcc = SRAM[T](D)
+          //Foreach(N by BN){ i =>
+            //val logregX = SRAM[T](BN, D)
+            //val logregY = SRAM[T](BN)
+            //Parallel {
+              //logregX load x(i::i+BN, 0::D par ip)
+              //logregY load y(i::i+BN par ip)
+            //}
+            //MemReduce(gradAcc par ip)(BN par P3){ ii =>
+              //val pipe2Res = Reg[T]
+              //val subRam   = SRAM[T](D)
+
+              //val dotAccum = Reduce(Reg[T])(D par ip){j => logregX(ii,j) * btheta(j) }{_+_}  // read
+              //Pipe { pipe2Res := (logregY(ii) - sigmoid(dotAccum.value)) }
+              //Foreach(D par ip) {j => subRam(j) = logregX(ii,j) * pipe2Res.value }
+              //subRam
+            //}{_+_}
+          //}
+          //gradAcc
+        //}{(b,g) => b+g*A.to[T]}
+
+        //// Flush gradAcc
+        ////Pipe(D by 1 par ip) { i => gradAcc(i) = 0.to[T]}
+      //}
+      //theta(0::D par ip) store btheta // read
+    //}
+
     Accel {
       val btheta = SRAM[T](D)
 
+      btheta load theta(0::D par ip)
+
       Sequential.Foreach(iters by 1) { epoch =>
 
-        Sequential.MemReduce(btheta par ip)(1 by 1){ xx =>
-          val gradAcc = SRAM[T](D)
-          Foreach(N by BN){ i =>
-            val logregX = SRAM[T](BN, D)
-            val logregY = SRAM[T](BN)
-            Parallel {
-              logregX load x(i::i+BN, 0::D par ip)
-              logregY load y(i::i+BN par ip)
-            }
-            MemReduce(gradAcc par ip)(BN par P3){ ii =>
-              val pipe2Res = Reg[T]
-              val subRam   = SRAM[T](D)
-
-              val dotAccum = Reduce(Reg[T])(D par ip){j => logregX(ii,j) * btheta(j) }{_+_}  // read
-              Pipe { pipe2Res := (logregY(ii) - sigmoid(dotAccum.value)) }
-              Foreach(D par ip) {j => subRam(j) = logregX(ii,j) - pipe2Res.value }
-              subRam
-            }{_+_}
+        val grad = MemReduce(SRAM[T](D) par ip)(N by BN par op){ i =>
+          val xTile = SRAM[T](BN, D)
+          val yTile = SRAM[T](BN)
+          Parallel {
+            xTile load x(i::i+BN, 0::D par ip)
+            yTile load y(i::i+BN par ip)
           }
-          gradAcc
-        }{(b,g) => b+g*A.to[T]}
+          MemReduce(SRAM[T](D) par ip)(BN by 1 par mp) { ii =>
+            val dot = Reduce(Reg[T])(D by 1) { d =>
+              xTile(ii,d) * btheta(d)
+            } { _ + _ }
+            val sub = Reg[T]
+            Pipe { 
+              sub := yTile(ii) - sigmoid[T](dot)
+            }
+            val gradRow = SRAM[T](D)
+            Foreach(D by 1 par ip) { d => gradRow(d) = xTile(ii, d) * sub.value }
+            gradRow
+          } { _ + _ }
+        } { _ + _ }
 
-        // Flush gradAcc
-        //Pipe(D by 1 par ip) { i => gradAcc(i) = 0.to[T]}
+        Foreach(D by 1) { d => btheta(d) = btheta(d) + grad(d) * A.to[T] }
+
       }
+
       theta(0::D par ip) store btheta // read
     }
+
     getMem(theta)
   }
 
@@ -83,22 +119,18 @@ object LogReg extends SpatialApp {
 
     val result = logreg(sX.flatten,sY, theta, N, iters)
 
+    printArray(theta, "theta: ")
     val gold = Array.empty[X](D)
     for (i <- 0 until D) {
       gold(i) = theta(i)
     }
     for (i <- 0 until iters) {
-      val next = sX.zip(sY) {case (row, y) =>
-        // println("sigmoid for " + y + " is " + sigmoid(row.zip(gold){_*_}.reduce{_+_}))
-        val sub = y - sigmoid(row.zip(gold){(a,b) =>
-          // println("doing " + a + " * " + b + " on row " + y)
-          a*b}.reduce{_+_})
-        row.map{a =>
-          // println("subtraction for " + y + " is " + (a - sub))
-          a - sub}
+      val gradient = sX.zip(sY) {case (row, y) =>
+        val sub = y - sigmoid(row.zip(gold){(a,b) => a*b}.reduce{_+_})
+        row.map{r => r * sub}
       }.reduce{(a,b) => a.zip(b){_+_}}
       for (i <- 0 until D) {
-        gold(i) = gold(i) + next(i)
+        gold(i) = gold(i) + A*gradient(i)
       }
       // printArr(gold, "gold now")
     }
@@ -111,7 +143,6 @@ object LogReg extends SpatialApp {
     // println("max err: " + result.zip(gold){(a,b) => (a-b)*(a-b)}.reduce{Math.max(_,_)})
     // println("mean err: " + result.zip(gold){(a,b) => (a-b)*(a-b)}.reduce{_+_} / D)
     println("PASS: " + cksum  + " (LogReg)")
-
 
 
     /* OptiMl version
