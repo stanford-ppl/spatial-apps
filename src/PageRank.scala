@@ -3,31 +3,36 @@ import spatial.targets._
 import virtualized._
 
 object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
+  override val target = targets.Default
 
-  val tileSize = 16 // param
+  val ts = 16 // param
+  val page_par = 2 // param (1, min(<ts>, 3), 1)
 
-  val par_load = 1 // Do not change
-  val par_store = 1 // Do not change
   val tile_par = 1 // Do not change
-  val page_par = 2 // (1 -> 1 -> tileSize)
+  val par_load = 16
+  val par_store = 16
+  type Elem = Float // FixPt[TRUE,_16,_16]
+  type X = Float // FixPt[TRUE,_16,_16]
 
-  type Elem = FixPt[TRUE,_16,_16] // Float
-  type X = FixPt[TRUE,_16,_16] // Float
+  val I = 1 // param
+
+  val damp = 0.85f
 
   /*
     Currently testing with DIMACS10 Chesapeake dataset from UF Sparse Matrix collection
 
   */
-  val margin = 0.3f
+  val margin = 0.5f
 
   @virtualize
   def main() {
-    val sparse_data = loadCSV2D[Int]("/remote/regression/data/machsuite/pagerank_chesapeake.csv", " ", "\n").transpose
+    val sparse_data = loadCSV2D[Int](sys.env("SPATIAL_HOME") + "/apps/data/pagerank/pagerank_chesapeake.csv", " ", "\n").transpose
     val rows = sparse_data(0,0)
     val node1_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(0, i+1)-1} // Every page is 1-indexed...
     val node2_list = Array.tabulate(sparse_data.cols - 1){i => sparse_data(1, i+1)-1} // Every page is 1-indexed...
     // Preprocess to get frontier sizes.  We can do this on chip also if we wanted
     println("Matrix has " + rows + " rows")
+    println("node2_list.length " + node2_list.length)
     val edgeLens = Array.tabulate(rows){i => Array.tabulate(node1_list.length){j => 
       if (node1_list(j) == i) 1 else 0
     }.reduce{_+_}}
@@ -46,17 +51,12 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
     printArray(edgeIds, "edgeIds: ")
 
     // Arguments
-    val itersIN = args(0).to[Int]
-    val dampIN = args(1).to[X]
-
     val iters = ArgIn[Int]
     val NP    = ArgIn[Int]
-    val damp  = ArgIn[X]
     val NE    = ArgIn[Int]
-    setArg(iters, itersIN)
-    setArg(NP, rows)
-    setArg(damp, dampIN)
-    setArg(NE, node2_list.length)
+    setArg(iters, I)
+    setArg(NP, rows); bound(rows) = 39
+    setArg(NE, node2_list.length); bound(node2_list.length) = 340
 
     val OCpages    = DRAM[X](NP)
     val OCedges    = DRAM[Int](NE)    // srcs of edges
@@ -73,16 +73,15 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
     Accel {
       Sequential.Foreach(iters by 1){iter => 
         // Step through each tile
-        Foreach(NP by tileSize par tile_par){page => 
-          val local_pages = SRAM.buffer[X](tileSize)
-          val local_edgeIds = SRAM[Int](tileSize)
-          val local_edgeLens = SRAM[Int](tileSize)
-          val pages_left = min(tileSize.to[Int], NP-page)
-          local_pages load OCpages(page::page+pages_left par par_load)
-          local_edgeLens load OCedgeLens(page::page+pages_left par par_load)
-          local_edgeIds load OCedgeIds(page::page+pages_left par par_load)
+        Foreach(NP by ts par tile_par){page => 
+          val local_pages = SRAM.buffer[X](ts)
+          val local_edgeIds = SRAM[Int](ts)
+          val local_edgeLens = SRAM[Int](ts)
+          local_pages load OCpages(page::page+ts par par_load)
+          local_edgeLens load OCedgeLens(page::page+ts par par_load)
+          local_edgeIds load OCedgeIds(page::page+ts par par_load)
           // Process each page in local tile
-          Sequential.Foreach(pages_left by 1 par page_par){local_page => 
+          Sequential.Foreach(ts by 1 par page_par){local_page => 
             // Fetch edge list for this page
             val edgeList = FIFO[Int](128)
             val id = local_edgeIds(local_page)
@@ -94,7 +93,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
             val farPages2 = FIFO[Int](128)
             Foreach(edgeList.numel by 1){i => 
               val tmp = edgeList.deq()
-              if (tmp >= page && tmp < page+pages_left) {
+              if (tmp >= page && tmp < page+ts) {
                 nearPages.enq(tmp - page)
               } else {
                 farPages1.enq(tmp)
@@ -120,9 +119,9 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
             }{_+_}
 
             // Write new rank
-            local_pages(local_page) = pagerank * damp + (1.to[X] - damp)
+            local_pages(local_page) = pagerank * damp + (1f - damp).to[X]
           }
-          OCpages(page::page+pages_left par par_store) store local_pages
+          OCpages(page::page+ts par par_store) store local_pages
         }
       }
     }
@@ -150,7 +149,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
           p/c.to[X]
         }.reduce{_+_}
         // println("new pr for " + i + " is " + pr)
-        gold(i) = pr*dampIN + (1.to[X]-dampIN)
+        gold(i) = pr * damp + (1f - damp).to[X]
       }
     }
 

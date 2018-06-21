@@ -37,13 +37,19 @@ import virtualized._
 
 object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0.0001
 
+  val N = 1024
+  val E = 1 // param # epoch
+  val D = 16
+  val ts = 16
+  val op = 1 
+  val mp1 = 1 // [1, 2, 3, 4, 5] # 
+  val mp2 = 1 // mp1 # mp2 and mp1 should be divisable 
+
+  val A = 0.0001f
+  val ip = 16
 
   type TM = FixPt[TRUE,_16,_16]
   type TX = FixPt[TRUE,_16,_16]
-  val modelSize = 16
-  val tileSize = 16
-  val innerPar = 4
-  val outerPar = 1 // Not used right now?
   val margin = 1
 
   @virtualize
@@ -51,13 +57,9 @@ object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0
     val E = ArgIn[Int]
     val N = ArgIn[Int]
     val A = ArgIn[TM]
-    val D = modelSize
 
-    val ip = innerPar (1 -> 1)
-    val op = outerPar (1 -> 1)
-
-    setArg(E, epochs)
-    setArg(N, nn)
+    setArg(E, epochs); bound(epochs) = SGD_minibatch.E
+    setArg(N, nn); bound(nn) = SGD_minibatch.N
     setArg(A, alpha)
 
     val x = DRAM[TX](N,D)
@@ -68,31 +70,55 @@ object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0
     setMem(y, y_in)
 
     Accel {
-      val y_tile = SRAM[TX](tileSize)
+      val y_tile = SRAM[TX](ts)
       val sgdmodel = SRAM[TM](D)
-      val x_tile = SRAM[TX](tileSize,D)
+      val x_tile = SRAM[TX](ts,D)
       Pipe(D by 1) { i => sgdmodel(i) = 0.to[TM]}
       Sequential.Foreach(E by 1) { e =>
-
-        Sequential.Foreach (N by tileSize) { b =>
-          y_tile load y(b::b+tileSize par ip)
-          x_tile load x(b::b+tileSize, 0::D)
-          val y_err = SRAM[TX](tileSize)
-          Sequential.Foreach(tileSize by 1) {i => 
-            val y_hat = Reg[TX]
-            Reduce(y_hat)(D by 1 par ip){ j => x_tile(i,j) * sgdmodel(j).to[TX] }{_+_}
+        Sequential.Foreach (N by ts) { b =>
+          y_tile load y(b::b+ts par ip)
+          x_tile load x(b::b+ts, 0::D)
+          val y_err = SRAM[TX](ts)
+          Foreach(ts by 1 par mp1) { i => 
+            val y_hat = Reduce(Reg[TX])(D by 1 par ip){ j => x_tile(i,j) * sgdmodel(j).to[TX] }{_+_}
             y_err(i) = y_tile(i) - y_hat.value
           }
-          Sequential.Foreach(D by 1) { i =>
-            val raw_update = Reg[TX]
-            Reduce(raw_update)(tileSize by 1 par ip){ j => x_tile(j,i) * y_err(j) }{_+_}
-            sgdmodel(i) = sgdmodel(i) + raw_update.value.to[TM]*A
-          }
+          MemFold(sgdmodel)(ts by 1 par mp2) { i =>
+            val row = SRAM[TX](D)
+            Foreach(D by 1 par ip) { j => row(j) = x_tile(i,j) * y_err(i) * A }
+            row
+          } { _ + _ }
         }
       }
       result(0::D par ip) store sgdmodel
-
     }
+
+    //Accel {
+      //val y_tile = SRAM[TX](ts)
+      //val sgdmodel = SRAM[TM](D)
+      //val x_tile = SRAM[TX](ts,D)
+      //Pipe(D by 1) { i => sgdmodel(i) = 0.to[TM]}
+      //Sequential.Foreach(E by 1) { e =>
+
+        //Sequential.Foreach (N by ts) { b =>
+          //y_tile load y(b::b+ts par ip)
+          //x_tile load x(b::b+ts, 0::D)
+          //val y_err = SRAM[TX](ts)
+          //Foreach(ts by 1 par mp1) { i => 
+            //val y_hat = Reduce(Reg[TX])(D by 1 par ip){ j => x_tile(i,j) * sgdmodel(j).to[TX] }{_+_}
+            //y_err(i) = y_tile(i) - y_hat.value
+          //}
+          //Foreach(D by 1 par mp2) { i =>
+          //// Can't parallelize this inner loop in plasticine, x_tile's second
+          //// dimension is the inner dimension
+            //val raw_update = Reduce(Reg[TX])(ts by 1 par ip){ j => x_tile(j,i) * y_err(j) }{_+_}
+            //sgdmodel(i) = sgdmodel(i) + raw_update.value.to[TM]*A
+          //}
+        //}
+      //}
+      //result(0::D par ip) store sgdmodel
+
+    //}
 
     getMem(result)
 
@@ -106,18 +132,13 @@ object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0
 
   @virtualize
   def main() {
-    val E = args(0).to[Int]
-    val N = args(1).to[Int]
-    val A = args(2).to[TM] // Should be somewhere around 0.0001 for point-wise sgd
-    val D = modelSize
-
     val sX = Array.fill(N){ Array.fill(D){ random[TX](3.to[TX]) + 1.to[TX]} }
     val ideal_model = Array.tabulate(D){ i => 2.to[TM] }
     val sY = Array.tabulate(N){i => ideal_model.zip(sX.apply(i)){case (a,b) => a.to[TX]*b}.reduce{_+_}}
     val id = Array.tabulate(D){ i => i }
     val ep = Array.tabulate(E){ i => i }
 
-    val result = sgdminibatch(sX.flatten, sY, A, E, N)
+    val result = sgdminibatch(sX.flatten, sY, A.to[TM], E, N)
 
 
     // (0 until E) foreach { i =>
