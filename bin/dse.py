@@ -50,8 +50,8 @@ def dse(app, args, params):
             return dse(app, args, newParams)
         else:
             continue
-    print('{}{} params=[{}]{}'.format(bcolors.UNDERLINE, app,
-        ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
+    # print('{}{} params=[{}]{}'.format(bcolors.UNDERLINE, app,
+        # ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
     target(app, args, params)
     return 1
 
