@@ -25,7 +25,9 @@ SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 
 passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
-APPS = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'Kmeans23', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
+APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
+APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
+# APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
 
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
 JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
@@ -68,6 +70,11 @@ colors = {
         "RUNNING" : bcolors.ORANGE,
         "NOTRUN"  : bcolors.YELLOW,
         }
+
+lanes = 16
+bankSize = 32 * 1024 / 4
+max_bw = 12.8*4
+pmuSize = 256 / 4 * 1024 # 256 kB / (4 word / Byte) = 64 * 1024 = 65536 word
 
 def rm(path):
     if os.path.exists(path):

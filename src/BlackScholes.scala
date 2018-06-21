@@ -4,8 +4,8 @@ import virtualized._
 
 object BlackScholes extends SpatialApp {
 
-  val N = 1024 // param
-  val ts = 32 // param
+  val N = 1024 // param pmuSize * 20 # old number 1966080
+  val ts = 32 // param pmuSize # (1024, pmuSize, 1024)
   val op = 1 // param (1, <N> / <ts>, 4)
 
   val ip = 16 

@@ -16,7 +16,7 @@ object PageRank extends SpatialApp { // Regression (Sparse) // Args: 50 0.125
 
   val I = 1 // param
 
-  val damp = 0.85f
+  val damp = 0.125f
 
   /*
     Currently testing with DIMACS10 Chesapeake dataset from UF Sparse Matrix collection

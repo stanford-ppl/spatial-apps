@@ -4,8 +4,8 @@ import virtualized._
 
 object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
 
-  val N = 1024 // param
-  val ts = 32 // param
+  val N = 1024 // param pmuSize * 20 # old size 96000
+  val ts = 32 // param pmuSize # (1024, pmuSize, 4*1024)
   val op = 2 // param (1, <N> / <ts>, 4)
 
   type FT = Int

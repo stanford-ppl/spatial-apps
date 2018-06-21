@@ -24,10 +24,6 @@ import math
 
 from util import *
 
-lanes = 16
-bankSize = 32 * 1024 / 4
-max_bw = 12.8*4
-
 summary_headers = ['App', 'cycle', 'lavgbw', 'savgbw', 'pcuUtil', 'mcuUtil', 'scuUtil', 'ocuUtil', 'mcUtil', 'ocuUtil', 'mcUtil',
     'slinkUtil', 'vlinkUtil', 'clinkUtil', 'totalRegUtil', 'totalFUUtil', 'totalSBufUtil', 
     'totalVBufUtil']

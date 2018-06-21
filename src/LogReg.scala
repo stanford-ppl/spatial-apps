@@ -5,10 +5,10 @@ import virtualized._
 object LogReg extends SpatialApp {
 
   val iters = 1 // param
-  val N = 1024 // param
-  val ts = 64 // param
-  val op = 1 // param (1, <N> / <ts>, 4)
-  val mp = 1 // param (1, min(ts, 5), 1)
+  val N = 1024 // param pmuSize * 10
+  val ts = 64 // param pmuSize
+  val op = 1 // param (1, <N> / <ts>, 2)
+  val mp = 1 // param (1, min(<ts>, 5), 2)
 
   type X = Float //FixPt[TRUE,_16,_16]
 

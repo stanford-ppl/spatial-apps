@@ -8,13 +8,13 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
   type X = Int
 
   val I = 1 // param
-  val N = 10240  // param
+  val N = 320  // param 8 * 1024
   val K = 16 // param
   val D = 32 // param
-  val ts = 1024 // param
+  val ts = 1024 // param (1024, pmuSize / <D>, 1024)
 
-  val op = 1 // param (1, <N> / <ts>, 1)
-  val mp = 1 // param (1, 5, min(1, <ts>))
+  val op = 1 // param (1, <N> / <ts>, 2)
+  val mp = 1 // param (1, 5, 2)
   val ip = 16
   val PX = 1
 

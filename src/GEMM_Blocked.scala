@@ -5,15 +5,15 @@ import spatial.targets._
 object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
   override val target = AWS_F1
                                                                                                   
-  val DIM = 512 // param
+  val DIM = 1024 // param
 
-  val ts = 32 // param
-  val its = 64 // param
-  val loop_ii    = 1 // param (1, <DIM> / <its>, 4)
-  val loop_jj    = 1 // param (1, <DIM> / <ts>, 4)
-  val loop_kk    = 1 // param (1, <DIM> / <ts>, 4)
-  val loop_i     = 1 // param (1, 5, 1)
-  val loop_k     = 1 // param (1, 5, 1)
+  val ts = 32 // param (64, 256, 64)
+  val its = 64 // param pmuSize / <ts>
+  val loop_ii    = 1 // param (1, <DIM> / <its>, 2)
+  val loop_jj    = 1 // param (1, <DIM> / <ts>, 2)
+  val loop_kk    = 1 // param (1, <DIM> / <ts>, 2)
+  val loop_i     = 1 // param (1, 6, 2)
+  val loop_k     = 1 // param (1, 6, 2)
 
   val ip = 16
   val loop_j     = ip
