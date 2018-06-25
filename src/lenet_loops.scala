@@ -86,7 +86,7 @@ object lenet_loops extends SpatialApp {
         val i0_SRAM = SRAM[T](28,32)
         i0_SRAM load i0_DRAM(batch_img, 0::28, 0::32 par 1)
         
-        // Conv2D
+        // Conv2D 1st layer
         val tmp1_SRAM = SRAM[T](20,12,12)
         Foreach(20 by 1 par conv1_par) { outD_i => // out channels
           val nr = 28
@@ -97,15 +97,14 @@ object lenet_loops extends SpatialApp {
           val oc = 24
           val tmp1_SRAM_conv = SRAM[T](or, oc) // 24 x 24
           val c0_RF = RegFile[T](32)
-          c0_RF load c0_DRAM(outD_i, 0, 0::32 par 1)
-          Foreach(0 until or, 0 until oc par 1) { (r,c) =>
+          c0_RF load c0_DRAM(outD_i, 0, 0::32 par 1) // Loading kernel
+          Foreach(0 until or, 0 until oc par 1) { (r,c) => // Convolution with 5 x 5 kernel
             val window = Reduce(Reg[T](0.to[T]))(0 until kr par 1, 0 until kc par 1){ (i,j) =>
               i0_SRAM(r+i,c+j) * c0_RF(i*5+j)
             }{_+_}
             tmp1_SRAM_conv(r, c) = window.value
           }
-          Foreach(12 by 1, 12 by 1) { (i,j) =>
-            // pulling + relu + biasAdd
+          Foreach(12 by 1, 12 by 1) { (i,j) => // Fused pulling + relu + biasAdd
             val out = Reduce(Reg[T](0.to[T]))(2 by 1, 2 by 1) { (ii, jj) =>
               max(0.to[T], tmp1_SRAM_conv(i*2 + ii, j*2 + jj) + c1_SRAM(outD_i))
             } { (x,y) => max(x,y) }
@@ -116,7 +115,7 @@ object lenet_loops extends SpatialApp {
         // Optimization: ReLU was merged into Conv2D above
         // Optimization: MaxPool was merged into Conv2D above
 
-        // Conv2D
+        // Conv2D 2nd layer
         val tmp2_SRAM = SRAM[T](50,4,4)
         Foreach(50 by 1 par conv2_par) { outD_i => // out channels
           val nr = 12
