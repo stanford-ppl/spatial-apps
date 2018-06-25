@@ -3,6 +3,14 @@ import virtualized._
 
 object lenet_loops extends SpatialApp {
 
+  val batch_par = 1 // param
+  val conv1_par = 1 // param
+  val conv2_par = 1 // param
+  val mat1_par = 1 // param
+  val mat2_par = 1 // param
+
+  val ip = 16
+
   type T = FixPt[TRUE,_5,_11] // Use higher precision for more accuracy
   val BATCH_SIZE = 17         // TODO: Make this an argin instead of hard-coded
   
@@ -72,7 +80,7 @@ object lenet_loops extends SpatialApp {
       val c7_SRAM = SRAM[T](32)
       c7_SRAM load c7_DRAM(0::32)
       
-      Foreach(BATCH_SIZE by 1 par 1) { batch_img =>
+      Foreach(BATCH_SIZE by 1 par batch_par) { batch_img =>
 
         // Move data on-chip
         val i0_SRAM = SRAM[T](28,32)
@@ -80,7 +88,7 @@ object lenet_loops extends SpatialApp {
         
         // Conv2D
         val tmp1_SRAM = SRAM[T](20,12,12)
-        Foreach(20 by 1 par 1) { outD_i => // out channels
+        Foreach(20 by 1 par conv1_par) { outD_i => // out channels
           val nr = 28
           val nc = 28
           val kr = 5
@@ -110,7 +118,7 @@ object lenet_loops extends SpatialApp {
 
         // Conv2D
         val tmp2_SRAM = SRAM[T](50,4,4)
-        Foreach(50 by 1 par 2) { outD_i => // out channels
+        Foreach(50 by 1 par conv2_par) { outD_i => // out channels
           val nr = 12
           val nc = 12
           val kr = 5
@@ -151,7 +159,7 @@ object lenet_loops extends SpatialApp {
 
         // MatMul
         val tmp4_SRAM = SRAM[T](500)
-        Foreach(100 by 1){out_i =>
+        Foreach(100 by 1 par mat1_par){out_i =>
           val c4_row_SRAM = SRAM[T](4000)
           c4_row_SRAM load c4_DRAM(out_i, 0::4000 par 16)
           Foreach(5 by 1){block_i =>
@@ -166,7 +174,7 @@ object lenet_loops extends SpatialApp {
 
         // MatMul
         val tmp5_SRAM = SRAM[T](32)
-        Foreach(10 by 1 par 1){out_i =>
+        Foreach(10 by 1 par mat2_par){out_i =>
           val c6_row_SRAM = SRAM[T](512)
           c6_row_SRAM load c6_DRAM(out_i, 0::512 par 1)
           val prod = Reduce(Reg[T](0.to[T]))(500 by 1 par 1){ in_i => tmp4_SRAM(in_i) * c6_row_SRAM(in_i) }{_+_}

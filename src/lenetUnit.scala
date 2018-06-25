@@ -63,8 +63,8 @@ object lenetUnit extends SpatialApp {
       val c1_SRAM = SRAM[T](32)
       c1_SRAM load c1_DRAM(0::32 par 1)
 
-      val c3_SRAM = SRAM[T](64)
-      c3_SRAM load c3_DRAM(0::64 par 1)
+      //val c3_SRAM = SRAM[T](64)
+      //c3_SRAM load c3_DRAM(0::64 par 1)
 
       //val c5_SRAM = SRAM[T](512)
       //c5_SRAM load c5_DRAM(0::512 par 1)
@@ -87,61 +87,42 @@ object lenetUnit extends SpatialApp {
           val kc = 5
           val or = 24
           val oc = 24
-          val tmp1_SRAM_conv = SRAM[T](or, oc) // 24 x 24
+          //val tmp1_SRAM_conv = SRAM[T](or, oc) // 24 x 24
           val c0_RF = RegFile[T](32)
           c0_RF load c0_DRAM(outD_i, 0, 0::32 par 1)
-          Foreach(0 until or, 0 until oc par 1) { (r,c) =>
-            val window = Reduce(Reg[T](0.to[T]))(0 until kr par 1, 0 until kc par 1){ (i,j) =>
-              i0_SRAM(r+i,c+j) * c0_RF(i*5+j)
-            }{_+_}
-            tmp1_SRAM_conv(r, c) = window.value
-          }
+          //Foreach(0 until or, 0 until oc par 1) { (r,c) =>
+            //val window = Reduce(Reg[T](0.to[T]))(0 until kr par 1, 0 until kc par 1){ (i,j) =>
+              //i0_SRAM(r+i,c+j) * c0_RF(i*5+j)
+            //}{_+_}
+            //tmp1_SRAM_conv(r, c) = window.value
+          //}
+          //Foreach(12 by 1, 12 by 1) { (i,j) =>
+            //// pulling + relu + biasAdd
+            //val out = Reduce(Reg[T](0.to[T]))(2 by 1, 2 by 1) { (ii, jj) =>
+              //max(0.to[T], tmp1_SRAM_conv(i*2 + ii, j*2 + jj) + c1_SRAM(outD_i))
+            //} { (x,y) => max(x,y) }
+            //tmp1_SRAM(outD_i, i, j) = out.value
+          //}
           Foreach(12 by 1, 12 by 1) { (i,j) =>
             // pulling + relu + biasAdd
             val out = Reduce(Reg[T](0.to[T]))(2 by 1, 2 by 1) { (ii, jj) =>
-              max(0.to[T], tmp1_SRAM_conv(i*2 + ii, j*2 + jj) + c1_SRAM(outD_i))
+              val window = Reduce(Reg[T](0.to[T]))(0 until kr par 1, 0 until kc par 1){ (ki,kj) =>
+                val r = i*2 + ii
+                val c = j*2 + jj
+                i0_SRAM(r+ki,c+kj) * c0_RF(ki*5+j)
+              }{_+_}
+              max(0.to[T], window.value + c1_SRAM(outD_i))
             } { (x,y) => max(x,y) }
             tmp1_SRAM(outD_i, i, j) = out.value
           }
+
         }
         // Optimization: BiasAdd was merged into Conv2D above
         // Optimization: ReLU was merged into Conv2D above
         // Optimization: MaxPool was merged into Conv2D above
-        
-        // Conv2D
-        val tmp2_SRAM = SRAM[T](50,4,4)
-        Foreach(50 by 1 par 2) { outD_i => // out channels
-          val nr = 12
-          val nc = 12
-          val kr = 5
-          val kc = 5
-          val or = 8
-          val oc = 8
-          val d = 20
-          val tmp2_SRAM_conv = SRAM[T](or, oc)
-          val c2_RF = SRAM[T](512)
-          c2_RF load c2_DRAM(outD_i, 0::512 par 1)                            // Banking error if parallelized
-          MemReduce(tmp2_SRAM_conv)(d by 1 par 1) { inD_i => // in channels   // Banking error if parallelized
-            val result = SRAM[T](or, oc)
-            Foreach(0 until or, 0 until oc par 1) { (r,c) =>
-              val window = Reduce(Reg[T](0.to[T]))(0 until kr par 1, 0 until kc par 1){ (i,j) =>
-                tmp1_SRAM(inD_i, r+i,c+j) * c2_RF(inD_i*25 + i*5 + j)
-              }{_+_}
-              result(r, c) = window.value
-            }
-            result
-          }{_+_} // Reduce across in channels
 
-          Foreach(4 by 1, 4 by 1) { (i,j) =>
-            val out = Reduce(Reg[T](0.to[T]))(2 by 1, 2 by 1) { (ii, jj) =>
-              max(0.to[T], tmp2_SRAM_conv(i*2 + ii, j*2 + jj) + c3_SRAM(outD_i))
-            } { (x,y) => max(x,y) }
-            tmp2_SRAM(outD_i, i, j) = out.value
-          }
-        }
-
-        val tmp_DRAM = DRAM[T](50, 4, 4)
-        tmp_DRAM(0::50, 0::4, 0::4) store tmp2_SRAM
+        val tmp_DRAM = DRAM[T](20, 12, 12)
+        tmp_DRAM(0::20, 0::12, 0::12) store tmp1_SRAM
       } // Metapipeline over all images
     }
     
