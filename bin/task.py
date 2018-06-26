@@ -1,18 +1,11 @@
 from os import listdir
 from os.path import isfile, isdir, join, splitext, basename, dirname 
 from collections import OrderedDict
-import os
-import argparse
 import subprocess
-import commands
 import time
-import pickle
 import signal
-import psutil
-import shutil
 import numpy as np
 import types
-import csv
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -74,11 +67,11 @@ def runPass(fullname, passName):
         return
     if success(fullname, passName) and not regenerate(passName):
         return
-    if running(fullname, passName):
+    if failed(fullname, passName) or running(fullname, passName):
         return
     for dep in dependency[passName]:
         if not success(fullname, dep):
-            print("{} {} not ran due to {} not succeeded".format(fullname, passName, dep))
+            # print("{} {} not ran due to {} not succeeded".format(fullname, passName, dep))
             return
 
     # print("runPass {} {}".format(fullname, passName))
@@ -159,23 +152,36 @@ def act(fullname, resp):
     elif "o " in resp :
         for passName in passes:
             if passName in resp: open(passName)
+    elif "q":
+        exit(0)
 
 def show(fullname):
-    for passName in passes:
-        if passName=="GEN_PIR":
-            keywords = ["Except"]
-        elif passName=="MAP_PIR":
-            keywords = ["error"]
-        else:
-            keywords = ["error"]
-
-        log = logs(fullname, passName)
-        prog = progress(fullname, passName)
-        print("{}{}({}){} {}".format(colors[prog], passName, prog, bcolors.NC, log))
+    import stats
+    def printError(passName, log):
         if failed(fullname, passName):
+            if passName=="GEN_PIR":
+                keywords = ["Except"]
+            elif passName=="MAP_PIR":
+                keywords = ["error"]
+            else:
+                keywords = ["error"]
             lines = grep(log, keywords)
             for line in lines:
                 sys.stdout.write('- ' + line)
+    def passMessage(passName, log):
+        msg = ""
+        if success(fullname, passName) and passName=="MAP_PIR":
+            pcu = stats.pcuUsage(log)
+            pmu = stats.pmuUsage(log)
+            mc = stats.mcUsage(log)
+            msg = "pcu={}% pmu={}% mc={}%".format(pcu, pmu, mc)
+        return msg
+    for passName in passes:
+        log = logs(fullname, passName)
+        prog = progress(fullname, passName)
+        msg = passMessage(passName, log)
+        print("{}{}({}){} {} {}".format(colors[prog], passName, prog, bcolors.NC, log, msg))
+        printError(passName, log)
     print("{}-------------------------------------------------------{}".format(bcolors.CYAN, bcolors.NC))
     return
 
@@ -197,7 +203,7 @@ def progress(fullname, passName):
     if os.path.exists(log):
         isDone = (len(grep(log,"PASS (DONE)".format(passName))) != 0)
         if isDone:
-	    isFailed = (len(grep(log, ['error','Error','ERROR','No rule to make', 'Killed', 'KILLED'])) != 0)
+	    isFailed = (len(grep(log, ['error','Error','ERROR','fail','No rule to make', 'Killed', 'KILLED'])) != 0)
             if passName=="RUN_SIMULATION":
 	        hasCycle=cycleOf(fullname) is not None
 	        timeOut = len(grep(log, 'Hardware timeout after') != 0)

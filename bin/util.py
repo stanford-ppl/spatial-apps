@@ -1,30 +1,18 @@
-from os import listdir
-from os.path import isfile, isdir, join, splitext, basename, dirname 
-from collections import OrderedDict
-import os
+from os.path import join
 import argparse
 import subprocess
-import commands
 import time
 import pickle
-import signal
-import psutil
-import shutil
-import numpy as np
-import types
-import csv
 
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib.ticker as ticker
 import os, sys
 import math
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 
-passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
+# passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
+# passes=["GEN_PIR","FIT_PIR","MAP_PIR","RUN_PSIM"]
+passes=["GEN_PIR","MAP_PIR"]
 APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
 APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
 # APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
@@ -198,9 +186,8 @@ def write(log, msg):
         f.write(msg)
 
 parser = argparse.ArgumentParser(description='Run experiments')
-parser.add_argument('--parallel', dest='parallel', nargs='?', default=1, type=int)
+parser.add_argument('--run', dest='run', nargs='?', default=0, type=int)
 parser.add_argument('--single', dest='single', action='store_true', default=False) 
-parser.add_argument('--run', dest='run', action='store_true', default=False) 
 parser.add_argument('--status', dest='status', action='store_true', default=False) 
 parser.add_argument('--dse', dest='dse', action='store_true', default=False) 
 parser.add_argument('--app', dest='app', action='store', default='ALL',help='App name')
@@ -217,3 +204,6 @@ global opts
 (opts, args) = parser.parse_known_args()
 
 opts.apps = APPS if opts.app == "ALL" else [opts.app]
+if opts.run > 0:
+    opts.parallel = opts.run
+opts.run = opts.run > 0

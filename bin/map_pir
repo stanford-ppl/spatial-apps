@@ -3,9 +3,18 @@
 app=$1
 log=$2
 
-cd $PIR_HOME
 mkdir -p $PIR_HOME/out/$app
-out_dir=$PIR_HOME/out/$app
-$PIR_HOME/bin/pir $app --debug --mapping=true --verbose --simulate=false --arch=SN16x8_LD >> $log 2>&1
+$PIR_HOME/bin/pir $app \
+  --debug \
+  --mapping=true \
+  --net=static \
+  --topo=mesh \
+  --row=16 --col=8 \
+  --load-pir=false \
+  --save-pir=true \
+  --psim=false \
+  --ctrl=true \
+  --bp=false \
+  --stat=true > $log 2>&1 
 
 echo "-------------PASS (DONE)------------" >> $log
