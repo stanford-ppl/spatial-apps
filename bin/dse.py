@@ -50,8 +50,8 @@ def dse(app, args, params):
             return dse(app, args, newParams)
         else:
             continue
-    # print('{}{} params=[{}]{}'.format(bcolors.UNDERLINE, app,
-        # ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
+    print('{}{} params=[{}]{}'.format(bcolors.UNDERLINE, app,
+        ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
     target(app, args, params)
     return 1
 
@@ -105,11 +105,15 @@ def parseParams(app):
                 range = tail.strip()
                 if range == "":
                     range = "[{}]".format(value)
-                if (range.startswith("(")):
-                    range = "irange" + range
+                if "(" in range:
+                    range = range.replace("(", "irange(")
+                if "|" in range:
+                    r, cond = range.split("|")
+                    range = "filter(lambda p: {}, {})".format(cond, r)
                 if ("<" in range):
                     range = range.replace("<", "params[\"").replace(">", "\"]")
                     range = "lambda params: " + range
+                print(range)
                 assign = "params[\"{}\"] = {}".format(param, range)
                 exec(assign)
 

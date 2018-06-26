@@ -3,16 +3,7 @@ from os import listdir
 from os.path import isfile, isdir, join, splitext, basename, dirname 
 from collections import OrderedDict
 import os
-import argparse
-import subprocess
-import commands
-import time
 import pickle
-import signal
-import psutil
-import shutil
-import numpy as np
-import types
 import csv
 
 import matplotlib
@@ -89,6 +80,26 @@ def cycleOf(app):
         cycle = int(line.split("Design ran for ")[1].split(" ")[0])
         cycle_cache[app] = cycle
         return cycle
+
+def pcuUsage(log):
+    line = grep(log, ["PCU usage ="])[0]
+    pct = float(line.split("(")[1].split("%")[0])
+    return pct
+
+def pmuUsage(log):
+    line = grep(log, ["PMU usage ="])[0]
+    pct = float(line.split("(")[1].split("%")[0])
+    return pct
+
+def mcUsage(log):
+    line = grep(log, ["MC usage ="])[0]
+    pct = float(line.split("(")[1].split("%")[0])
+    return pct
+
+def totalUsage(log):
+    line = grep(log, ["Total usage ="])[0]
+    pct = float(line.split("(")[1].split("%")[0])
+    return pct
 
 def avgbw(app, args, params):
     lword = 0
