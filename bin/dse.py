@@ -113,7 +113,6 @@ def parseParams(app):
                 if ("<" in range):
                     range = range.replace("<", "params[\"").replace(">", "\"]")
                     range = "lambda params: " + range
-                print(range)
                 assign = "params[\"{}\"] = {}".format(param, range)
                 exec(assign)
 
