@@ -191,7 +191,7 @@ parser.add_argument('--single', dest='single', action='store_true', default=Fals
 parser.add_argument('--status', dest='status', action='store_true', default=False) 
 parser.add_argument('--dse', dest='dse', action='store_true', default=False) 
 parser.add_argument('--app', dest='app', action='store', default='ALL',help='App name')
-parser.add_argument('--regen', dest='regen', action='store', default='false',
+parser.add_argument('--rerun', dest='regen', action='store', default='false',
     help='force pass to rerun' )
 parser.add_argument('--torun', dest='torun', action='store', default='ALL',
     help='Pass to run')

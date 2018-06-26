@@ -65,9 +65,9 @@ def getCommand(passName, fullapp):
 def runPass(fullname, passName):
     if not torun(passName):
         return
-    if success(fullname, passName) and not regenerate(passName):
+    if running(fullname, passName):
         return
-    if failed(fullname, passName) or running(fullname, passName):
+    if progress(fullname, passName)!="NOTRUN" and not regenerate(passName):
         return
     for dep in dependency[passName]:
         if not success(fullname, dep):
