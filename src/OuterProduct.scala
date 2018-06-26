@@ -5,13 +5,15 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
 
   type X = FixPt[TRUE,_32,_0]
 
-  val M = 1024 // param
-  val N = 1024 // param
-
-  val ts1 = 32 // param
-  val ts2 = 16 // param
-  val op = 1 // param (1, <N> / <ts2>, 4)
+  val op1 = 1 // param (2, 10, 2)
+  val op2 = 1 // param (2, 10, 2)
+  val ts1 = 32 // param (pmuSize / 256, pmuSize, pmuSize / 256)
+  val ts2 = 16 // param pmuSize / <ts1>
+  val M = op1 * ts1 * 4
+  val N = op2 * ts2 * 4
   val ip = 16
+  val ip1 = 16 // param (2, 16, 2)
+  val ip2 = ip / ip1
 
   @virtualize
   def outerproduct[T:Type:Num](a: Array[T], b: Array[T]) = {
@@ -29,19 +31,16 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
     setMem(vec2, b)
 
     Accel {
-      Foreach(sizeA by ts1, sizeB by ts2 par op){ (i,j) =>
+      Foreach(sizeA by ts1 par op1, sizeB by ts2 par op2){ (i,j) =>
         val b1 = SRAM[T](ts1)
         val b2 = SRAM[T](ts2)
         val outTile = SRAM[T](ts1, ts2)
-        //val blkA = Reg[Int]
-        //val blkB = Reg[Int]
         Parallel {
           b1 load vec1(i::i+ts1 par ip)
           b2 load vec2(j::j+ts2 par ip)
         }
-        Foreach(ts1 by 1, ts2 par ip){ (ii,jj) => outTile(ii, jj) = b1(ii) * b2(jj) } // 2
-
-        out(i::i+ts1, j::j+ts2 par 16) store outTile
+        Foreach(ts1 by ip2, ts2 par ip1){ (ii,jj) => outTile(ii, jj) = b1(ii) * b2(jj) } // 2
+        out(i::i+ts1, j::j+ts2 par ip) store outTile
       }
     }
     getMem(out)
