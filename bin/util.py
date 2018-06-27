@@ -93,11 +93,7 @@ def grep(path, patterns):
     return found
 
 def openfile(path, flag):
-    try:
-        return open(path, flag)
-    except e:
-        time.sleep(1)
-        return openfile(path, flat)
+    return open(path, flag)
         
 def check_pid(pid):        
     """ Check For the existence of a unix pid. """
@@ -138,7 +134,7 @@ def getpid(fullapp, passName):
         return None
 
 def setpid(fullapp, passName, pid):
-    job_list = pickle.load(openfile(JOB_PATH, 'rb'))
+    job_list = checkProcess()
     job_list[(fullapp, passName)] = pid
     pickle.dump(job_list, openfile(JOB_PATH, 'wb'))
 
