@@ -170,7 +170,7 @@ def show(fullname):
                 sys.stdout.write('- ' + line)
     def passMessage(passName, log):
         msg = ""
-        if success(fullname, passName) and passName=="MAP_PIR":
+        if success(fullname, passName) and (passName=="FIT_PIR" or passName=="MAP_PIR"):
             pcu = stats.pcuUsage(log)
             pmu = stats.pmuUsage(log)
             mc = stats.mcUsage(log)

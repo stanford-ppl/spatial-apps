@@ -82,23 +82,31 @@ def cycleOf(app):
         return cycle
 
 def pcuUsage(log):
-    line = grep(log, ["PCU usage ="])[0]
-    pct = float(line.split("(")[1].split("%")[0])
+    line = grep(log, ["PCU usage ="])
+    if len(line) == 0:
+      return None
+    pct = float(line[0].split("(")[1].split("%")[0])
     return pct
 
 def pmuUsage(log):
-    line = grep(log, ["PMU usage ="])[0]
-    pct = float(line.split("(")[1].split("%")[0])
+    line = grep(log, ["PMU usage ="])
+    if len(line) == 0:
+      return None
+    pct = float(line[0].split("(")[1].split("%")[0])
     return pct
 
 def mcUsage(log):
-    line = grep(log, ["MC usage ="])[0]
-    pct = float(line.split("(")[1].split("%")[0])
+    line = grep(log, ["MC usage ="])
+    if len(line) == 0:
+      return None
+    pct = float(line[0].split("(")[1].split("%")[0])
     return pct
 
 def totalUsage(log):
-    line = grep(log, ["Total usage ="])[0]
-    pct = float(line.split("(")[1].split("%")[0])
+    line = grep(log, ["Total usage ="])
+    if len(line) == 0:
+      return None
+    pct = float(line[0].split("(")[1].split("%")[0])
     return pct
 
 def avgbw(app, args, params):

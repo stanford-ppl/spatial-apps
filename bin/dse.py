@@ -13,6 +13,8 @@ import shutil
 import numpy as np
 import types
 import csv
+import traceback
+import re
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -89,6 +91,29 @@ def SPMV_CRS():
 
     print('{} space: {}'.format(app, space))
 
+def matchRange(range):
+    if "(" in range:
+        patterns = re.findall("\([\d\s]*,[\d\s]*,[\d\s]*\)",range)
+        for pattern in patterns:
+            range = range.replace(pattern, "irange" + pattern)
+    return range
+def matchCondition(range):
+    if "|" in range:
+        r, cond = range.split("|")
+        range = "filter(lambda p: {}, {})".format(cond, r)
+    return range
+def matchParam(range):
+    if ("<" in range):
+        patterns = re.findall("\<[\w\s]*\>",range)
+        for pattern in patterns:
+            range = range.replace(pattern, pattern.replace("<","params[\"").replace(">","\"]"))
+        range = "lambda params: " + range
+    return range
+def matchEmpty(range, value):
+    if range == "":
+        range = "[{}]".format(value)
+    return range
+
 def parseParams(app):
     params = OrderedDict()
     path = '{0}{1}.scala'.format(APP_DIR, app)
@@ -103,18 +128,18 @@ def parseParams(app):
                 param = param.strip()
                 value = value.strip()
                 range = tail.strip()
-                if range == "":
-                    range = "[{}]".format(value)
-                if "(" in range:
-                    range = range.replace("(", "irange(")
-                if "|" in range:
-                    r, cond = range.split("|")
-                    range = "filter(lambda p: {}, {})".format(cond, r)
-                if ("<" in range):
-                    range = range.replace("<", "params[\"").replace(">", "\"]")
-                    range = "lambda params: " + range
+                range = matchEmpty(range, value)
+                range = matchRange(range)
+                range = matchCondition(range)
+                range = matchParam(range)
                 assign = "params[\"{}\"] = {}".format(param, range)
-                exec(assign)
+                print(assign)
+                try:
+                  exec(assign)
+                except Exception as e:
+                  print(assign)
+                  traceback.print_exc()
+                  exit(-1)
 
     print("parsed params:")
     for param in params:

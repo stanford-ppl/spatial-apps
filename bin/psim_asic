@@ -1,0 +1,29 @@
+#!/bin/bash
+
+app=$1
+log=$2
+
+outDir=$PLASTISIM_HOME/configs/gen/${app}_asic/
+config=${outDir}/config.psim
+
+[ -e $config ] && rm $config
+
+export _JAVA_OPTIONS="-Xss8192k" 
+$PIR_HOME/bin/pir $app \
+  --debug \
+  --mapping=true \
+  --load-pir=true \
+  --save-pir=false \
+  --psim=true \
+  --psim_out=$outDir \
+  --ctrl=true \
+  --bp=false \
+  --stat=true \
+  --arch=MyDesign \
+  --net=static \
+  --row=16 --col=8 \
+  --argin=64 > $log 2>&1 
+
+$PLASTISIM_HOME/plastisim -f $config >> $log
+
+echo "-------------PASS (DONE)------------" >> $log

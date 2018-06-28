@@ -30,20 +30,20 @@ def regression():
 
         # mapping working
         apps.append("DotProduct")
-        apps.append("OuterProduct")
-        apps.append("TPCHQ6")
-        apps.append("GDA")
-        apps.append("BlackScholes")
-        apps.append("SGD")
-        apps.append("SPMV_CRS")
-        apps.append("Gibbs_Ising2D")
-        apps.append("GEMM_Blocked")
-        apps.append("GEMM_NCubed")
-        apps.append("AES")
-        apps.append("Differentiator")
-        apps.append("BFS")
-        apps.append("TRSM")
-        apps.append("SimpleIf")
+        # apps.append("OuterProduct")
+        # apps.append("TPCHQ6")
+        # apps.append("GDA")
+        # apps.append("BlackScholes")
+        # apps.append("SGD")
+        # apps.append("SPMV_CRS")
+        # apps.append("Gibbs_Ising2D")
+        # apps.append("GEMM_Blocked")
+        # apps.append("GEMM_NCubed")
+        # apps.append("AES")
+        # apps.append("Differentiator")
+        # apps.append("BFS")
+        # apps.append("TRSM")
+        # apps.append("SimpleIf")
         # apps.append("Backprop")
 
         # pirgen working
@@ -67,7 +67,7 @@ def regression():
         apps = [opts.app]
 
     # opts.torun = "GEN_PIR,MAP_PIR"
-    opts.torun = "GEN_PIR"
+    opts.torun = "GEN_PIR,FIT_PIR"
     for app in apps:
         target(app, [], {})
 

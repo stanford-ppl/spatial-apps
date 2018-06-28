@@ -11,8 +11,7 @@ SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 
 # passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
-# passes=["GEN_PIR","FIT_PIR","MAP_PIR","RUN_PSIM"]
-passes=["GEN_PIR","MAP_PIR"]
+passes=["GEN_PIR","FIT_PIR"]
 APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
 APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
 # APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
@@ -189,7 +188,7 @@ parser.add_argument('--dse', dest='dse', action='store_true', default=False)
 parser.add_argument('--app', dest='app', action='store', default='ALL',help='App name')
 parser.add_argument('--rerun', dest='regen', action='store', default='false',
     help='force pass to rerun' )
-parser.add_argument('--torun', dest='torun', action='store', default='ALL',
+parser.add_argument('--torun', dest='torun', action='store', default='GEN_PIR,FIT_PIR',
     help='Pass to run')
 parser.add_argument('--regression', dest='regression', action='store_true', default=False) 
 parser.add_argument('--summary', dest='summary', action='store_true', default=False) 
@@ -199,6 +198,7 @@ parser.add_argument('--plot', dest='plot', action='store_true', default=False)
 global opts
 (opts, args) = parser.parse_known_args()
 
+print(opts.app)
 opts.apps = APPS if opts.app == "ALL" else [opts.app]
 if opts.run > 0:
     opts.parallel = opts.run

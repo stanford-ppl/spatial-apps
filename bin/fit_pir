@@ -3,19 +3,22 @@
 app=$1
 log=$2
 
-cd $PIR_HOME
 mkdir -p $PIR_HOME/out/$app
+export _JAVA_OPTIONS="-Xss8192k" 
 $PIR_HOME/bin/pir $app \
   --debug \
   --mapping=false \
-  --net=static \
-  --topo=mesh \
-  --row=16 --col=8 \
   --load-pir=false \
   --save-pir=true \
   --psim=false \
   --ctrl=true \
   --bp=false \
-  >> $log 2>&1
+  --stat=true \
+  --arch=MyDesign \
+  --net=dynamic \
+  --topo=mesh \
+  --row=16 --col=8 \
+  --argin=64 \
+  > $log 2>&1 
 
 echo "-------------PASS (DONE)------------" >> $log
