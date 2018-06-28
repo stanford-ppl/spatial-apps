@@ -212,7 +212,11 @@ def progress(fullname, passName):
             if isFailed: 
 	        prog = "FAILED"
             else:
-	        prog = "SUCCESS"
+                pirsrc = "{}/pir/apps/src/gen/{}.scala".format(PIR_HOME, fullname)
+                if passName=="GEN_PIR" and not os.path.exists(pirsrc):
+                    prog = "NOTRUN"
+                else:
+	            prog = "SUCCESS"
         else:
             pid = getpid(fullname, passName)
             if pid is not None:
@@ -223,6 +227,14 @@ def progress(fullname, passName):
         prog = "NOTRUN"
     # progress_cache[(fullname,passName)] = prog
     return prog
+
+def hasRun(fullname, passName):
+    log = logs(fullname, passName)
+    res = os.path.exists(log)
+    if passName == "GEN_PIR":
+        pirsrc = "{}/pir/apps/src/gen/{}.scala".format(PIR_HOME, fullname)
+        res &= os.path.exists(pirsrc)
+    return res
 
 def failed(fullname, passName):
     return progress(fullname, passName)=="FAILED"

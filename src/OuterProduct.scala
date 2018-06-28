@@ -5,8 +5,8 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
 
   type X = FixPt[TRUE,_32,_0]
 
-  val op1 = 1 // param (2, 16, 2)
-  val op2 = 1 // param (2, 16, 2) | p * <op1> <= 16
+  val op1 = 1 // param [1] + (2, 16, 2)
+  val op2 = 1 // param [1] + (2, 16, 2) | p * <op1> <= 12
   val ip = 16
   val ip2 = 16 // param (8, 16, 8)
   val ip1 = ip / ip2 // param 16 / <ip2>
