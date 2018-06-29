@@ -11,7 +11,7 @@ SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 
 # passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
-passes=["GEN_PIR","FIT_PIR"]
+passes=["GEN_PIR","FIT_PIR", "PSIM_ASIC"]
 APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
 APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
 # APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
@@ -30,8 +30,46 @@ dependency = {
         "GEN_CHISEL":[],
         "MAKE_VCS":["GEN_CHISEL"],
         "MAP_PIR":["GEN_PIR"],
-        "RUN_SIMUlATION":["MAKE_VCS"]
+        "RUN_SIMUlATION":["MAKE_VCS"],
+        "PSIM_ASIC":["FIT_PIR"]
         }
+
+def logs(app, passName):
+    if passName=="GEN_PIR":
+        return '{}/gen/{}/gen_pir.log'.format(SPATIAL_HOME, app)
+    elif passName=="FIT_PIR":
+        return '{}/out/{}/fit_pir.log'.format(PIR_HOME,app)
+    elif passName=="GEN_CHISEL":
+        return '{}/gen/{}/gen_chisel.log'.format(SPATIAL_HOME,app)
+    elif passName=="MAKE_VCS":
+        return '{}/gen/{}/vcs.log'.format(SPATIAL_HOME,app)
+    elif passName=="MAP_PIR":
+        return '{}/out/{}/map_pir.log'.format(PIR_HOME,app)
+    elif passName=="RUN_SIMULATION":
+        return '{}/gen/{}/sim.log'.format(SPATIAL_HOME, app)
+    elif passName=="Utilization":
+        return '{}/out/{}/ResourceAnalysis.log'.format(PIR_HOME, app)
+    elif passName=="PSIM_ASIC":
+        return '{}/out/{}/psim_asic.log'.format(PIR_HOME,app)
+
+def getCommand(passName, fullapp):
+    log = logs(fullapp, passName)
+    if passName=="GEN_PIR":
+        command = "{}/apps/bin/gen_pir {} {}".format(SPATIAL_HOME, fullapp, log)
+    elif passName=="FIT_PIR":
+        command = "{}/apps/bin/fit_pir {} {}".format(SPATIAL_HOME, fullapp, log)
+    elif passName=="GEN_CHISEL":
+        command = "{}/apps/bin/gen_chisel {} {}".format(SPATIAL_HOME, fullapp, log)
+    elif passName=="MAKE_VCS":
+        command = "{}/apps/bin/make_vcs {} {}".format(SPATIAL_HOME, fullapp, log)
+    elif passName=="MAP_PIR":
+        command = "{}/apps/bin/map_pir {} {}".format(SPATIAL_HOME, fullapp, log)
+    elif passName=="RUN_SIMULATION":
+        command = "{}/apps/bin/run_sim {} {}".format(SPATIAL_HOME, fullapp, log)
+    elif passName=="PSIM_ASIC":
+        command = "{}/apps/bin/psim_asic {} {}".format(SPATIAL_HOME, fullapp, log)
+    return command
+
 
 class bcolors:
     HEADER    = '\033[95m'
@@ -160,22 +198,6 @@ def irange(start, stop, step):
         r.append(stop)
     return r
 
-def logs(app, passName):
-    if passName=="GEN_PIR":
-        return '{}/gen/{}/gen_pir.log'.format(SPATIAL_HOME, app)
-    elif passName=="FIT_PIR":
-        return '{}/out/{}/fit_pir.log'.format(PIR_HOME,app)
-    elif passName=="GEN_CHISEL":
-        return '{}/gen/{}/gen_chisel.log'.format(SPATIAL_HOME,app)
-    elif passName=="MAKE_VCS":
-        return '{}/gen/{}/vcs.log'.format(SPATIAL_HOME,app)
-    elif passName=="MAP_PIR":
-        return '{}/out/{}/map_pir.log'.format(PIR_HOME,app)
-    elif passName=="RUN_SIMULATION":
-        return '{}/gen/{}/sim.log'.format(SPATIAL_HOME, app)
-    elif passName=="Utilization":
-        return '{}/out/{}/ResourceAnalysis.log'.format(PIR_HOME, app)
-
 def write(log, msg):
     with open(log, 'a') as f:
         f.write(msg)
@@ -188,7 +210,7 @@ parser.add_argument('--dse', dest='dse', action='store_true', default=False)
 parser.add_argument('--app', dest='app', action='store', default='ALL',help='App name')
 parser.add_argument('--rerun', dest='regen', action='store', default='false',
     help='force pass to rerun' )
-parser.add_argument('--torun', dest='torun', action='store', default='GEN_PIR,FIT_PIR',
+parser.add_argument('--torun', dest='torun', action='store', default='GEN_PIR,FIT_PIR,PSIM_ASIC',
     help='Pass to run')
 parser.add_argument('--regression', dest='regression', action='store_true', default=False) 
 parser.add_argument('--summary', dest='summary', action='store_true', default=False) 
@@ -198,8 +220,7 @@ parser.add_argument('--plot', dest='plot', action='store_true', default=False)
 global opts
 (opts, args) = parser.parse_known_args()
 
-print(opts.app)
-opts.apps = APPS if opts.app == "ALL" else [opts.app]
+opts.apps = APPS if args[0] == "ALL" else args
 if opts.run > 0:
     opts.parallel = opts.run
 opts.run = opts.run > 0

@@ -14,16 +14,17 @@ $PIR_HOME/bin/pir $app \
   --mapping=true \
   --load-pir=true \
   --save-pir=false \
+  --net=asic \
   --psim=true \
   --psim_out=$outDir \
+  --run-psim=true \
   --ctrl=true \
   --bp=false \
-  --stat=true \
+  --stat=false \
   --arch=MyDesign \
-  --net=static \
   --row=16 --col=8 \
-  --argin=64 > $log 2>&1 
-
-$PLASTISIM_HOME/plastisim -f $config >> $log
+  --argin=64 \
+  --tokenout=32 \
+  > $log 2>&1 
 
 echo "-------------PASS (DONE)------------" >> $log

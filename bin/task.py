@@ -43,25 +43,6 @@ def copyApp(app, args, params):
             print('Param {} not found !!!'.format(param))
             exit()
 
-def getCommand(passName, fullapp):
-    log = logs(fullapp, passName)
-    if passName=="GEN_PIR":
-        command = "{}/apps/bin/gen_pir {} {}".format(SPATIAL_HOME, fullapp, log)
-        if opts.regression:
-            command += ' {}/pir/apps/src'.format(PIR_HOME)
-    elif passName=="FIT_PIR":
-        command = "{}/apps/bin/fit_pir {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="GEN_CHISEL":
-        command = "{}/apps/bin/gen_chisel {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="MAKE_VCS":
-        command = "{}/apps/bin/make_vcs {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="MAP_PIR":
-        command = "{}/apps/bin/map_pir {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="RUN_SIMULATION":
-        command = "{}/apps/bin/run_sim {} {}".format(SPATIAL_HOME, fullapp, log)
-
-    return command
-    
 def runPass(fullname, passName):
     if not torun(passName):
         return
@@ -216,7 +197,7 @@ def progress(fullname, passName):
                 if passName=="GEN_PIR" and not os.path.exists(pirsrc):
                     prog = "NOTRUN"
                 else:
-	            prog = "SUCCESS"
+	                  prog = "SUCCESS"
         else:
             pid = getpid(fullname, passName)
             if pid is not None:
