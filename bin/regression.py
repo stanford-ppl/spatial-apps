@@ -25,8 +25,6 @@ from util import *
 from task import *
 
 def regression():
-    # opts.torun = "GEN_PIR,MAP_PIR"
-    opts.torun = "GEN_PIR,FIT_PIR"
     for app in opts.apps:
         target(app, [], {})
 

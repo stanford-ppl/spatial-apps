@@ -15,6 +15,7 @@ import os, sys
 import math
 import multiprocessing 
 
+from stats import *
 from util import *
 
 def copyApp(app, args, params):
@@ -27,6 +28,8 @@ def copyApp(app, args, params):
     with open(newpath, 'w') as newapp:
         with open(path, 'r') as origapp :
             for line in origapp:
+                if line.strip().startswith("//"):
+                    continue
                 found = False
                 if 'object {}'.format(app) in line:
                     newapp.write(line.replace(app, fullname))
@@ -55,6 +58,9 @@ def runPass(fullname, passName):
             # print("{} {} not ran due to {} not succeeded".format(fullname, passName, dep))
             return
 
+    if opts.parallel > 1:
+        waitProcess()
+
     # print("runPass {} {}".format(fullname, passName))
     # clean log
     log = logs(fullname, passName)
@@ -74,8 +80,6 @@ def runJob(app, args, params):
         runPass(fullname, passName)
 
 def launchJob(app, args, params):
-    if opts.parallel > 1:
-        waitProcess()
     print('Running {} args={} and params=[{}]'.format(app, str(args),
         ' '.join(['{}={}'.format(p,params[p]) for p in params])))
     if opts.parallel > 1:
@@ -137,7 +141,6 @@ def act(fullname, resp):
         exit(0)
 
 def show(fullname):
-    import stats
     def printError(passName, log):
         if failed(fullname, passName):
             if passName=="GEN_PIR":
@@ -152,10 +155,12 @@ def show(fullname):
     def passMessage(passName, log):
         msg = ""
         if success(fullname, passName) and (passName=="FIT_PIR" or passName=="MAP_PIR"):
-            pcu = stats.pcuUsage(log)
-            pmu = stats.pmuUsage(log)
-            mc = stats.mcUsage(log)
+            pcu = pcuUsage(log)
+            pmu = pmuUsage(log)
+            mc = mcUsage(log)
             msg = "pcu={}% pmu={}% mc={}%".format(pcu, pmu, mc)
+        if success(fullname, passName) and (passName=="PSIM_ASIC"):
+            msg = "cycle={}".format(cycleOf(log))
         return msg
     for passName in passes:
         log = logs(fullname, passName)
@@ -193,7 +198,7 @@ def progress(fullname, passName):
             if isFailed: 
 	        prog = "FAILED"
             else:
-                pirsrc = "{}/pir/apps/src/gen/{}.scala".format(PIR_HOME, fullname)
+                pirsrc = "{}/{}.scala".format(opts.pirsrc, fullname)
                 if passName=="GEN_PIR" and not os.path.exists(pirsrc):
                     prog = "NOTRUN"
                 else:

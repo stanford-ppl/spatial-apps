@@ -120,6 +120,8 @@ def parseParams(app):
 
     with open(path, 'r') as f:
         for line in f:
+            if line.strip().startswith("//"):
+                continue
             if "param " in line:
                 line = line.split("#")[0]
                 head, tail = line.split("//")

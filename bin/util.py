@@ -55,7 +55,7 @@ def logs(app, passName):
 def getCommand(passName, fullapp):
     log = logs(fullapp, passName)
     if passName=="GEN_PIR":
-        command = "{}/apps/bin/gen_pir {} {}".format(SPATIAL_HOME, fullapp, log)
+        command = "{}/apps/bin/gen_pir {} {} {}".format(SPATIAL_HOME, fullapp, log, opts.pirsrc)
     elif passName=="FIT_PIR":
         command = "{}/apps/bin/fit_pir {} {}".format(SPATIAL_HOME, fullapp, log)
     elif passName=="GEN_CHISEL":
@@ -179,8 +179,7 @@ def sargs(args):
     return '_'.join([str(a) for a in args])
 
 def getFullName(app, args, params):
-    postfix = sargs(args) 
-    postfix = postfix + ''.join(["_{}_{}".format(k,str(params[k])) for k in params ]) 
+    postfix = ''.join(["_{}_{}".format(k,str(params[k])) for k in params ]) 
     if postfix != "":
         fullname = '{}_{}'.format(app, postfix)
     else:
@@ -221,6 +220,7 @@ global opts
 (opts, args) = parser.parse_known_args()
 
 opts.apps = APPS if args[0] == "ALL" else args
-if opts.run > 0:
-    opts.parallel = opts.run
+opts.parallel = opts.run
 opts.run = opts.run > 0
+
+opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME) if opts.dse else '{}/pir/apps/src'.format(PIR_HOME)

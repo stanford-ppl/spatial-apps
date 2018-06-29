@@ -7,9 +7,12 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
   type X = FixPt[TRUE,_32,_0]
 
   // Final params
-  val N = 1024 // param 330301440 # pmuSize * 16 * 5 * 7 * 9
-  val ts = 32 // param 65536 # [pmuSize] | <N> % p == 0
-  val op = 1 // param 16 # (14, 18, 1) | <N> / <ts> % p == 0
+  val N = 1024 // param pmuSize * 16 * 5 * 7 * 9
+  val ts = 32 // param [pmuSize] | <N> % p == 0
+  val op = 1 // param (4, 16, 4) | <N> / <ts> % p == 0
+  //val N = 1024 // param 330301440 # pmuSize * 16 * 5 * 7 * 9
+  //val ts = 32 // param 65536 # [pmuSize] | <N> % p == 0
+  //val op = 1 // param 16 # (14, 18, 1) | <N> / <ts> % p == 0
   val ip = 16
 
   @virtualize

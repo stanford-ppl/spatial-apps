@@ -69,16 +69,13 @@ def getUtil(line):
     total = int(total)
     return (used, total)
 
-def cycleOf(app):
-    if app in cycle_cache:
-        return cycle_cache[app]
-    log = logs(app, "RUN_SIMULATION")
-    line = grep(log, ["Design ran for"])[0]
-    if line is None:
+def cycleOf(log):
+    lines = grep(log, ["Simulation complete at cycle"])
+    if len(lines) is None:
         return None
     else:
-        cycle = int(line.split("Design ran for ")[1].split(" ")[0])
-        cycle_cache[app] = cycle
+        line = lines[0]
+        cycle = int(line.split("Simulation complete at cycle:")[1].strip())
         return cycle
 
 def pcuUsage(log):

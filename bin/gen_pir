@@ -2,13 +2,9 @@
 
 app=$1
 log=$2
+pir_src_dir=$3
 
 cd $SPATIAL_HOME
-if [[ $3 == "" ]]; then
-  pir_src_dir=$PIR_HOME/pir/apps/src/gen
-else
-  pir_src_dir=$3
-fi
 app_file=$pir_src_dir/$app.scala
 pir_dir=$SPATIAL_HOME/gen/$app/pir
 if [ -e $pir_dir ]; then rm -r $pir_dir; fi
