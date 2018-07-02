@@ -71,7 +71,7 @@ def getUtil(line):
 
 def cycleOf(log):
     lines = grep(log, ["Simulation complete at cycle"])
-    if len(lines) is None:
+    if len(lines)==0:
         return None
     else:
         line = lines[0]

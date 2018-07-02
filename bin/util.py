@@ -11,11 +11,13 @@ SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 
 # passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
-passes=["GEN_PIR","FIT_PIR", "PSIM_ASIC"]
-APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
-APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
+passes=["GEN_PIR","FIT_PIR", "PSIM_ASIC", "PSIM_STATIC", "PSIM_DYNAMIC"]
+APPS = ['DotProduct', 'OuterProduct', 'GDA', 'BlackScholes']
+# APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
+# APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
 # APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
 
+LOG_DIR='{}/apps/log'.format(SPATIAL_HOME)
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
 JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
 SUMMARY_PATH="{}/apps/summary.pickle".format(SPATIAL_HOME)
@@ -31,26 +33,30 @@ dependency = {
         "MAKE_VCS":["GEN_CHISEL"],
         "MAP_PIR":["GEN_PIR"],
         "RUN_SIMUlATION":["MAKE_VCS"],
-        "PSIM_ASIC":["FIT_PIR"]
+        "PSIM_ASIC":["FIT_PIR"],
+        "PSIM_STATIC":["FIT_PIR"],
+        "PSIM_DYNAMIC":["FIT_PIR"]
         }
 
 def logs(app, passName):
     if passName=="GEN_PIR":
-        return '{}/gen/{}/gen_pir.log'.format(SPATIAL_HOME, app)
+        return '{}/{}/gen_pir.log'.format(LOG_DIR, app)
     elif passName=="FIT_PIR":
-        return '{}/out/{}/fit_pir.log'.format(PIR_HOME,app)
+        return '{}/{}/fit_pir.log'.format(LOG_DIR, app)
     elif passName=="GEN_CHISEL":
-        return '{}/gen/{}/gen_chisel.log'.format(SPATIAL_HOME,app)
+        return '{}/{}/gen_chisel.log'.format(LOG_DIR, app)
     elif passName=="MAKE_VCS":
-        return '{}/gen/{}/vcs.log'.format(SPATIAL_HOME,app)
+        return '{}/{}/make_vcs.log'.format(LOG_DIR, app)
     elif passName=="MAP_PIR":
-        return '{}/out/{}/map_pir.log'.format(PIR_HOME,app)
+        return '{}/{}/map_pir.log'.format(LOG_DIR, app)
     elif passName=="RUN_SIMULATION":
-        return '{}/gen/{}/sim.log'.format(SPATIAL_HOME, app)
-    elif passName=="Utilization":
-        return '{}/out/{}/ResourceAnalysis.log'.format(PIR_HOME, app)
+        return '{}/{}/run_sim.log'.format(LOG_DIR, app)
     elif passName=="PSIM_ASIC":
-        return '{}/out/{}/psim_asic.log'.format(PIR_HOME,app)
+        return '{}/{}/psim_asic.log'.format(LOG_DIR, app)
+    elif passName=="PSIM_STATIC":
+        return '{}/{}/psim_static.log'.format(LOG_DIR, app)
+    elif passName=="PSIM_DYNAMIC":
+        return '{}/{}/psim_dynamic.log'.format(LOG_DIR, app)
 
 def getCommand(passName, fullapp):
     log = logs(fullapp, passName)
@@ -68,6 +74,10 @@ def getCommand(passName, fullapp):
         command = "{}/apps/bin/run_sim {} {}".format(SPATIAL_HOME, fullapp, log)
     elif passName=="PSIM_ASIC":
         command = "{}/apps/bin/psim_asic {} {}".format(SPATIAL_HOME, fullapp, log)
+    elif passName=="PSIM_STATIC":
+        command = "{}/apps/bin/psim_static {} {}".format(SPATIAL_HOME, fullapp, log)
+    elif passName=="PSIM_DYNAMIC":
+        command = "{}/apps/bin/psim_dynamic {} {}".format(SPATIAL_HOME, fullapp, log)
     return command
 
 
@@ -147,7 +157,11 @@ def checkProcess():
         job_list = {}
         print("New job_list!")
     else:
-        job_list = pickle.load(openfile(JOB_PATH, 'rb'))
+        try:
+          job_list = pickle.load(openfile(JOB_PATH, 'rb'))
+        except EOFError:
+          time.sleep(1)
+          job_list = pickle.load(openfile(JOB_PATH, 'rb'))
     for key in job_list.keys():
         pid = job_list[key]
         if not check_pid(pid):
@@ -209,7 +223,7 @@ parser.add_argument('--dse', dest='dse', action='store_true', default=False)
 parser.add_argument('--app', dest='app', action='store', default='ALL',help='App name')
 parser.add_argument('--rerun', dest='regen', action='store', default='false',
     help='force pass to rerun' )
-parser.add_argument('--torun', dest='torun', action='store', default='GEN_PIR,FIT_PIR,PSIM_ASIC',
+parser.add_argument('--torun', dest='torun', action='store', default='ALL',
     help='Pass to run')
 parser.add_argument('--regression', dest='regression', action='store_true', default=False) 
 parser.add_argument('--summary', dest='summary', action='store_true', default=False) 

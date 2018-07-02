@@ -5,15 +5,15 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
 
   type X = FixPt[TRUE,_32,_0]
 
-  val op1 = 1 // param [1] + (2, 16, 2)
-  val op2 = 1 // param [1] + (2, 16, 2) | p * <op1> <= 12
+  val M = 1024 // param pmuSize / 16 * 3
+  val N = 1024 // param pmuSize / 16 * 3
+  val ts1 = 32 // param [pmuSize / 1024] | <N> % p == 0
+  val ts2 = 32 // param [pmuSize / <ts1>] | <N> % p == 0
+  val op1 = 1 // param (2, 16, 2) | <M> / <ts1> % p == 0
+  val op2 = 1 // param (2, 16, 2) | (<N> / <ts2> % p == 0) and (p * <op1> <= 16) and (p * <op1> >= 8)
   val ip = 16
   val ip2 = 16 // param (8, 16, 8)
   val ip1 = ip / ip2 // param 16 / <ip2>
-  val ts1 = 32 // param [pmuSize / 1024] | p % <ip1> == 0
-  val ts2 = 16 // param [pmuSize / <ts1>] | p % <ip2> == 0
-  val M = op1 * ts1 * 4
-  val N = op2 * ts2 * 4
 
   @virtualize
   def outerproduct[T:Type:Num](a: Array[T], b: Array[T]) = {

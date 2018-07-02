@@ -4,6 +4,7 @@ app=$1
 log=$2
 pir_src_dir=$3
 
+mkdir -p $(dirname $log)
 cd $SPATIAL_HOME
 app_file=$pir_src_dir/$app.scala
 pir_dir=$SPATIAL_HOME/gen/$app/pir

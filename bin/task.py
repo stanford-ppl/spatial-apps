@@ -35,7 +35,7 @@ def copyApp(app, args, params):
                     newapp.write(line.replace(app, fullname))
                     found = True
                 for param in params:
-                    if 'val {} = '.format(param) in line:
+                    if 'val {} = '.format(param) in line and "param " in line:
                         newapp.write('val {} = {}\n'.format(param, params[param]))
                         paramFound[param] = True
                         found = True
@@ -159,7 +159,7 @@ def show(fullname):
             pmu = pmuUsage(log)
             mc = mcUsage(log)
             msg = "pcu={}% pmu={}% mc={}%".format(pcu, pmu, mc)
-        if success(fullname, passName) and (passName=="PSIM_ASIC"):
+        if success(fullname, passName) and (passName.startswith("PSIM_")):
             msg = "cycle={}".format(cycleOf(log))
         return msg
     for passName in passes:
@@ -195,6 +195,8 @@ def progress(fullname, passName):
 	        timeOut = len(grep(log, 'Hardware timeout after') != 0)
                 if not hasCycle or timeOut:
                     isFailed = True
+            if passName.startswith("PSIM_") and cycleOf(log) == None:
+                isFailed = True
             if isFailed: 
 	        prog = "FAILED"
             else:

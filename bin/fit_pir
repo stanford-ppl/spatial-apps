@@ -3,13 +3,14 @@
 app=$1
 log=$2
 
-mkdir -p $PIR_HOME/out/$app
+mkdir -p $(dirname $log)
 export _JAVA_OPTIONS="-Xss8192k" 
 $PIR_HOME/bin/pir $app \
   --debug \
   --mapping=false \
   --load-pir=false \
   --save-pir=true \
+  --dot=false \
   --psim=false \
   --ctrl=true \
   --bp=false \

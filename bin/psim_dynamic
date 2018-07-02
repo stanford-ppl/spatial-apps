@@ -3,7 +3,7 @@
 app=$1
 log=$2
 
-outDir=$PLASTISIM_HOME/configs/gen/${app}_asic/
+outDir=$PLASTISIM_HOME/configs/gen/${app}_dynamic/
 config=${outDir}/config.psim
 
 [ -e $config ] && rm $config
@@ -15,8 +15,9 @@ $PIR_HOME/bin/pir $app \
   --mapping=true \
   --load-pir=true \
   --save-pir=false \
-  --net=asic \
+  --net=dynamic \
   --psim=true \
+  --routing-algo=proute \
   --psim_out=$outDir \
   --run-psim=true \
   --trace=false \

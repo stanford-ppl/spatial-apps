@@ -6,12 +6,12 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
   type X = Float
 
-  val C = 96 // param
-  val R = 1024 // param pmuSize * 5 # orignal size 38400
+  val C = 128 // param [128]
+  val R = 1024 // param [pmuSize / <C> * 8] # orignal size 38400
 
-  val ts = 32 // param (1024, pmuSize, 1024)
-  val op = 1 // param (1, <R> / <ts>, 1)
-  val mp = 1 // param (1, 10, 1)
+  val ts = 32 // param (pmuSize / <C> / 2, pmuSize / <C>, pmuSize / <C> / 2) | <R> % p == 0
+  val op = 1 // param (1, 5, 1) | <R> / <ts> % p == 0
+  val mp = 1 // param (1, 5, 1) | <ts> % p == 0
 
   val ip = 16
   val margin = 1

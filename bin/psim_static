@@ -8,22 +8,25 @@ config=${outDir}/config.psim
 
 [ -e $config ] && rm $config
 
+mkdir -p $(dirname $log)
 export _JAVA_OPTIONS="-Xss8192k" 
 $PIR_HOME/bin/pir $app \
   --debug \
   --mapping=true \
   --load-pir=true \
   --save-pir=false \
+  --net=static \
   --psim=true \
   --psim_out=$outDir \
+  --run-psim=true \
+  --trace=false \
   --ctrl=true \
   --bp=false \
-  --stat=true \
+  --stat=false \
   --arch=MyDesign \
-  --net=static \
   --row=16 --col=8 \
-  --argin=64 > $log 2>&1 
-
-$PLASTISIM_HOME/plastisim -f $config >> $log
+  --argin=64 \
+  --tokenout=32 \
+  > $log 2>&1 
 
 echo "-------------PASS (DONE)------------" >> $log

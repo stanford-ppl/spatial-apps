@@ -93,7 +93,7 @@ def SPMV_CRS():
 
 def matchRange(range):
     if "(" in range:
-        patterns = re.findall("\([\d\s]*,[\d\s]*,[\d\s]*\)",range)
+        patterns = re.findall("\([^\(^)]*,[^\(^)]*,[^\(^)]*\)",range)
         for pattern in patterns:
             range = range.replace(pattern, "irange" + pattern)
     return range
@@ -135,7 +135,6 @@ def parseParams(app):
                 range = matchCondition(range)
                 range = matchParam(range)
                 assign = "params[\"{}\"] = {}".format(param, range)
-                print(assign)
                 try:
                   exec(assign)
                 except Exception as e:
