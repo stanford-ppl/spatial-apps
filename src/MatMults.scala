@@ -31,13 +31,13 @@ object MatMult_outer extends SpatialApp { // Regression (Dense) // Args: 32 128 
     val c = DRAM[T](M, N)
 
     val op = outerPar (1 -> 1)
-    val mp = midPar (1 -> 16)
-    val ip = innerPar (1 -> 64)
+    val mp = midPar GAUSSIAN (1 -> 16)
+    val ip = innerPar EXP (1 -> 64)
     val px = 1 (1 -> 1) // Cannot parallelize accum across k blocks
 
-    val bm = tsm (48 -> 48 -> 1920)
-    val bn = tsn (48 -> 48 -> 1920)
-    val bp = tsp (48 -> 48 -> 1920)
+    val bm = tsm GAUSSIAN (48 -> 48 -> 1920)
+    val bn = tsn GAUSSIAN (48 -> 48 -> 1920)
+    val bp = tsp GAUSSIAN (48 -> 48 -> 1920)
 
     setMem(a, A)
     setMem(b, B)

@@ -22,15 +22,15 @@ object Kmeans extends SpatialApp { // Regression (Dense) // Args: 3 64
     bound(numCents) = MAXK
     bound(numDims) = MAXD
 
-    val BN = pts_per_ld (96 -> 96 -> 9600)
+    val BN = pts_per_ld GAUSSIAN (96 -> 96 -> 9600)
     val BD = MAXD
     val par_load = 16
     val par_store = 16
     val PX = 1 (1 -> 1)
-    val P0 = 4 (1 -> 2 -> dim)
-    val P1 = 4 (1 -> 2 -> dim)
-    val P2 = 4 (1 -> 2 -> dim)
-    val P3 = 16 (1 -> 2 -> numcents)
+    val P0 = 4 GAUSSIAN (1 -> 2 -> dim)
+    val P1 = 4 (1 -> 2 -> dim)          // Unused
+    val P2 = 4 EXP (1 -> 2 -> dim)
+    val P3 = 16 GAUSSIAN (1 -> 2 -> numcents)
 
     val iters = ArgIn[Int]
     val N     = ArgIn[Int]
@@ -368,9 +368,9 @@ object BlackScholes extends SpatialApp {
     svolatility: Array[Float],
     stimes:      Array[Float]
   ): Array[Float] = {
-    val B  = tileSize DECAY (96 -> 96 -> 19200)
+    val B  = tileSize GAUSSIAN (96 -> 96 -> 19200)
     val OP = outerPar DECAY (1 -> 4)
-    val IP = innerPar GAUSSIAN (1 -> 96)
+    val IP = innerPar EXP (1 -> 96)
 
     val size = stypes.length; bound(size) = 9995328
 
@@ -697,24 +697,25 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   val C = MAXC
   val margin = 1
 
-  val innerPar = 16
-  val outerPar = 2
+  val innerPar  = 16
+  val middlePar = 8
+  val outerPar  = 2
 
   val tileSize = 20
 
   @virtualize
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
-    val rTileSize = tileSize(96 -> 19200)
-    val op = outerPar(1 -> 8)
-    val ip = innerPar(1 -> 12)
-    val subLoopPar = innerPar(1 -> 16)
-    val prodLoopPar = innerPar(1 -> 96)
-    val outerAccumPar = innerPar(1 -> 16)
-    val innerAccumPar = innerPar(1 -> 16)
+    val rTileSize = tileSize GAUSSIAN (96 -> 19200)
+    val op = outerPar DECAY (1 -> 8)
+    val mp = middlePar GAUSSIAN (1 -> 8)
+    val ip = innerPar GAUSSIAN (1 -> 12)
+    val subLoopPar = innerPar GAUSSIAN (1 -> 16)
+    val outerAccumPar = innerPar EXP (1 -> 16)
+    val innerAccumPar = innerPar EXP (1 -> 16)
 
-    val rows = yCPU.length;
+    val rows = yCPU.length
     bound(rows) = 360000
-    val cols = mu0CPU.length;
+    val cols = mu0CPU.length
     bound(cols) = MAXC
 
     val R = ArgIn[Int]
@@ -757,7 +758,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
         val sigmaBlk = SRAM[T](MAXC, MAXC)
 
-        MemReduce(sigmaBlk par innerAccumPar)(blk par param(1)) { rr =>
+        MemReduce(sigmaBlk par innerAccumPar)(blk par mp) { rr =>
           val subTile = SRAM[T](MAXC)
           val sigmaTile = SRAM[T](MAXC, MAXC)
           Foreach(C par subLoopPar) { cc =>
@@ -1724,10 +1725,10 @@ object TPCHQ6 extends SpatialApp { // Regression (Dense) // Args: 3840
     val maxDateIn = MAX_DATE
     val out = ArgOut[T]
 
-    val ts = tileSize (96 -> 96 -> 192000)
-    val op = outerPar (1 -> 6)
-    val ip = innerPar (1 -> 384)
-    val lp = 16 (1 -> 384)
+    val ts = tileSize GAUSSIAN (96 -> 96 -> 192000)
+    val op = outerPar DECAY (1 -> 6)
+    val ip = innerPar EXP (1 -> 384)
+    val lp = 16 EXP (1 -> 384)
 
     setMem(dates, datesIn)
     setMem(quants, quantsIn)

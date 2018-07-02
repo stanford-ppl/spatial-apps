@@ -13,10 +13,10 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
 
   @virtualize
   def outerproduct[T:Type:Num](a: Array[T], b: Array[T]) = {
-    val tileSizeA = tileSize1 (64 -> 64 -> 5760)
-    val tileSizeB = tileSize2 (64 -> 64 -> 5760)
-    val outerPar  = op (1 -> 4)
-    val innerPar  = ip (1 -> 256)
+    val tileSizeA = tileSize1 GAUSSIAN (64 -> 64 -> 5760)
+    val tileSizeB = tileSize2 GAUSSIAN (64 -> 64 -> 5760)
+    val outerPar  = op EXP (1 -> 4)
+    val innerPar  = ip EXP (1 -> 256)
 
     val M = a.length;  bound(M) = 38400
     val N = b.length;  bound(N) = 38400
@@ -90,10 +90,10 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
 
   @virtualize
   def dotproduct[T:Type:Num](aIn: Array[T], bIn: Array[T]): T = {
-    val B  = 7680 (64 -> 64 -> 9600) // 150
-    val P1 = 2 (1 -> 6) // 6
-    val P2 = 176 (1 -> 256) // 256
-    val P3 = 8 (1 -> 256) // 256
+    val B  = 7680 GAUSSIAN (64 -> 64 -> 9600) // 150
+    val P1 = 2 EXP (1 -> 6) // 6
+    val P2 = 176 EXP (1 -> 256) // 256
+    val P3 = 8 GAUSSIAN (1 -> 256) // 256
 
     val size = aIn.length; bound(size) = 19200000
 
