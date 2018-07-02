@@ -368,9 +368,9 @@ object BlackScholes extends SpatialApp {
     svolatility: Array[Float],
     stimes:      Array[Float]
   ): Array[Float] = {
-    val B  = tileSize (96 -> 96 -> 19200)
-    val OP = outerPar (1 -> 2)
-    val IP = innerPar (1 -> 96)
+    val B  = tileSize DECAY (96 -> 96 -> 19200)
+    val OP = outerPar DECAY (1 -> 4)
+    val IP = innerPar GAUSSIAN (1 -> 96)
 
     val size = stypes.length; bound(size) = 9995328
 
@@ -691,8 +691,6 @@ object Differentiator extends SpatialApp { // Regression (Dense) // Args: none
 }
 
 object GDA extends SpatialApp { // Regression (Dense) // Args: 64
-
-
   type X = Float
 
   val MAXC = 96
