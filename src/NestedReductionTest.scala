@@ -24,7 +24,6 @@ object NestRed extends SpatialApp {
 	
 			val test_pt = RegFile[Float](num_features)
 			val w = Reg[Float] 
-			val sq_diff = Reg[Float]
 			
 		
 
@@ -46,8 +45,13 @@ object NestRed extends SpatialApp {
 				// Toy example
 				w := Reduce(Reg[Float](0.to[Float]))(num_sv by 1 par num_sv){i =>
 					// RBF Kernel
+          //  declared outside the Reduce above, all parallelized Reduction below will all
+          //  write to the same register, which will become a racy write. 
+			    val sq_diff = Reg[Float]
+
 					sq_diff := Reduce(Reg[Float](0.to[Float]))(num_features by 1 par num_features){j => 
-						(23.5f - test_pt(j)) * (23.5f - test_pt(j))
+            val diff = (23.5f - test_pt(j))
+            diff * diff
 					}{_+_}
 					
 					32.5f * exp_taylor(-1.0f * 0.5f * sq_diff)
