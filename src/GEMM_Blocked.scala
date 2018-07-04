@@ -240,7 +240,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
                 }
                 c_tmp_partial
               }{_+_}
-            Foreach(ts by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
+              Foreach(ts by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
             }
           c_col_partial
           }{_+_}
