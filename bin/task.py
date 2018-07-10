@@ -46,6 +46,18 @@ def copyApp(app, args, params):
             print('Param {} not found !!!'.format(param))
             exit()
 
+def logs(app, passName):
+    return '{}/{}/{}.log'.format(LOG_DIR, app, passName)
+
+def getCommand(passName, fullapp):
+    log = logs(fullapp, passName)
+    if passName=="gen_pir":
+        command = "{}/apps/bin/{} {} {} {}".format(SPATIAL_HOME, passName, fullapp, log, opts.pirsrc)
+    else:
+        command = "{}/apps/bin/{} {} {}".format(SPATIAL_HOME, passName, fullapp, log)
+    return command
+
+
 def runPass(fullname, passName):
     if not torun(passName):
         return
@@ -143,23 +155,17 @@ def act(fullname, resp):
 def show(fullname):
     def printError(passName, log):
         if failed(fullname, passName):
-            if passName=="GEN_PIR":
-                keywords = ["Except"]
-            elif passName=="MAP_PIR":
-                keywords = ["error"]
-            else:
-                keywords = ["error"]
-            lines = grep(log, keywords)
+            lines = grep(log, ["error"])
             for line in lines:
                 sys.stdout.write('- ' + line)
     def passMessage(passName, log):
         msg = ""
-        if success(fullname, passName) and (passName=="FIT_PIR" or passName=="MAP_PIR"):
+        if success(fullname, passName) and (passName=="fit_pir" or passName=="map_pir"):
             pcu = pcuUsage(log)
             pmu = pmuUsage(log)
             mc = mcUsage(log)
             msg = "pcu={}% pmu={}% mc={}%".format(pcu, pmu, mc)
-        if success(fullname, passName) and (passName.startswith("PSIM_")):
+        if success(fullname, passName) and (passName.startswith("psim_")):
             msg = "cycle={}".format(cycleOf(log))
         return msg
     for passName in passes:
@@ -190,18 +196,18 @@ def progress(fullname, passName):
         isDone = (len(grep(log,"PASS (DONE)".format(passName))) != 0)
         if isDone:
 	    isFailed = (len(grep(log, ['error','Error','ERROR','fail','No rule to make', 'Killed', 'KILLED'])) != 0)
-            if passName=="RUN_SIMULATION":
+            if passName=="run_simulation":
 	        hasCycle=cycleOf(fullname) is not None
 	        timeOut = len(grep(log, 'Hardware timeout after') != 0)
                 if not hasCycle or timeOut:
                     isFailed = True
-            if passName.startswith("PSIM_") and cycleOf(log) == None:
+            if passName.startswith("psim_") and cycleOf(log) == None:
                 isFailed = True
             if isFailed: 
 	        prog = "FAILED"
             else:
                 pirsrc = "{}/{}.scala".format(opts.pirsrc, fullname)
-                if passName=="GEN_PIR" and not os.path.exists(pirsrc):
+                if passName=="gen_pir" and not os.path.exists(pirsrc):
                     prog = "NOTRUN"
                 else:
 	                  prog = "SUCCESS"
