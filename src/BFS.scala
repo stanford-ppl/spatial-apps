@@ -4,10 +4,13 @@ import virtualized._
 
 object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
 
-  val E = 9600000 // param
-  val ts = 8000 // param
-
+  val E = 1024 // param
+  val ts = 32 // param
   val N = ts
+
+  val average_nodes_per_edge = 10
+  val d = 6
+
   val edges_per_node = 6 // Will make this random later
 
   @virtualize
@@ -22,7 +25,6 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
     setMem(ids, idsIn)
 
     val depth = ArgIn[Int]
-    val d = args(1).to[Int]
     setArg(depth, d)
     val anpe = ArgIn[Int]
     setArg(anpe, average_nodes_per_edge)
@@ -96,7 +98,6 @@ object BFS extends SpatialApp { // DISABLED Regression (Sparse) // Args: 6 10
   @virtualize
   def main() {
     /* NEW VERSION FOR PERFORMANCE MEASUREMENTS */
-    val average_nodes_per_edge = args(0).to[Int]
     val spacing = 3 
 
     val OCnodes = Array.tabulate(N) {i => 0.to[Int]}

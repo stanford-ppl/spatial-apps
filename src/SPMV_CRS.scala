@@ -8,7 +8,6 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
 
  /*                                                                                                  
    Sparse Matrix is the IEEE 494 bus interconnect matrix from UF Sparse Datasets   
-
     Datastructures in CRS:
               0__1__2__3__4__5_
       rowid: |__|__|__|__|__|__|
@@ -17,12 +16,9 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
       cols:  |___________________________________|
               _↓________↓________________↓_______
      values: |___________________________________|    
-
         Use cols to gather from vector:
               ____________________________________________
      vector: |____________________________________________|
-
-
    Concerns:
       Machsuite assumes everything fits on chip?  So there are no gathers...  Setting tilesize to problem size for now
  */
@@ -53,15 +49,13 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
     val pt_par = 1 (1 -> 1 -> 16) // Do not change?
     val red_par = 2 (1 -> 1 -> 16)
 
-    val size = ArgIn[Int]
-    bound(size) = N
     setMem(values_dram, raw_values)
     setMem(cols_dram, raw_cols)
     setMem(rowid_dram, raw_rowid)
     setMem(vec_dram, raw_vec)
 
     Accel {
-      Foreach(size/tileSize by 1 par tile_par) { tile =>
+      Foreach(N/tileSize by 1 par tile_par) { tile =>
         val rowid_sram = SRAM[Int](tileSize+1)
         val result_sram = SRAM[T](tileSize)
 
@@ -74,11 +68,11 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
           val start_id = rowid_sram(i)
           val stop_id = rowid_sram(i+1)
           Parallel{
-            cols_sram load cols_dram(start_id :: stop_id par par_segment_load)
-            values_sram load values_dram(start_id :: stop_id par par_segment_load)
+            Pipe{cols_sram load cols_dram(start_id :: stop_id par par_segment_load)} // Remove when bug #244 is resolved
+            Pipe{values_sram load values_dram(start_id :: stop_id par par_segment_load)} // Remove when bug #244 is resolved
           }
           vec_sram gather vec_dram(cols_sram, stop_id - start_id)
-          //println("row " + {i + tile})
+          println("row " + {i + tile})
           val element = Reduce(Reg[T](0))(stop_id - start_id by 1 par red_par) { j => 
             // println(" partial from " + j + " = " + {values_sram(j) * vec_sram(j)})
             values_sram(j) * vec_sram(j)
@@ -103,4 +97,3 @@ object SPMV_CRS extends SpatialApp { // Regression (Sparse) // Args: none
 
   }
 }
-
