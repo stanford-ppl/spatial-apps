@@ -1,24 +1,23 @@
 #!/bin/bash
 
 app=$1
-log=$2
 
-outDir=$PLASTISIM_HOME/configs/gen/${app}_dynamic/
+outDir=$PIR_HOME/out/${app}_dynamic
 config=${outDir}/config.psim
 
 [ -e $config ] && rm $config
 
-mkdir -p $(dirname $log)
 export _JAVA_OPTIONS="-Xss8192k" 
 $PIR_HOME/bin/pir $app \
+  --out=$outDir \
   --debug \
   --mapping=true \
-  --load-pir=true \
+  --load-pir=false \
   --save-pir=false \
   --net=dynamic \
   --psim=true \
   --routing-algo=proute \
-  --psim_out=$outDir \
+  --psim-out=$outDir \
   --run-psim=true \
   --trace=false \
   --ctrl=true \
@@ -27,7 +26,6 @@ $PIR_HOME/bin/pir $app \
   --arch=MyDesign \
   --row=16 --col=8 \
   --argin=64 \
-  --tokenout=32 \
-  > $log 2>&1 
+  --tokenout=32
 
-echo "-------------PASS (DONE)------------" >> $log
+echo "-------------PASS (DONE)------------"

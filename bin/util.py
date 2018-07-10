@@ -10,9 +10,10 @@ import math
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 
-# passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
-passes=["GEN_PIR","FIT_PIR", "PSIM_ASIC", "PSIM_STATIC", "PSIM_DYNAMIC"]
-APPS = ['DotProduct', 'OuterProduct', 'GDA', 'BlackScholes']
+# passes=["gen_pir","fit_pir","gen_chisel","make_vcs","map_pir","run_simulation"]
+# passes=["gen_pir","fit_pir", "psim_asic", "psim_static", "psim_dynamic"]
+passes=["gen_pir","fit_pir", "psim_asic", "psim_static"]
+APPS = ['DotProduct', 'OuterProduct', 'GDA', 'BlackScholes', 'TPCHQ6']
 # APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
 # APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
 # APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
@@ -27,58 +28,16 @@ BEST_SUMMARY_CSV_PATH="{}/apps/best.csv".format(SPATIAL_HOME)
 cycle_cache = {}
 
 dependency = {
-        "GEN_PIR":[],
-        "FIT_PIR":["GEN_PIR"],
-        "GEN_CHISEL":[],
-        "MAKE_VCS":["GEN_CHISEL"],
-        "MAP_PIR":["GEN_PIR"],
-        "RUN_SIMUlATION":["MAKE_VCS"],
-        "PSIM_ASIC":["FIT_PIR"],
-        "PSIM_STATIC":["FIT_PIR"],
-        "PSIM_DYNAMIC":["FIT_PIR"]
+        "gen_pir":[],
+        "fit_pir":["gen_pir"],
+        "gen_chisel":[],
+        "make_vcs":["gen_chisel"],
+        "map_pir":["gen_pir"],
+        "run_simulation":["make_vcs"],
+        "psim_asic":["fit_pir"],
+        "psim_static":["fit_pir"],
+        "psim_dynamic":["fit_pir"]
         }
-
-def logs(app, passName):
-    if passName=="GEN_PIR":
-        return '{}/{}/gen_pir.log'.format(LOG_DIR, app)
-    elif passName=="FIT_PIR":
-        return '{}/{}/fit_pir.log'.format(LOG_DIR, app)
-    elif passName=="GEN_CHISEL":
-        return '{}/{}/gen_chisel.log'.format(LOG_DIR, app)
-    elif passName=="MAKE_VCS":
-        return '{}/{}/make_vcs.log'.format(LOG_DIR, app)
-    elif passName=="MAP_PIR":
-        return '{}/{}/map_pir.log'.format(LOG_DIR, app)
-    elif passName=="RUN_SIMULATION":
-        return '{}/{}/run_sim.log'.format(LOG_DIR, app)
-    elif passName=="PSIM_ASIC":
-        return '{}/{}/psim_asic.log'.format(LOG_DIR, app)
-    elif passName=="PSIM_STATIC":
-        return '{}/{}/psim_static.log'.format(LOG_DIR, app)
-    elif passName=="PSIM_DYNAMIC":
-        return '{}/{}/psim_dynamic.log'.format(LOG_DIR, app)
-
-def getCommand(passName, fullapp):
-    log = logs(fullapp, passName)
-    if passName=="GEN_PIR":
-        command = "{}/apps/bin/gen_pir {} {} {}".format(SPATIAL_HOME, fullapp, log, opts.pirsrc)
-    elif passName=="FIT_PIR":
-        command = "{}/apps/bin/fit_pir {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="GEN_CHISEL":
-        command = "{}/apps/bin/gen_chisel {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="MAKE_VCS":
-        command = "{}/apps/bin/make_vcs {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="MAP_PIR":
-        command = "{}/apps/bin/map_pir {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="RUN_SIMULATION":
-        command = "{}/apps/bin/run_sim {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="PSIM_ASIC":
-        command = "{}/apps/bin/psim_asic {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="PSIM_STATIC":
-        command = "{}/apps/bin/psim_static {} {}".format(SPATIAL_HOME, fullapp, log)
-    elif passName=="PSIM_DYNAMIC":
-        command = "{}/apps/bin/psim_dynamic {} {}".format(SPATIAL_HOME, fullapp, log)
-    return command
 
 
 class bcolors:
@@ -121,12 +80,12 @@ def cat(path):
         for line in f:
             sys.stdout.write(line)
 
-def vim(path):
-    subprocess.call("vim {}".format(path), shell=True)
-
 def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+def vim(path):
+    subprocess.call("vim {}".format(path), shell=True)
 
 def grep(path, patterns):
     found = []

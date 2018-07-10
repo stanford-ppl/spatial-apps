@@ -1,11 +1,12 @@
 #!/bin/bash
 
 app=$1
-log=$2
 
-mkdir -p $(dirname $log)
+outDir=$PIR_HOME/out/${app}
+
 export _JAVA_OPTIONS="-Xss8192k" 
 $PIR_HOME/bin/pir $app \
+  --out=$outDir \
   --debug \
   --mapping=false \
   --load-pir=false \
@@ -20,7 +21,6 @@ $PIR_HOME/bin/pir $app \
   --topo=mesh \
   --row=16 --col=8 \
   --argin=64 \
-  --tokenout=32 \
-  > $log 2>&1 
+  --tokenout=32
 
-echo "-------------PASS (DONE)------------" >> $log
+echo "-------------PASS (DONE)------------"
