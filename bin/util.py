@@ -80,12 +80,12 @@ def cat(path):
         for line in f:
             sys.stdout.write(line)
 
-def vim(path):
-    subprocess.call("vim {}".format(path), shell=True)
-
 def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+def vim(path):
+    subprocess.call("vim {}".format(path), shell=True)
 
 def grep(path, patterns):
     found = []

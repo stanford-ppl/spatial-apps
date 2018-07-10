@@ -50,11 +50,10 @@ def logs(app, passName):
     return '{}/{}/{}.log'.format(LOG_DIR, app, passName)
 
 def getCommand(passName, fullapp):
-    log = logs(fullapp, passName)
     if passName=="gen_pir":
-        command = "{}/apps/bin/{} {} {} {}".format(SPATIAL_HOME, passName, fullapp, log, opts.pirsrc)
+        command = "{}/apps/bin/{} {} {}".format(SPATIAL_HOME, passName, fullapp, opts.pirsrc)
     else:
-        command = "{}/apps/bin/{} {} {}".format(SPATIAL_HOME, passName, fullapp, log)
+        command = "{}/apps/bin/{} {}".format(SPATIAL_HOME, passName, fullapp)
     return command
 
 
@@ -77,10 +76,12 @@ def runPass(fullname, passName):
     # clean log
     log = logs(fullname, passName)
     rm(log)
+    mkdir(dirname(log))
 
     command = getCommand(passName, fullname)
 
-    proc = subprocess.Popen(command.split(" "))
+    logFile = open(log, 'w')
+    proc = subprocess.Popen(command.split(" "), stdout=logFile, stderr=logFile)
     setpid(fullname, passName, proc.pid)
     proc.wait()
 
