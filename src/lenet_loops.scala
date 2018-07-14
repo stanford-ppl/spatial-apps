@@ -11,7 +11,7 @@ object lenet_loops extends SpatialApp {
 
   val ip = 16
 
-  type T = FixPt[TRUE,_5,_11] // Use higher precision for more accuracy
+  type T = FixPt[TRUE,_16,_16] // Use higher precision for more accuracy
   val BATCH_SIZE = 17         // TODO: Make this an argin instead of hard-coded
   
   @virtualize
