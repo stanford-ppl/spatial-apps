@@ -26,26 +26,16 @@ import math
 from util import *
 from stat import *
 from task import *
-from dse import *
 
 def main():
-    mkdir('{}/gen'.format(SPATIAL_HOME))
-
-    if opts.summary or opts.plot or opts.best:
-        load_summary()
-    elif opts.dse:
-        runExp()
-    else:
-        target(args[0], [], {})
-
-    if opts.summary:
-        summaryToCsv()
-
-    if opts.best:
-        bestSummary()
-
-    if opts.plot:
-        plot()
+    apps = []
+    apps += ["DotProduct__N_330301440_ts_65536_op_16"]
+    apps += ["TPCHQ6__N_330301440_ts_65536_op_8"]
+    apps += ["OuterProduct__M_12288_N_12288_ts1_64_ts2_1024_op1_4_op2_2_ip2_16_ip1_1"]
+    apps += ["BlackScholes__N_1048576_ts_65536_op_1"]
+    apps += ["GDA__C_128_R_4096_ts_256_op_2_mp_4"]
+    for app in apps:
+        target(app, [], {})
     #################################################################################################################
 
 if __name__ == "__main__":

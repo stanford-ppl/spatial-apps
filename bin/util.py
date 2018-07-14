@@ -11,8 +11,8 @@ SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 
 # passes=["gen_pir","fit_pir","gen_chisel","make_vcs","map_pir","run_simulation"]
-# passes=["gen_pir","fit_pir", "psim_asic", "psim_static", "psim_dynamic"]
-passes=["gen_pir","fit_pir", "psim_asic", "psim_static"]
+# passes=["gen_pir","fit_pir", "psim_asic", "psim_p2p", "psim_static"]
+passes=["gen_pir","fit_pir", "psim_asic", "psim_p2p", "psim_static", "psim_dynamic"]
 APPS = ['DotProduct', 'OuterProduct', 'GDA', 'BlackScholes', 'TPCHQ6']
 # APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
 # APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
@@ -35,6 +35,7 @@ dependency = {
         "map_pir":["gen_pir"],
         "run_simulation":["make_vcs"],
         "psim_asic":["fit_pir"],
+        "psim_p2p":["fit_pir"],
         "psim_static":["fit_pir"],
         "psim_dynamic":["fit_pir"]
         }
@@ -192,8 +193,9 @@ parser.add_argument('--plot', dest='plot', action='store_true', default=False)
 global opts
 (opts, args) = parser.parse_known_args()
 
-opts.apps = APPS if args[0] == "ALL" else args
+opts.apps = [] if len(args)==0 else APPS if args[0] == "ALL" else args
 opts.parallel = opts.run
 opts.run = opts.run > 0
 
 opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME) if opts.dse else '{}/pir/apps/src'.format(PIR_HOME)
+# opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME)

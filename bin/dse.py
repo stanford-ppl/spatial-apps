@@ -152,7 +152,10 @@ def runExp():
     
         addArgs(app, args) # TODO: remove?
 
-        params = parseParams(app)
+        if opts.dse:
+            params = parseParams(app)
+        else:
+            params = OrderedDict()
         space = dse(app, args, params)
         print("space size: {}".format(space))
 

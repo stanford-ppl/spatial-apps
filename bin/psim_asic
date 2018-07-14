@@ -6,7 +6,6 @@ outDir=$PIR_HOME/out/${app}_asic
 config=${outDir}/config.psim
 
 [ -e $config ] && rm $config
-
 export _JAVA_OPTIONS="-Xss8192k" 
 $PIR_HOME/bin/pir $app \
   --out=$outDir \
@@ -17,7 +16,7 @@ $PIR_HOME/bin/pir $app \
   --net=asic \
   --psim=true \
   --psim-out=$outDir \
-  --run-psim=true \
+  --run-psim=false \
   --trace=false \
   --ctrl=true \
   --bp=false \
@@ -25,6 +24,9 @@ $PIR_HOME/bin/pir $app \
   --arch=MyDesign \
   --row=16 --col=8 \
   --argin=64 \
-  --tokenout=32
+  --tokenout=32 \
+  --fifo-depth=20
+
+$PLASTISIM_HOME/plastisim -f $config
 
 echo "-------------PASS (DONE)------------"

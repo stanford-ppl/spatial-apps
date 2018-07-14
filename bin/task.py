@@ -106,51 +106,58 @@ def launchJob(app, args, params):
         runJob(app, args, params)
 
 def kill(fullname, passName):
-    for passName in passes:
-        pid = getpid(fullname, passName)
-        log = logs(fullname, passName)
-        if pid is None:
-            resp = raw_input("{}Kill {} ({}){} for {}?".format(bcolors.RED, passName, pid, bcolors.NC, fullname))
-            if resp == "y":
-                write(log, "-------------{}PASS (KILLED){}------------".format(bcolors.RED, bcolors.NC))
-                os.kill(pid, signal.SIGTERM)
-                print("Killed {}".format(pid))
-        else:
-            rm(log)
+    pid = getpid(fullname, passName)
+    log = logs(fullname, passName)
+    if pid is not None:
+        resp = raw_input("{}Kill {} ({}){} for {}? ".format(bcolors.RED, passName, pid, bcolors.NC, fullname))
+        if resp == "y":
+            write(log, "-------------{}PASS (KILLED){}------------".format(bcolors.RED, bcolors.NC))
+            os.kill(pid, signal.SIGTERM)
+            print("Killed {}".format(pid))
+    else:
+        rm(log)
 
 def act(fullname, resp):
-    def removeLog():
+    def getPass():
+        ps = []
         for passName in passes:
             if passName in resp:
-                log = logs(fullname, passName)
-                rm(log)
-                # del progress_cache[(fullname, passName)]
-    def printlog(passName):
-        log = logs(fullname, passName)
-        print("{}Show {} {}{}".format(bcolors.CYAN, passName, log, bcolors.NC))
-        cat(log)
-        print("{}-------------------------------------------------------{}".format(bcolors.CYAN, bcolors.NC))
-    def open(passName):
-        log = logs(fullname, passName)
-        vim(log)
+                ps.append(passName)
+        if len(ps) == 0:
+            for passName in reversed(passes):
+                if running(fullname, passName): ps.append(passName); break
+        if len(ps) == 0:
+            for passName in reversed(passes):
+                if failed(fullname, passName): ps.append(passName); break
+        return ps
+    def removeLog():
+        for passName in getPass():
+            log = logs(fullname, passName)
+            rm(log)
+            # del progress_cache[(fullname, passName)]
+    def printlog():
+        for passName in getPass():
+            log = logs(fullname, passName)
+            print("{}Show {} {}{}".format(bcolors.CYAN, passName, log, bcolors.NC))
+            cat(log)
+            print("{}-------------------------------------------------------{}".format(bcolors.CYAN, bcolors.NC))
+    def open():
+        for passName in getPass():
+            log = logs(fullname, passName)
+            vim(log)
+    def killPass():
+        for passName in getPass():
+            kill(fullname, passName)
 
-    if resp == "k":
-        kill(fullname)
-    elif "r" in resp:
+    if resp.startswith("k"):
+        killPass()
+    elif resp.startswith("r"):
         removeLog()
-    elif resp == "s":
-        for passName in passes:
-            if running(fullname, passName) or failed(fullname, passName): printlog(passName); break
-    elif "s " in resp:
-        for passName in passes:
-            if passName in resp: printlog(passName);
-    elif resp == "o":
-        for passName in passes:
-            if running(fullname, passName) or failed(fullname, passName): open(passName); break
-    elif "o " in resp :
-        for passName in passes:
-            if passName in resp: open(passName)
-    elif "q":
+    elif resp.startswith("s"):
+        printlog();
+    elif resp.startswith("o"):
+        open()
+    elif resp.startswith("q"):
         exit(0)
 
 def show(fullname):
@@ -173,7 +180,9 @@ def show(fullname):
         log = logs(fullname, passName)
         prog = progress(fullname, passName)
         msg = passMessage(passName, log)
-        print("{}{}({}){} {} {}".format(colors[prog], passName, prog, bcolors.NC, log, msg))
+        pid = getpid(fullname, passName)
+        pid = " [{}]".format(pid) if pid is not None else ""
+        print("{}{}({}){}{} {} {}".format(colors[prog], passName, prog, bcolors.NC, pid, log, msg))
         printError(passName, log)
     print("{}-------------------------------------------------------{}".format(bcolors.CYAN, bcolors.NC))
     return
@@ -192,32 +201,39 @@ def progress(fullname, passName):
     # if (fullname, passName) in progress_cache:
         # return progress_cache[(fullname, passName)]
     log = logs(fullname, passName)
+
+    def checkFail(include, exclude, exists):
+        return (len(exclude)!=0 and len(grep(log, exclude)) != 0) or  \
+               (len(include)!=0 and len(grep(log, include)) == 0) or  \
+               (len(exists)!=0 and any([not os.path.exists(path) for path in exists]))
+
+    def isFailed():
+        if passName=="run_simulation":
+            include = ["Simulation ran for "]
+            exclude = ["Hardware timeout after"]
+            exists = []
+        elif passName.startswith("psim_") and cycleOf(log) == None:
+            include = ["Simulation complete at cycle"]
+            exclude = ["DEADLOCK"]
+            exists = []
+        elif passName=="gen_pir":
+            include = ["success"]
+            exclude = ['error','Error','ERROR','fail','Killed', 'KILLED']
+            exists = ["{}/{}.scala".format(opts.pirsrc, fullname)]
+            exists = []
+        else:
+            include = []
+            exclude = ['error','Error','ERROR','fail','Killed', 'KILLED']
+            exists = []
+        return checkFail(include, exclude, exists)
+
     prog = "NONE"
     if os.path.exists(log):
-        isDone = (len(grep(log,"PASS (DONE)".format(passName))) != 0)
-        if isDone:
-	    isFailed = (len(grep(log, ['error','Error','ERROR','fail','No rule to make', 'Killed', 'KILLED'])) != 0)
-            if passName=="run_simulation":
-	        hasCycle=cycleOf(fullname) is not None
-	        timeOut = len(grep(log, 'Hardware timeout after') != 0)
-                if not hasCycle or timeOut:
-                    isFailed = True
-            if passName.startswith("psim_") and cycleOf(log) == None:
-                isFailed = True
-            if isFailed: 
-	        prog = "FAILED"
-            else:
-                pirsrc = "{}/{}.scala".format(opts.pirsrc, fullname)
-                if passName=="gen_pir" and not os.path.exists(pirsrc):
-                    prog = "NOTRUN"
-                else:
-	                  prog = "SUCCESS"
+        if (len(grep(log,"PASS (DONE)".format(passName))) != 0):
+            prog = "FAILED" if isFailed() else "SUCCESS"
         else:
             pid = getpid(fullname, passName)
-            if pid is not None:
-                prog = "RUNNING"
-            else:
-                prog = "NOTRUN"
+            prog = "NOTRUN" if pid is None else "RUNNING"
     else:
         prog = "NOTRUN"
     # progress_cache[(fullname,passName)] = prog

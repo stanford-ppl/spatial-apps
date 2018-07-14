@@ -3,7 +3,6 @@
 app=$1
 pir_src_dir=$2
 
-cd $SPATIAL_HOME
 app_file=$pir_src_dir/$app.scala
 pir_dir=$SPATIAL_HOME/gen/$app/pir
 if [ -e $pir_dir ]; then rm -r $pir_dir; fi
@@ -11,6 +10,7 @@ if [ -e $app_file ]; then rm $app_file; fi
 mkdir -p $SPATIAL_HOME/gen/$app
 mkdir -p $pir_src_dir 
 mkdir -p $pir_dir
+cd $SPATIAL_HOME
 $SPATIAL_HOME/bin/spatial $app --dot --cgra+ --pirsrc $pir_src_dir
 
 echo "-------------PASS (DONE)------------"
