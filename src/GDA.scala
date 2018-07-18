@@ -43,7 +43,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
       val sigmaOut = SRAM[T](C, C)
 
-      MemReduce(sigmaOut)(R by ts par op){ r =>
+      MemReduce(sigmaOut par ip)(R by ts par op){ r =>
         val gdaYtile = SRAM[Int](ts)
         val gdaXtile = SRAM[T](ts, C)
         val blk = Reg[Int]
@@ -54,7 +54,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
 
         val sigmaBlk = SRAM[T](C, C)
 
-        MemReduce(sigmaBlk)(ts par mp) { rr =>
+        MemReduce(sigmaBlk par ip)(ts par mp) { rr =>
           val subTile = SRAM[T](C)
           val sigmaTile = SRAM[T](C, C)
           Foreach(C par ip) { cc =>

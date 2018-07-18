@@ -93,33 +93,6 @@ object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0
       result(0::D par ip) store sgdmodel
     }
 
-    //Accel {
-      //val y_tile = SRAM[TX](ts)
-      //val sgdmodel = SRAM[TM](D)
-      //val x_tile = SRAM[TX](ts,D)
-      //Pipe(D by 1) { i => sgdmodel(i) = 0.to[TM]}
-      //Sequential.Foreach(E by 1) { e =>
-
-        //Sequential.Foreach (N by ts) { b =>
-          //y_tile load y(b::b+ts par ip)
-          //x_tile load x(b::b+ts, 0::D)
-          //val y_err = SRAM[TX](ts)
-          //Foreach(ts by 1 par mp1) { i => 
-            //val y_hat = Reduce(Reg[TX])(D by 1 par ip){ j => x_tile(i,j) * sgdmodel(j).to[TX] }{_+_}
-            //y_err(i) = y_tile(i) - y_hat.value
-          //}
-          //Foreach(D by 1 par mp2) { i =>
-          //// Can't parallelize this inner loop in plasticine, x_tile's second
-          //// dimension is the inner dimension
-            //val raw_update = Reduce(Reg[TX])(ts by 1 par ip){ j => x_tile(j,i) * y_err(j) }{_+_}
-            //sgdmodel(i) = sgdmodel(i) + raw_update.value.to[TM]*A
-          //}
-        //}
-      //}
-      //result(0::D par ip) store sgdmodel
-
-    //}
-
     getMem(result)
 
   }
