@@ -5,10 +5,10 @@ import spatial.targets._
 object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
   override val target = AWS_F1
                                                                                                   
-  val DIM = 32 // param
+  val DIM = 128 // param
 
-  val ts = 16 // param (64, 256, 64)
-  val its = 16 // param pmuSize / <ts>
+  val ts = 64 // param (64, 256, 64)
+  val its = 64 // param pmuSize / <ts>
   val loop_ii    = 1 // param (1, <DIM> / <its>, 2)
   val loop_jj    = 1 // param (1, <DIM> / <ts>, 2)
   val loop_kk    = 1 // param (1, <DIM> / <ts>, 2)
@@ -16,11 +16,6 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
   val loop_k     = 1 // param (1, 6, 2)
 
   val ip = 16
-  val loop_j     = ip
-  val par_load = ip
-  val par_store = ip
-  val reduce_col = ip
-  val reduce_tmp = ip
  /*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 
 
@@ -224,27 +219,25 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
       Foreach(dim by its par loop_ii) { ii => // this loop defenitilely cant be parallelized right now
         Foreach(dim by ts par loop_jj) { jj => 
           val c_col = SRAM[T](its,ts)
-          MemReduce(c_col par reduce_col)(dim by ts par loop_kk) { kk => 
+          MemReduce(c_col par ip)(dim by ts par loop_kk) { kk => 
             val c_col_partial = SRAM[T](its,ts)
             val b_sram = SRAM[T](ts,ts)
-            b_sram load b_dram(kk::kk+ts, jj::jj+ts par par_load)
+            b_sram load b_dram(kk::kk+ts, jj::jj+ts par ip)
             Foreach(its by 1 par loop_i) { i => 
               val a_sram = SRAM[T](ts)
               a_sram load a_dram(ii+i, kk::kk+ts)
               val c_tmp = SRAM[T](ts)
-              MemReduce(c_tmp par reduce_tmp)(ts by 1 par loop_k) { k => 
+              MemReduce(c_tmp par ip)(ts by 1 par loop_k) { k => 
                 val c_tmp_partial = SRAM[T](ts)
                 val temp_a = a_sram(k)
-                Foreach(ts by 1 par loop_j) { j => 
-                  c_tmp_partial(j) = b_sram(k, j) * temp_a
-                }
+                Foreach(ts by 1 par ip) { j => c_tmp_partial(j) = b_sram(k, j) * temp_a }
                 c_tmp_partial
               }{_+_}
-              Foreach(ts by 1){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
+              Foreach(ts by 1 par ip){cpy => c_col_partial(i,cpy) = c_tmp(cpy)}
             }
             c_col_partial
           }{_+_}
-          c_dram(ii::ii+its, jj::jj+ts par par_store) store c_col
+          c_dram(ii::ii+its, jj::jj+ts par ip) store c_col
         }
       }
     }
