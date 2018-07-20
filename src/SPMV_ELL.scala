@@ -67,9 +67,9 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
     val raw_cols = loadCSV2D[Int](sys.env("SPATIAL_HOME") + s"/gen/$appName/ell_cols.csv")
     val raw_vec = loadCSV1D[T](sys.env("SPATIAL_HOME") + s"/gen/$appName/ell_vec.csv", "\n")
 
-    val values_dram = DRAM[T](N,L) 
-    val cols_dram = DRAM[Int](N,L) 
-    val vec_dram = DRAM[T](N) 
+    val values_dram = DRAM[T](N,L); fileNameOf(values_dram) = sys.env("SPATIAL_HOME") + s"/gen/$appName/ell_values.csv"
+    val cols_dram = DRAM[Int](N,L); fileNameOf(cols_dram) = sys.env("SPATIAL_HOME") + s"/gen/$appName/ell_cols.csv"
+    val vec_dram = DRAM[T](N); fileNameOf(vec_dram) = sys.env("SPATIAL_HOME") + s"/gen/$appName/ell_vec.csv"
     val result_dram = DRAM[T](N)
 
     setMem(values_dram, raw_values)
@@ -77,7 +77,7 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
     setMem(vec_dram, raw_vec)
 
     Accel {
-      Foreach(N/ts by 1){ tile => 
+      Foreach(N by ts){ tile => 
         val cols_sram = SRAM[Int](ts, L)
         val values_sram = SRAM[T](ts, L)
         val result_sram = SRAM[T](ts)

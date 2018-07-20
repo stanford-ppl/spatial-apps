@@ -98,8 +98,8 @@ object P4 extends SpatialApp {
 
 
 	// Setup streams
-	val stream_in0  = StreamIn[UInt32](GPInput1)
-	val stream_in1  = StreamIn[UInt32](GPInput2)
+	val stream_in0  = StreamIn[UInt32](GPInput1); countOf(stream_in0) = 1024l
+	val stream_in1  = StreamIn[UInt32](GPInput2); countOf(stream_in1) = 1024l
     
 	val stream_out0 = StreamOut[UInt32](GPOutput1)
 	val stream_out1 = StreamOut[UInt32](GPOutput2)
