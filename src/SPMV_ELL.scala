@@ -8,6 +8,7 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
   val N = 64
   val L = 16
   val ts = 32
+  val ip = 16
 
  /*                                                                                                  
    Sparse Matrix is the IEEE 494 bus interconnect matrix from UF Sparse Datasets   
@@ -88,7 +89,7 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
         Foreach(ts by 1) { i => 
           val vec_sram = SRAM[T](L)
           val gather_addrs = SRAM[Int](L)
-          Foreach(L by 1) { j => gather_addrs(j) = cols_sram(i, j) }
+          Foreach(L by 1 par ip) { j => gather_addrs(j) = cols_sram(i, j) }
           vec_sram gather vec_dram(gather_addrs, L)
           val element = Reduce(Reg[T](0))(L by 1) { k => values_sram(i,k) * vec_sram(k) }{_+_}
           result_sram(i) = element
