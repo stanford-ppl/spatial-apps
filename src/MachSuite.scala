@@ -2120,7 +2120,7 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
     setMem(vec_dram, raw_vec)
 
     Accel {
-      Foreach(N/tileSize by 1){ tile => 
+      Foreach(N by tileSize){ tile => 
         val cols_sram = SRAM[Int](tileSize, L)
         val values_sram = SRAM[T](tileSize, L)
         val result_sram = SRAM[T](tileSize)
