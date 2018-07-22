@@ -5,7 +5,7 @@ object lenet_loops extends SpatialApp {
 
   val batch_par = 1 // param [1]
   val conv1_par = 1 // param [1, 2, 4, 6] | 20 % p == 0 
-  val conv2_par = 1 // param
+  val conv2_par = 2 // param
   val mat1_par = 1 // param
   val mat2_par = 1 // param
 
@@ -27,15 +27,15 @@ object lenet_loops extends SpatialApp {
     c7: Array[T]
   ) : Matrix[T] = {
 
-    val c0_DRAM = DRAM[T](20,1,32)
+    val c0_DRAM = DRAM[T](20,5,16)
     val i0_DRAM = DRAM[T](BATCH_SIZE,28,32)
     val c1_DRAM = DRAM[T](32)
-    val c2_DRAM = DRAM[T](50,512)
+    val c2_DRAM = DRAM[T](50,5,16)
     val c3_DRAM = DRAM[T](64)
-    val c4_DRAM = DRAM[T](100, 4000)
+    val c4_DRAM = DRAM[T](100,4,4,4,64)
 
-    val c5_DRAM = DRAM[T](512)
-    val c6_DRAM = DRAM[T](10,512)
+    val c5_DRAM = DRAM[T](100,5)
+    val c6_DRAM = DRAM[T](10,100,5)
 
     val c7_DRAM = DRAM[T](32)
     val tmp5_DRAM = DRAM[T](BATCH_SIZE,32)
@@ -56,7 +56,7 @@ object lenet_loops extends SpatialApp {
     
     setMem(c3_DRAM, c3)
     
-    setMem(c4_DRAM, c4.reshape(100,4000))
+    setMem(c4_DRAM, c4)
     
     setMem(c5_DRAM, c5)
 
@@ -69,16 +69,16 @@ object lenet_loops extends SpatialApp {
     Accel {
     
       val c1_SRAM = SRAM[T](32)
-      c1_SRAM load c1_DRAM(0::32 par 1)
+      c1_SRAM load c1_DRAM(0::32 par ip)
 
       val c3_SRAM = SRAM[T](64)
-      c3_SRAM load c3_DRAM(0::64 par 1)
+      c3_SRAM load c3_DRAM(0::64 par ip)
 
-      val c5_SRAM = SRAM[T](512)
-      c5_SRAM load c5_DRAM(0::512 par 1)
+      val c5_SRAM = SRAM[T](5,128)
+      c5_SRAM load c5_DRAM(0::5,0::128 par ip)
       
       val c7_SRAM = SRAM[T](32)
-      c7_SRAM load c7_DRAM(0::32)
+      c7_SRAM load c7_DRAM(0::32 par ip)
       
       Foreach(BATCH_SIZE by 1 par batch_par) { batch_img =>
 
@@ -88,6 +88,8 @@ object lenet_loops extends SpatialApp {
         
         // Conv2D 1st layer
         val tmp1_SRAM = SRAM[T](20,12,12)
+        val c0_RF = SRAM[T](20,5,16)
+        c0_RF load c0_DRAM(0::20, 0::5, 0::16 par ip) // Loading kernel
         Foreach(20 by 1 par conv1_par) { outD_i => // out channels
           val nr = 28
           val nc = 28
@@ -95,20 +97,18 @@ object lenet_loops extends SpatialApp {
           val kc = 5
           val or = 24
           val oc = 24
-          val tmp1_SRAM_conv = SRAM[T](or, oc) // 24 x 24
-          val c0_RF = RegFile[T](32)
-          c0_RF load c0_DRAM(outD_i, 0, 0::32 par ip) // Loading kernel
-          Foreach(0 until or) { r => // Convolution with 5 x 5 kernel
-            Foreach(0 until oc par 1) { c => // Convolution with 5 x 5 kernel
-              val window = Reduce(Reg[T](0.to[T]))(0 until kr par 1, 0 until kc par 5){ (i,j) =>
-                i0_SRAM(r+i,c+j) * c0_RF(i*5+j)
+          val tmp1_SRAM_conv = SRAM[T](or/2,2,oc/2,2) // 24 x 24
+          Foreach(0 until or by 2, 2 by 1) { (ro, ri) => // Convolution with 5 x 5 kernel
+            Foreach(0 until oc by 2, 2 by 1) { (co,ci) => // Convolution with 5 x 5 kernel
+              val window = Reduce(Reg[T](0.to[T]))(0 until kr, 0 until kc par 5){ (i,j) =>
+                i0_SRAM(ro+ri+i,co+ci+j) * c0_RF(outD_i,i,j)
               }{_+_}
-              tmp1_SRAM_conv(r, c) = window.value
+              tmp1_SRAM_conv(ro,ri,co,ci) = window.value
             }
           }
           Foreach(12 by 1, 12 by 1) { (i,j) => // Fused pulling + relu + biasAdd
-            val out = Reduce(Reg[T](0.to[T]))(2 by 1 par 2, 2 by 1 par 2) { (ii, jj) =>
-              max(0.to[T], tmp1_SRAM_conv(i*2 + ii, j*2 + jj) + c1_SRAM(outD_i))
+            val out = Reduce(Reg[T](0.to[T]))(2 by 1, 2 by 1 par 2) { (ii, jj) =>
+              max(0.to[T], tmp1_SRAM_conv(i,ii,j,jj) + c1_SRAM(outD_i))
             } { (x,y) => max(x,y) }
             tmp1_SRAM(outD_i, i, j) = out.value
           }
@@ -119,6 +119,8 @@ object lenet_loops extends SpatialApp {
 
         // Conv2D 2nd layer
         val tmp2_SRAM = SRAM[T](50,4,4)
+        val c2_RF = SRAM[T](50,5,16)
+        c2_RF load c2_DRAM(0::50,0::5,0::16 par ip)                            // Banking error if parallelized
         Foreach(50 by 1 par conv2_par) { outD_i => // out channels
           val nr = 12
           val nc = 12
@@ -128,13 +130,11 @@ object lenet_loops extends SpatialApp {
           val oc = 8
           val d = 20
           val tmp2_SRAM_conv = SRAM[T](or, oc)
-          val c2_RF = SRAM[T](512)
-          c2_RF load c2_DRAM(outD_i, 0::512 par 1)                            // Banking error if parallelized
           MemReduce(tmp2_SRAM_conv)(d by 1 par 1) { inD_i => // in channels   // Banking error if parallelized
             val result = SRAM[T](or, oc)
             Foreach(0 until or, 0 until oc par 1) { (r,c) =>
-              val window = Reduce(Reg[T](0.to[T]))(0 until kr par 1, 0 until kc par 1){ (i,j) =>
-                tmp1_SRAM(inD_i, r+i,c+j) * c2_RF(inD_i*25 + i*5 + j)
+              val window = Reduce(Reg[T](0.to[T]))(0 until kr par 1, 0 until kc par 5){ (i,j) =>
+                tmp1_SRAM(inD_i, r+i,c+j) * c2_RF(inD_i,i,j)
               }{_+_}
               result(r, c) = window.value
             }
@@ -142,7 +142,7 @@ object lenet_loops extends SpatialApp {
           }{_+_} // Reduce across in channels
 
           Foreach(4 by 1, 4 by 1) { (i,j) =>
-            val out = Reduce(Reg[T](0.to[T]))(2 by 1, 2 by 1) { (ii, jj) =>
+            val out = Reduce(Reg[T](0.to[T]))(2 by 1 by 2, 2 by 1 by 2) { (ii, jj) =>
               max(0.to[T], tmp2_SRAM_conv(i*2 + ii, j*2 + jj) + c3_SRAM(outD_i))
             } { (x,y) => max(x,y) }
             tmp2_SRAM(outD_i, i, j) = out.value
@@ -153,21 +153,22 @@ object lenet_loops extends SpatialApp {
         // Optimization: MaxPool was merged into Conv2D above
 
         // Reshape
-        val tmp3_SRAM = SRAM[T](4*4*50)
-        Foreach(50 by 1, 4 by 1 par 4, 4 by 1 par 4) { (j,i,k) =>
-          tmp3_SRAM(k*50 + i*4*50 + j) = tmp2_SRAM(j, i, k)
-        }
+        //val tmp3_SRAM = SRAM[T](4,4,50)
+        //Foreach(50 by 1 par 10, 4 by 1, 4 by 1) { (j,i,k) =>
+          //tmp3_SRAM(k,i,j) = tmp2_SRAM(j, i, k)
+        //}
 
         // MatMul
-        val tmp4_SRAM = SRAM[T](500)
-        Foreach(100 by 1 par mat1_par){out_i =>
-          val c4_row_SRAM = SRAM[T](4000)
-          c4_row_SRAM load c4_DRAM(out_i, 0::4000 par ip)
+        val tmp4_SRAM = SRAM[T](5,128)
+        Foreach(128 by 1 par mat1_par){ out_i =>
+          val c4_row_SRAM = SRAM[T](5,4,4,64)
+          c4_row_SRAM load c4_DRAM(out_i, 0::5, 0::4, 0::4, 0::64 par ip)
           Foreach(5 by 1){block_i =>
-            val prod = Reduce(Reg[T](0.to[T]))(800 by 1 par 1){ in_i =>             // Banking error if parallelized
-              tmp3_SRAM(in_i) * c4_row_SRAM(block_i*800 + in_i)
+            val prod = Reduce(Reg[T](0.to[T]))(50 by 1, 4 by 1, 4 by 1 par 4){ (j,i,k) =>
+              //tmp3_SRAM(j,i,k) * c4_row_SRAM(block_i,j,i,k)
+              tmp2_SRAM(i,i,j) * c4_row_SRAM(block_i,j,i,k)
             }{_+_}
-            tmp4_SRAM(out_i*5 + block_i) = max(0.to[T], prod.value + c5_SRAM(out_i*5 + block_i))
+            tmp4_SRAM(block_i,out_i) = max(0.to[T], prod.value + c5_SRAM(block_i,out_i))
           }
         }
         // Optimization: BiasAdd was merged into MatMul above
@@ -175,10 +176,12 @@ object lenet_loops extends SpatialApp {
 
         // MatMul
         val tmp5_SRAM = SRAM[T](32)
+        val c6_row_SRAM = SRAM[T](10,5,128)
+        c6_row_SRAM load c6_DRAM(0::10, 0::5, 0::128 par ip)
         Foreach(10 by 1 par mat2_par){out_i =>
-          val c6_row_SRAM = SRAM[T](512)
-          c6_row_SRAM load c6_DRAM(out_i, 0::512 par ip)
-          val prod = Reduce(Reg[T](0.to[T]))(500 by 1 par ip){ in_i => tmp4_SRAM(in_i) * c6_row_SRAM(in_i) }{_+_}
+          val prod = Reduce(Reg[T](0.to[T]))(5 by 1, 128 by ip){ (in_i,in_j) => 
+            tmp4_SRAM(in_i,in_j) * c6_row_SRAM(out_i,in_i, in_j) 
+          }{_+_}
           tmp5_SRAM(out_i) = prod.value + c7_SRAM(out_i)
         }
         // Optimization: BiasAdd was merged into MatMul above
