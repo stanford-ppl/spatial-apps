@@ -3,8 +3,8 @@ import virtualized._
 
 object lenet_loops extends SpatialApp {
 
-  val batch_par = 1 // param
-  val conv1_par = 1 // param
+  val batch_par = 1 // param [1]
+  val conv1_par = 1 // param [1, 2, 4, 6] | 20 % p == 0 
   val conv2_par = 1 // param
   val mat1_par = 1 // param
   val mat2_par = 1 // param
@@ -12,7 +12,7 @@ object lenet_loops extends SpatialApp {
   val ip = 16
 
   type T = FixPt[TRUE,_16,_16] // Use higher precision for more accuracy
-  val BATCH_SIZE = 17         // TODO: Make this an argin instead of hard-coded
+  val BATCH_SIZE = 3         // TODO: Make this an argin instead of hard-coded
   
   @virtualize
   def lenet_Dec6[T:Type:Num](
@@ -84,7 +84,7 @@ object lenet_loops extends SpatialApp {
 
         // Move data on-chip
         val i0_SRAM = SRAM[T](28,32)
-        i0_SRAM load i0_DRAM(batch_img, 0::28, 0::32 par 1)
+        i0_SRAM load i0_DRAM(batch_img, 0::28, 0::32 par ip)
         
         // Conv2D 1st layer
         val tmp1_SRAM = SRAM[T](20,12,12)
@@ -97,15 +97,17 @@ object lenet_loops extends SpatialApp {
           val oc = 24
           val tmp1_SRAM_conv = SRAM[T](or, oc) // 24 x 24
           val c0_RF = RegFile[T](32)
-          c0_RF load c0_DRAM(outD_i, 0, 0::32 par 1) // Loading kernel
-          Foreach(0 until or, 0 until oc par 1) { (r,c) => // Convolution with 5 x 5 kernel
-            val window = Reduce(Reg[T](0.to[T]))(0 until kr par 1, 0 until kc par 1){ (i,j) =>
-              i0_SRAM(r+i,c+j) * c0_RF(i*5+j)
-            }{_+_}
-            tmp1_SRAM_conv(r, c) = window.value
+          c0_RF load c0_DRAM(outD_i, 0, 0::32 par ip) // Loading kernel
+          Foreach(0 until or) { r => // Convolution with 5 x 5 kernel
+            Foreach(0 until oc par 1) { c => // Convolution with 5 x 5 kernel
+              val window = Reduce(Reg[T](0.to[T]))(0 until kr par 1, 0 until kc par 5){ (i,j) =>
+                i0_SRAM(r+i,c+j) * c0_RF(i*5+j)
+              }{_+_}
+              tmp1_SRAM_conv(r, c) = window.value
+            }
           }
           Foreach(12 by 1, 12 by 1) { (i,j) => // Fused pulling + relu + biasAdd
-            val out = Reduce(Reg[T](0.to[T]))(2 by 1, 2 by 1) { (ii, jj) =>
+            val out = Reduce(Reg[T](0.to[T]))(2 by 1 par 2, 2 by 1 par 2) { (ii, jj) =>
               max(0.to[T], tmp1_SRAM_conv(i*2 + ii, j*2 + jj) + c1_SRAM(outD_i))
             } { (x,y) => max(x,y) }
             tmp1_SRAM(outD_i, i, j) = out.value
@@ -152,7 +154,7 @@ object lenet_loops extends SpatialApp {
 
         // Reshape
         val tmp3_SRAM = SRAM[T](4*4*50)
-        Foreach(50 by 1, 4 by 1, 4 by 1) { (j,i,k) =>
+        Foreach(50 by 1, 4 by 1 par 4, 4 by 1 par 4) { (j,i,k) =>
           tmp3_SRAM(k*50 + i*4*50 + j) = tmp2_SRAM(j, i, k)
         }
 
@@ -160,7 +162,7 @@ object lenet_loops extends SpatialApp {
         val tmp4_SRAM = SRAM[T](500)
         Foreach(100 by 1 par mat1_par){out_i =>
           val c4_row_SRAM = SRAM[T](4000)
-          c4_row_SRAM load c4_DRAM(out_i, 0::4000 par 16)
+          c4_row_SRAM load c4_DRAM(out_i, 0::4000 par ip)
           Foreach(5 by 1){block_i =>
             val prod = Reduce(Reg[T](0.to[T]))(800 by 1 par 1){ in_i =>             // Banking error if parallelized
               tmp3_SRAM(in_i) * c4_row_SRAM(block_i*800 + in_i)
@@ -175,14 +177,14 @@ object lenet_loops extends SpatialApp {
         val tmp5_SRAM = SRAM[T](32)
         Foreach(10 by 1 par mat2_par){out_i =>
           val c6_row_SRAM = SRAM[T](512)
-          c6_row_SRAM load c6_DRAM(out_i, 0::512 par 1)
-          val prod = Reduce(Reg[T](0.to[T]))(500 by 1 par 1){ in_i => tmp4_SRAM(in_i) * c6_row_SRAM(in_i) }{_+_}
+          c6_row_SRAM load c6_DRAM(out_i, 0::512 par ip)
+          val prod = Reduce(Reg[T](0.to[T]))(500 by 1 par ip){ in_i => tmp4_SRAM(in_i) * c6_row_SRAM(in_i) }{_+_}
           tmp5_SRAM(out_i) = prod.value + c7_SRAM(out_i)
         }
         // Optimization: BiasAdd was merged into MatMul above
         // Optimization: ReLU was merged into MatMul above
 
-        tmp5_DRAM(batch_img, 0::32) store tmp5_SRAM
+        tmp5_DRAM(batch_img, 0::32 par ip) store tmp5_SRAM
       } // Metapipeline over all images
     }
     

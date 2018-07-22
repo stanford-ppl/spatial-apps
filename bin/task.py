@@ -174,7 +174,7 @@ def show(fullname):
             mc = mcUsage(log)
             msg += "pcu={}% pmu={}% mc={}%".format(pcu, pmu, mc)
         if success(fullname, passName) and (passName.startswith("psim_")):
-            msg += "cycle={} dram={}".format(cycleOf(log), drambw(log))
+            msg += " cycle={} dram={}".format(cycleOf(log), drambw(log))
         return msg
     for passName in passes:
         log = logs(fullname, passName)

@@ -2,19 +2,19 @@ import spatial.dsl._
 import spatial.targets._
 import virtualized._
 
-object Kmeans extends SpatialApp { self => // Regression (Dense) // Args: 3 64
+object Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1 extends SpatialApp { self => // Regression (Dense) // Args: 3 64
   override val target = targets.Default
   type X = Int
 
-  val I = 2 // param [2]
-  val N = 64 // param [pmuSize / 64 * 16]
-  val K = 16 // param [64]
-  val D = 32 // param [64] | <K> * p <= pmuSize 
-  val ts = 16 // param [pmuSize / <D>]
-  val op = 1 // param [1] | <N> / <ts> % p == 0
-  val mp1 = 2 // param [1,2,4] | <ts> % p == 0
-  val mp2 = 1 // param [1] | <K> % p == 0 and <mp1> * p < 10
-  val mp3 = 1 // param [1] | <K> % p == 0
+val I = 2
+val N = 16384
+val K = 64
+val D = 64
+val ts = 1024
+val op = 1
+val mp1 = 4
+val mp2 = 1
+val mp3 = 1
   val ip = 16
 
   val DM1 = D - 1
@@ -38,18 +38,14 @@ object Kmeans extends SpatialApp { self => // Regression (Dense) // Args: 3 64
     Accel {
       val cts = SRAM[T](K, D)
 
-      // Load initial centroids (from points)
       cts load points(0::K, 0::D par ip)
 
       Sequential.Foreach(iters by 1){epoch =>
-        // For each set of points
         val newCents = MemReduce(SRAM[T](K,D) par ip)(N by ts par op){i =>
           val pts = SRAM[T](ts, D)
           pts load points(i::i+ts, 0::D par ip)
 
-          // For each point in this set
           MemReduce(SRAM[T](K,D) par ip)(ts par mp1){pt =>
-            // Find the index of the closest centroid
             val dists = SRAM[T](K)
             Foreach(K by 1 par mp2) { ct =>
               val dist = Reduce(Reg[T])(D par ip){d => (pts(pt,d) - cts(ct,d)) ** 2 }{_+_}
@@ -60,7 +56,6 @@ object Kmeans extends SpatialApp { self => // Regression (Dense) // Args: 3 64
               mux(dists(ct) == minDist.value, ct, -1)
             } { (a,b) => max(a,b) }
 
-            // Store this point to the set of accumulators
             val localCent = SRAM[T](K,D)
             Foreach(K by 1, D par ip){(ct,d) =>
               localCent(ct, d) = mux(ct == minCent.value, pts(pt,d), 0.to[T])
@@ -69,7 +64,6 @@ object Kmeans extends SpatialApp { self => // Regression (Dense) // Args: 3 64
           }{_+_} // Add the current point to the accumulators for this centroid
         }{_+_}
 
-        // Average each new centroid
         Foreach(K by 1 par mp3){ ct =>
           val centCount = Reg[T](0.to[T])
           Pipe {
@@ -81,7 +75,6 @@ object Kmeans extends SpatialApp { self => // Regression (Dense) // Args: 3 64
         }
       }
 
-      // Store the centroids out
       centroids(0::K, D par ip) store cts
     }
 
@@ -105,13 +98,11 @@ object Kmeans extends SpatialApp { self => // Regression (Dense) // Args: 3 64
     for(epoch <- 0 until I) {
       def dist[T:Type:Num](p1: Array[T], p2: Array[T]) = p1.zip(p2){(a,b) => (a - b)**2 }.reduce(_+_)
 
-      // Make weighted points
       val map = pts.groupByReduce{pt =>
         val dists = cts.map{ct => dist(ct, pt) }
         dists.zip(ii){(a,b) => pack(a,b) }.reduce{(a,b) => if (a._1 < b._1) a else b}._2  // minIndex
       }{pt => pt}{(x,y) => x.zip(y){_+_} }
 
-      // Average
       for (k <- 0 until K) {
         if (!map.contains(k)) {
           cts(k) = Array.tabulate(D){d => 0.to[X]}

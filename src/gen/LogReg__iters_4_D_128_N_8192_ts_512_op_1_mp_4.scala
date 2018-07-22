@@ -2,14 +2,14 @@ import spatial.dsl._
 import spatial.targets._
 import virtualized._
 
-object LogReg extends SpatialApp {
+object LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4 extends SpatialApp {
 
-  val iters = 1 // param [4]
-  val D = 128 // param [128]
-  val N = 1024 // param [pmuSize / <D> * 16]
-  val ts = 64 // param [pmuSize / <D>] | <N> % p == 0
-  val op = 1 // param [1] | <N> / <ts> % p == 0
-  val mp = 1 // param [1,2,4,6,8] | <ts> % p == 0
+val iters = 4
+val D = 128
+val N = 8192
+val ts = 512
+val op = 1
+val mp = 4
 
   type X = Float //FixPt[TRUE,_16,_16]
 
@@ -93,7 +93,6 @@ object LogReg extends SpatialApp {
       for (i <- 0 until D) {
         gold(i) = gold(i) + A*gradient(i)
       }
-      // printArr(gold, "gold now")
     }
 
 
@@ -101,8 +100,6 @@ object LogReg extends SpatialApp {
     printArray(result, "result: ")
 
     val cksum = result.zip(gold){ (a,b) => a > b-margin && a < b+margin}.reduce{_&&_}
-    // println("max err: " + result.zip(gold){(a,b) => (a-b)*(a-b)}.reduce{Math.max(_,_)})
-    // println("mean err: " + result.zip(gold){(a,b) => (a-b)*(a-b)}.reduce{_+_} / D)
     println("PASS: " + cksum  + " (LogReg)")
 
 
