@@ -2,16 +2,17 @@ import spatial.dsl._
 import spatial.targets._
 import virtualized._
 
-object GDA extends SpatialApp { // Regression (Dense) // Args: 64
+object GDA extends SpatialApp { self => // Regression (Dense) // Args: 64
 
   type X = Float
 
   val C = 64 // param [128]
   val R = 1024 // param [pmuSize / <C> * 8] # orignal size 38400
 
-  val ts = 32 // param (pmuSize / <C> / 2, pmuSize / <C>, pmuSize / <C> / 2) | <R> % p == 0
-  val op = 1 // param (1, 5, 1) | <R> / <ts> % p == 0
-  val mp = 1 // param (1, 5, 1) | <ts> % p == 0
+  val ts = 32 // param [pmuSize / <C>]  # (pmuSize / <C> / 2, pmuSize / <C>, pmuSize / <C> / 2) | <R> % p == 0
+  val op = 1 // param [1] # (1, 5, 1) | <R> / <ts> % p == 0
+  val mp1 = 1 // param [1] + (2, 8, 2) | <ts> % p == 0
+  val mp2 = 1 // param [1] + (2, 8, 2) | <C> % p == 0 and <mp1> * p < 10
 
   val ip = 16
   val margin = 1
@@ -20,7 +21,7 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
   def gda[T: Type : Num](xCPU: Array[T], yCPU: Array[Int], mu0CPU: Array[T], mu1CPU: Array[T]) = {
 
     val R = ArgIn[Int]
-    setArg(R, yCPU.length); bound(yCPU.length) = GDA.R
+    setArg(R, yCPU.length); bound(yCPU.length) = self.R
 
     val x = DRAM[T](R, C)
     val y = DRAM[Int](R)
@@ -48,20 +49,22 @@ object GDA extends SpatialApp { // Regression (Dense) // Args: 64
         val gdaXtile = SRAM[T](ts, C)
         val blk = Reg[Int]
         Parallel {
-          gdaYtile load y(r :: r + ts par 16)
-          gdaXtile load x(r :: r + ts, 0 :: C par 16) // Load tile of x
+          gdaYtile load y(r :: r + ts par ip)
+          gdaXtile load x(r :: r + ts, 0 :: C par ip) // Load tile of x
         }
 
         val sigmaBlk = SRAM[T](C, C)
 
-        MemReduce(sigmaBlk par ip)(ts par mp) { rr =>
+        MemReduce(sigmaBlk par ip)(ts par mp1) { rr =>
           val subTile = SRAM[T](C)
           val sigmaTile = SRAM[T](C, C)
           Foreach(C par ip) { cc =>
             subTile(cc) = gdaXtile(rr, cc) - mux(gdaYtile(rr) == 1, mu1Tile(cc), mu0Tile(cc))
           }
-          Foreach(C by 1, C par ip) { (ii, jj) =>
-            sigmaTile(ii, jj) = subTile(ii) * subTile(jj)
+          Foreach(C by 1 par mp2) { ii =>
+            Foreach(C par ip) { jj =>
+              sigmaTile(ii, jj) = subTile(ii) * subTile(jj)
+            }
           }
           sigmaTile
         }{_+_}
