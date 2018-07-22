@@ -20,7 +20,7 @@ $PIR_HOME/bin/pir $app \
   --routing-algo=proute \
   --psim-out=$outDir \
   --run-psim=false \
-  --trace=false \
+  --trace=true \
   --ctrl=true \
   --bp=false \
   --stat=false \
@@ -30,6 +30,7 @@ $PIR_HOME/bin/pir $app \
   --argin=64 \
   --tokenout=32 \
   --fifo-depth=20 \
+  --vfifo=4 \
   --vc=8
 
 $PLASTISIM_HOME/plastisim -f $config -p $place

@@ -17,7 +17,7 @@ $PIR_HOME/bin/pir $app \
   --psim=true \
   --psim-out=$outDir \
   --run-psim=false \
-  --trace=false \
+  --trace=true \
   --ctrl=true \
   --bp=false \
   --stat=false \
@@ -25,7 +25,8 @@ $PIR_HOME/bin/pir $app \
   --row=16 --col=8 \
   --argin=64 \
   --tokenout=32 \
-  --fifo-depth=20
+  --fifo-depth=20 \
+  --vfifo=4
 
 $PLASTISIM_HOME/plastisim -f $config
 

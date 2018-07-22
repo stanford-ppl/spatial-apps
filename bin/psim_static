@@ -17,7 +17,7 @@ $PIR_HOME/bin/pir $app \
   --psim=true \
   --psim-out=$outDir \
   --run-psim=false \
-  --trace=false \
+  --trace=true \
   --ctrl=true \
   --bp=false \
   --stat=false \
@@ -26,6 +26,7 @@ $PIR_HOME/bin/pir $app \
   --topo=mesh \
   --argin=64 \
   --tokenout=32 \
+  --vfifo=4 \
   --fifo-depth=20
 
 $PLASTISIM_HOME/plastisim -f $config

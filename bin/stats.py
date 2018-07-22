@@ -106,6 +106,13 @@ def totalUsage(log):
     pct = float(line[0].split("(")[1].split("%")[0])
     return pct
 
+def drambw(log):
+    line = grep(log, ["Total DRAM"])
+    if len(line) == 0:
+      return None
+    pct = line[0].split("(")[1].split(")")[0].strip()
+    return pct
+
 def avgbw(app, args, params):
     lword = 0
     sword = 0

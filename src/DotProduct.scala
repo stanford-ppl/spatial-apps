@@ -7,15 +7,13 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
   type X = FixPt[TRUE,_32,_0]
 
   // Final params
-  val N = 1024 // param pmuSize * 16 * 5 * 7 * 9
+  val N = 1024 // param pmuSize * 16
   val ts = 32 // param [pmuSize] | <N> % p == 0
-  val op = 1 // param (4, 16, 4) | <N> / <ts> % p == 0
+  val op = 1 // param [1,2] # (4, 16, 4) | <N> / <ts> % p == 0
   val ip = 16
 
   @virtualize
   def dotproduct[T:Type:Num](aIn: Array[T], bIn: Array[T]): T = {
-
-    bound(aIn.length) = N
 
     val size = ArgIn[Int]
     setArg(size, aIn.length)
@@ -23,8 +21,8 @@ object DotProduct extends SpatialApp { // Regression (Dense) // Args: 640
     val a = DRAM[T](size)
     val b = DRAM[T](size)
     val out = ArgOut[T]
-    setMem(a, aIn)
-    setMem(b, bIn)
+    setMem(a, aIn); bound(aIn.length) = N
+    setMem(b, bIn); bound(aIn.length) = N
 
     Accel {
       out := Reduce(Reg[T](0.to[T]))(size by ts par op){i =>

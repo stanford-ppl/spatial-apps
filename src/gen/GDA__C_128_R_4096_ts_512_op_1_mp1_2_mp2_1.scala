@@ -2,17 +2,18 @@ import spatial.dsl._
 import spatial.targets._
 import virtualized._
 
-object GDA extends SpatialApp { self => // Regression (Dense) // Args: 64
+object GDA__C_128_R_4096_ts_512_op_1_mp1_2_mp2_1 extends SpatialApp { self => // Regression (Dense) // Args: 64
 
   type X = Float
 
-  val C = 64 // param [128]
-  val R = 1024 // param [pmuSize / <C> * 8] # orignal size 38400
+val C = 128
+val R = 4096
 
-  val ts = 32 // param [pmuSize / <C>]  # (pmuSize / <C> / 2, pmuSize / <C>, pmuSize / <C> / 2) | <R> % p == 0
-  val op = 1 // param [1] # (1, 5, 1) | <R> / <ts> % p == 0
-  val mp1 = 1 // param [1] + (2, 8, 2) | <ts> % p == 0
-  val mp2 = 1 // param [1] + (2, 8, 2) | <C> % p == 0 and <mp1> * p < 10
+val ts = 512
+val op = 1
+val mp1 = 2
+val mp2 = 1
+
   val ip = 16
   val margin = 1
 
@@ -84,12 +85,7 @@ object GDA extends SpatialApp { self => // Regression (Dense) // Args: 64
 
   @virtualize
   def main() {
-    // val C = args(0).to[SInt] // TODO: Should be selectable up to maximum
 
-    // val x  = Array.fill(R){ Array.fill(C){ random[X](10) }}
-    // val ys = Array.fill(R){ random[Int](1) }
-    // val mu0 = Array.fill(C){ random[X](10) }
-    // val mu1 = Array.fill(C){ random[X](10) }
 
     val x = Array.tabulate(R) { i => Array.tabulate(C) { j => (i * C + j) % 256 } }
     val ys = Array.tabulate(R) { i => i % 256 }
@@ -109,16 +105,8 @@ object GDA extends SpatialApp { self => // Regression (Dense) // Args: 64
     val cksum = gold.zip(result){ case (a,b) => a < b + margin && a > b - margin }.reduce{_&&_}
     println("PASS: " + cksum  + " (GDA)")
 
-    // // println("actual: " + gold.mkString(", "))
-    // //println("result: " + result.mkString(", "))
-    // // println("Sum of differences: " + gold.zip(result){_-_}.reduce{_+_})
-    // printArr(gold, "gold: ")
-    // printArr(result, "result: ")
 
-    // val cksum = gold.zip(result){ case (a,b) => a < b + margin && a > b - margin }.reduce{_&&_}
-    // println("PASS: " + cksum  + " (GDA)")
 
-    // assert( result == gold )
   }
 
 }

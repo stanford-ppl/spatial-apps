@@ -26,18 +26,17 @@ import math
 from util import *
 from stat import *
 from task import *
+from dse import *
 
 def main():
-    apps = []
-    apps += ["DotProduct__N_1048576_ts_65536_op_1"]
-    apps += ["TPCHQ6__N_1048576_ts_65536_op_1"]
-    apps += ["OuterProduct__M_12288_N_12288_ts1_64_ts2_1024_op1_1_op2_2_ip2_16_ip1_1"]
-    # apps += ["BlackScholes__N_1048576_ts_65536_op_1"]
-    # apps += ["GDA__C_128_R_4096_ts_256_op_2_mp_4"]
-    for app in apps:
-        target(app, [], {})
+    mkdir('{}/gen'.format(SPATIAL_HOME))
+
+    opts.dse=True
+    opts.parallel=20
+    runExp()
     #################################################################################################################
 
 if __name__ == "__main__":
     main()
+
 

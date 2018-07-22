@@ -168,13 +168,13 @@ def show(fullname):
                 sys.stdout.write('- ' + line)
     def passMessage(passName, log):
         msg = ""
-        if success(fullname, passName) and (passName=="fit_pir" or passName=="map_pir"):
+        if success(fullname, passName) and passName=="psim_p2p":
             pcu = pcuUsage(log)
             pmu = pmuUsage(log)
             mc = mcUsage(log)
-            msg = "pcu={}% pmu={}% mc={}%".format(pcu, pmu, mc)
+            msg += "pcu={}% pmu={}% mc={}%".format(pcu, pmu, mc)
         if success(fullname, passName) and (passName.startswith("psim_")):
-            msg = "cycle={}".format(cycleOf(log))
+            msg += "cycle={} dram={}".format(cycleOf(log), drambw(log))
         return msg
     for passName in passes:
         log = logs(fullname, passName)
@@ -212,7 +212,7 @@ def progress(fullname, passName):
             include = ["Simulation ran for "]
             exclude = ["Hardware timeout after"]
             exists = []
-        elif passName.startswith("psim_") and cycleOf(log) == None:
+        elif passName.startswith("psim_"):
             include = ["Simulation complete at cycle"]
             exclude = ["DEADLOCK"]
             exists = []

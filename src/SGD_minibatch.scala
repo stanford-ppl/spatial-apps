@@ -75,7 +75,7 @@ object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0
       val x_tile = SRAM[TX](ts,D)
       Pipe(D by 1) { i => sgdmodel(i) = 0.to[TM]}
       Sequential.Foreach(E by 1) { e =>
-        Sequential.Foreach (N by ts) { b =>
+        Foreach (N by ts) { b => // par here TODO
           y_tile load y(b::b+ts par ip)
           x_tile load x(b::b+ts, 0::D)
           val y_err = SRAM[TX](ts)

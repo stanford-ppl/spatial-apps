@@ -17,14 +17,15 @@ $PIR_HOME/bin/pir $app \
   --psim=true \
   --psim-out=$outDir \
   --run-psim=false \
-  --trace=false \
+  --trace=true \
   --ctrl=true \
   --bp=false \
-  --stat=false \
+  --stat=true \
   --arch=MyDesign \
   --row=16 --col=8 \
   --argin=64 \
   --tokenout=32 \
+  --vfifo=4 \
   --fifo-depth=20
 
 $PLASTISIM_HOME/plastisim -f $config
