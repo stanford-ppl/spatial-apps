@@ -1,0 +1,22 @@
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss16M
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/spatial-lang/project[0m
+[0m[[0minfo[0m] [0mSet current project to spatial-lang (in build file:/home/yaqiz/spatial-lang/)[0m
+[0m[[33mwarn[0m] [0mThe `-` command is deprecated in favor of `onFailure` and will be removed in 0.14.0[0m
+[0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/yaqiz/spatial-lang/apps/target/scala-2.12/classes...[0m
+[0m[[0minfo[0m] [0mRunning DotProduct --dot --cgra+ --pirsrc /home/yaqiz/pir/pir/apps/src/gen[0m
+Loaded RoutingLUTs model from file
+Loaded FanoutRegisters model from file
+Loaded UnavailableALMs model from file
+Loaded TileLoadModel model from file
+Compiling DotProduct to /home/yaqiz/spatial-lang/gen/DotProduct
+[[33mwarn[0m] Plasticine only support 32 bit wordwidth. FixConvert to LongType. Use single precision instead DotProduct.scala:34:16
+[[33mwarn[0m] Plasticine only support 32 bit wordwidth. FixConvert to LongType. Use single precision instead DotProduct.scala:35:16
+[[34minfo[0m] mkdir -p /home/yaqiz/pir/pir/apps/src/gen
+cp /home/yaqiz/spatial-lang/gen/DotProduct/pir/main.scala /home/yaqiz/pir/pir/apps/src/gen/DotProduct.scala
+rm /home/yaqiz/pir/out/DotProduct/DotProduct.pir
+[[32mcompleted[0m] Total time: 4.3490 seconds
+[0m[[32msuccess[0m] [0mTotal time: 14 s, completed Jul 11, 2018 10:20:33 PM[0m
+sbt -batch "apps/run-main DotProduct --dot --cgra+ --pirsrc /home/yaqiz/pir/pir/apps/src/gen"
+-------------PASS (DONE)------------

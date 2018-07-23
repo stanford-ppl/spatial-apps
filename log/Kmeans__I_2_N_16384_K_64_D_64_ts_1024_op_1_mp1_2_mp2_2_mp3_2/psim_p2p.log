@@ -1,0 +1,128 @@
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
+[0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mCompiling 9 Scala sources to /home/yaqiz/pir/pir/apps/target/scala-2.12/classes...[0m
+[0m[[0minfo[0m] [0mRunning Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2 --out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p --debug --mapping=true --load-pir=false --save-pir=false --net=p2p --psim=true --psim-out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p --run-psim=false --trace=true --ctrl=true --bp=false --stat=true --arch=MyDesign --row=16 --col=8 --argin=64 --tokenout=32 --vfifo=4 --fifo-depth=20[0m
+[pir] args=[--load-pir=false, --run-psim=true, --trace=true, --net=p2p, --stat=true, --psim-timeout=100000000, --vfifo=4, --row=8, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p, --debug, --mapping=true, --load-pir=false, --save-pir=false, --net=p2p, --psim=true, --psim-out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=true, --arch=MyDesign, --row=16, --col=8, --argin=64, --tokenout=32, --vfifo=4, --fifo-depth=20]
+[pir] Output directory set to [36m/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p[0m
+[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p[0m[0m
+[pir] Finishing graph construction for Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2
+[pir] Configuring spade MyDesign ...
+New design elapsed time: 1966.317ms
+[pir] Running 0-TestTraversal ...[pir] Finished 0-TestTraversal in 1016.382966ms
+[pir] Running 1-ControlPropogation ...[pir] Finished 1-ControlPropogation in 6.620135ms
+[pir] Running 2-FringeElaboration ...[pir] Finished 2-FringeElaboration in 92.40911ms
+[pir] Running 3-PIRIRDotCodegen ...[pir] Finished 3-PIRIRDotCodegen to [36mtop1.dot[0m in 1049.163747ms
+[pir] Running 4-DeadCodeElimination ...[pir] Finished 4-DeadCodeElimination in 1749.89752ms
+[pir] Running 5-ConstantExpressionEvaluation ...[pir] Finished 5-ConstantExpressionEvaluation in 689.639779ms
+[pir] Running 6-ControlPropogation ...[pir] Finished 6-ControlPropogation in 2.099466ms
+[pir] Running 7-IRCheck ...[pir] Finished 7-IRCheck in 1427.296317ms
+[pir] Running 8-PIRPrinter ...[pir] Finished 8-PIRPrinter to [36mIR1.txt[0m in 579.715952ms
+[pir] Running 9-PIRIRDotCodegen ...[pir] Finished 9-PIRIRDotCodegen to [36mtop2.dot[0m in 535.117793ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 113.275367ms
+[pir] Running 11-PIRIRDotCodegen ...[pir] Finished 11-PIRIRDotCodegen to [36mtop3.dot[0m in 581.786776ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 111.856669ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 3200.6192ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 719.663342ms
+[pir] Running 15-PIRIRDotCodegen ...[pir] Finished 15-PIRIRDotCodegen to [36mtop4.dot[0m in 319.84272ms
+[pir] Running 16-SimpleIRDotCodegen ...[pir] Finished 16-SimpleIRDotCodegen to [36msimple1.dot[0m in 340.914013ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 825.29432ms
+[pir] Running 18-PIRIRDotCodegen ...[pir] Finished 18-PIRIRDotCodegen to [36mtop5.dot[0m in 2446.475116ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 2874.083923ms
+[pir] Running 20-PIRIRDotCodegen ...[pir] Finished 20-PIRIRDotCodegen to [36mtop6.dot[0m in 2195.449834ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 267.55108ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 470.513954ms
+[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 811.657711ms
+[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer1995 in 347.418007ms[pir] Split CUContainer5156 in 401.272566ms[pir] Split CUContainer5158 in 417.019854ms[pir] Split CUContainer5161 in 531.695447ms[pir] Split CUContainer5163 in 463.197839ms[pir] Split CUContainer5165 in 529.249884ms[pir] Split CUContainer5166 in 412.114321ms[pir] Split CUContainer5168 in 378.182225ms[pir] Split CUContainer5157 in 514.105605ms[pir] Split CUContainer5172 in 496.619083ms[pir] Split CUContainer5174 in 542.923815ms[pir] Split CUContainer2006 in 409.810793ms[pir] Split CUContainer5178 in 365.593054ms[pir] Split CUContainer5181 in 481.638241ms[pir] Split CUContainer5183 in 416.064796ms[pir] Split CUContainer5184 in 465.204182ms[pir] Split CUContainer5179 in 472.683548ms[pir] Split CUContainer5189 in 415.885819ms[pir] Split CUContainer5191 in 406.044804ms[pir] Split CUContainer5192 in 353.463402ms[pir] Split CUContainer2010 in 400.431753ms[pir] Split CUContainer5196 in 460.832305ms[pir] Split CUContainer5198 in 324.028887ms[pir] Split CUContainer5201 in 420.561227ms[pir] Split CUContainer5202 in 514.327203ms[pir] Split CUContainer5205 in 386.733759ms[pir] Split CUContainer5206 in 386.979255ms[pir] Split CUContainer5208 in 350.680737ms[pir] Split CUContainer5197 in 262.270131ms[pir] Split CUContainer5212 in 337.958106ms[pir] Split CUContainer5214 in 355.592073ms[pir] Split CUContainer2025 in 474.081667ms[pir] Split CUContainer2026 in 349.189231ms[pir] Split CUContainer2033 in 267.421477ms[pir] Split CUContainer5223 in 289.046352ms[pir] Split CUContainer2034 in 285.904264ms[pir] Split CUContainer5227 in 469.065556ms[pir] Split CUContainer2037 in 280.542871ms[pir] Split CUContainer5231 in 302.948941ms[pir] Split CUContainer2038 in 292.853123ms[pir] Split CUContainer5235 in 373.010301ms[pir] Split CUContainer2041 in 336.891978ms[pir] Split CUContainer5238 in 316.46013ms[pir] Split CUContainer5241 in 408.86201ms[pir] Split CUContainer5243 in 278.601375ms[[31merror[0m] 24-IgraphPartioner throw java.lang.AssertionError: assertion failed: partition size != 2 List(CUContainer5244)
+[pir] Finished 24-IgraphPartioner in 21223.067971ms
+[pir] Running 25-PIRIRDotCodegen ...[pir] Finished 25-PIRIRDotCodegen to [36mtop7.dot[0m in 1605.711573ms
+[pir] Running 26-SimpleIRDotCodegen ...[pir] Finished 26-SimpleIRDotCodegen to [36msimple2.dot[0m in 421.867864ms
+[pir] Running 27-ControllerDotCodegen ...[pir] Finished 27-ControllerDotCodegen to [36mcontroller1.dot[0m in 2279.003404ms
+[[33mwarn[0m] 28-RouteThroughElimination not run due to dependency IgraphPartioner not success
+[[33mwarn[0m] 29-DeadCodeElimination not run due to dependency RouteThroughElimination not success
+[pir] Running 30-ControllerDotCodegen ...[pir] Finished 30-ControllerDotCodegen to [36mcontroller2.dot[0m in 2255.108531ms
+[pir] Running 31-PIRIRDotCodegen ...[pir] Finished 31-PIRIRDotCodegen to [36mtop8.dot[0m in 1630.453414ms
+[[33mwarn[0m] 32-SimpleIRDotCodegen not run due to dependency RouteThroughElimination not success
+[pir] Running 33-PIRPrinter ...[pir] Finished 33-PIRPrinter to [36mIR2.txt[0m in 1597.735495ms
+[[33mwarn[0m] 34-IRCheck not run due to dependency RouteThroughElimination not success
+[[33mwarn[0m] 35-ContextInsertion not run due to dependency IgraphPartioner not success
+[[33mwarn[0m] 36-PIRIRDotCodegen not run due to dependency ContextInsertion not success
+[[33mwarn[0m] 37-MemoryAnalyzer not run due to dependency ContextInsertion not success
+[[33mwarn[0m] 38-ControlAllocation not run due to dependency ContextInsertion not success
+[[33mwarn[0m] 39-ControlRegInsertion not run due to dependency ControlAllocation not success
+[[33mwarn[0m] 40-MemoryAnalyzer not run due to dependency ControlRegInsertion not success
+[pir] Running 41-PIRIRDotCodegen ...[pir] Finished 41-PIRIRDotCodegen to [36mtop10.dot[0m in 1666.375164ms
+[[33mwarn[0m] 42-ControlAllocation not run due to dependency MemoryAnalyzer not success
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 2347.355421ms
+[pir] Running 44-PIRIRDotCodegen ...[pir] Finished 44-PIRIRDotCodegen to [36mtop11.dot[0m in 1504.603662ms
+[[33mwarn[0m] 45-ControlLowering not run due to dependency ControlAllocation not success
+[pir] Running 46-PIRIRDotCodegen ...[pir] Finished 46-PIRIRDotCodegen to [36mtop12.dot[0m in 1672.253237ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 58.722932ms
+[pir] Running 48-ControllerPrinter ...[pir] Finished 48-ControllerPrinter to [36mcontroller.txt[0m in 755.579291ms
+[pir] Running 49-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
+[pir] 
+[pir] number of cus=110
+[pir] number of ocu = 46
+[pir] - cin (0.00,0.02,1.00) sin (0.00,0.13,1.00) vin (0.00,0.98,3.00)
+[pir] - cout (0.00,0.02,1.00) sout (0.00,0.15,1.00) vout (0.00,0.78,4.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] number of pcu = 32
+[pir] - cin (0.00,0.00,0.00) sin (0.00,0.28,1.00) vin (0.00,1.41,4.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.31,1.00) vout (0.00,1.09,4.00)
+[pir] - stages (1.00,2.53,5.00)
+[pir] number of dag = 3
+[pir] - cin (0.00,0.00,0.00) sin (1.00,1.33,2.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.00,0.00) sout (2.00,2.00,2.00) vout (0.00,0.00,0.00)
+[pir] - stages (4.00,4.33,5.00)
+[pir] number of pmu = 25
+[pir] - cin (0.00,0.00,0.00) sin (0.00,0.32,2.00) vin (0.00,1.92,5.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.08,1.00) vout (0.00,0.92,1.00)
+[pir] - stages (0.00,2.32,4.00)
+[pir] number of dfg = 3
+[pir] - cin (0.00,0.00,0.00) sin (2.00,2.00,2.00) vin (0.00,0.33,1.00)
+[pir] - cout (0.00,0.33,1.00) sout (0.00,0.00,0.00) vout (0.00,0.67,1.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] number of afg = 1
+[pir] - cin (1.00,1.00,1.00) sin (0.00,0.00,0.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.00,0.00) sout (5.00,5.00,5.00) vout (0.00,0.00,0.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] PCU usage = 78 / 63 (123.81%)
+[pir] PMU usage = 25 / 64 (39.06%)
+[pir] MC usage = 3 / 32 (9.38%)
+[pir] Total usage = 81 / 159 (50.94%)
+[pir] Finished 49-CUStatistics to [36mstat.json[0m in 425.83173ms
+[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p
+[[33mtrace[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_2_mp2_2_mp3_2_p2p/trace.log
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 17021.226549ms
+[[33mwarn[0m] 51-PlastisimLinkAnalyzer not run due to dependency ControlLowering not success
+[[33mwarn[0m] 52-PlastisimDotCodegen not run due to dependency PlastisimLinkAnalyzer not success
+[[33mwarn[0m] 53-PlastisimCountCheck not run due to dependency PlastisimLinkAnalyzer not success
+[pir] Running 54-ControllerDotCodegen ...[pir] Finished 54-ControllerDotCodegen to [36mcontroller.dot[0m in 2301.49759ms
+[pir] Running 55-PIRIRDotCodegen ...[pir] Finished 55-PIRIRDotCodegen to [36mtop.dot[0m in 1528.534199ms
+[pir] Running 56-SimpleIRDotCodegen ...[pir] Finished 56-SimpleIRDotCodegen to [36msimple.dot[0m in 383.096247ms
+[pir] Running 57-PIRPrinter ...[pir] Finished 57-PIRPrinter to [36mIR.txt[0m in 1482.672297ms
+[pir] Running 58-CUPruning ...[[31mfail[0m] CUPruning failed: CostConstrainFailure: CUContainer2042
+CUCost(AFGCost(false),MCCost(false),SramSizeCost(2048),SramCost(1),ControlInputCost(0),ScalarInputCost(0),VectorInputCost(5),ControlOutputCost(0),ScalarOutputCost(0),VectorOutputCost(1),StageCost(4),LaneCost(16),OpCost(Set(FixMul, FixAdd)))
+[pir] Finished 58-CUPruning in 676.819468ms
+[[33mwarn[0m] 59-CUPlacer not run due to dependency CUPruning not success
+[[33mwarn[0m] 60-PIRNetworkDotCodegen not run due to dependency CUPlacer not success
+[[33mwarn[0m] 61-PIRNetworkDotCodegen not run due to dependency CUPlacer not success
+[[33mwarn[0m] 62-PIRNetworkDotCodegen not run due to dependency CUPlacer not success
+[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 235.054596ms
+[[33mwarn[0m] 64-LinkCSVCodegen not run due to dependency PlastisimLinkAnalyzer not success
+[[33mwarn[0m] 65-PlastisimDotCodegen not run due to dependency PlastisimLinkAnalyzer not success
+[[33mwarn[0m] 67-PlastisimConfigCodegen not run due to dependency CUPlacer not success
+
+Exception: sbt.TrapExitSecurityException thrown from the UncaughtExceptionHandler in thread "run-main-0"
+java.lang.RuntimeException: Nonzero exit code: 1
+	at scala.sys.package$.error(package.scala:27)
+[0m[[31mtrace[0m] [0mStack trace suppressed: run [34mlast apps/compile:runMain[0m for the full output.[0m
+[0m[[31merror[0m] [0m(apps/compile:[31mrunMain[0m) Nonzero exit code: 1[0m
+[0m[[31merror[0m] [0mTotal time: 134 s, completed Jul 21, 2018 10:12:33 PM[0m
+Unable to open input file!
+-------------PASS (DONE)------------

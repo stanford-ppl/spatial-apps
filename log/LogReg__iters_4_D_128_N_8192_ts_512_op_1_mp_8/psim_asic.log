@@ -1,0 +1,1242 @@
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
+[0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mRunning LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8 --out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic --debug --mapping=true --load-pir=false --save-pir=false --net=asic --psim=true --psim-out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic --run-psim=false --trace=true --ctrl=true --bp=false --stat=false --arch=MyDesign --row=16 --col=8 --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4[0m
+[pir] args=[--load-pir=false, --run-psim=true, --trace=true, --net=p2p, --stat=true, --psim-timeout=100000000, --vfifo=4, --row=8, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic, --debug, --mapping=true, --load-pir=false, --save-pir=false, --net=asic, --psim=true, --psim-out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=false, --arch=MyDesign, --row=16, --col=8, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4]
+[pir] Output directory set to [36m/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic[0m
+[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic[0m[0m
+[pir] Finishing graph construction for LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8
+[pir] Configuring spade MyDesign ...
+New design elapsed time: 2260.983ms
+[pir] Running 0-TestTraversal ...[pir] Finished 0-TestTraversal in 727.4547ms
+[pir] Running 1-ControlPropogation ...[pir] Finished 1-ControlPropogation in 7.332118ms
+[pir] Running 2-FringeElaboration ...[pir] Finished 2-FringeElaboration in 116.13792ms
+[pir] Running 3-PIRIRDotCodegen ...[pir] Finished 3-PIRIRDotCodegen to [36mtop1.dot[0m in 865.917504ms
+[pir] Running 4-DeadCodeElimination ...[pir] Finished 4-DeadCodeElimination in 1210.955123ms
+[pir] Running 5-ConstantExpressionEvaluation ...[pir] Finished 5-ConstantExpressionEvaluation in 641.503576ms
+[pir] Running 6-ControlPropogation ...[pir] Finished 6-ControlPropogation in 2.332591ms
+[pir] Running 7-IRCheck ...[pir] Finished 7-IRCheck in 925.701356ms
+[pir] Running 8-PIRPrinter ...[pir] Finished 8-PIRPrinter to [36mIR1.txt[0m in 534.451771ms
+[pir] Running 9-PIRIRDotCodegen ...[pir] Finished 9-PIRIRDotCodegen to [36mtop2.dot[0m in 475.656907ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 174.123934ms
+[pir] Running 11-PIRIRDotCodegen ...[pir] Finished 11-PIRIRDotCodegen to [36mtop3.dot[0m in 760.431256ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 83.21018ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 3110.026035ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 517.14097ms
+[pir] Running 15-PIRIRDotCodegen ...[pir] Finished 15-PIRIRDotCodegen to [36mtop4.dot[0m in 272.462644ms
+[pir] Running 16-SimpleIRDotCodegen ...[pir] Finished 16-SimpleIRDotCodegen to [36msimple1.dot[0m in 306.565995ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 525.503901ms
+[pir] Running 18-PIRIRDotCodegen ...[pir] Finished 18-PIRIRDotCodegen to [36mtop5.dot[0m in 1205.592862ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 1535.206785ms
+[pir] Running 20-PIRIRDotCodegen ...[pir] Finished 20-PIRIRDotCodegen to [36mtop6.dot[0m in 1174.294264ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 195.890232ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 414.140854ms
+[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 257.796531ms
+[pir] Running 24-IgraphPartioner ...[pir] Finished 24-IgraphPartioner in 124.352222ms
+[pir] Running 25-PIRIRDotCodegen ...[pir] Finished 25-PIRIRDotCodegen to [36mtop7.dot[0m in 1169.140788ms
+[pir] Running 26-SimpleIRDotCodegen ...[pir] Finished 26-SimpleIRDotCodegen to [36msimple2.dot[0m in 394.350436ms
+[pir] Running 27-ControllerDotCodegen ...[pir] Finished 27-ControllerDotCodegen to [36mcontroller1.dot[0m in 1600.846098ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 5880.963639ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 2853.798848ms
+[pir] Running 30-ControllerDotCodegen ...[pir] Finished 30-ControllerDotCodegen to [36mcontroller2.dot[0m in 1427.036338ms
+[pir] Running 31-PIRIRDotCodegen ...[pir] Finished 31-PIRIRDotCodegen to [36mtop8.dot[0m in 1077.761606ms
+[pir] Running 32-SimpleIRDotCodegen ...[pir] Finished 32-SimpleIRDotCodegen to [36msimple3.dot[0m in 290.471213ms
+[pir] Running 33-PIRPrinter ...[pir] Finished 33-PIRPrinter to [36mIR2.txt[0m in 1063.823443ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 17.610182ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 118.557378ms
+[pir] Running 36-PIRIRDotCodegen ...[pir] Finished 36-PIRIRDotCodegen to [36mtop9.dot[0m in 1508.116048ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 237.58987ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 27120.622477ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 579.743837ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 576.900334ms
+[pir] Running 41-PIRIRDotCodegen ...[pir] Finished 41-PIRIRDotCodegen to [36mtop10.dot[0m in 9563.925269ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 3453.452378ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 10275.675775ms
+[pir] Running 44-PIRIRDotCodegen ...[pir] Finished 44-PIRIRDotCodegen to [36mtop11.dot[0m in 7904.353648ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 1208.911278ms
+[pir] Running 46-PIRIRDotCodegen ...[pir] Finished 46-PIRIRDotCodegen to [36mtop12.dot[0m in 16006.479441ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 381.720693ms
+[pir] Running 48-ControllerPrinter ...[pir] Finished 48-ControllerPrinter to [36mcontroller.txt[0m in 2264.126592ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 489.87644ms
+[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic
+[[33mtrace[0m] log in /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic/trace.log
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 22711.700653ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 31127.944939ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 15895.354879ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 759.409239ms
+[pir] Running 54-ControllerDotCodegen ...[pir] Finished 54-ControllerDotCodegen to [36mcontroller.dot[0m in 4809.251653ms
+[pir] Running 55-PIRIRDotCodegen ...[pir] Finished 55-PIRIRDotCodegen to [36mtop.dot[0m in 14017.270007ms
+[pir] Running 56-SimpleIRDotCodegen ...[pir] Finished 56-SimpleIRDotCodegen to [36msimple.dot[0m in 1323.784552ms
+[pir] Running 57-PIRPrinter ...[pir] Finished 57-PIRPrinter to [36mIR.txt[0m in 16089.535693ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 171.086004ms
+[pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
+[pir] Finished 59-CUPlacer in 4.816201ms
+[pir] Running 60-PIRNetworkDotCodegen ...[pir] Finished 60-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 0.497034ms
+[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mscalar.dot[0m in 0.194966ms
+[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mvector.dot[0m in 0.198365ms
+[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 1045.767322ms
+[pir] Running 64-LinkCSVCodegen ...[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 15949.980572ms
+[pir] Running 65-PlastisimDotCodegen ...[pir] Finished 65-PlastisimDotCodegen to [36mpsim.dot[0m in 13565.867107ms
+[pir] Running 67-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic/
+[pir] To run simulation manually, use following command, or use --run-psim to launch simulation automatically
+[pir] [33m/home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic/config.psim -c 100000000[0m
+[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 12946.891988ms
+[0m[[32msuccess[0m] [0mTotal time: 269 s, completed Jul 21, 2018 10:56:48 PM[0m
+Changing to config directory: /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_8_asic
+Added all names to the symbol table.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 5
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 4
+Set lat 1 from 0 to 3
+Set lat 1 from 0 to 2
+Set lat 1 from 0 to 1
+Set lat 1 from 0 to 6
+Set lat 1 from 0 to 7
+Set lat 1 from 0 to 8
+Set lat 1 from 0 to 9
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set lat 1 from 0 to 2
+Set lat 1 from 0 to 3
+Set lat 1 from 0 to 4
+Set lat 1 from 0 to 5
+Set lat 1 from 0 to 6
+Set lat 1 from 0 to 7
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set lat 1 from 0 to 2
+Set lat 1 from 0 to 3
+Set lat 1 from 0 to 4
+Set lat 1 from 0 to 5
+Set lat 1 from 0 to 6
+Set lat 1 from 0 to 7
+Set lat 1 from 0 to 8
+Set lat 1 from 0 to 9
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 2
+Set lat 1 from 0 to 12
+Set lat 1 from 0 to 13
+Set lat 1 from 0 to 3
+Set lat 1 from 0 to 4
+Set lat 1 from 0 to 5
+Set lat 1 from 0 to 6
+Set lat 1 from 0 to 7
+Set lat 1 from 0 to 8
+Set lat 1 from 0 to 9
+Set lat 1 from 0 to 10
+Set lat 1 from 0 to 11
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 2
+Set lat 1 from 0 to 3
+Set lat 1 from 0 to 4
+Set lat 1 from 0 to 5
+Set lat 1 from 0 to 6
+Set lat 1 from 0 to 7
+Set lat 1 from 0 to 8
+Set lat 1 from 0 to 9
+Set lat 1 from 0 to 10
+Set lat 1 from 0 to 11
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+== Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
+== Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
+===== MemorySystem 0 =====
+CH. 0 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+===== MemorySystem 1 =====
+CH. 1 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+===== MemorySystem 2 =====
+CH. 2 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+===== MemorySystem 3 =====
+CH. 3 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Parsed definitions of all elements.
+Total of 176 links:
+  0: SRAM147
+    
+  1: SRAM146
+    
+  2: SRAM145
+    
+  3: SRAM144
+    
+  4: SRAM143
+    
+  5: SRAM142
+    
+  6: SRAM141
+    
+  7: SRAM140
+    
+  8: SRAM139
+    
+  9: SRAM138
+    
+  10: SRAM137
+    
+  11: SRAM136
+    
+  12: SRAM135
+    
+  13: SRAM134
+    
+  14: SRAM133
+    
+  15: SRAM132
+    
+  16: RetimingFIFO5515_RetimingFIFO5538_RetimingFIFO5561_RetimingFIFO5584_RetimingFIFO5607_RetimingFIFO5630_RetimingFIFO5653_RetimingFIFO5676
+    
+  17: RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503
+    
+  18: RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158
+    
+  19: SRAM148
+    
+  20: DramAddress294
+    
+  21: RetimingFIFO4130
+    
+  22: RetimingFIFO3737
+    
+  23: RetimingFIFO3772
+    
+  24: RetimingFIFO3392
+    
+  25: RetimingFIFO5480
+    
+  26: RetimingFIFO5384
+    
+  27: RetimingFIFO5288
+    
+  28: RetimingFIFO5192
+    
+  29: RetimingFIFO5096
+    
+  30: RetimingFIFO5000
+    
+  31: RetimingFIFO4904
+    
+  32: RetimingFIFO4808
+    
+  33: RetimingFIFO4677
+    
+  34: RetimingFIFO4646
+    
+  35: RetimingFIFO4615
+    
+  36: RetimingFIFO4584
+    
+  37: RetimingFIFO4553
+    
+  38: RetimingFIFO4522
+    
+  39: RetimingFIFO4491
+    
+  40: RetimingFIFO4460
+    
+  41: RetimingFIFO4429
+    
+  42: RetimingFIFO4398
+    
+  43: RetimingFIFO4367
+    
+  44: RetimingFIFO4336
+    
+  45: RetimingFIFO4305
+    
+  46: RetimingFIFO4274
+    
+  47: RetimingFIFO4243
+    
+  48: RetimingFIFO4212
+    
+  49: RetimingFIFO4668
+    
+  50: RetimingFIFO4637
+    
+  51: RetimingFIFO4606
+    
+  52: RetimingFIFO4575
+    
+  53: RetimingFIFO4544
+    
+  54: RetimingFIFO4513
+    
+  55: RetimingFIFO4482
+    
+  56: RetimingFIFO4451
+    
+  57: RetimingFIFO4420
+    
+  58: RetimingFIFO4389
+    
+  59: RetimingFIFO4358
+    
+  60: RetimingFIFO4327
+    
+  61: RetimingFIFO4296
+    
+  62: RetimingFIFO4265
+    
+  63: RetimingFIFO4234
+    
+  64: RetimingFIFO4203
+    
+  65: RetimingFIFO4693
+    
+  66: RetimingFIFO5737
+    
+  67: RetimingFIFO5827
+    
+  68: RetimingFIFO5917
+    
+  69: RetimingFIFO6007
+    
+  70: RetimingFIFO6097
+    
+  71: RetimingFIFO6187
+    
+  72: RetimingFIFO6277
+    
+  73: RetimingFIFO6367
+    
+  74: RetimingFIFO4773
+    
+  75: RetimingFIFO4869
+    
+  76: RetimingFIFO4965
+    
+  77: RetimingFIFO5061
+    
+  78: RetimingFIFO5157
+    
+  79: RetimingFIFO5253
+    
+  80: RetimingFIFO5349
+    
+  81: RetimingFIFO5445
+    
+  82: RetimingFIFO6197
+    
+  83: RetimingFIFO4025
+    
+  84: RetimingFIFO5927
+    
+  85: RetimingFIFO3920
+    
+  86: RetimingFIFO6107
+    
+  87: RetimingFIFO3990
+    
+  88: RetimingFIFO6017
+    
+  89: RetimingFIFO3955
+    
+  90: RetimingFIFO5837
+    
+  91: RetimingFIFO3885
+    
+  92: RetimingFIFO6287
+    
+  93: RetimingFIFO4060
+    
+  94: RetimingFIFO5747
+    
+  95: RetimingFIFO3850
+    
+  96: RetimingFIFO6377
+    
+  97: RetimingFIFO4095
+    
+  98: RetimingFIFO3357
+    
+  99: StreamOut28
+    
+  100: StreamOut2133
+    
+  101: StreamOut173
+    
+  102: StreamOut285
+    
+  103: SRAM353
+    
+  104: SRAM352
+    
+  105: SRAM114
+    
+  106: SRAM113
+    
+  107: SRAM26
+    
+  108: SRAM25
+    
+  109: SRAM24
+    
+  110: SRAM23
+    
+  111: SRAM22
+    
+  112: SRAM21
+    
+  113: SRAM20
+    
+  114: SRAM19
+    
+  115: SRAM18
+    
+  116: SRAM1351
+    
+  117: SRAM1348
+    
+  118: SRAM1350
+    
+  119: SRAM1349
+    
+  120: SRAM1347
+    
+  121: SRAM1352
+    
+  122: SRAM1346
+    
+  123: SRAM1353
+    
+  124: SRAM17
+    
+  125: StreamOut286
+    
+  126: StreamOut29
+    
+  127: StreamOut2134
+    
+  128: StreamOut174
+    
+  129: DramAddress199
+    
+  130: ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246
+    
+  131: RetimingFIFO4140_RetimingFIFO4169
+    
+  132: RetimingFIFO3782_RetimingFIFO3811
+    
+  133: DramAddress39
+    
+  134: DramAddress2145
+    
+  135: StreamIn2136
+    
+  136: ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400
+    
+  137: TokenOut2319
+    
+  138: TokenIn9134
+    
+  139: TokenIn9147
+    
+  140: TokenIn9239
+    
+  141: TokenIn9252
+    
+  142: TokenIn9389
+    
+  143: TokenIn9376
+    
+  144: TokenIn9526
+    
+  145: TokenIn9513
+    
+  146: TokenIn9663
+    
+  147: TokenIn9650
+    
+  148: TokenIn9800
+    
+  149: TokenIn9787
+    
+  150: TokenIn9937
+    
+  151: TokenIn9924
+    
+  152: TokenIn10074
+    
+  153: TokenIn10061
+    
+  154: TokenIn10211
+    
+  155: TokenIn10198
+    
+  156: TokenIn10348
+    
+  157: TokenIn10335
+    
+  158: StreamIn175
+    
+  159: StreamOut2135
+    
+  160: Reg401
+    
+  161: Reg1005
+    
+  162: Reg395
+    
+  163: Reg1002
+    
+  164: Reg399
+    
+  165: Reg1004
+    
+  166: Reg397
+    
+  167: Reg1003
+    
+  168: Reg393
+    
+  169: Reg1001
+    
+  170: Reg403
+    
+  171: Reg1006
+    
+  172: Reg391
+    
+  173: Reg1000
+    
+  174: Reg405
+    
+  175: Reg1007
+    
+Total of 127 nodes:
+  0: CE13469
+    [StreamOut29 *8 /1] [StreamOut28 *8 /1]  => [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158] 
+  1: CE13483
+    [StreamOut174 *8 /1] [StreamOut173 *8 /1]  => [StreamIn175] 
+  2: CE13759
+    [StreamIn175 *1 /1]  => [RetimingFIFO4451] [RetimingFIFO4420] [RetimingFIFO4389] [RetimingFIFO4358] [RetimingFIFO4327] [RetimingFIFO4296] [RetimingFIFO4265] [RetimingFIFO4429] [RetimingFIFO4460] [RetimingFIFO4491] [RetimingFIFO4522] [RetimingFIFO4553] [RetimingFIFO4584] [RetimingFIFO4482] [RetimingFIFO4513] [RetimingFIFO4544] [RetimingFIFO4575] [RetimingFIFO4606] [RetimingFIFO4637] [RetimingFIFO4668] [RetimingFIFO4398] [RetimingFIFO4367] [RetimingFIFO4336] [RetimingFIFO4305] [RetimingFIFO4274] [RetimingFIFO4243] [RetimingFIFO4212] [RetimingFIFO4615] [RetimingFIFO4646] [RetimingFIFO4677] [RetimingFIFO4203] [RetimingFIFO4234] 
+  3: CE14781
+    [RetimingFIFO4203 *1 /1] [RetimingFIFO4212 *1 /1]  => [SRAM132] 
+  4: CE14769
+    [SRAM132 *512 /1]  => [RetimingFIFO5737] 
+  5: CE14805
+    [RetimingFIFO4234 *1 /1] [RetimingFIFO4243 *1 /1]  => [SRAM133] 
+  6: CE14793
+    [SRAM133 *512 /1]  => [RetimingFIFO5827] 
+  7: CE14829
+    [RetimingFIFO4265 *1 /1] [RetimingFIFO4274 *1 /1]  => [SRAM134] 
+  8: CE14817
+    [SRAM134 *512 /1]  => [RetimingFIFO5917] 
+  9: CE14853
+    [RetimingFIFO4296 *1 /1] [RetimingFIFO4305 *1 /1]  => [SRAM135] 
+  10: CE14841
+    [SRAM135 *512 /1]  => [RetimingFIFO6007] 
+  11: CE14877
+    [RetimingFIFO4327 *1 /1] [RetimingFIFO4336 *1 /1]  => [SRAM136] 
+  12: CE14865
+    [SRAM136 *512 /1]  => [RetimingFIFO6097] 
+  13: CE14901
+    [RetimingFIFO4358 *1 /1] [RetimingFIFO4367 *1 /1]  => [SRAM137] 
+  14: CE14889
+    [SRAM137 *512 /1]  => [RetimingFIFO6187] 
+  15: CE14925
+    [RetimingFIFO4389 *1 /1] [RetimingFIFO4398 *1 /1]  => [SRAM138] 
+  16: CE14913
+    [SRAM138 *512 /1]  => [RetimingFIFO6277] 
+  17: CE14949
+    [RetimingFIFO4420 *1 /1] [RetimingFIFO4429 *1 /1]  => [SRAM139] 
+  18: CE14937
+    [SRAM139 *512 /1]  => [RetimingFIFO6367] 
+  19: CE14973
+    [RetimingFIFO4451 *1 /1] [RetimingFIFO4460 *1 /1]  => [SRAM140] 
+  20: CE14961
+    [SRAM140 *512 /1]  => [RetimingFIFO4773] 
+  21: CE14997
+    [RetimingFIFO4482 *1 /1] [RetimingFIFO4491 *1 /1]  => [SRAM141] 
+  22: CE14985
+    [SRAM141 *512 /1]  => [RetimingFIFO4869] 
+  23: CE15021
+    [RetimingFIFO4513 *1 /1] [RetimingFIFO4522 *1 /1]  => [SRAM142] 
+  24: CE15009
+    [SRAM142 *512 /1]  => [RetimingFIFO4965] 
+  25: CE15045
+    [RetimingFIFO4544 *1 /1] [RetimingFIFO4553 *1 /1]  => [SRAM143] 
+  26: CE15033
+    [SRAM143 *512 /1]  => [RetimingFIFO5061] 
+  27: CE15069
+    [RetimingFIFO4575 *1 /1] [RetimingFIFO4584 *1 /1]  => [SRAM144] 
+  28: CE15057
+    [SRAM144 *512 /1]  => [RetimingFIFO5157] 
+  29: CE15093
+    [RetimingFIFO4606 *1 /1] [RetimingFIFO4615 *1 /1]  => [SRAM145] 
+  30: CE15081
+    [SRAM145 *512 /1]  => [RetimingFIFO5253] 
+  31: CE15117
+    [RetimingFIFO4637 *1 /1] [RetimingFIFO4646 *1 /1]  => [SRAM146] 
+  32: CE15105
+    [SRAM146 *512 /1]  => [RetimingFIFO5349] 
+  33: CE15141
+    [RetimingFIFO4668 *1 /1] [RetimingFIFO4677 *1 /1]  => [SRAM147] 
+  34: CE15129
+    [SRAM147 *512 /1]  => [RetimingFIFO5445] 
+  35: CE13497
+    [StreamOut286 *32 /1] [StreamOut285 *32 /1]  => [RetimingFIFO4693] 
+  36: CE15163
+    [RetimingFIFO4693 *1 /1]  => [SRAM148] 
+  37: CE15153
+    [SRAM148 *64 /1]  => [RetimingFIFO5515_RetimingFIFO5538_RetimingFIFO5561_RetimingFIFO5584_RetimingFIFO5607_RetimingFIFO5630_RetimingFIFO5653_RetimingFIFO5676] 
+  38: CE13535
+     => [DramAddress294] [DramAddress199] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246] [DramAddress39] [DramAddress2145] [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400] 
+  39: CE13551
+    [TokenOut2319 *1 /1]  => 
+  40: CE13571
+    [DramAddress39 *1 /1]  => [StreamOut29] [StreamOut28] 
+  41: CE13599
+    [DramAddress2145 *1 /1]  => [StreamOut2134] [StreamOut2133] 
+  42: CE13681
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *32768 /1] [DramAddress199 *32768 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32768 /1]  => [StreamOut174] [StreamOut173] 
+  43: CE13837
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *64 /1] [DramAddress294 *64 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *64 /1]  => [StreamOut286] [StreamOut285] 
+  44: CE13559
+    [StreamIn2136 *1 /1]  => [TokenOut2319] 
+  45: CE14759
+    [RetimingFIFO3782_RetimingFIFO3811 *1 /1]  => [SRAM114] 
+  46: CE14749
+    [SRAM114 *8 /1]  => [RetimingFIFO3772] 
+  47: CE15183
+    [RetimingFIFO4140_RetimingFIFO4169 *1 /1]  => [SRAM352] 
+  48: CE15173
+    [SRAM352 *8 /1]  => [RetimingFIFO3737] 
+  49: CE13617
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *512 /1] [RetimingFIFO3737 *1 /1] [RetimingFIFO3772 *1 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *512 /1]  => [RetimingFIFO3782_RetimingFIFO3811] 
+  50: CE14735
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *512 /1] [RetimingFIFO3782_RetimingFIFO3811 *1 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *512 /1]  => [SRAM113] 
+  51: CE14721
+    [SRAM113 *8 /1]  => [RetimingFIFO3392] 
+  52: CE15203
+    [RetimingFIFO4140_RetimingFIFO4169 *1 /1]  => [SRAM353] 
+  53: CE15193
+    [SRAM353 *8 /1]  => [RetimingFIFO4130] 
+  54: CE15223
+    [RetimingFIFO5747 *1 /1]  => [SRAM1346] 
+  55: CE15213
+    [SRAM1346 *8 /1]  => [RetimingFIFO3850] 
+  56: CE15243
+    [RetimingFIFO5837 *1 /1]  => [SRAM1347] 
+  57: CE15233
+    [SRAM1347 *8 /1]  => [RetimingFIFO3885] 
+  58: CE15263
+    [RetimingFIFO5927 *1 /1]  => [SRAM1348] 
+  59: CE15253
+    [SRAM1348 *8 /1]  => [RetimingFIFO3920] 
+  60: CE15283
+    [RetimingFIFO6017 *1 /1]  => [SRAM1349] 
+  61: CE15273
+    [SRAM1349 *8 /1]  => [RetimingFIFO3955] 
+  62: CE15303
+    [RetimingFIFO6107 *1 /1]  => [SRAM1350] 
+  63: CE15293
+    [SRAM1350 *8 /1]  => [RetimingFIFO3990] 
+  64: CE15323
+    [RetimingFIFO6197 *1 /1]  => [SRAM1351] 
+  65: CE15313
+    [SRAM1351 *8 /1]  => [RetimingFIFO4025] 
+  66: CE15343
+    [RetimingFIFO6287 *1 /1]  => [SRAM1352] 
+  67: CE15333
+    [SRAM1352 *8 /1]  => [RetimingFIFO4060] 
+  68: CE15363
+    [RetimingFIFO6377 *1 /1]  => [SRAM1353] 
+  69: CE15353
+    [SRAM1353 *8 /1]  => [RetimingFIFO4095] 
+  70: CE13649
+    [RetimingFIFO3850 *1 /1] [RetimingFIFO3885 *1 /1] [RetimingFIFO3920 *1 /1] [RetimingFIFO3955 *1 /1] [RetimingFIFO3990 *1 /1] [RetimingFIFO4025 *1 /1] [RetimingFIFO4060 *1 /1] [RetimingFIFO4095 *1 /1] [RetimingFIFO4130 *1 /1]  => [RetimingFIFO4140_RetimingFIFO4169] 
+  71: CE13513
+    [StreamOut2134 *8 /1] [StreamOut2135 *1 /1] [StreamOut2133 *8 /1]  => [StreamIn2136] 
+  72: CE13585
+    [RetimingFIFO3357 *1 /1] [RetimingFIFO3392 *1 /1]  => [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503] 
+  73: CE14205
+    [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158 *1 /1]  => [TokenIn9134] 
+  74: CE14223
+    [TokenIn9134 *32 /1] [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503 *1 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32 /1]  => [TokenIn9147] [SRAM17] 
+  75: CE14191
+    [TokenIn9147 *8 /1] [SRAM17 *8 /1]  => [StreamOut2135] 
+  76: CE14255
+    [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158 *1 /1]  => [TokenIn9239] 
+  77: CE14273
+    [TokenIn9239 *32 /1] [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503 *1 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32 /1]  => [TokenIn9252] [SRAM18] 
+  78: CE14241
+    [TokenIn9252 *8 /1] [SRAM18 *8 /1]  => [RetimingFIFO3357] 
+  79: CE14317
+    [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158 *1 /1]  => [TokenIn9376] [SRAM19] 
+  80: CE14297
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *32768 /1] [TokenIn9376 *32768 /1] [SRAM19 *8192 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32768 /1]  => [TokenIn9389] [RetimingFIFO4808] 
+  81: CE14331
+    [TokenIn9389 *8 /1] [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503 *1 /1]  => [SRAM19] 
+  82: CE14371
+    [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158 *1 /1]  => [TokenIn9513] [SRAM20] 
+  83: CE14351
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *32768 /1] [TokenIn9513 *32768 /1] [SRAM20 *8192 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32768 /1]  => [TokenIn9526] [RetimingFIFO4904] 
+  84: CE14385
+    [TokenIn9526 *8 /1] [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503 *1 /1]  => [SRAM20] 
+  85: CE14425
+    [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158 *1 /1]  => [TokenIn9650] [SRAM21] 
+  86: CE14405
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *32768 /1] [TokenIn9650 *32768 /1] [SRAM21 *8192 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32768 /1]  => [TokenIn9663] [RetimingFIFO5000] 
+  87: CE14439
+    [TokenIn9663 *8 /1] [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503 *1 /1]  => [SRAM21] 
+  88: CE14479
+    [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158 *1 /1]  => [TokenIn9787] [SRAM22] 
+  89: CE14459
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *32768 /1] [TokenIn9787 *32768 /1] [SRAM22 *8192 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32768 /1]  => [TokenIn9800] [RetimingFIFO5096] 
+  90: CE14493
+    [TokenIn9800 *8 /1] [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503 *1 /1]  => [SRAM22] 
+  91: CE14533
+    [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158 *1 /1]  => [TokenIn9924] [SRAM23] 
+  92: CE14513
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *32768 /1] [TokenIn9924 *32768 /1] [SRAM23 *8192 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32768 /1]  => [TokenIn9937] [RetimingFIFO5192] 
+  93: CE14547
+    [TokenIn9937 *8 /1] [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503 *1 /1]  => [SRAM23] 
+  94: CE14587
+    [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158 *1 /1]  => [TokenIn10061] [SRAM24] 
+  95: CE14567
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *32768 /1] [TokenIn10061 *32768 /1] [SRAM24 *8192 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32768 /1]  => [TokenIn10074] [RetimingFIFO5288] 
+  96: CE14601
+    [TokenIn10074 *8 /1] [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503 *1 /1]  => [SRAM24] 
+  97: CE14641
+    [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158 *1 /1]  => [TokenIn10198] [SRAM25] 
+  98: CE14621
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *32768 /1] [TokenIn10198 *32768 /1] [SRAM25 *8192 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32768 /1]  => [TokenIn10211] [RetimingFIFO5384] 
+  99: CE14655
+    [TokenIn10211 *8 /1] [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503 *1 /1]  => [SRAM25] 
+  100: CE14695
+    [RetimingFIFO3042_RetimingFIFO3100_RetimingFIFO3187_RetimingFIFO3245_RetimingFIFO3303_RetimingFIFO3071_RetimingFIFO3129_RetimingFIFO3216_RetimingFIFO3274_RetimingFIFO3158 *1 /1]  => [TokenIn10335] [SRAM26] 
+  101: CE14675
+    [ArgIn3012_ArgIn2944_ArgIn2978_ArgIn9328_ArgIn9465_ArgIn9602_ArgIn9739_ArgIn9876_ArgIn10013_ArgIn10150_ArgIn10287_ArgIn10400 *32768 /1] [TokenIn10335 *32768 /1] [SRAM26 *8192 /1] [ArgIn7339_ArgIn7670_ArgIn7769_ArgIn9090_ArgIn12706_ArgIn12758_ArgIn12819_ArgIn12880_ArgIn12941_ArgIn13002_ArgIn13063_ArgIn13124_ArgIn13185_ArgIn13246 *32768 /1]  => [TokenIn10348] [RetimingFIFO5480] 
+  102: CE14709
+    [TokenIn10348 *8 /1] [RetimingFIFO3402_RetimingFIFO3460_RetimingFIFO3532_RetimingFIFO3590_RetimingFIFO3648_RetimingFIFO3431_RetimingFIFO3474_RetimingFIFO3561_RetimingFIFO3619_RetimingFIFO3503 *1 /1]  => [SRAM26] 
+  103: CE13855
+    [RetimingFIFO4773 *1 /1] [RetimingFIFO4808 *1 /1]  => [Reg391] 
+  104: CE13869
+    [RetimingFIFO4869 *1 /1] [RetimingFIFO4904 *1 /1]  => [Reg393] 
+  105: CE13883
+    [RetimingFIFO4965 *1 /1] [RetimingFIFO5000 *1 /1]  => [Reg395] 
+  106: CE13897
+    [RetimingFIFO5061 *1 /1] [RetimingFIFO5096 *1 /1]  => [Reg397] 
+  107: CE13911
+    [RetimingFIFO5157 *1 /1] [RetimingFIFO5192 *1 /1]  => [Reg399] 
+  108: CE13925
+    [RetimingFIFO5253 *1 /1] [RetimingFIFO5288 *1 /1]  => [Reg401] 
+  109: CE13939
+    [RetimingFIFO5349 *1 /1] [RetimingFIFO5384 *1 /1]  => [Reg403] 
+  110: CE13953
+    [RetimingFIFO5445 *1 /1] [RetimingFIFO5480 *1 /1]  => [Reg405] 
+  111: CE13967
+    [RetimingFIFO5515_RetimingFIFO5538_RetimingFIFO5561_RetimingFIFO5584_RetimingFIFO5607_RetimingFIFO5630_RetimingFIFO5653_RetimingFIFO5676 *1 /1] [Reg391 *1 /1]  => [Reg1000] 
+  112: CE13981
+    [RetimingFIFO5515_RetimingFIFO5538_RetimingFIFO5561_RetimingFIFO5584_RetimingFIFO5607_RetimingFIFO5630_RetimingFIFO5653_RetimingFIFO5676 *1 /1] [Reg393 *1 /1]  => [Reg1001] 
+  113: CE13995
+    [RetimingFIFO5515_RetimingFIFO5538_RetimingFIFO5561_RetimingFIFO5584_RetimingFIFO5607_RetimingFIFO5630_RetimingFIFO5653_RetimingFIFO5676 *1 /1] [Reg395 *1 /1]  => [Reg1002] 
+  114: CE14009
+    [RetimingFIFO5515_RetimingFIFO5538_RetimingFIFO5561_RetimingFIFO5584_RetimingFIFO5607_RetimingFIFO5630_RetimingFIFO5653_RetimingFIFO5676 *1 /1] [Reg397 *1 /1]  => [Reg1003] 
+  115: CE14023
+    [RetimingFIFO5515_RetimingFIFO5538_RetimingFIFO5561_RetimingFIFO5584_RetimingFIFO5607_RetimingFIFO5630_RetimingFIFO5653_RetimingFIFO5676 *1 /1] [Reg399 *1 /1]  => [Reg1004] 
+  116: CE14037
+    [RetimingFIFO5515_RetimingFIFO5538_RetimingFIFO5561_RetimingFIFO5584_RetimingFIFO5607_RetimingFIFO5630_RetimingFIFO5653_RetimingFIFO5676 *1 /1] [Reg401 *1 /1]  => [Reg1005] 
+  117: CE14051
+    [RetimingFIFO5515_RetimingFIFO5538_RetimingFIFO5561_RetimingFIFO5584_RetimingFIFO5607_RetimingFIFO5630_RetimingFIFO5653_RetimingFIFO5676 *1 /1] [Reg403 *1 /1]  => [Reg1006] 
+  118: CE14065
+    [RetimingFIFO5515_RetimingFIFO5538_RetimingFIFO5561_RetimingFIFO5584_RetimingFIFO5607_RetimingFIFO5630_RetimingFIFO5653_RetimingFIFO5676 *1 /1] [Reg405 *1 /1]  => [Reg1007] 
+  119: CE14079
+    [Reg1000 *8 /1] [RetimingFIFO5737 *1 /1]  => [RetimingFIFO5747] 
+  120: CE14093
+    [Reg1001 *8 /1] [RetimingFIFO5827 *1 /1]  => [RetimingFIFO5837] 
+  121: CE14107
+    [Reg1002 *8 /1] [RetimingFIFO5917 *1 /1]  => [RetimingFIFO5927] 
+  122: CE14121
+    [Reg1003 *8 /1] [RetimingFIFO6007 *1 /1]  => [RetimingFIFO6017] 
+  123: CE14135
+    [Reg1004 *8 /1] [RetimingFIFO6097 *1 /1]  => [RetimingFIFO6107] 
+  124: CE14149
+    [Reg1005 *8 /1] [RetimingFIFO6187 *1 /1]  => [RetimingFIFO6197] 
+  125: CE14163
+    [Reg1006 *8 /1] [RetimingFIFO6277 *1 /1]  => [RetimingFIFO6287] 
+  126: CE14177
+    [Reg1007 *8 /1] [RetimingFIFO6367 *1 /1]  => [RetimingFIFO6377] 
+
+DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
+10000...
+20000...
+30000...
+40000...
+50000...
+60000...
+70000...
+80000...
+90000...
+100000...
+110000...
+120000...
+130000...
+140000...
+150000...
+160000...
+170000...
+180000...
+190000...
+200000...
+210000...
+220000...
+230000...
+240000...
+250000...
+260000...
+270000...
+280000...
+290000...
+300000...
+310000...
+320000...
+330000...
+340000...
+Simulation complete at cycle: 342451
+CE13469: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8        8 
+	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
+CE13483: Active:  76.5 Stalled:   0.0 Starved:   0.6 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+	DRAM:  48.99 GB/s ( 48.99 GB/s R,   0.00 GB/s W)
+CE13759: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144 
+CE14781: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE14769: Active:   9.6 Stalled:  13.8 Starved:  76.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE14805: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE14793: Active:   9.6 Stalled:  13.8 Starved:  76.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE14829: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE14817: Active:   9.6 Stalled:  13.8 Starved:  76.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE14853: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE14841: Active:   9.6 Stalled:  13.8 Starved:  76.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE14877: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE14865: Active:   9.6 Stalled:  13.8 Starved:  76.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE14901: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE14889: Active:   9.6 Stalled:  13.8 Starved:  76.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE14925: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE14913: Active:   9.6 Stalled:  13.8 Starved:  76.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE14949: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE14937: Active:   9.6 Stalled:  13.8 Starved:  76.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE14973: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE14961: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE14997: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE14985: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15021: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE15009: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15045: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE15033: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15069: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE15057: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15093: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE15081: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15117: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE15105: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15141: Active:  76.5 Stalled:   0.0 Starved:  23.5 Total Active:   262144 Expected Active:   262144
+	  262144   262144 
+CE15129: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE13497: Active:   0.6 Stalled:  78.8 Starved:  32.8 Total Active:     2048 Expected Active:     2048
+	    2048     2048 
+	DRAM:   0.38 GB/s (  0.38 GB/s R,   0.00 GB/s W)
+CE15163: Active:   0.6 Stalled:  80.3 Starved:  20.6 Total Active:     2048 Expected Active:     2048
+	    2048 
+CE15153: Active:   1.2 Stalled:  98.4 Starved:   0.5 Total Active:     4096 Expected Active:     4096
+	    4096 
+CE13535: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
+	
+CE13551: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
+	       1 
+CE13571: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
+	       1 
+CE13599: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
+	       1 
+CE13681: Active:   9.6 Stalled:  89.8 Starved:   0.7 Total Active:    32768 Expected Active:    32768
+	   32768    32768    32768 
+CE13837: Active:   0.0 Stalled:  48.6 Starved:  56.1 Total Active:       64 Expected Active:       64
+	      64       64       64 
+CE13559: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14759: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Expected Active:      512
+	     512 
+CE14749: Active:   0.2 Stalled:   0.0 Starved:  99.8 Total Active:      520 Expected Active:      512
+	     512 
+CE15183: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15173: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Expected Active:      512
+	     512 
+CE13617: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Expected Active:      512
+	     512      512      513      512 
+CE14735: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Expected Active:      512
+	     512      512      512 
+CE14721: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32 
+CE15203: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15193: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32776 Expected Active:    32768
+	   32768 
+CE15223: Active:   9.6 Stalled:  15.0 Starved:  75.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15213: Active:   9.6 Stalled:  20.7 Starved:  69.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15243: Active:   9.6 Stalled:  15.0 Starved:  75.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15233: Active:   9.6 Stalled:  20.7 Starved:  69.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15263: Active:   9.6 Stalled:  15.0 Starved:  75.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15253: Active:   9.6 Stalled:  20.7 Starved:  69.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15283: Active:   9.6 Stalled:  15.0 Starved:  75.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15273: Active:   9.6 Stalled:  20.7 Starved:  69.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15303: Active:   9.6 Stalled:  15.0 Starved:  75.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15293: Active:   9.6 Stalled:  20.7 Starved:  69.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15323: Active:   9.6 Stalled:  15.0 Starved:  75.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15313: Active:   9.6 Stalled:  20.7 Starved:  69.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15343: Active:   9.6 Stalled:  15.0 Starved:  75.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15333: Active:   9.6 Stalled:  20.7 Starved:  69.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15363: Active:   9.6 Stalled:  15.0 Starved:  75.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE15353: Active:   9.6 Stalled:  20.7 Starved:  69.7 Total Active:    32768 Expected Active:    32768
+	   32768 
+CE13649: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768    32768    32768    32768    32768    32768    32768    32768    32769 
+CE13513: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8        8        8 
+	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
+CE13585: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      33       32 
+CE14205: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14223: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32       32       32 
+CE14191: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8        8 
+CE14255: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14273: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32       32       32 
+CE14241: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       40 Expected Active:       32
+	      32       32 
+CE14317: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14297: Active:   9.6 Stalled:  89.0 Starved:   1.5 Total Active:    32768 Expected Active:    32768
+	   32768    32768    40960    32768 
+CE14331: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32       32 
+CE14371: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14351: Active:   9.6 Stalled:  89.0 Starved:   1.5 Total Active:    32768 Expected Active:    32768
+	   32768    32768    40960    32768 
+CE14385: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32       32 
+CE14425: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14405: Active:   9.6 Stalled:  89.0 Starved:   1.5 Total Active:    32768 Expected Active:    32768
+	   32768    32768    40960    32768 
+CE14439: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32       32 
+CE14479: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14459: Active:   9.6 Stalled:  89.0 Starved:   1.5 Total Active:    32768 Expected Active:    32768
+	   32768    32768    40960    32768 
+CE14493: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32       32 
+CE14533: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14513: Active:   9.6 Stalled:  89.0 Starved:   1.5 Total Active:    32768 Expected Active:    32768
+	   32768    32768    40960    32768 
+CE14547: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32       32 
+CE14587: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14567: Active:   9.6 Stalled:  89.0 Starved:   1.5 Total Active:    32768 Expected Active:    32768
+	   32768    32768    40960    32768 
+CE14601: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32       32 
+CE14641: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14621: Active:   9.6 Stalled:  89.0 Starved:   1.5 Total Active:    32768 Expected Active:    32768
+	   32768    32768    40960    32768 
+CE14655: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32       32 
+CE14695: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
+	       8 
+CE14675: Active:   9.6 Stalled:  89.0 Starved:   1.5 Total Active:    32768 Expected Active:    32768
+	   32768    32768    40960    32768 
+CE14709: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
+	      32       32 
+CE13855: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE13869: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE13883: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE13897: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE13911: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE13925: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE13939: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE13953: Active:   9.6 Stalled:   0.0 Starved:  90.4 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE13967: Active:   1.2 Stalled:  11.7 Starved:  90.1 Total Active:     4096 Expected Active:     4096
+	    4096     4096 
+CE13981: Active:   1.2 Stalled:  11.7 Starved:  90.1 Total Active:     4096 Expected Active:     4096
+	    4096     4096 
+CE13995: Active:   1.2 Stalled:  11.7 Starved:  90.1 Total Active:     4096 Expected Active:     4096
+	    4096     4096 
+CE14009: Active:   1.2 Stalled:  11.7 Starved:  90.1 Total Active:     4096 Expected Active:     4096
+	    4096     4096 
+CE14023: Active:   1.2 Stalled:  11.7 Starved:  90.1 Total Active:     4096 Expected Active:     4096
+	    4096     4096 
+CE14037: Active:   1.2 Stalled:  11.7 Starved:  90.1 Total Active:     4096 Expected Active:     4096
+	    4096     4096 
+CE14051: Active:   1.2 Stalled:  11.7 Starved:  90.1 Total Active:     4096 Expected Active:     4096
+	    4096     4096 
+CE14065: Active:   1.2 Stalled:  11.7 Starved:  90.1 Total Active:     4096 Expected Active:     4096
+	    4096     4096 
+CE14079: Active:   9.6 Stalled:  14.2 Starved:  76.2 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE14093: Active:   9.6 Stalled:  14.2 Starved:  76.2 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE14107: Active:   9.6 Stalled:  14.2 Starved:  76.2 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE14121: Active:   9.6 Stalled:  14.2 Starved:  76.2 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE14135: Active:   9.6 Stalled:  14.2 Starved:  76.2 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE14149: Active:   9.6 Stalled:  14.2 Starved:  76.2 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE14163: Active:   9.6 Stalled:  14.2 Starved:  76.2 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+CE14177: Active:   9.6 Stalled:  14.2 Starved:  76.2 Total Active:    32768 Expected Active:    32768
+	   32768    32768 
+Total DRAM:	  49.38 GB/s ( 49.38 GB/s R,   0.00 GB/s W)
+-------------PASS (DONE)------------

@@ -1,0 +1,86 @@
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
+[0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/yaqiz/pir/pir/apps/target/scala-2.12/classes...[0m
+[0m[[0minfo[0m] [0mRunning TPCHQ6__N_1048576_ts_65536_op_1 --out=/home/yaqiz/pir/out/TPCHQ6__N_1048576_ts_65536_op_1 --debug --mapping=false --load-pir=false --save-pir=true --dot=false --psim=false --ctrl=true --bp=false --stat=true --arch=MyDesign --net=p2p --topo=mesh --row=16 --col=8 --argin=64 --tokenout=32 --vfifo=4[0m
+[pir] args=[--load-pir=false, --run-psim=true, --trace=true, --net=p2p, --stat=true, --psim-timeout=100000000, --vfifo=4, --row=8, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/TPCHQ6__N_1048576_ts_65536_op_1, --debug, --mapping=false, --load-pir=false, --save-pir=true, --dot=false, --psim=false, --ctrl=true, --bp=false, --stat=true, --arch=MyDesign, --net=p2p, --topo=mesh, --row=16, --col=8, --argin=64, --tokenout=32, --vfifo=4]
+[pir] Output directory set to [36m/home/yaqiz/pir/out/TPCHQ6__N_1048576_ts_65536_op_1[0m
+[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/TPCHQ6__N_1048576_ts_65536_op_1[0m[0m
+[pir] Finishing graph construction for TPCHQ6__N_1048576_ts_65536_op_1
+[pir] Configuring spade MyDesign ...
+New design elapsed time: 1085.261ms
+[pir] Running 0-TestTraversal ...[pir] Finished 0-TestTraversal in 85.319814ms
+[pir] Running 1-ControlPropogation ...[pir] Finished 1-ControlPropogation in 3.419159ms
+[pir] Running 2-FringeElaboration ...[pir] Finished 2-FringeElaboration in 63.939121ms
+[pir] Running 4-DeadCodeElimination ...[pir] Finished 4-DeadCodeElimination in 122.42059ms
+[pir] Running 5-ConstantExpressionEvaluation ...[pir] Finished 5-ConstantExpressionEvaluation in 53.125015ms
+[pir] Running 6-ControlPropogation ...[pir] Finished 6-ControlPropogation in 1.257311ms
+[pir] Running 7-IRCheck ...[pir] Finished 7-IRCheck in 41.771136ms
+[pir] Running 8-PIRPrinter ...[pir] Finished 8-PIRPrinter to [36mIR1.txt[0m in 123.703134ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 39.403026ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 30.891725ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 163.600949ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 66.471094ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 97.857865ms
+[pir] Running 19-MemoryAnalyzer ...[pir] Finished 19-MemoryAnalyzer in 18.574883ms
+[pir] Running 20-ControllerRuntimeAnalyzer ...[pir] Finished 20-ControllerRuntimeAnalyzer in 64.662705ms
+[pir] Running 21-CUStatistics ...[pir] Finished 21-CUStatistics to [36mstat.json[0m in 267.206949ms
+[pir] Running 22-IgraphPartioner ...[pir] Split CUContainer585 in 92.08259ms[pir] Split CUContainer921 in 79.327073ms[pir] Split CUContainer923 in 76.143785ms[pir] Split CUContainer926 in 75.581459ms[pir] Finished 22-IgraphPartioner in 1302.347056ms
+[pir] Running 26-RouteThroughElimination ...[pir] Finished 26-RouteThroughElimination in 155.587029ms
+[pir] Running 27-DeadCodeElimination ...[pir] Finished 27-DeadCodeElimination in 107.257442ms
+[pir] Running 31-PIRPrinter ...[pir] Finished 31-PIRPrinter to [36mIR2.txt[0m in 76.063718ms
+[pir] Running 32-IRCheck ...[pir] Finished 32-IRCheck in 3.556376ms
+[pir] Running 33-ContextInsertion ...[pir] Finished 33-ContextInsertion in 31.968749ms
+[pir] Running 35-MemoryAnalyzer ...[pir] Finished 35-MemoryAnalyzer in 12.826893ms
+[pir] Running 36-ControlAllocation ...[pir] Finished 36-ControlAllocation in 648.980175ms
+[pir] Running 37-ControlRegInsertion ...[pir] Finished 37-ControlRegInsertion in 23.347972ms
+[pir] Running 38-MemoryAnalyzer ...[pir] Finished 38-MemoryAnalyzer in 20.886586ms
+[pir] Running 40-ControlAllocation ...[pir] Finished 40-ControlAllocation in 105.912049ms
+[pir] Running 41-DeadCodeElimination ...[pir] Finished 41-DeadCodeElimination in 348.438766ms
+[pir] Running 43-ControlLowering ...[pir] Finished 43-ControlLowering in 94.014095ms
+[pir] Running 45-IRCheck ...[pir] Finished 45-IRCheck in 59.193143ms
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/TPCHQ6__N_1048576_ts_65536_op_1/TPCHQ6__N_1048576_ts_65536_op_1.pir
+[pir] Running 47-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
+[pir] 
+[pir] number of cus=18
+[pir] number of pcu = 4
+[pir] - cin (0.00,0.00,0.00) sin (0.00,0.00,0.00) vin (1.00,2.00,4.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.25,1.00) vout (0.00,0.75,1.00)
+[pir] - stages (3.00,4.00,5.00)
+[pir] number of dag = 4
+[pir] - cin (0.00,0.00,0.00) sin (2.00,2.00,2.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.00,0.00) sout (2.00,2.00,2.00) vout (0.00,0.00,0.00)
+[pir] - stages (2.00,2.00,2.00)
+[pir] number of pmu = 4
+[pir] - cin (0.00,0.00,0.00) sin (0.00,0.00,0.00) vin (1.00,1.00,1.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.00,0.00) vout (1.00,1.00,1.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] number of dfg = 4
+[pir] - cin (0.00,0.00,0.00) sin (2.00,2.00,2.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.00,0.00) vout (1.00,1.00,1.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] number of scu = 1
+[pir] - cin (0.00,0.00,0.00) sin (2.00,2.00,2.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.00,0.00) sout (1.00,1.00,1.00) vout (0.00,0.00,0.00)
+[pir] - stages (1.00,1.00,1.00)
+[pir] number of afg = 1
+[pir] - cin (0.00,0.00,0.00) sin (1.00,1.00,1.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.00,0.00) sout (5.00,5.00,5.00) vout (0.00,0.00,0.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] PCU usage = 5 / 63 (7.94%)
+[pir] PMU usage = 4 / 64 (6.25%)
+[pir] MC usage = 4 / 32 (12.50%)
+[pir] Total usage = 9 / 159 (5.66%)
+[pir] Finished 47-CUStatistics to [36mstat.json[0m in 269.893077ms
+[pir] Running 49-PlastisimLinkAnalyzer ...[pir] Finished 49-PlastisimLinkAnalyzer in 390.840765ms
+[pir] Running 50-PlastisimDotCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/gen/TPCHQ6__N_1048576_ts_65536_op_1[0m[0m
+[pir] Finished 50-PlastisimDotCodegen to [36mpsim.dot[0m in 354.53206ms
+[pir] Running 51-PlastisimCountCheck ...[pir] Finished 51-PlastisimCountCheck in 45.113612ms
+[pir] Running 55-PIRPrinter ...[pir] Finished 55-PIRPrinter to [36mIR.txt[0m in 294.695696ms
+[pir] Running 56-CUPruning ...[pir] Finished 56-CUPruning in 653.831272ms
+[pir] Saving node prism.Session@e468173 to /home/yaqiz/pir/out/TPCHQ6__N_1048576_ts_65536_op_1/TPCHQ6__N_1048576_ts_65536_op_1.sess
+[0m[[32msuccess[0m] [0mTotal time: 18 s, completed Jul 20, 2018 11:54:30 PM[0m
+-------------PASS (DONE)------------

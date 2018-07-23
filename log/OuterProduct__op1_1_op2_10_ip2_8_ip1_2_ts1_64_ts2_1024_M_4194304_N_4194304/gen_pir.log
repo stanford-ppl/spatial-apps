@@ -1,0 +1,33 @@
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss16M
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/spatial-lang/project[0m
+[0m[[0minfo[0m] [0mSet current project to spatial-lang (in build file:/home/yaqiz/spatial-lang/)[0m
+[0m[[33mwarn[0m] [0mThe `-` command is deprecated in favor of `onFailure` and will be removed in 0.14.0[0m
+[0m[[0minfo[0m] [0mCompiling 28 Scala sources to /home/yaqiz/spatial-lang/apps/target/scala-2.12/classes...[0m
+[0m[[0minfo[0m] [0mRunning OuterProduct__op1_1_op2_10_ip2_8_ip1_2_ts1_64_ts2_1024_M_4194304_N_4194304 --dot --cgra+ --pirsrc /home/yaqiz/pir/pir/apps/src/gen[0m
+Loaded RoutingLUTs model from file
+Loaded FanoutRegisters model from file
+Loaded UnavailableALMs model from file
+Loaded TileLoadModel model from file
+Compiling OuterProduct__op1_1_op2_10_ip2_8_ip1_2_ts1_64_ts2_1024_M_4194304_N_4194304 to /home/yaqiz/spatial-lang/gen/OuterProduct__op1_1_op2_10_ip2_8_ip1_2_ts1_64_ts2_1024_M_4194304_N_4194304
+[[35mbug[0m] Access (x5581,(x5586,0)) on x5190 is set to use invalid instances: 
+[[35mbug[0m]   Instances: 9 (Largest should be 4)
+[[35mbug[0m] Access (x5569,(x5574,0)) on x5190 is set to use invalid instances: 
+[[35mbug[0m]   Instances: 8 (Largest should be 4)
+[[35mbug[0m] Access (x5557,(x5562,0)) on x5190 is set to use invalid instances: 
+[[35mbug[0m]   Instances: 7 (Largest should be 4)
+[[35mbug[0m] Access (x5545,(x5550,0)) on x5190 is set to use invalid instances: 
+[[35mbug[0m]   Instances: 6 (Largest should be 4)
+[[35mbug[0m] Access (x5533,(x5538,0)) on x5190 is set to use invalid instances: 
+[[35mbug[0m]   Instances: 5 (Largest should be 4)
+[[35mbug[0m] An exception was encountered while compiling OuterProduct__op1_1_op2_10_ip2_8_ip1_2_ts1_64_ts2_1024_M_4194304_N_4194304: 
+[[35mbug[0m]   Encountered compiler bug during pass Buffer Analyzer
+[[35mbug[0m] This is likely a compiler bug. A log file has been created at: 
+[[35mbug[0m]   /home/yaqiz/spatial-lang/logs/OuterProduct__op1_1_op2_10_ip2_8_ip1_2_ts1_64_ts2_1024_M_4194304_N_4194304/OuterProduct__op1_1_op2_10_ip2_8_ip1_2_ts1_64_ts2_1024_M_4194304_N_4194304_exception.log
+[[35mbug[0m] If you'd like, you can submit this log and your code in a bug report at: 
+[[35mbug[0m]   https://github.com/stanford-ppl/spatial-lang/issues
+[[35mbug[0m] and we'll try to fix it as soon as we can.
+sbt -batch "apps/run-main OuterProduct__op1_1_op2_10_ip2_8_ip1_2_ts1_64_ts2_1024_M_4194304_N_4194304 --dot --cgra+ --pirsrc /home/yaqiz/pir/pir/apps/src/gen"
+[[91merror[0m] Spatial compilation failed
+-------------PASS (DONE)------------
