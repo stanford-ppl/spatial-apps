@@ -262,7 +262,11 @@ def git_add(app, args, params):
     fullname = getFullName(app, args, params)
     for passName in passes:
         log = logs(fullname, passName)
-        subprocess.call("git add -f {}".format(log), shell=True)
+        spatial_app = "{}/apps/src/gen/{}.scala".format(SPATIAL_HOME,fullname)
+        # pir_app = "{}/pir/apps/gen/{}.scala".format(PIR_HOME,fullname)
+        files = [log, spatial_app]
+        for f in files:
+          subprocess.call("git add -f {}".format(f), shell=True)
 
 def target(app, args, params):
     if opts.run:

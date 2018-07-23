@@ -32,4 +32,153 @@ New design elapsed time: 5726.449ms
 [pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 19.107447ms
 [pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 88.20441ms
 [pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 223.510549ms
-[pir] Running 38-ControlAllocation ...
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 17445.97415ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 526.775586ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 499.056634ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 3939.963558ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 11047.962165ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 873.718492ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 242.426878ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 695.381282ms
+[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2 /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2
+[[33mtrace[0m] log in /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/trace.log
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 14053.230413ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 14695.300688ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 10412.438576ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 647.007777ms
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16.pir
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 2654.243909ms
+[pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
+[pir] Finished 59-CUPlacer in 78373.102942ms
+[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 353.834745ms
+[pir] Running 64-LinkCSVCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/node.csv -l /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/link.csv -o /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/proute.place -r 16 -c 8 -s1 -x2
+[[33mproute[0m] log in /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/proute.log
+[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 9942.242966ms
+[pir] Running 65-PlastisimDotCodegen ...[pir] Finished 65-PlastisimDotCodegen to [36mpsim.dot[0m in 9717.550438ms
+[pir] Running 66-PlastisimPlacementCodegen ...[pir] Finished 66-PlastisimPlacementCodegen to [36mpir.place[0m in 8948.166066ms
+[pir] Running 67-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/
+[pir] To run simulation manually, use following command, or use --run-psim to launch simulation automatically
+[pir] [33m/home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/config.psim -p /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/proute.place -c 100000000[0m
+[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 9573.891621ms
+[pir] Saving node prism.Session@714b4c0f to /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16.sess
+[0m[[32msuccess[0m] [0mTotal time: 234 s, completed Jul 23, 2018 4:11:04 PM[0m
+plastisim: parse.cpp:275: bool parse_link(std::ifstream&, Link*, SymTab<Node>&, SymTab<NetShim>&, std::map<int, int>&, std::map<int, int>&, std::map<int, std::map<std::pair<int, int>, int> >&): Assertion `stat_map.find(ival) != stat_map.end()' failed.
+Changing to config directory: /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16_dynamic_s2
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Added all names to the symbol table.
+Adding static hop for route 9934 (187->3046, lat 3).
+Adding static hop for route 9934 (187->3040, lat 3).
+Adding static hop for route 9934 (187->3054, lat 5).
+Adding static hop for route 9934 (187->3045, lat 5).
+Adding static hop for route 9934 (187->3044, lat 5).
+Adding static hop for route 9934 (187->3050, lat 5).
+Adding static hop for route 9934 (187->3055, lat 5).
+Adding static hop for route 9934 (187->3047, lat 5).
+Adding static hop for route 9934 (187->3053, lat 5).
+Adding static hop for route 9934 (187->3043, lat 7).
+Adding static hop for route 9934 (187->3051, lat 7).
+Adding static hop for route 9934 (187->3049, lat 7).
+Adding static hop for route 9934 (187->3048, lat 7).
+Adding static hop for route 9934 (187->3042, lat 7).
+Adding static hop for route 9934 (187->3041, lat 7).
+Adding static hop for route 9934 (187->3052, lat 7).
+Printing hop routes
+Parsed placement file.
+/home/yaqiz/spatial-lang/apps/bin/psim_dynamic_s2: line 37: 37289 Aborted                 (core dumped) $PLASTISIM_HOME/plastisim -f $config -p $place
+-------------PASS (DONE)------------

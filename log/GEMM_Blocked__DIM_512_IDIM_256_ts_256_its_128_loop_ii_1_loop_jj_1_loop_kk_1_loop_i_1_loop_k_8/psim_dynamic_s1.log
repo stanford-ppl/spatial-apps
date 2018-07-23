@@ -9,62 +9,61 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [pir] Output directory set to [36m/home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1[0m
 [pir] Finishing graph construction for GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8
 [pir] Configuring spade MyDesign ...
-New design elapsed time: 5890.928ms
-[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 342.588288ms
-[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 3.981754ms
-[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 58.468464ms
-[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 809.288207ms
-[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 147.220869ms
-[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 1.565768ms
-[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 641.759994ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 53.118449ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 49.228622ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 1897.646672ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 426.754904ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 251.348979ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 598.050075ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 104.916438ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 335.033167ms
-[pir] Running 23-CUStatistics ...[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1[0m[0m
-[pir] Finished 23-CUStatistics to [36mstat.json[0m in 578.755944ms
-[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer1942 in 173.488248ms[pir] Split CUContainer4332 in 129.51471ms[pir] Split CUContainer4335 in 121.691781ms[pir] Split CUContainer4336 in 129.89461ms[pir] Split CUContainer4338 in 129.902937ms[pir] Finished 24-IgraphPartioner in 2146.948019ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 2914.794812ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 1846.090882ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 12.156944ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 143.238169ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 156.767379ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 7763.315473ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 307.024408ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 232.748283ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 2910.310165ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 6570.192843ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 590.936157ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 150.848809ms
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 667.511548ms
+New design elapsed time: 5197.194ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 293.017727ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 3.650667ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 51.656011ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 703.946689ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 125.740365ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 1.400848ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 537.13101ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 47.966896ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 43.528251ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 1625.945349ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 424.672797ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 227.614271ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 487.944981ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 76.074097ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 201.568968ms
+[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 516.139021ms
+[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer1942 in 137.150777ms[pir] Split CUContainer4332 in 117.028669ms[pir] Split CUContainer4335 in 112.227529ms[pir] Split CUContainer4336 in 109.424514ms[pir] Split CUContainer4338 in 102.197236ms[pir] Finished 24-IgraphPartioner in 1804.185075ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 2451.412368ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 1018.641029ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 7.713346ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 52.964993ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 76.338487ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 5180.456042ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 260.94675ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 205.100881ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 2063.630627ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 4445.516255ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 363.989475ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 135.579683ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 494.936619ms
 [pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/traces
 [[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/trace_classes
 [[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1 /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1
 [[33mtrace[0m] log in /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 31588.412821ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 8166.872524ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 4192.524168ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 478.132146ms
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 8083.621658ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 5274.574073ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 3082.531235ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 270.146228ms
 [pir] Saving node PIRDesign() to /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8.pir
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 3005.995398ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1650.883197ms
 [pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 77321.384287ms
-[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 270.99327ms
+[pir] Finished 59-CUPlacer in 45906.393671ms
+[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 226.788398ms
 [pir] Running 64-LinkCSVCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/node.csv -l /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/link.csv -o /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/proute.place -r 16 -c 8 -s1 -x1
 [[33mproute[0m] log in /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/proute.log
-[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 3594.78756ms
-[pir] Running 65-PlastisimDotCodegen ...[pir] Finished 65-PlastisimDotCodegen to [36mpsim.dot[0m in 5107.648087ms
-[pir] Running 66-PlastisimPlacementCodegen ...[pir] Finished 66-PlastisimPlacementCodegen to [36mpir.place[0m in 3784.78674ms
+[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 2924.608054ms
+[pir] Running 65-PlastisimDotCodegen ...[pir] Finished 65-PlastisimDotCodegen to [36mpsim.dot[0m in 3079.660505ms
+[pir] Running 66-PlastisimPlacementCodegen ...[pir] Finished 66-PlastisimPlacementCodegen to [36mpir.place[0m in 2525.812871ms
 [pir] Running 67-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/
 [pir] To run simulation manually, use following command, or use --run-psim to launch simulation automatically
 [pir] [33m/home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/config.psim -p /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/proute.place -c 100000000[0m
-[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 3816.659402ms
-[pir] Saving node prism.Session@618fe764 to /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8.sess
-[0m[[32msuccess[0m] [0mTotal time: 186 s, completed Jul 23, 2018 1:22:54 PM[0m
+[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 2871.951809ms
+[pir] Saving node prism.Session@6d8656d6 to /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8.sess
+[0m[[32msuccess[0m] [0mTotal time: 110 s, completed Jul 23, 2018 4:19:05 PM[0m
 Changing to config directory: /home/yaqiz/pir/out/GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_8_dynamic_s1
 Constructing NetworkLink.
 Constructing NetworkLink.
@@ -887,12 +886,13 @@ Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 1
 Link specified in placement file.
-Changing link to static with placed lError setting lat = 11
+Changing link tError setting lat = 11
 Error setting lat = 1
 Error setting saddr = 4
 Error setting daddr = 17
@@ -964,7 +964,7 @@ Error setting daddr = 179
 Error setting class = 1
 Error setting saddr = 132
 Error setting daddr = 149
-atencies.
+o static with placed latencies.
 Set lat 11 from 0 to 0
 Set lat 1 from 0 to 1
 Link specified in placement file.
@@ -1114,7 +1114,6 @@ Set exit class for pos 0 to 1 (rt 5890)
 1 hops for route 5890
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 5945
 1 hops Error setting class = 1
 Error setting saddr = 200
 Error setting daddr = 136
@@ -1129,6 +1128,7 @@ Error setting saddr = 198
 Error setting daddr = 196
 Error setting lat = 2
 for route 5945
+1 hops for route 5945
 1 hops for route 5945
 Set exit class for pos 0 to 1 (rt 5945)
 Link specified in placement file.
@@ -1151,16 +1151,7 @@ Set exit class for pos 0 to 1 (rt 6110)
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 2 from 0 to 0
-Set lat 1 from 0 to 0
-Child process has pid -20441
-Sleeping for other message queue.
-Sleeping for other message queue.
-Sleeping for other message queue.
-Sleeping for other message queue.
-Sleeping for other message queue.
-Sleeping for other message queue.
-Sleeping for other message queue.
-Sleeping for other message queue.
+Child process has pid -25663
 == Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
 == Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
 ===== MemorySystem 0 =====
@@ -1287,59 +1278,59 @@ Total of 84 links:
     
   56: SRAM452
     
-  57: SRAM448
+  57: SRAM246
     
-  58: SRAM449
+  58: SRAM448
     
-  59: SRAM450
+  59: SRAM449
     
-  60: SRAM451
+  60: SRAM450
     
-  61: RetimingFIFO3341_RetimingFIFO3370
+  61: SRAM451
     
-  62: RetimingFIFO2572_RetimingFIFO2626
+  62: RetimingFIFO3341_RetimingFIFO3370
     
-  63: DramAddress144
+  63: RetimingFIFO2572_RetimingFIFO2626
     
-  64: DramAddress326
+  64: DramAddress144
     
-  65: DramAddress1630
+  65: DramAddress326
     
-  66: StreamIn1607
+  66: DramAddress1630
     
-  67: TokenOut1832
+  67: StreamIn1607
     
-  68: ArgIn2004_ArgIn2371_ArgIn4851_ArgIn5143_ArgIn5338_ArgIn5518_ArgIn8255_ArgIn8360_ArgIn8449
+  68: TokenOut1832
     
-  69: ArgIn2218_ArgIn1982_ArgIn2324_ArgIn2413_ArgIn4870_ArgIn5424_ArgIn6221_ArgIn8379_ArgIn8468
+  69: ArgIn2004_ArgIn2371_ArgIn4851_ArgIn5143_ArgIn5338_ArgIn5518_ArgIn8255_ArgIn8360_ArgIn8449
     
-  70: SRAM81
+  70: ArgIn2218_ArgIn1982_ArgIn2324_ArgIn2413_ArgIn4870_ArgIn5424_ArgIn6221_ArgIn8379_ArgIn8468
     
-  71: SRAM62
+  71: SRAM81
     
-  72: SRAM63
+  72: SRAM62
     
-  73: StreamOut1606
+  73: SRAM63
     
-  74: Reg247
+  74: StreamOut1606
     
-  75: Reg456
+  75: Reg247
     
-  76: Reg457
+  76: Reg456
     
-  77: Reg458
+  77: Reg457
     
-  78: Reg459
+  78: Reg458
     
-  79: Reg460
+  79: Reg459
     
-  80: Reg461
+  80: Reg460
     
-  81: Reg462
+  81: Reg461
     
-  82: Reg463
+  82: Reg462
     
-  83: SRAM246
+  83: Reg463
     
 Total of 77 nodes:
   0: CE8632
@@ -1481,6 +1472,7 @@ Total of 77 nodes:
   68: CE9056
     [RetimingFIFO2572_RetimingFIFO2626 *1 /1] [ArgIn2218_ArgIn1982_ArgIn2324_ArgIn2413_ArgIn4870_Argfor route 5945
 1 hops for route 5945
+1 hops for route 5945
 Set exit class for pos 0 to 1 (rt 5945)
 Link specified in placement file.
 Updating dynamic link exit VCs.
@@ -1502,7 +1494,6 @@ Set exit class for pos 0 to 1 (rt 6110)
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 2 from 0 to 0
-Set lat 1 from 0 to 0
 I'm the child process!
 GPGPU-Sim uArch: interconnect node map (shaderID+MemID to icntID)
 GPGPU-Sim uArch: Memory nodes ID start from index: 256
@@ -1682,16 +1673,16 @@ DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
 1210000...
 1220000...
 1230000...
-Simulation complete at cycle: 1230449
+Simulation complete at cycle: 1230492
 CE8632: Active:   2.7 Stalled:  26.8 Starved:  70.7 Total Active:    32768 Expected Active:    32768
 	   32768    32768 
 	DRAM:   1.70 GB/s (  1.70 GB/s R,   0.00 GB/s W)
-CE8646: Active:   1.3 Stalled:  77.3 Starved:   2.9 Total Active:    16384 Expected Active:   262144
+CE8646: Active:   1.3 Stalled:  96.3 Starved:   3.8 Total Active:    16384 Expected Active:    16384
 	   16384    16384 
 	DRAM:   0.85 GB/s (  0.85 GB/s R,   0.00 GB/s W)
-CE9312: Active:  21.3 Stalled:  77.4 Starved:   1.4 Total Active:   262144 Expected Active:   262144
-	  262144 
-CE9302: Active:   2.7 Stalled:  96.6 Starved:   0.8 Total Active:    32768 Expected Active:    32768
+CE9312: Active:   1.3 Stalled:  97.4 Starved:   1.4 Total Active:    16384 Expected Active:    16384
+	   16384 
+CE9302: Active:   2.7 Stalled:  96.6 Starved:   0.7 Total Active:    32768 Expected Active:    32768
 	   32768 
 CE8850: Active:   2.7 Stalled:   0.0 Starved:  97.3 Total Active:    32768 Expected Active:    32768
 	   32768 
@@ -1703,7 +1694,7 @@ CE8880: Active:   2.7 Stalled:  96.6 Starved:  35.3 Total Active:    32768 Expec
 	   32768 
 CE8890: Active:   2.7 Stalled:   0.0 Starved:  97.3 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE8900: Active:   2.7 Stalled:  96.7 Starved:   0.7 Total Active:    32768 Expected Active:    32768
+CE8900: Active:   2.7 Stalled:  96.7 Starved:   0.6 Total Active:    32768 Expected Active:    32768
 	   32768 
 CE8910: Active:   2.7 Stalled:  96.6 Starved:  53.9 Total Active:    32768 Expected Active:    32768
 	   32768 
@@ -1719,11 +1710,11 @@ CE8776: Active:   0.2 Stalled:  28.2 Starved:  71.8 Total Active:     2048 Expec
 	    2048     2048     2048 
 CE8796: Active:   2.7 Stalled:  26.8 Starved:  70.5 Total Active:    32768 Expected Active:    32768
 	   32768    32768    32768 
-CE8812: Active:   0.1 Stalled:  87.1 Starved:  13.7 Total Active:     1024 Expected Active:     1024
+CE8812: Active:   0.1 Stalled:  86.1 Starved:  14.6 Total Active:     1024 Expected Active:     1024
 	    1024     1024 
 CE9526: Active:  42.6 Stalled:  56.9 Starved:   0.5 Total Active:   524288 Expected Active:   524288
 	  524288   524288   524288 
-CE8832: Active:   0.1 Stalled:  95.4 Starved:   5.4 Total Active:     1024 Expected Active:     1024
+CE8832: Active:   0.1 Stalled:  94.4 Starved:   6.3 Total Active:     1024 Expected Active:     1024
 	    1024     1024     1024     1024 
 CE9122: Active:   2.7 Stalled:   0.0 Starved:  97.3 Total Active:    32768 Expected Active:    32768
 	   32768    32768 
@@ -1783,29 +1774,29 @@ CE9382: Active:  42.6 Stalled:  53.3 Starved:   4.1 Total Active:   524288 Expec
 	  524288 
 CE9412: Active:  42.6 Stalled:  53.2 Starved:   4.2 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE9402: Active:  42.6 Stalled:  53.3 Starved:   4.1 Total Active:   524288 Expected Active:   524288
+CE9402: Active:  42.6 Stalled:  53.2 Starved:   4.1 Total Active:   524288 Expected Active:   524288
 	  524288 
 CE9432: Active:  42.6 Stalled:  53.2 Starved:   4.2 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE9422: Active:  42.6 Stalled:  53.3 Starved:   4.1 Total Active:   524288 Expected Active:   524288
+CE9422: Active:  42.6 Stalled:  53.2 Starved:   4.1 Total Active:   524288 Expected Active:   524288
 	  524288 
 CE9452: Active:  42.6 Stalled:  53.2 Starved:   4.2 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE9442: Active:  42.6 Stalled:  53.3 Starved:   4.1 Total Active:   524288 Expected Active:   524288
+CE9442: Active:  42.6 Stalled:  53.2 Starved:   4.1 Total Active:   524288 Expected Active:   524288
 	  524288 
 CE9472: Active:  42.6 Stalled:  53.2 Starved:   4.2 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE9462: Active:  42.6 Stalled:  53.2 Starved:   4.1 Total Active:   524288 Expected Active:   524288
+CE9462: Active:  42.6 Stalled:  53.2 Starved:   4.2 Total Active:   524288 Expected Active:   524288
 	  524288 
 CE9492: Active:  42.6 Stalled:  53.2 Starved:   4.2 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE9482: Active:  42.6 Stalled:  53.3 Starved:   4.1 Total Active:   524288 Expected Active:   524288
+CE9482: Active:  42.6 Stalled:  53.2 Starved:   4.1 Total Active:   524288 Expected Active:   524288
 	  524288 
 CE9512: Active:  42.6 Stalled:  53.2 Starved:   4.2 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE9502: Active:  42.6 Stalled:  53.3 Starved:   4.1 Total Active:   524288 Expected Active:   524288
+CE9502: Active:  42.6 Stalled:  53.2 Starved:   4.1 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE9546: Active:  42.6 Stalled:  53.3 Starved:   4.1 Total Active:   524288 Expected Active:   524288
+CE9546: Active:  42.6 Stalled:  53.2 Starved:   4.1 Total Active:   524288 Expected Active:   524288
 	  524288   524288   524288   524288 
 CE9582: Active:  42.6 Stalled:  53.3 Starved:   4.1 Total Active:   524288 Expected Active:   524288
 	  524288   524288 
@@ -1825,7 +1816,7 @@ CE9056: Active:   1.3 Stalled:   0.0 Starved:  98.7 Total Active:    16384 Expec
 	   16384    16384    16384 
 CE9042: Active:   0.7 Stalled:   0.4 Starved:  99.0 Total Active:     8192 Expected Active:     8192
 	    8192 
-CE8662: Active:   0.7 Stalled:   0.0 Starved:  98.9 Total Active:     8192 Expected Active:     8192
+CE8662: Active:   0.7 Stalled:   0.0 Starved:  99.0 Total Active:     8192 Expected Active:     8192
 	    8192     8192     8192 
 	DRAM:   0.43 GB/s (  0.00 GB/s R,   0.43 GB/s W)
 CE8712: Active:   0.7 Stalled:   0.0 Starved:  99.3 Total Active:     8192 Expected Active:     8192
@@ -1842,5 +1833,5 @@ CE9566: Active:  42.6 Stalled:   0.0 Starved:  57.4 Total Active:   524288 Expec
 	  524289   524288   524288 
 Total DRAM:	   2.98 GB/s (  2.56 GB/s R,   0.43 GB/s W)
 Sending shutdown IPC message.
-IPC layer sent 1230449 msgs recvd 1230449 msgs
+IPC layer sent 1230492 msgs recvd 1230492 msgs
 -------------PASS (DONE)------------
