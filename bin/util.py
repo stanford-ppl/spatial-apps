@@ -10,6 +10,7 @@ import math
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
+PAPER_HOME = os.environ['HOME'] + "/papers/"
 
 # passes=["gen_pir","fit_pir","gen_chisel","make_vcs","map_pir","run_simulation"]
 # passes=["gen_pir","fit_pir", "psim_asic", "psim_p2p", "psim_static"]
@@ -74,7 +75,7 @@ colors = {
 
 lanes = 16
 bankSize = 32 * 1024 / 4
-max_bw = 12.8*4
+peak_bw = 12.8*4
 pmuSize = 256 / 4 * 1024 # 256 kB / (4 word / Byte) = 64 * 1024 = 65536 word
 
 def rm(path):
@@ -197,7 +198,7 @@ parser.add_argument('--torun', dest='torun', action='store', default='ALL',
     help='Pass to run')
 parser.add_argument('--regression', dest='regression', action='store_true', default=False) 
 parser.add_argument('--best', dest='best', action='store_true', default=False) 
-parser.add_argument('--plot', dest='plot', action='store_true', default=False) 
+parser.add_argument('--summarize', dest='summarize', action='store_true', default=False) 
 
 global opts
 (opts, args) = parser.parse_known_args()
@@ -206,5 +207,5 @@ opts.apps = [] if len(args)==0 else APPS if args[0] == "ALL" else args
 
 opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME) if opts.dse else '{}/pir/apps/src'.format(PIR_HOME)
 # opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME)
-if opts.plot:
+if opts.summarize:
     opts.summary = OrderedDict()

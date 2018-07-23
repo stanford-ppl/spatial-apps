@@ -12,44 +12,9 @@ import matplotlib.patches as mpatches
 import matplotlib.ticker as ticker
 import os, sys
 import math
+import numpy as np
 
 from util import *
-
-def plot_util_bw():
-    cmap = matplotlib.cm.get_cmap('Oranges')
-    fig, ax = plit.subplots()
-    apps = []
-    pcus = []
-    pmus = []
-    mcs = []
-    laodbws = []
-    storebws = []
-    for app in summary:
-        apps.append(app)
-        pcus.append(summary["pcu"])
-        pmus.append(summary["pmu"])
-        mcs.append(summary["mc"])
-        loadbws.append(summary["loadbw"])
-        storebws.append(summary["storebws"])
-
-    ind = range(len(apps))
-    width = 0.35
-    numbar = 5
-    ax.bar(ind - width/numbar , pcus     , width , yerr=men_std , color='SkyBlue' , label='pcu')
-    ax.bar(ind - width/numbar , pmus     , width , yerr=men_std , color='SkyBlue' , label='pmu')
-    ax.bar(ind - width/numbar , mcs      , width , yerr=men_std , color='SkyBlue' , label='mc')
-    ax.bar(ind - width/numbar , loadbws  , width , yerr=men_std , color='SkyBlue' , label='loadbw')
-    ax.bar(ind - width/numbar , storebws , width , yerr=men_std , color='SkyBlue' , label='storebw')
-    ax.set_xticklabels(apps)
-    plot_path = '{}/apps/plots/util_bw.png'.format(SPATIAL_HOME)
-    plt.grid(True)
-    plt.xlabel('Apps')
-    plt.ylabel('Percentage Utilization / Percentage to Peak Bandwith')
-    ax.set_ylim(0,100)
-    fig.set_size_inches(6,4)
-    plt.gcf().subplots_adjust(bottom=0.15)
-    plt.savefig(plot_path, format='png', dpi=900)
-    print('Generate {}'.format(plot_path))
 
 def sargs(args):
     return '_'.join([str(a) for a in args])
@@ -101,13 +66,13 @@ def loadbw(log):
     line = grep(log, ["Total DRAM"])
     if len(line) == 0:
       return None
-    return float(line[0].split("(")[1].split("GB")[0].strip())
+    return float(line[0].split("(")[1].split("GB")[0].strip()) / peak_bw * 100
 
 def storebw(log):
     line = grep(log, ["Total DRAM"])
     if len(line) == 0:
       return None
-    return float(line[0].split("R,")[1].split("GB")[0].strip())
+    return float(line[0].split("R,")[1].split("GB")[0].strip()) / peak_bw * 100
 
 def summarize(app, args, params):
     opts.summary[app] = {}

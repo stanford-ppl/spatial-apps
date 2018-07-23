@@ -42,7 +42,9 @@ def main():
     opts.parallel=20
     for app in apps:
         target(app, [], {})
-    print(opts.summary)
+    if opts.summarize:
+        path = '{}/plasticine_network/data/summary.pickle'.format(PAPER_HOME)
+        pickle.dump(opts.summary, openfile(path, 'wb'))   
     #################################################################################################################
 
 if __name__ == "__main__":

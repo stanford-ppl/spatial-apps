@@ -269,7 +269,7 @@ def target(app, args, params):
         launchJob(app, args, params)
     if opts.status:
         status(app, args, params)
-    if opts.plot:
+    if opts.summarize:
         summarize(app, args, params)
     if opts.git:
         git_add(app, args, params)
