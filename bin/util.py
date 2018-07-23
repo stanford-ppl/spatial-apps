@@ -3,6 +3,7 @@ import argparse
 import subprocess
 import time
 import pickle
+from collections import OrderedDict
 
 import os, sys
 import math
@@ -166,6 +167,9 @@ def getFullName(app, args, params):
     fullname = fullname.replace('.','d')
     return fullname
 
+def logs(app, passName):
+    return '{}/{}/{}.log'.format(LOG_DIR, app, passName)
+
 def irange(start, stop, step):
     r = range(start, stop, step)
     if (len(r)>0):
@@ -185,13 +189,13 @@ parser.add_argument('--run', dest='run', action='store_true', default=False)
 parser.add_argument('--single', dest='single', action='store_true', default=False) 
 parser.add_argument('--status', dest='status', action='store_true', default=False) 
 parser.add_argument('--dse', dest='dse', action='store_true', default=False) 
+parser.add_argument('--git', dest='git', action='store_true', default=True) 
 parser.add_argument('--app', dest='app', action='store', default='ALL',help='App name')
 parser.add_argument('--rerun', dest='regen', action='store', default='false',
     help='force pass to rerun' )
 parser.add_argument('--torun', dest='torun', action='store', default='ALL',
     help='Pass to run')
 parser.add_argument('--regression', dest='regression', action='store_true', default=False) 
-parser.add_argument('--summary', dest='summary', action='store_true', default=False) 
 parser.add_argument('--best', dest='best', action='store_true', default=False) 
 parser.add_argument('--plot', dest='plot', action='store_true', default=False) 
 
@@ -202,3 +206,5 @@ opts.apps = [] if len(args)==0 else APPS if args[0] == "ALL" else args
 
 opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME) if opts.dse else '{}/pir/apps/src'.format(PIR_HOME)
 # opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME)
+if opts.plot:
+    opts.summary = OrderedDict()

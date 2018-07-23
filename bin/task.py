@@ -46,16 +46,12 @@ def copyApp(app, args, params):
             print('Param {} not found !!!'.format(param))
             exit()
 
-def logs(app, passName):
-    return '{}/{}/{}.log'.format(LOG_DIR, app, passName)
-
 def getCommand(passName, fullapp):
     if passName=="gen_pir":
         command = "{}/apps/bin/{} {} {}".format(SPATIAL_HOME, passName, fullapp, opts.pirsrc)
     else:
         command = "{}/apps/bin/{} {}".format(SPATIAL_HOME, passName, fullapp)
     return command
-
 
 def runPass(fullname, passName):
     if not torun(passName):
@@ -262,11 +258,19 @@ def regenerate(passName):
 def torun(passName):
     return passName in opts.torun or opts.torun == "ALL"
 
+def git_add(app, args, params):
+    fullname = getFullName(app, args, params)
+    for passName in passes:
+        log = logs(fullname, passName)
+        subprocess.call("git add -f {}".format(log), shell=True)
+
 def target(app, args, params):
     if opts.run:
         launchJob(app, args, params)
     if opts.status:
         status(app, args, params)
-    if opts.summary:
+    if opts.plot:
         summarize(app, args, params)
+    if opts.git:
+        git_add(app, args, params)
 
