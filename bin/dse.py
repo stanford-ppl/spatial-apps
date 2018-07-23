@@ -26,11 +26,6 @@ import math
 from util import *
 from task import *
 
-def addArgs(app, args):
-    if opts.summary:
-        if sargs(args) not in summary[app]: 
-            summary[app][sargs(args)] = OrderedDict()
-
 def dse(app, args, params):
     # print(params)
     for param in params:
@@ -56,40 +51,6 @@ def dse(app, args, params):
         ' '.join(['{}={}'.format(p,params[p]) for p in params]), bcolors.ENDC))
     target(app, args, params)
     return 1
-
-def PageRank_plasticine():
-    app = 'PageRank_plasticine'
-    space = 0
-    iters = 1
-    NP = 491520 # 2048 in simulation
-    damp = 0.125
-    args = [iters, NP, damp]
-    addArgs(app, args)
-
-    params = OrderedDict()
-    maxTile = min(bankSize*lanes,NP)
-    params['tileSize'] = [16, 1024, 1024*6, maxTile/4, maxTile/2, maxTile] 
-    space += dse(app, args, params)
-
-    print('{} space: {}'.format(app, space))
-
-# tucson
-def SPMV_CRS():
-    app = 'SPMV_CRS'
-    space = 0
-    N = 494
-    args = []
-    addArgs(app, args)
-
-    params = OrderedDict()
-    maxTile = min(bankSize*lanes, N)
-    # Finished
-    params['tileSize'] = irange(16, maxTile, 64) 
-    params['tile_par'] = lambda params: irange(1, min(5, N/params['tileSize']), 1)
-    params['pt_par'] = lambda params: irange(1, min(5, params['tileSize']), 1)
-    space += dse(app, args, params)
-
-    print('{} space: {}'.format(app, space))
 
 def matchRange(range):
     if "(" in range:
@@ -150,8 +111,6 @@ def parseParams(app):
 def runExp():
     for app in opts.apps:
     
-        addArgs(app, args) # TODO: remove?
-
         if opts.dse:
             params = parseParams(app)
         else:

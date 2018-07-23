@@ -13,7 +13,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
   val loop_ii = 1 // param [1] #(1, <DIM> / <its>, 2)
   val loop_jj = 1 // param [1] #(1, <DIM> / <ts>, 2)
   val loop_kk = 1 // param [1] #(1, <DIM> / <ts>, 2)
-  val loop_i = 1 // param [1,2] #(1, 6, 2)
+  val loop_i = 1 // param [1] #(1, 6, 2)
   val loop_k = 8 // param (8, 16, 8) | <ts> % p == 0
 
   val ip = 16
@@ -43,7 +43,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
             b_sram load b_dram(kk::kk+ts, jj::jj+ts par ip)
             Foreach(its by 1 par loop_i) { i => 
               val a_sram = SRAM[T](ts)
-              a_sram load a_dram(ii+i, kk::kk+ts)
+              a_sram load a_dram(ii+i, kk::kk+ts par ip)
               val c_tmp = SRAM[T](ts)
               MemReduce(c_tmp par ip)(ts by 1 par loop_k) { k => 
                 val c_tmp_partial = SRAM[T](ts)
