@@ -1,0 +1,39 @@
+#!/bin/bash
+
+app=$1
+
+outDir=$PIR_HOME/out/${app}_dynamic_s1
+config=${outDir}/config.psim
+place=${outDir}/proute.place
+
+[ -e $config ] && rm $config
+export _JAVA_OPTIONS="-Xss8192k" 
+$PIR_HOME/bin/pir $app \
+  --out=$outDir \
+  --debug=false \
+  --dot=false \
+  --mapping=true \
+  --load-pir=false \
+  --save-pir=true \
+  --net=dynamic \
+  --psim=true \
+  --routing-algo=proute \
+  --proute-slink=1 \
+  --psim-out=$outDir \
+  --run-psim=false \
+  --trace=true \
+  --ctrl=true \
+  --bp=false \
+  --stat=false \
+  --arch=MyDesign \
+  --row=16 --col=8 \
+  --topo=mesh \
+  --argin=64 \
+  --tokenout=32 \
+  --fifo-depth=20 \
+  --vfifo=4 \
+  --vc=8
+
+$PLASTISIM_HOME/plastisim -f $config -p $place
+
+echo "-------------PASS (DONE)------------"

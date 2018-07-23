@@ -2,48 +2,15 @@ import spatial.dsl._
 import spatial.targets._
 import virtualized._
 
-/*
+object SGD_minibatch extends SpatialApp { self => // Regression (Dense) // Args: 40 64 0.0001
 
-
-
-
-
-         Minibatch impelementation:
-                             _
-                            | |
-                            |M|
-                            | |
-                            | |
-                            | |
-                            | |
-                  D         |_|
-             _____________   _       _                  _
-            |             | |^|     | |                | |
-          N |      X      | |Y|  -  |Y|  =>            |Y_err
-            |_____________| |_|     |_|                |_|
-                                                ____    _        _      _
-                                               |    |  | |      | |    | |
-                                               |    |  | |      |M|    |M|
-                                               |    |  |Δ|  +   | | -> | |
-                                               | X_T|  | |      | |    | |
-                                               |    |  | |      | |    | |
-                                               |    |  | |      | |    | |
-                                               |____|  |_|      |_|    |_|
-
-
-*/
-
-
-
-object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0.0001
-
-  val N = 1024
-  val E = 1 // param # epoch
-  val D = 16
-  val ts = 16
-  val op = 1 
-  val mp1 = 1 // [1, 2, 3, 4, 5] # 
-  val mp2 = 1 // mp1 # mp2 and mp1 should be divisable 
+  val D = 16 // param [64]
+  val N = 1024 // param [pmuSize / <D> * 16]
+  val E = 1 // param [2]
+  val ts = 16 // param [pmuSize / <D>]
+  val op = 1  // param [1]
+  val mp1 = 1 // param [1,2,4,8] | <ts> % p == 0
+  val mp2 = 1 // param [1,2,4,8] | <ts> % p == 0 and <mp1> * p <= 12 
 
   val A = 0.0001f
   val ip = 16
@@ -58,8 +25,8 @@ object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0
     val N = ArgIn[Int]
     val A = ArgIn[TM]
 
-    setArg(E, epochs); bound(epochs) = SGD_minibatch.E
-    setArg(N, nn); bound(nn) = SGD_minibatch.N
+    setArg(E, epochs); bound(E) = self.E
+    setArg(N, nn); bound(N) = self.N
     setArg(A, alpha)
 
     val x = DRAM[TX](N,D)
@@ -75,9 +42,9 @@ object SGD_minibatch extends SpatialApp { // Regression (Dense) // Args: 40 64 0
       val x_tile = SRAM[TX](ts,D)
       Pipe(D by 1) { i => sgdmodel(i) = 0.to[TM]}
       Sequential.Foreach(E by 1) { e =>
-        Foreach (N by ts) { b => // par here TODO
+        Foreach (N by ts par op) { b =>
           y_tile load y(b::b+ts par ip)
-          x_tile load x(b::b+ts, 0::D)
+          x_tile load x(b::b+ts, 0::D par ip)
           val y_err = SRAM[TX](ts)
           Foreach(ts by 1 par mp1) { i => 
             val y_hat = Reduce(Reg[TX])(D by 1 par ip){ j => x_tile(i,j) * sgdmodel(j).to[TX] }{_+_}

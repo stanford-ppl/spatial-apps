@@ -1,38 +1,0 @@
-Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
-Picked up _JAVA_OPTIONS: -Xss8192k
-[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
-[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
-[0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mRunning TPCHQ6__N_330301440_ts_65536_op_4 --debug --mapping=true --load-pir=true --save-pir=false --net=dynamic --psim=true --routing-algo=proute --psim_out=/home/yaqiz/plastisim/configs/gen/TPCHQ6__N_330301440_ts_65536_op_4_dynamic/ --run-psim=true --trace=false --ctrl=true --bp=false --stat=false --arch=MyDesign --row=16 --col=8 --argin=64 --tokenout=32[0m
-[pir] args=[--load-pir=true, --save-pir=true, --load-spade=false, --save-spade=false, --mapping=true, --splitting=true, --splitting-algo=alias_weighted_igraph, --psim=true, --ctrl=true, --trace=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --arch=MyDesign, --row=4, --col=4, --net=dynamic, --topo=mesh, --nn=false, --dag=true, --pattern=checkerboard, --argin=64, --argout=4, --tokenout=5, --routing-algo=dor, --routing-cost=H-hop, --debug, --mapping=true, --load-pir=true, --save-pir=false, --net=dynamic, --psim=true, --routing-algo=proute, --psim_out=/home/yaqiz/plastisim/configs/gen/TPCHQ6__N_330301440_ts_65536_op_4_dynamic/, --run-psim=true, --trace=false, --ctrl=true, --bp=false, --stat=false, --arch=MyDesign, --row=16, --col=8, --argin=64, --tokenout=32]
-[pir] Loading from /home/yaqiz/pir/out/TPCHQ6__N_330301440_ts_65536_op_4/TPCHQ6__N_330301440_ts_65536_op_4.pir[pir] Loading PIRDesign() from /home/yaqiz/pir/out/TPCHQ6__N_330301440_ts_65536_op_4/TPCHQ6__N_330301440_ts_65536_op_4.pir
-[pir] Configuring spade MyDesign ...
-[pir] Loading from /home/yaqiz/pir/out/TPCHQ6__N_330301440_ts_65536_op_4/TPCHQ6__N_330301440_ts_65536_op_4.sess[pir] Loading prism.Session@2f69c4d from /home/yaqiz/pir/out/TPCHQ6__N_330301440_ts_65536_op_4/TPCHQ6__N_330301440_ts_65536_op_4.sess
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/stat.json[0m in 1367.096598ms
-[pir] Running 50-PlastisimLinkAnalyzer ...[pir] Finished 50-PlastisimLinkAnalyzer in 3584.928169ms
-[pir] Running 51-ControllerDotCodegen ...[pir] Finished 51-ControllerDotCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/controller.dot[0m in 1605.627938ms
-[pir] Running 52-PIRIRDotCodegen ...[pir] Finished 52-PIRIRDotCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/top.dot[0m in 3518.365877ms
-[pir] Running 53-SimpleIRDotCodegen ...[pir] Finished 53-SimpleIRDotCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/simple.dot[0m in 622.922986ms
-[pir] Running 54-PIRPrinter ...[pir] Finished 54-PIRPrinter to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/IR.txt[0m in 3378.641161ms
-[pir] Running 55-PlastisimDotCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/gen/TPCHQ6__N_330301440_ts_65536_op_4_dynamic/[0m[0m
-[pir] Finished 55-PlastisimDotCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/psim.dot[0m in 5162.173741ms
-[pir] Running 56-CUPruning ...[pir] Finished 56-CUPruning in 2647.811959ms
-[pir] Running 57-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 57-CUPlacer in 88496.110831ms
-[pir] Running 58-PIRNetworkDotCodegen ...[pir] Finished 58-PIRNetworkDotCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/control.dot[0m in 598.661581ms
-[pir] Running 59-PIRNetworkDotCodegen ...[pir] Finished 59-PIRNetworkDotCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/scalar.dot[0m in 610.32329ms
-[pir] Running 60-PIRNetworkDotCodegen ...[pir] Finished 60-PIRNetworkDotCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/vector.dot[0m in 502.99686ms
-[pir] Running 61-TerminalCSVCodegen ...[pir] Finished 61-TerminalCSVCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/node.csv[0m in 563.470136ms
-[pir] Running 62-LinkCSVCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/plastisim/configs/gen/TPCHQ6__N_330301440_ts_65536_op_4_dynamic//node.csv -l /home/yaqiz/plastisim/configs/gen/TPCHQ6__N_330301440_ts_65536_op_4_dynamic//link.csv -o /home/yaqiz/plastisim/configs/gen/TPCHQ6__N_330301440_ts_65536_op_4_dynamic//proute.place -r 16 -c 12
-[[33mproute[0m] log in /home/yaqiz/pir/out/TPCHQ6__N_330301440_ts_65536_op_4/proute.log
-[pir] Finished 62-LinkCSVCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/link.csv[0m in 4196.955429ms
-[pir] Running 65-PlastisimDotCodegen ...[pir] Finished 65-PlastisimDotCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/psim.dot[0m in 4683.207762ms
-[pir] Running 66-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/gen/TPCHQ6__N_330301440_ts_65536_op_4_dynamic//
-[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/gen/TPCHQ6__N_330301440_ts_65536_op_4_dynamic//config.psim -p /home/yaqiz/plastisim/configs/gen/TPCHQ6__N_330301440_ts_65536_op_4_dynamic//proute.place
-[[33mpsim[0m] log in /home/yaqiz/pir/out/TPCHQ6__N_330301440_ts_65536_op_4/psim.log
-[[31mfail[0m] PlastisimConfigCodegen failed: Plastisim failed. details in /home/yaqiz/pir/out/TPCHQ6__N_330301440_ts_65536_op_4/psim.log
-[pir] Finished 66-PlastisimConfigCodegen to [36mout/TPCHQ6__N_330301440_ts_65536_op_4/config.psim[0m in 5950475.86554ms
-compilation elapsed time: 6079.019s
-[0m[[32msuccess[0m] [0mTotal time: 6083 s, completed Jul 2, 2018 6:19:24 PM[0m
--------------PASS (DONE)------------

@@ -1,104 +1,0 @@
-Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
-Picked up _JAVA_OPTIONS: -Xss8192k
-[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
-[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
-[0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/yaqiz/pir/pir/apps/target/scala-2.12/classes...[0m
-[0m[[0minfo[0m] [0mRunning BlackScholes__N_1310720_ts_65536_op_2 --debug --mapping=false --load-pir=false --save-pir=true --psim=false --ctrl=true --bp=false --stat=true --arch=MyDesign --net=dynamic --topo=mesh --row=16 --col=8 --argin=64 --tokenout=32[0m
-[pir] args=[--load-pir=true, --save-pir=true, --load-spade=false, --save-spade=false, --mapping=true, --splitting=true, --splitting-algo=alias_weighted_igraph, --psim=true, --ctrl=true, --trace=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --arch=MyDesign, --row=4, --col=4, --net=dynamic, --topo=mesh, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --routing-algo=dor, --routing-cost=H-hop, --debug, --mapping=false, --load-pir=false, --save-pir=true, --psim=false, --ctrl=true, --bp=false, --stat=true, --arch=MyDesign, --net=dynamic, --topo=mesh, --row=16, --col=8, --argin=64, --tokenout=32]
-[pir] Finishing graph construction for BlackScholes__N_1310720_ts_65536_op_2
-[pir] Configuring spade MyDesign ...
-New design elapsed time: 5147.806ms
-[pir] Running 0-TestTraversal ...[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/BlackScholes__N_1310720_ts_65536_op_2[0m[0m
-[pir] Finished 0-TestTraversal in 1265.157659ms
-[pir] Running 1-ControlPropogation ...[pir] Finished 1-ControlPropogation in 1543.944597ms
-[pir] Running 2-FringeElaboration ...[pir] Finished 2-FringeElaboration in 141.472061ms
-[pir] Running 3-PIRIRDotCodegen ...[pir] Finished 3-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top1.dot[0m in 10455.097606ms
-[pir] Running 4-DeadCodeElimination ...[pir] Finished 4-DeadCodeElimination in 14887.884653ms
-[pir] Running 5-ConstantExpressionEvaluation ...[pir] Finished 5-ConstantExpressionEvaluation in 1312.596369ms
-[pir] Running 6-ControlPropogation ...[pir] Finished 6-ControlPropogation in 1109.568298ms
-[pir] Running 7-IRCheck ...[pir] Finished 7-IRCheck in 10241.875596ms
-[pir] Running 8-PIRPrinter ...[pir] Finished 8-PIRPrinter to [36mout/BlackScholes__N_1310720_ts_65536_op_2/IR1.txt[0m in 11024.8402ms
-[pir] Running 9-PIRIRDotCodegen ...[pir] Finished 9-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top2.dot[0m in 10461.899966ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 95.959279ms
-[pir] Running 11-PIRIRDotCodegen ...[pir] Finished 11-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top3.dot[0m in 10351.291557ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 731.702989ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 9727.766974ms
-[pir] Running 14-PIRIRDotCodegen ...[pir] Finished 14-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top4.dot[0m in 3148.640213ms
-[pir] Running 15-DeadCodeElimination ...[pir] Finished 15-DeadCodeElimination in 5172.861592ms
-[pir] Running 16-PIRIRDotCodegen ...[pir] Finished 16-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top5.dot[0m in 3123.497701ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 10338.608572ms
-[pir] Running 18-PIRIRDotCodegen ...[pir] Finished 18-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top6.dot[0m in 3940.500475ms
-[pir] Running 19-DeadCodeElimination ...[pir] Finished 19-DeadCodeElimination in 6916.179502ms
-[pir] Running 20-PIRIRDotCodegen ...[pir] Finished 20-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top7.dot[0m in 3165.163075ms
-[pir] Running 21-ControllerRuntimeAnalyzer ...[pir] Finished 21-ControllerRuntimeAnalyzer in 28.037111ms
-[pir] Running 22-CUStatistics ...[pir] Finished 22-CUStatistics to [36mout/BlackScholes__N_1310720_ts_65536_op_2/stat.json[0m in 9509.815531ms
-[pir] Running 23-SimpleIRDotCodegen ...[pir] Finished 23-SimpleIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/simple1.dot[0m in 12460.560136ms
-[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer3280 in 1185.556777ms[pir] Split CUContainer4445 in 1219.354817ms[pir] Split CUContainer4446 in 975.956689ms[pir] Split CUContainer4448 in 912.95383ms[pir] Split CUContainer4450 in 843.185951ms[pir] Split CUContainer4452 in 775.057193ms[pir] Split CUContainer4455 in 862.918244ms[pir] Split CUContainer4456 in 795.692687ms[pir] Split CUContainer4453 in 819.595897ms[pir] Split CUContainer4451 in 982.134783ms[pir] Split CUContainer4462 in 893.909641ms[pir] Split CUContainer4465 in 902.249222ms[pir] Split CUContainer4466 in 880.530532ms[pir] Split CUContainer4468 in 911.768167ms[pir] Split CUContainer4463 in 993.49222ms[pir] Split CUContainer4473 in 1033.831141ms[pir] Split CUContainer4474 in 1130.8915ms[pir] Split CUContainer4477 in 1108.681892ms[pir] Split CUContainer4449 in 1341.05139ms[pir] Split CUContainer4480 in 1186.873297ms[pir] Split CUContainer4482 in 1255.17457ms[pir] Split CUContainer4484 in 1392.91497ms[pir] Split CUContainer4487 in 1506.944286ms[pir] Split CUContainer4483 in 1748.741246ms[pir] Split CUContainer4481 in 1281.735085ms[pir] Split CUContainer4492 in 1901.813776ms[pir] Split CUContainer4494 in 1413.431541ms[pir] Split CUContainer4447 in 2390.828013ms[pir] Split CUContainer4498 in 1922.693388ms[pir] Split CUContainer4500 in 2282.78916ms[pir] Split CUContainer4502 in 2109.548983ms[pir] Split CUContainer4505 in 1789.993318ms[pir] Split CUContainer4499 in 2027.99922ms[pir] Split CUContainer4508 in 1909.772632ms[pir] Split CUContainer4510 in 1719.079654ms[pir] Split CUContainer4512 in 1522.627948ms[pir] Split CUContainer4514 in 1943.870127ms[pir] Split CUContainer4516 in 2125.70737ms[pir] Split CUContainer4517 in 1872.391736ms[pir] Split CUContainer4513 in 1904.224823ms[pir] Split CUContainer4522 in 1786.271899ms[pir] Split CUContainer4524 in 1761.058962ms[pir] Split CUContainer4511 in 1536.187983ms[pir] Split CUContainer4509 in 1505.174553ms[pir] Split CUContainer4530 in 1635.39604ms[pir] Split CUContainer3281 in 1617.298336ms[pir] Split CUContainer4535 in 1625.207979ms[pir] Split CUContainer4536 in 1347.307658ms[pir] Split CUContainer4538 in 1232.891823ms[pir] Split CUContainer4540 in 1079.449134ms[pir] Split CUContainer4542 in 1100.154821ms[pir] Split CUContainer4545 in 1097.675761ms[pir] Split CUContainer4546 in 1191.507696ms[pir] Split CUContainer4543 in 1097.375101ms[pir] Split CUContainer4541 in 1234.35024ms[pir] Split CUContainer4552 in 1236.733502ms[pir] Split CUContainer4555 in 1237.271758ms[pir] Split CUContainer4556 in 1310.732156ms[pir] Split CUContainer4558 in 1281.262318ms[pir] Split CUContainer4553 in 1346.163314ms[pir] Split CUContainer4563 in 1440.298396ms[pir] Split CUContainer4564 in 1753.842913ms[pir] Split CUContainer4567 in 1730.433941ms[pir] Split CUContainer4539 in 1762.012253ms[pir] Split CUContainer4570 in 1653.44686ms[pir] Split CUContainer4572 in 1742.024881ms[pir] Split CUContainer4574 in 1657.850624ms[pir] Split CUContainer4577 in 1608.181793ms[pir] Split CUContainer4573 in 1660.462425ms[pir] Split CUContainer4571 in 1698.954516ms[pir] Split CUContainer4582 in 1735.855334ms[pir] Split CUContainer4584 in 1713.902516ms[pir] Split CUContainer4537 in 1761.699408ms[pir] Split CUContainer4588 in 1645.704853ms[pir] Split CUContainer4590 in 1643.819727ms[pir] Split CUContainer4592 in 1628.175982ms[pir] Split CUContainer4595 in 1632.078995ms[pir] Split CUContainer4589 in 1709.69378ms[pir] Split CUContainer4598 in 1629.613493ms[pir] Split CUContainer4600 in 1661.703596ms[pir] Split CUContainer4602 in 1605.091204ms[pir] Split CUContainer4604 in 1604.260254ms[pir] Split CUContainer4606 in 1599.880284ms[pir] Split CUContainer4607 in 1604.275563ms[pir] Split CUContainer4603 in 1619.824836ms[pir] Split CUContainer4612 in 1645.402269ms[pir] Split CUContainer4614 in 1613.533974ms[pir] Split CUContainer4601 in 1634.995344ms[pir] Split CUContainer4599 in 1649.436685ms[pir] Split CUContainer4620 in 1678.168177ms[pir] Finished 24-IgraphPartioner in 330375.097016ms
-[pir] Running 25-PIRIRDotCodegen ...[pir] Finished 25-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top8.dot[0m in 5487.770774ms
-[pir] Running 26-SimpleIRDotCodegen ...[pir] Finished 26-SimpleIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/simple2.dot[0m in 2494.2729ms
-[pir] Running 27-RouteThroughElimination ...[pir] Finished 27-RouteThroughElimination in 26717.67415ms
-[pir] Running 28-DeadCodeElimination ...[pir] Finished 28-DeadCodeElimination in 8721.984233ms
-[pir] Running 29-MemoryAnalyzer ...[pir] Finished 29-MemoryAnalyzer in 16564.739738ms
-[pir] Running 30-ControllerDotCodegen ...[pir] Finished 30-ControllerDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/controller.dot[0m in 3360.618606ms
-[pir] Running 31-PIRIRDotCodegen ...[pir] Finished 31-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top9.dot[0m in 5063.091984ms
-[pir] Running 32-SimpleIRDotCodegen ...[pir] Finished 32-SimpleIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/simple3.dot[0m in 2203.698836ms
-[pir] Running 33-PIRPrinter ...[pir] Finished 33-PIRPrinter to [36mout/BlackScholes__N_1310720_ts_65536_op_2/IR2.txt[0m in 5814.822439ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 67.397834ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 4767.003696ms
-[pir] Running 36-PIRIRDotCodegen ...[pir] Finished 36-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top10.dot[0m in 6860.921576ms
-[pir] Running 37-ContextMerging ...[pir] Finished 37-ContextMerging in 912.346978ms
-[pir] Running 38-DeadCodeElimination ...[pir] Finished 38-DeadCodeElimination in 10666.219451ms
-[pir] Running 39-PIRIRDotCodegen ...[pir] Finished 39-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top11.dot[0m in 8239.19228ms
-[pir] Running 40-ControlAllocation ...[pir] Finished 40-ControlAllocation in 65966.136918ms
-[pir] Running 41-ControlRegInsertion ...[pir] Finished 41-ControlRegInsertion in 1240.164955ms
-[pir] Running 42-MemoryAnalyzer ...[pir] Finished 42-MemoryAnalyzer in 847.057593ms
-[pir] Running 43-PIRIRDotCodegen ...[pir] Finished 43-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top12.dot[0m in 45901.861674ms
-[pir] Running 44-ControlAllocation ...[pir] Finished 44-ControlAllocation in 1241.654786ms
-[pir] Running 45-DeadCodeElimination ...[pir] Finished 45-DeadCodeElimination in 49135.427643ms
-[pir] Running 46-PIRIRDotCodegen ...[pir] Finished 46-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top13.dot[0m in 45251.325539ms
-[pir] Running 47-ControlLowering ...[pir] Finished 47-ControlLowering in 5203.889141ms
-[pir] Running 48-IRCheck ...[pir] Finished 48-IRCheck in 723.090483ms
-[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/BlackScholes__N_1310720_ts_65536_op_2/BlackScholes__N_1310720_ts_65536_op_2.pir
-[pir] Running 49-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
-[pir] 
-[pir] number of cus=135
-[pir] number of ocu = 2
-[pir] - cin (1.00,1.00,1.00) sin (1.00,1.00,1.00) vin (0.00,0.00,0.00)
-[pir] - cout (1.00,1.00,1.00) sout (0.00,0.00,0.00) vout (0.00,0.00,0.00)
-[pir] - stages (0.00,0.00,0.00)
-[pir] number of pcu = 90
-[pir] - cin (0.00,0.00,0.00) sin (0.00,0.00,0.00) vin (1.00,2.13,6.00)
-[pir] - cout (0.00,0.00,0.00) sout (0.00,0.00,0.00) vout (1.00,1.20,2.00)
-[pir] - stages (1.00,4.02,6.00)
-[pir] number of dag = 14
-[pir] - cin (0.00,0.00,0.00) sin (2.00,2.00,2.00) vin (0.00,0.00,0.00)
-[pir] - cout (0.00,0.00,0.00) sout (2.00,2.00,2.00) vout (0.00,0.00,0.00)
-[pir] - stages (2.00,2.00,2.00)
-[pir] number of pmu = 14
-[pir] - cin (0.00,0.00,0.00) sin (0.00,0.00,0.00) vin (1.00,1.00,1.00)
-[pir] - cout (0.00,0.00,0.00) sout (0.00,0.00,0.00) vout (1.00,1.00,1.00)
-[pir] - stages (0.00,0.00,0.00)
-[pir] number of dfg = 14
-[pir] - cin (0.00,0.00,0.00) sin (2.00,2.00,2.00) vin (0.00,0.14,1.00)
-[pir] - cout (0.00,0.14,1.00) sout (0.00,0.00,0.00) vout (0.00,0.86,1.00)
-[pir] - stages (0.00,0.00,0.00)
-[pir] number of afg = 1
-[pir] - cin (2.00,2.00,2.00) sin (0.00,0.00,0.00) vin (0.00,0.00,0.00)
-[pir] - cout (0.00,0.00,0.00) sout (15.00,15.00,15.00) vout (0.00,0.00,0.00)
-[pir] - stages (0.00,0.00,0.00)
-[pir] PCU usage = 92 / 63 (146.03%)
-[pir] PMU usage = 14 / 64 (21.88%)
-[pir] MC usage = 14 / 32 (43.75%)
-[pir] Total usage = 106 / 159 (66.67%)
-[pir] Finished 49-CUStatistics to [36mout/BlackScholes__N_1310720_ts_65536_op_2/stat.json[0m in 7711.668239ms
-[pir] Running 51-ControllerDotCodegen ...[pir] Finished 51-ControllerDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/controller.dot[0m in 13374.300707ms
-[pir] Running 52-PIRIRDotCodegen ...[pir] Finished 52-PIRIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/top.dot[0m in 64751.11285ms
-[pir] Running 53-SimpleIRDotCodegen ...[pir] Finished 53-SimpleIRDotCodegen to [36mout/BlackScholes__N_1310720_ts_65536_op_2/simple.dot[0m in 12535.531241ms
-[pir] Running 54-PIRPrinter ...[pir] Finished 54-PIRPrinter to [36mout/BlackScholes__N_1310720_ts_65536_op_2/IR.txt[0m in 63895.347418ms
-[pir] Running 56-CUPruning ...[pir] Finished 56-CUPruning in 12057.008866ms
-[pir] Saving node prism.Session@790b5158 to /home/yaqiz/pir/out/BlackScholes__N_1310720_ts_65536_op_2/BlackScholes__N_1310720_ts_65536_op_2.sess
-compilation elapsed time: 977.902s
-[0m[[32msuccess[0m] [0mTotal time: 990 s, completed Jul 1, 2018 10:54:57 PM[0m
--------------PASS (DONE)------------

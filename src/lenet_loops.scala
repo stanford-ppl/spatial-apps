@@ -4,10 +4,10 @@ import virtualized._
 object lenet_loops extends SpatialApp {
 
   val batch_par = 1 // param [1]
-  val conv1_par = 1 // param [1, 2, 4, 6] | 20 % p == 0 
-  val conv2_par = 2 // param
-  val mat1_par = 1 // param
-  val mat2_par = 1 // param
+  val conv1_par = 1 // param [2] | 20 % p == 0 
+  val conv2_par = 2 // param [4] | 64 % p == 0
+  val mat1_par = 1 // param [1] | 128 % p == 0
+  val mat2_par = 1 // param [1] | 10 % p == 0
 
   val ip = 16
 
@@ -121,7 +121,8 @@ object lenet_loops extends SpatialApp {
         val tmp2_SRAM = SRAM[T](50,4,4)
         val c2_RF = SRAM[T](50,5,16)
         c2_RF load c2_DRAM(0::50,0::5,0::16 par ip)                            // Banking error if parallelized
-        Foreach(50 by 1 par conv2_par) { outD_i => // out channels
+        //Foreach(50 by 1 par conv2_par) { outD_i => // out channels
+        Foreach(64 by 1 par conv2_par) { outD_i => // out channels
           val nr = 12
           val nc = 12
           val kr = 5

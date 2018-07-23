@@ -1,586 +1,0 @@
-Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
-Picked up _JAVA_OPTIONS: -Xss8192k
-[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
-[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
-[0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mCompiling 3 Scala sources to /home/yaqiz/pir/pir/apps/target/scala-2.12/classes...[0m
-[0m[[0minfo[0m] [0mRunning LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1 --out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p --debug --mapping=true --load-pir=false --save-pir=false --net=p2p --psim=true --psim-out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p --run-psim=false --trace=true --ctrl=true --bp=false --stat=true --arch=MyDesign --row=16 --col=8 --argin=64 --tokenout=32 --vfifo=4 --fifo-depth=20[0m
-[pir] args=[--load-pir=false, --run-psim=true, --trace=true, --net=p2p, --stat=true, --psim-timeout=100000000, --vfifo=4, --row=8, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p, --debug, --mapping=true, --load-pir=false, --save-pir=false, --net=p2p, --psim=true, --psim-out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=true, --arch=MyDesign, --row=16, --col=8, --argin=64, --tokenout=32, --vfifo=4, --fifo-depth=20]
-[pir] Output directory set to [36m/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p[0m
-[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p[0m[0m
-[pir] Finishing graph construction for LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1
-[pir] Configuring spade MyDesign ...
-New design elapsed time: 1577.824ms
-[pir] Running 0-TestTraversal ...[pir] Finished 0-TestTraversal in 251.205162ms
-[pir] Running 1-ControlPropogation ...[pir] Finished 1-ControlPropogation in 8.17879ms
-[pir] Running 2-FringeElaboration ...[pir] Finished 2-FringeElaboration in 121.461129ms
-[pir] Running 3-PIRIRDotCodegen ...[pir] Finished 3-PIRIRDotCodegen to [36mtop1.dot[0m in 345.597845ms
-[pir] Running 4-DeadCodeElimination ...[pir] Finished 4-DeadCodeElimination in 349.68005ms
-[pir] Running 5-ConstantExpressionEvaluation ...[pir] Finished 5-ConstantExpressionEvaluation in 138.680671ms
-[pir] Running 6-ControlPropogation ...[pir] Finished 6-ControlPropogation in 1.921179ms
-[pir] Running 7-IRCheck ...[pir] Finished 7-IRCheck in 114.537504ms
-[pir] Running 8-PIRPrinter ...[pir] Finished 8-PIRPrinter to [36mIR1.txt[0m in 139.714936ms
-[pir] Running 9-PIRIRDotCodegen ...[pir] Finished 9-PIRIRDotCodegen to [36mtop2.dot[0m in 91.517061ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 45.595332ms
-[pir] Running 11-PIRIRDotCodegen ...[pir] Finished 11-PIRIRDotCodegen to [36mtop3.dot[0m in 93.201793ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 51.415551ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 514.82538ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 142.282124ms
-[pir] Running 15-PIRIRDotCodegen ...[pir] Finished 15-PIRIRDotCodegen to [36mtop4.dot[0m in 102.322395ms
-[pir] Running 16-SimpleIRDotCodegen ...[pir] Finished 16-SimpleIRDotCodegen to [36msimple1.dot[0m in 168.245829ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 210.80453ms
-[pir] Running 18-PIRIRDotCodegen ...[pir] Finished 18-PIRIRDotCodegen to [36mtop5.dot[0m in 245.978866ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 278.216718ms
-[pir] Running 20-PIRIRDotCodegen ...[pir] Finished 20-PIRIRDotCodegen to [36mtop6.dot[0m in 249.14363ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 39.786916ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 108.757026ms
-[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 265.888245ms
-[pir] Running 24-IgraphPartioner ...[pir] Finished 24-IgraphPartioner in 1286.300479ms
-[pir] Running 25-PIRIRDotCodegen ...[pir] Finished 25-PIRIRDotCodegen to [36mtop7.dot[0m in 252.657834ms
-[pir] Running 26-SimpleIRDotCodegen ...[pir] Finished 26-SimpleIRDotCodegen to [36msimple2.dot[0m in 113.216528ms
-[pir] Running 27-ControllerDotCodegen ...[pir] Finished 27-ControllerDotCodegen to [36mcontroller1.dot[0m in 273.335528ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 716.953792ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 362.742044ms
-[pir] Running 30-ControllerDotCodegen ...[pir] Finished 30-ControllerDotCodegen to [36mcontroller2.dot[0m in 266.472506ms
-[pir] Running 31-PIRIRDotCodegen ...[pir] Finished 31-PIRIRDotCodegen to [36mtop8.dot[0m in 223.281175ms
-[pir] Running 32-SimpleIRDotCodegen ...[pir] Finished 32-SimpleIRDotCodegen to [36msimple3.dot[0m in 119.609888ms
-[pir] Running 33-PIRPrinter ...[pir] Finished 33-PIRPrinter to [36mIR2.txt[0m in 366.62546ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 11.322182ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 82.724183ms
-[pir] Running 36-PIRIRDotCodegen ...[pir] Finished 36-PIRIRDotCodegen to [36mtop9.dot[0m in 336.264504ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 36.502675ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 2832.09911ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 107.582557ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 103.148024ms
-[pir] Running 41-PIRIRDotCodegen ...[pir] Finished 41-PIRIRDotCodegen to [36mtop10.dot[0m in 1258.652824ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 882.829028ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 1720.430367ms
-[pir] Running 44-PIRIRDotCodegen ...[pir] Finished 44-PIRIRDotCodegen to [36mtop11.dot[0m in 906.337788ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 230.169307ms
-[pir] Running 46-PIRIRDotCodegen ...[pir] Finished 46-PIRIRDotCodegen to [36mtop12.dot[0m in 1479.756ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 212.79953ms
-[pir] Running 48-ControllerPrinter ...[pir] Finished 48-ControllerPrinter to [36mcontroller.txt[0m in 332.028582ms
-[pir] Running 49-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
-[pir] 
-[pir] number of cus=27
-[pir] number of ocu = 1
-[pir] - cin (1.00,1.00,1.00) sin (0.00,0.00,0.00) vin (0.00,0.00,0.00)
-[pir] - cout (1.00,1.00,1.00) sout (0.00,0.00,0.00) vout (0.00,0.00,0.00)
-[pir] - stages (0.00,0.00,0.00)
-[pir] number of pcu = 5
-[pir] - cin (0.00,0.00,0.00) sin (0.00,0.60,2.00) vin (1.00,1.80,2.00)
-[pir] - cout (0.00,0.00,0.00) sout (0.00,0.20,1.00) vout (0.00,0.80,1.00)
-[pir] - stages (1.00,3.00,6.00)
-[pir] number of dag = 4
-[pir] - cin (0.00,0.00,0.00) sin (1.00,2.00,3.00) vin (0.00,0.00,0.00)
-[pir] - cout (0.00,0.00,0.00) sout (2.00,2.00,2.00) vout (0.00,0.00,0.00)
-[pir] - stages (1.00,2.25,5.00)
-[pir] number of pmu = 11
-[pir] - cin (0.00,0.00,0.00) sin (0.00,0.55,2.00) vin (1.00,1.27,2.00)
-[pir] - cout (0.00,0.00,0.00) sout (0.00,0.09,1.00) vout (0.00,0.91,1.00)
-[pir] - stages (0.00,0.73,4.00)
-[pir] number of dfg = 4
-[pir] - cin (0.00,0.00,0.00) sin (2.00,2.00,2.00) vin (0.00,0.25,1.00)
-[pir] - cout (0.00,0.25,1.00) sout (0.00,0.00,0.00) vout (0.00,0.75,1.00)
-[pir] - stages (0.00,0.00,0.00)
-[pir] number of scu = 1
-[pir] - cin (0.00,0.00,0.00) sin (2.00,2.00,2.00) vin (0.00,0.00,0.00)
-[pir] - cout (0.00,0.00,0.00) sout (1.00,1.00,1.00) vout (0.00,0.00,0.00)
-[pir] - stages (5.00,5.00,5.00)
-[pir] number of afg = 1
-[pir] - cin (1.00,1.00,1.00) sin (0.00,0.00,0.00) vin (0.00,0.00,0.00)
-[pir] - cout (0.00,0.00,0.00) sout (6.00,6.00,6.00) vout (0.00,0.00,0.00)
-[pir] - stages (0.00,0.00,0.00)
-[pir] PCU usage = 7 / 63 (11.11%)
-[pir] PMU usage = 11 / 64 (17.19%)
-[pir] MC usage = 4 / 32 (12.50%)
-[pir] Total usage = 11 / 159 (6.92%)
-[pir] Finished 49-CUStatistics to [36mstat.json[0m in 427.537101ms
-[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p/traces
-[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p/trace_classes
-[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p
-[[33mtrace[0m] log in /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 15595.083843ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 2186.576976ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 1415.481251ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 117.713856ms
-[pir] Running 54-ControllerDotCodegen ...[pir] Finished 54-ControllerDotCodegen to [36mcontroller.dot[0m in 751.95739ms
-[pir] Running 55-PIRIRDotCodegen ...[pir] Finished 55-PIRIRDotCodegen to [36mtop.dot[0m in 1349.440382ms
-[pir] Running 56-SimpleIRDotCodegen ...[pir] Finished 56-SimpleIRDotCodegen to [36msimple.dot[0m in 405.474973ms
-[pir] Running 57-PIRPrinter ...[pir] Finished 57-PIRPrinter to [36mIR.txt[0m in 1269.310818ms
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1626.520851ms
-[pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 65.617436ms
-[pir] Running 60-PIRNetworkDotCodegen ...[pir] Finished 60-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 99.420392ms
-[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mscalar.dot[0m in 92.29616ms
-[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mvector.dot[0m in 86.06763ms
-[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 266.160973ms
-[pir] Running 64-LinkCSVCodegen ...[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 1156.336205ms
-[pir] Running 65-PlastisimDotCodegen ...[pir] Finished 65-PlastisimDotCodegen to [36mpsim.dot[0m in 1403.862957ms
-[pir] Running 67-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p/
-[pir] To run simulation manually, use following command, or use --run-psim to launch simulation automatically
-[pir] [33m/home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p/config.psim -c 100000000[0m
-[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 1898.181167ms
-[0m[[32msuccess[0m] [0mTotal time: 69 s, completed Jul 21, 2018 10:42:55 PM[0m
-Changing to config directory: /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_1_p2p
-Added all names to the symbol table.
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 1
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 2
-Set lat 1 from 0 to 3
-Set lat 1 from 0 to 4
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 1
-Set lat 1 from 0 to 2
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 1
-Set lat 1 from 0 to 2
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 1
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 1
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 1
-Set lat 1 from 0 to 1
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 2
-Set lat 1 from 0 to 5
-Set lat 1 from 0 to 6
-Set lat 1 from 0 to 3
-Set lat 1 from 0 to 4
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-== Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
-== Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
-===== MemorySystem 0 =====
-CH. 0 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
-===== MemorySystem 1 =====
-CH. 1 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
-===== MemorySystem 2 =====
-CH. 2 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
-===== MemorySystem 3 =====
-CH. 3 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
-Parsed definitions of all elements.
-Total of 53 links:
-  0: SRAM120
-    
-  1: DramAddress252
-    
-  2: RetimingFIFO1402
-    
-  3: RetimingFIFO1736
-    
-  4: RetimingFIFO1367
-    
-  5: RetimingFIFO1190
-    
-  6: RetimingFIFO1225
-    
-  7: RetimingFIFO1541
-    
-  8: RetimingFIFO1897
-    
-  9: RetimingFIFO1637
-    
-  10: RetimingFIFO1506
-    
-  11: RetimingFIFO1576
-    
-  12: RetimingFIFO1647
-    
-  13: RetimingFIFO1701
-    
-  14: StreamOut674
-    
-  15: StreamOut21
-    
-  16: StreamOut145
-    
-  17: StreamOut243
-    
-  18: SRAM100
-    
-  19: SRAM311
-    
-  20: SRAM310
-    
-  21: SRAM19
-    
-  22: SRAM18
-    
-  23: SRAM99
-    
-  24: SRAM448
-    
-  25: SRAM17
-    
-  26: StreamOut146
-    
-  27: StreamOut675
-    
-  28: StreamOut22
-    
-  29: StreamOut244
-    
-  30: DramAddress171
-    
-  31: ArgIn996_ArgIn962_ArgIn1048_ArgIn3299_ArgIn3412
-    
-  32: RetimingFIFO1235_RetimingFIFO1264_RetimingFIFO1278
-    
-  33: RetimingFIFO1078_RetimingFIFO1107_RetimingFIFO1136
-    
-  34: SRAM118
-    
-  35: SRAM119
-    
-  36: RetimingFIFO1412_RetimingFIFO1441
-    
-  37: RetimingFIFO1746_RetimingFIFO1775
-    
-  38: RetimingFIFO1789_RetimingFIFO1843
-    
-  39: ArgIn2602_ArgIn2920_ArgIn2994_ArgIn3061_ArgIn3926_ArgIn3978_ArgIn4039
-    
-  40: DramAddress686
-    
-  41: DramAddress32
-    
-  42: StreamIn677
-    
-  43: TokenOut860
-    
-  44: TokenIn3105
-    
-  45: TokenIn3118
-    
-  46: TokenIn3210
-    
-  47: TokenIn3223
-    
-  48: TokenIn3360
-    
-  49: TokenIn3347
-    
-  50: StreamOut676
-    
-  51: Reg328
-    
-  52: Reg404
-    
-Total of 42 nodes:
-  0: CE4129
-    [StreamOut22 *8 /1] [StreamOut21 *8 /1]  => [RetimingFIFO1078_RetimingFIFO1107_RetimingFIFO1136] 
-  1: CE4143
-    [StreamOut146 *8 /1] [StreamOut145 *8 /1]  => [RetimingFIFO1789_RetimingFIFO1843] 
-  2: CE4605
-    [RetimingFIFO1789_RetimingFIFO1843 *1 /1]  => [SRAM118] 
-  3: CE4595
-    [SRAM118 *4096 /1]  => [RetimingFIFO1637] 
-  4: CE4625
-    [RetimingFIFO1789_RetimingFIFO1843 *1 /1]  => [SRAM119] 
-  5: CE4615
-    [SRAM119 *4096 /1]  => [RetimingFIFO1506] 
-  6: CE4157
-    [StreamOut244 *32 /1] [StreamOut243 *32 /1]  => [RetimingFIFO1897] 
-  7: CE4645
-    [RetimingFIFO1897 *1 /1]  => [SRAM120] 
-  8: CE4635
-    [SRAM120 *512 /1]  => [RetimingFIFO1576] 
-  9: CE4195
-     => [DramAddress252] [DramAddress171] [ArgIn996_ArgIn962_ArgIn1048_ArgIn3299_ArgIn3412] [ArgIn2602_ArgIn2920_ArgIn2994_ArgIn3061_ArgIn3926_ArgIn3978_ArgIn4039] [DramAddress32] [DramAddress686] 
-  10: CE4211
-    [TokenOut860 *1 /1]  => 
-  11: CE4231
-    [DramAddress32 *1 /1]  => [StreamOut22] [StreamOut21] 
-  12: CE4259
-    [DramAddress686 *1 /1]  => [StreamOut675] [StreamOut674] 
-  13: CE4355
-    [ArgIn996_ArgIn962_ArgIn1048_ArgIn3299_ArgIn3412 *32768 /1] [DramAddress171 *32768 /1] [ArgIn2602_ArgIn2920_ArgIn2994_ArgIn3061_ArgIn3926_ArgIn3978_ArgIn4039 *32768 /1]  => [StreamOut146] [StreamOut145] 
-  14: CE4377
-    [ArgIn996_ArgIn962_ArgIn1048_ArgIn3299_ArgIn3412 *64 /1] [ArgIn2602_ArgIn2920_ArgIn2994_ArgIn3061_ArgIn3926_ArgIn3978_ArgIn4039 *64 /1] [DramAddress252 *64 /1]  => [StreamOut244] [StreamOut243] 
-  15: CE4219
-    [StreamIn677 *1 /1]  => [TokenOut860] 
-  16: CE4585
-    [RetimingFIFO1412_RetimingFIFO1441 *1 /1]  => [SRAM100] 
-  17: CE4575
-    [SRAM100 *8 /1]  => [RetimingFIFO1402] 
-  18: CE4665
-    [RetimingFIFO1746_RetimingFIFO1775 *1 /1]  => [SRAM310] 
-  19: CE4655
-    [SRAM310 *8 /1]  => [RetimingFIFO1367] 
-  20: CE4277
-    [ArgIn996_ArgIn962_ArgIn1048_ArgIn3299_ArgIn3412 *512 /1] [ArgIn2602_ArgIn2920_ArgIn2994_ArgIn3061_ArgIn3926_ArgIn3978_ArgIn4039 *512 /1] [RetimingFIFO1367 *1 /1] [RetimingFIFO1402 *1 /1]  => [RetimingFIFO1412_RetimingFIFO1441] 
-  21: CE4561
-    [ArgIn996_ArgIn962_ArgIn1048_ArgIn3299_ArgIn3412 *512 /1] [ArgIn2602_ArgIn2920_ArgIn2994_ArgIn3061_ArgIn3926_ArgIn3978_ArgIn4039 *512 /1] [RetimingFIFO1412_RetimingFIFO1441 *1 /1]  => [SRAM99] 
-  22: CE4547
-    [SRAM99 *8 /1]  => [RetimingFIFO1225] 
-  23: CE4685
-    [RetimingFIFO1746_RetimingFIFO1775 *1 /1]  => [SRAM311] 
-  24: CE4675
-    [SRAM311 *8 /1]  => [RetimingFIFO1736] 
-  25: CE4705
-    [RetimingFIFO1647 *1 /1]  => [SRAM448] 
-  26: CE4695
-    [SRAM448 *8 /1]  => [RetimingFIFO1701] 
-  27: CE4337
-    [RetimingFIFO1701 *1 /1] [RetimingFIFO1736 *1 /1]  => [RetimingFIFO1746_RetimingFIFO1775] 
-  28: CE4173
-    [StreamOut675 *8 /1] [StreamOut676 *1 /1] [StreamOut674 *8 /1]  => [StreamIn677] 
-  29: CE4245
-    [RetimingFIFO1190 *1 /1] [RetimingFIFO1225 *1 /1]  => [RetimingFIFO1235_RetimingFIFO1264_RetimingFIFO1278] 
-  30: CE4409
-    [RetimingFIFO1078_RetimingFIFO1107_RetimingFIFO1136 *1 /1]  => [TokenIn3105] 
-  31: CE4427
-    [TokenIn3105 *32 /1] [ArgIn2602_ArgIn2920_ArgIn2994_ArgIn3061_ArgIn3926_ArgIn3978_ArgIn4039 *32 /1] [RetimingFIFO1235_RetimingFIFO1264_RetimingFIFO1278 *1 /1]  => [TokenIn3118] [SRAM17] 
-  32: CE4395
-    [TokenIn3118 *8 /1] [SRAM17 *8 /1]  => [StreamOut676] 
-  33: CE4459
-    [RetimingFIFO1078_RetimingFIFO1107_RetimingFIFO1136 *1 /1]  => [TokenIn3210] 
-  34: CE4477
-    [TokenIn3210 *32 /1] [ArgIn2602_ArgIn2920_ArgIn2994_ArgIn3061_ArgIn3926_ArgIn3978_ArgIn4039 *32 /1] [RetimingFIFO1235_RetimingFIFO1264_RetimingFIFO1278 *1 /1]  => [TokenIn3223] [SRAM18] 
-  35: CE4445
-    [TokenIn3223 *8 /1] [SRAM18 *8 /1]  => [RetimingFIFO1190] 
-  36: CE4521
-    [RetimingFIFO1078_RetimingFIFO1107_RetimingFIFO1136 *1 /1]  => [TokenIn3347] [SRAM19] 
-  37: CE4501
-    [TokenIn3347 *262144 /1] [ArgIn996_ArgIn962_ArgIn1048_ArgIn3299_ArgIn3412 *262144 /1] [ArgIn2602_ArgIn2920_ArgIn2994_ArgIn3061_ArgIn3926_ArgIn3978_ArgIn4039 *262144 /1] [SRAM19 *65536 /1]  => [TokenIn3360] [RetimingFIFO1541] 
-  38: CE4535
-    [TokenIn3360 *8 /1] [RetimingFIFO1235_RetimingFIFO1264_RetimingFIFO1278 *1 /1]  => [SRAM19] 
-  39: CE4295
-    [RetimingFIFO1506 *1 /1] [RetimingFIFO1541 *1 /1]  => [Reg328] 
-  40: CE4309
-    [Reg328 *1 /1] [RetimingFIFO1576 *1 /1]  => [Reg404] 
-  41: CE4323
-    [Reg404 *8 /1] [RetimingFIFO1637 *1 /1]  => [RetimingFIFO1647] 
-
-DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
-10000...
-20000...
-30000...
-40000...
-50000...
-60000...
-70000...
-80000...
-90000...
-100000...
-110000...
-120000...
-130000...
-140000...
-150000...
-160000...
-170000...
-180000...
-190000...
-200000...
-210000...
-220000...
-230000...
-240000...
-250000...
-260000...
-270000...
-280000...
-290000...
-300000...
-310000...
-320000...
-330000...
-340000...
-350000...
-360000...
-370000...
-380000...
-390000...
-400000...
-410000...
-420000...
-430000...
-440000...
-450000...
-460000...
-470000...
-480000...
-490000...
-500000...
-510000...
-520000...
-530000...
-540000...
-550000...
-560000...
-570000...
-580000...
-590000...
-600000...
-610000...
-620000...
-630000...
-640000...
-650000...
-660000...
-670000...
-680000...
-690000...
-700000...
-710000...
-720000...
-730000...
-740000...
-750000...
-760000...
-770000...
-780000...
-790000...
-800000...
-810000...
-820000...
-830000...
-840000...
-850000...
-860000...
-870000...
-880000...
-890000...
-900000...
-910000...
-920000...
-Simulation complete at cycle: 923808
-CE4129: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
-	       8        8 
-	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
-CE4143: Active:  28.4 Stalled:  54.6 Starved:  10.4 Total Active:   262144 Expected Active:   262144
-	  262144   262144 
-	DRAM:  18.16 GB/s ( 18.16 GB/s R,   0.00 GB/s W)
-CE4605: Active:  28.4 Stalled:  55.8 Starved:  16.9 Total Active:   262144 Expected Active:   262144
-	  262144 
-CE4595: Active:  28.4 Stalled:  70.9 Starved:   0.7 Total Active:   262144 Expected Active:   262144
-	  262144 
-CE4625: Active:  28.4 Stalled:  47.0 Starved:  25.5 Total Active:   262144 Expected Active:   262144
-	  262144 
-CE4615: Active:  28.4 Stalled:  70.8 Starved:   0.9 Total Active:   262144 Expected Active:   262144
-	  262144 
-CE4157: Active:   0.2 Stalled:  88.6 Starved:  23.5 Total Active:     2048 Expected Active:     2048
-	    2048     2048 
-	DRAM:   0.14 GB/s (  0.14 GB/s R,   0.00 GB/s W)
-CE4645: Active:   0.2 Stalled:  90.2 Starved:  11.1 Total Active:     2048 Expected Active:     2048
-	    2048 
-CE4635: Active:   3.5 Stalled:  96.2 Starved:   0.3 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE4195: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
-	
-CE4211: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
-	       1 
-CE4231: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
-	       1 
-CE4259: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
-	       1 
-CE4355: Active:   3.5 Stalled:  86.0 Starved:  10.4 Total Active:    32768 Expected Active:    32768
-	   32768    32768    32768 
-CE4377: Active:   0.0 Stalled:  48.5 Starved:  59.2 Total Active:       64 Expected Active:       64
-	      64       64       64 
-CE4219: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
-	       8 
-CE4585: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Expected Active:      512
-	     512 
-CE4575: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      520 Expected Active:      512
-	     512 
-CE4665: Active:  28.4 Stalled:   0.0 Starved:  71.6 Total Active:   262144 Expected Active:   262144
-	  262144 
-CE4655: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Expected Active:      512
-	     512 
-CE4277: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Expected Active:      512
-	     512      512      512      513 
-CE4561: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Expected Active:      512
-	     512      512      512 
-CE4547: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
-	      32 
-CE4685: Active:  28.4 Stalled:   0.0 Starved:  71.6 Total Active:   262144 Expected Active:   262144
-	  262144 
-CE4675: Active:  28.4 Stalled:   0.0 Starved:  71.6 Total Active:   262152 Expected Active:   262144
-	  262144 
-CE4705: Active:  28.4 Stalled:  70.8 Starved:   0.8 Total Active:   262144 Expected Active:   262144
-	  262144 
-CE4695: Active:  28.4 Stalled:  70.9 Starved:   0.7 Total Active:   262144 Expected Active:   262144
-	  262144 
-CE4337: Active:  28.4 Stalled:   0.0 Starved:  71.6 Total Active:   262144 Expected Active:   262144
-	  262144   262145 
-CE4173: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
-	       8        8        8 
-	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
-CE4245: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
-	      33       32 
-CE4409: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
-	       8 
-CE4427: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
-	      32       32       32 
-CE4395: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
-	       8        8 
-CE4459: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
-	       8 
-CE4477: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
-	      32       32       32 
-CE4445: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       40 Expected Active:       32
-	      32       32 
-CE4521: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Expected Active:        8
-	       8 
-CE4501: Active:  28.4 Stalled:  70.7 Starved:   0.9 Total Active:   262144 Expected Active:   262144
-	  262144   262144   262144   327680 
-CE4535: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       32 Expected Active:       32
-	      32       32 
-CE4295: Active:  28.4 Stalled:  70.2 Starved:   1.5 Total Active:   262144 Expected Active:   262144
-	  262144   262144 
-CE4309: Active:   3.5 Stalled:  95.2 Starved:   1.3 Total Active:    32768 Expected Active:    32768
-	   32768    32768 
-CE4323: Active:  28.4 Stalled:  70.8 Starved:   0.8 Total Active:   262144 Expected Active:   262144
-	  262144   262144 
-Total DRAM:	  18.30 GB/s ( 18.30 GB/s R,   0.00 GB/s W)
--------------PASS (DONE)------------

@@ -12,8 +12,9 @@ PIR_HOME = os.environ['PIR_HOME']
 
 # passes=["gen_pir","fit_pir","gen_chisel","make_vcs","map_pir","run_simulation"]
 # passes=["gen_pir","fit_pir", "psim_asic", "psim_p2p", "psim_static"]
-passes=["gen_pir","psim_p2p", "psim_asic", "psim_static", "psim_dynamic"]
-APPS = ['GDA', "BlackScholes"]
+passes=["gen_pir","psim_p2p", "psim_asic", "psim_static", "psim_dynamic", "psim_dynamic_s1",
+"psim_dynamic_s2","psim_dynamic_s3"]
+APPS = ["lenet_loops"]
 # APPS = ['DotProduct', 'OuterProduct', 'GDA', 'BlackScholes', 'TPCHQ6']
 # APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
 # APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
@@ -38,7 +39,10 @@ dependency = {
         "psim_p2p":["gen_pir"],
         "psim_asic":["psim_p2p"],
         "psim_static":["psim_p2p"],
-        "psim_dynamic":["psim_p2p"]
+        "psim_dynamic":["psim_p2p"],
+        "psim_dynamic_s1":["psim_p2p"],
+        "psim_dynamic_s2":["psim_p2p"],
+        "psim_dynamic_s3":["psim_p2p"],
         }
 
 

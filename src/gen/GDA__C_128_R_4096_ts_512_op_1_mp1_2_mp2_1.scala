@@ -13,7 +13,6 @@ val ts = 512
 val op = 1
 val mp1 = 2
 val mp2 = 1
-
   val ip = 16
   val margin = 1
 
