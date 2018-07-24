@@ -41,6 +41,7 @@ def main():
     apps += ['lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1']
 
     opts.parallel=20
+    opts.git=True
     for app in apps:
         target(app, [], {})
     if opts.summarize:

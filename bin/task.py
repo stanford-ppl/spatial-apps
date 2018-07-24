@@ -266,7 +266,8 @@ def git_add(app, args, params):
         # pir_app = "{}/pir/apps/gen/{}.scala".format(PIR_HOME,fullname)
         files = [log, spatial_app]
         for f in files:
-          subprocess.call("git add -f {}".format(f), shell=True)
+          if os.path.exists(f):
+            subprocess.call("git add -f {}".format(f), shell=True)
 
 def target(app, args, params):
     if opts.run:

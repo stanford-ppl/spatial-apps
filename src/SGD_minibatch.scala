@@ -8,8 +8,8 @@ object SGD_minibatch extends SpatialApp { self => // Regression (Dense) // Args:
   val N = 1024 // param [pmuSize / <D> * 16]
   val E = 1 // param [2]
   val ts = 16 // param [pmuSize / <D>]
-  val mp1 = 1 // param [1,2,4,8] | <ts> % p == 0
-  val mp2 = 1 // param [1,2,4,8] | <ts> % p == 0 and <mp1> * p <= 12 
+  val mp1 = 1 // param [2,4] | <ts> % p == 0
+  val mp2 = 1 // param [8,16] | <ts> % p == 0 and <mp1> * p <= 32
 
   val A = 0.0001f
   val ip = 16
