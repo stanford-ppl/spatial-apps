@@ -8,7 +8,6 @@ object SGD_minibatch extends SpatialApp { self => // Regression (Dense) // Args:
   val N = 1024 // param [pmuSize / <D> * 16]
   val E = 1 // param [2]
   val ts = 16 // param [pmuSize / <D>]
-  val op = 1  // param [1]
   val mp1 = 1 // param [1,2,4,8] | <ts> % p == 0
   val mp2 = 1 // param [1,2,4,8] | <ts> % p == 0 and <mp1> * p <= 12 
 
@@ -41,21 +40,19 @@ object SGD_minibatch extends SpatialApp { self => // Regression (Dense) // Args:
       val sgdmodel = SRAM[TM](D)
       val x_tile = SRAM[TX](ts,D)
       Pipe(D by 1) { i => sgdmodel(i) = 0.to[TM]}
-      Sequential.Foreach(E by 1) { e =>
-        Foreach (N by ts par op) { b =>
-          y_tile load y(b::b+ts par ip)
-          x_tile load x(b::b+ts, 0::D par ip)
-          val y_err = SRAM[TX](ts)
-          Foreach(ts by 1 par mp1) { i => 
-            val y_hat = Reduce(Reg[TX])(D by 1 par ip){ j => x_tile(i,j) * sgdmodel(j).to[TX] }{_+_}
-            y_err(i) = y_tile(i) - y_hat.value
-          }
-          MemFold(sgdmodel)(ts by 1 par mp2) { i =>
-            val row = SRAM[TX](D)
-            Foreach(D by 1 par ip) { j => row(j) = x_tile(i,j) * y_err(i) * A }
-            row
-          } { _ + _ }
+      Sequential.Foreach(E by 1, N by ts) { (e,b) =>
+        y_tile load y(b::b+ts par ip)
+        x_tile load x(b::b+ts, 0::D par ip)
+        val y_err = SRAM[TX](ts)
+        Foreach(ts by 1 par mp1) { i => 
+          val y_hat = Reduce(Reg[TX])(D by 1 par ip){ j => x_tile(i,j) * sgdmodel(j).to[TX] }{_+_}
+          y_err(i) = y_tile(i) - y_hat.value
         }
+        MemFold(sgdmodel)(ts by 1 par mp2) { i =>
+          val row = SRAM[TX](D)
+          Foreach(D by 1 par ip) { j => row(j) = x_tile(i,j) * y_err(i) * A }
+          row
+        } { _ + _ }
       }
       result(0::D par ip) store sgdmodel
     }
