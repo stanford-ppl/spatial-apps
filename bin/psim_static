@@ -16,7 +16,7 @@ $PIR_HOME/bin/pir $app \
   --net=static \
   --psim=true \
   --psim-out=$outDir \
-  --run-psim=false \
+  --run-psim=true \
   --trace=true \
   --ctrl=true \
   --bp=false \
@@ -28,7 +28,5 @@ $PIR_HOME/bin/pir $app \
   --tokenout=32 \
   --vfifo=4 \
   --fifo-depth=20
-
-$PLASTISIM_HOME/plastisim -f $config
 
 echo "-------------PASS (DONE)------------"
