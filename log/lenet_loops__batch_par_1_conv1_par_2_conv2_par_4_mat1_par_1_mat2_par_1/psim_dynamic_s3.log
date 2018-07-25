@@ -1,75 +1,0 @@
-Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
-Picked up _JAVA_OPTIONS: -Xss8192k
-[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
-[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
-[0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mRunning lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1 --out=/home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3 --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --net=dynamic --psim=true --routing-algo=proute --proute-slink=3 --psim-out=/home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3 --run-psim=false --trace=true --ctrl=true --bp=false --stat=false --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4 --vc=8[0m
-[pir] args=[--load-pir=false, --run-psim=true, --trace=true, --net=static, --stat=true, --psim-timeout=100000000, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --net=dynamic, --psim=true, --routing-algo=proute, --proute-slink=3, --psim-out=/home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=false, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8]
-[pir] Output directory set to [36m/home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3[0m
-[pir] Finishing graph construction for lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1
-[pir] Configuring spade MyDesign ...
-New design elapsed time: 6354.048ms
-[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 5305.488981ms
-[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 8.251754ms
-[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 147.572897ms
-[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 12627.560761ms
-[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 1983.379806ms
-[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 4.118546ms
-[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 10533.957306ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 169.929397ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 167.249899ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 17906.975701ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 2815.937605ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 1773.110022ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 8239.103016ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 612.403839ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 907.974776ms
-[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 814.064158ms
-[pir] Running 24-IgraphPartioner ...[[33mwarn[0m] CUContainer4842[dag](dag) not fit DramAGParam267786598 overCosts=(StageCost(11),StageCost(8))
-[pir] Split CUContainer4842 in 804.074787ms[[33mwarn[0m] CUContainer12354[dag](dag) not fit DramAGParam267786598 overCosts=(StageCost(11),StageCost(8))
-[pir] Split CUContainer12354 in 728.642652ms[pir] Split CUContainer4869 in 619.681728ms[pir] Split CUContainer4871 in 677.146617ms[pir] Split CUContainer4885 in 779.773117ms[pir] Split CUContainer4886 in 679.035122ms[pir] Split CUContainer4887 in 555.254401ms[pir] Split CUContainer4888 in 574.993027ms[pir] Split CUContainer4889 in 645.930739ms[pir] Split CUContainer4890 in 636.091415ms[pir] Split CUContainer4891 in 549.941017ms[pir] Split CUContainer4892 in 626.111402ms[pir] Split CUContainer4893 in 580.758589ms[pir] Split CUContainer4894 in 627.369169ms[pir] Split CUContainer4897 in 659.770935ms[pir] Split CUContainer12382 in 598.54124ms[pir] Split CUContainer4898 in 554.202895ms[pir] Split CUContainer12386 in 684.390999ms[pir] Split CUContainer4899 in 619.21873ms[pir] Split CUContainer12391 in 523.389277ms[pir] Split CUContainer12393 in 555.311859ms[pir] Split CUContainer12395 in 548.433167ms[pir] Split CUContainer12397 in 668.126162ms[pir] Split CUContainer12398 in 533.070812ms[pir] Split CUContainer4900 in 791.504499ms[pir] Split CUContainer4901 in 522.988272ms[pir] Split CUContainer4902 in 553.689014ms[pir] Split CUContainer4903 in 558.50205ms[pir] Split CUContainer4904 in 557.815523ms[pir] Split CUContainer4906 in 541.409806ms[pir] Split CUContainer4908 in 549.27722ms[pir] Split CUContainer4910 in 513.112088ms[pir] Split CUContainer4917 in 469.364447ms[pir] Split CUContainer12419 in 519.239311ms[pir] Split CUContainer4919 in 445.21341ms[pir] Finished 24-IgraphPartioner in 23869.379811ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 28330.260222ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 17516.781068ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 48.882638ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 139.811472ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 760.321926ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 23563.000007ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 1764.582616ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 1738.782303ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 48649.370672ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 45768.344484ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 2522.895172ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 524.802329ms
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 771.622457ms
-[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/traces
-[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/trace_classes
-[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3 /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3
-[[33mtrace[0m] log in /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 37731.670695ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 150930.0531ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 44685.08066ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 1771.536363ms
-[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1.pir
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 2028.355135ms
-[pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 87959.216962ms
-[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 1628.336139ms
-[pir] Running 64-LinkCSVCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/node.csv -l /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/link.csv -o /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/proute.place -r 16 -c 8 -s1 -x3
-[[33mproute[0m] log in /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/proute.log
-[[31merror[0m] failed /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/node.csv -l /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/link.csv -o /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/proute.place -r 16 -c 8 -s1 -x3
-[[31mfail[0m] LinkCSVCodegen failed: Plastiroute failed. details in /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/proute.log
-[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 43250.504842ms
-[pir] Running 65-PlastisimDotCodegen ...[pir] Finished 65-PlastisimDotCodegen to [36mpsim.dot[0m in 42626.155115ms
-[pir] Running 66-PlastisimPlacementCodegen ...[pir] Finished 66-PlastisimPlacementCodegen to [36mpir.place[0m in 38739.523887ms
-[[33mwarn[0m] 67-PlastisimConfigCodegen not run due to dependency LinkCSVCodegen not success
-[pir] Saving node prism.Session@544dee90 to /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1_dynamic_s3/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_1_mat2_par_1.sess
-
-Exception: sbt.TrapExitSecurityException thrown from the UncaughtExceptionHandler in thread "run-main-0"
-java.lang.RuntimeException: Nonzero exit code: 1
-	at scala.sys.package$.error(package.scala:27)
-[0m[[31mtrace[0m] [0mStack trace suppressed: run [34mlast apps/compile:runMain[0m for the full output.[0m
-[0m[[31merror[0m] [0m(apps/compile:[31mrunMain[0m) Nonzero exit code: 1[0m
-[0m[[31merror[0m] [0mTotal time: 723 s, completed Jul 24, 2018 3:21:01 PM[0m
-Unable to open input file!
--------------PASS (DONE)------------
