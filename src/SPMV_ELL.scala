@@ -9,6 +9,8 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
   val L = 16
   val ts = 32
   val ip = 16
+  val op = 1
+  val mp = 1
 
  /*                                                                                                  
    Sparse Matrix is the IEEE 494 bus interconnect matrix from UF Sparse Datasets   
@@ -78,24 +80,24 @@ object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
     setMem(vec_dram, raw_vec)
 
     Accel {
-      Foreach(N by ts){ tile => 
+      Foreach(N by ts par op){ tile => 
         val cols_sram = SRAM[Int](ts, L)
         val values_sram = SRAM[T](ts, L)
         val result_sram = SRAM[T](ts)
 
-        cols_sram load cols_dram(tile::tile+ts, 0::L)
-        values_sram load values_dram(tile::tile+ts, 0::L)
+        cols_sram load cols_dram(tile::tile+ts, 0::L par ip)
+        values_sram load values_dram(tile::tile+ts, 0::L par ip)
 
-        Foreach(ts by 1) { i => 
+        Foreach(ts by 1 par mp) { i => 
           val vec_sram = SRAM[T](L)
           val gather_addrs = SRAM[Int](L)
           Foreach(L by 1 par ip) { j => gather_addrs(j) = cols_sram(i, j) }
-          vec_sram gather vec_dram(gather_addrs, L)
-          val element = Reduce(Reg[T](0))(L by 1) { k => values_sram(i,k) * vec_sram(k) }{_+_}
+          vec_sram gather vec_dram(gather_addrs par ip, L)
+          val element = Reduce(Reg[T](0))(L by 1 par ip) { k => values_sram(i,k) * vec_sram(k) }{_+_}
           result_sram(i) = element
         }
 
-        result_dram(tile::tile+ts) store result_sram
+        result_dram(tile::tile+ts par ip) store result_sram
 
       }
     }
