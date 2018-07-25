@@ -2,14 +2,14 @@ import spatial.dsl._
 import virtualized._
 import spatial.targets._
 
-object SPMV_ELL extends SpatialApp { // Regression (Sparse) // Args: none
+object SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2 extends SpatialApp { // Regression (Sparse) // Args: none
   override val target = AWS_F1
 
-  val L = 16 // param [ 64 ]
-  val N = 64 // param [ pmuSize / <L> * 16 ]
-  val ts = 32 // param [ pmuSize / <L> ] | <N> % p == 0
-  val op = 1 // param [1] | <N> % p == 0
-  val mp = 1 // param [1,2,4] | <N> % p == 0
+val L = 64
+val N = 16384
+val ts = 1024
+val op = 1
+val mp = 2
   val ip = 16
 
  /*                                                                                                  
