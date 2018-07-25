@@ -1,0 +1,252 @@
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
+[0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mRunning lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1 --out=/home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3 --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --net=dynamic --psim=true --routing-algo=proute --proute-slink=3 --psim-out=/home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3 --run-psim=false --trace=true --ctrl=true --bp=false --stat=false --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4 --vc=8[0m
+[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=p2p, --stat=false, --psim-timeout=100000000, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --net=dynamic, --psim=true, --routing-algo=proute, --proute-slink=3, --psim-out=/home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=false, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8]
+[pir] Output directory set to [36m/home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3[0m
+[pir] Finishing graph construction for lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1
+[pir] Configuring spade MyDesign ...
+New design elapsed time: 5710.222ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 5742.644069ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 7.284036ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 110.055986ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 12794.198108ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 1847.265769ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 3.614229ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 12115.309872ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 148.680452ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 115.229037ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 18176.166852ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 2885.850451ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 1957.32981ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 8456.240218ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 640.069541ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 953.901968ms
+[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 755.529888ms
+[pir] Running 24-IgraphPartioner ...[[33mwarn[0m] CUContainer5334[dag](dag) not fit DramAGParam265583852 overCosts=(StageCost(11),StageCost(8))
+[pir] Split CUContainer5334 in 671.11258ms[[33mwarn[0m] CUContainer13453[dag](dag) not fit DramAGParam265583852 overCosts=(StageCost(11),StageCost(8))
+[pir] Split CUContainer13453 in 603.123809ms[[33mwarn[0m] CUContainer5337[dag](dag) not fit DramAGParam265583852 overCosts=(StageCost(11),StageCost(8))
+[pir] Split CUContainer5337 in 657.464877ms[[33mwarn[0m] CUContainer13457[dag](dag) not fit DramAGParam265583852 overCosts=(StageCost(11),StageCost(8))
+[pir] Split CUContainer13457 in 589.480141ms[pir] Split CUContainer5344 in 589.963356ms[pir] Split CUContainer5346 in 705.751749ms[pir] Split CUContainer5358 in 594.564745ms[pir] Split CUContainer5360 in 659.665492ms[pir] Split CUContainer5361 in 614.961443ms[pir] Split CUContainer5362 in 582.909619ms[pir] Split CUContainer5363 in 667.779417ms[pir] Split CUContainer5364 in 571.219884ms[pir] Split CUContainer5365 in 589.674776ms[pir] Split CUContainer5366 in 544.054207ms[pir] Split CUContainer5367 in 572.96968ms[pir] Split CUContainer5368 in 554.833385ms[pir] Split CUContainer5369 in 674.045814ms[pir] Split CUContainer5372 in 726.131548ms[pir] Split CUContainer13487 in 537.980404ms[pir] Split CUContainer5373 in 560.529481ms[pir] Split CUContainer13491 in 578.048181ms[pir] Split CUContainer5374 in 565.886576ms[pir] Split CUContainer13495 in 521.674403ms[pir] Split CUContainer13498 in 608.753145ms[pir] Split CUContainer13499 in 521.948753ms[pir] Split CUContainer13501 in 512.306657ms[pir] Split CUContainer13504 in 510.401023ms[pir] Split CUContainer5375 in 579.849711ms[pir] Split CUContainer13507 in 501.956083ms[pir] Split CUContainer13510 in 540.304663ms[pir] Split CUContainer13511 in 548.714101ms[pir] Split CUContainer13513 in 470.750268ms[pir] Split CUContainer13516 in 475.979106ms[pir] Split CUContainer5376 in 471.757975ms[pir] Split CUContainer5377 in 502.852428ms[pir] Split CUContainer5378 in 471.198541ms[pir] Split CUContainer5379 in 464.625254ms[pir] Split CUContainer5380 in 462.590061ms[pir] Split CUContainer5382 in 444.252185ms[pir] Split CUContainer5384 in 423.575018ms[pir] Split CUContainer5386 in 422.997884ms[pir] Split CUContainer5394 in 436.958195ms[pir] Split CUContainer13535 in 482.921086ms[pir] Split CUContainer5395 in 386.610207ms[pir] Split CUContainer13539 in 391.857445ms[pir] Split CUContainer5397 in 393.452424ms[pir] Finished 24-IgraphPartioner in 28212.170773ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 31191.248008ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 19369.839426ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 54.209786ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 119.343898ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 800.176441ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 28167.31892ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 1873.464233ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 1933.342845ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 67325.526423ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 55635.508928ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 2841.51908ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 543.395398ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 773.789425ms
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1.pir
+[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3 /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3
+[[33mtrace[0m] log in /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/trace.log
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 44282.269297ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 202960.954871ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 55763.626317ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 2160.612412ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 2891.114708ms
+[pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
+[pir] Finished 59-CUPlacer in 112364.208909ms
+[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 9.606736ms
+[pir] Running 64-LinkCSVCodegen ...[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 55387.453789ms
+[pir] Running 65-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/node.csv -l /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/link.csv -o /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/final.place -r 16 -c 8 -s1 -x3
+[[33mproute[0m] log in /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/proute.log
+[pir] Finished 65-PlastisimPlacementCodegen to [36mfinal.place[0m in 50292.004812ms
+[pir] Running 66-PlastisimDotCodegen ...[pir] Finished 66-PlastisimDotCodegen to [36mpsim.dot[0m in 55958.267268ms
+[pir] Running 67-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/
+[pir] To run simulation manually, use following command, or use --run-psim to launch simulation automatically
+[pir] [33m/home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/config.psim -p /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/final.place -c 100000000[0m
+[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 51642.302309ms
+[pir] Saving node prism.Session@407d8022 to /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1.sess
+[0m[[32msuccess[0m] [0mTotal time: 951 s, completed Jul 25, 2018 2:42:54 AM[0m
+Changing to config directory: /home/yaqiz/pir/out/lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1_dynamic_s3
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+ConstructingCould not find link ID 16075 in placement file.
+plastisim: parse.cpp:279: bool parse_link(std::ifstream&, Link*, SymTab<Node>&, SymTab<NetShim>&, std::map<int, int>&, std::map<int, int>&, std::map<int, std::map<std::pair<int, int>, int> >&): Assertion `stat_map.find(ival) != stat_map.end()' failed.
+ NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Added all names to the symbol table.
+Printing hop routes
+Parsed placement file.
+Set lat 1 from 0 to 0
+/home/yaqiz/spatial-lang/apps/bin/psim_dynamic_s3: line 37: 19236 Aborted                 (core dumped) $PLASTISIM_HOME/plastisim -f $config -p $place
+-------------PASS (DONE)------------

@@ -1,13 +1,13 @@
 import spatial.dsl._
 import virtualized._
 
-object lenet_loops extends SpatialApp {
+object lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1 extends SpatialApp {
 
-  val batch_par = 1 // param [1]
-  val conv1_par = 1 // param [2,4] | 20 % p == 0 
-  val conv2_par = 2 // param [2,4] | 64 % p == 0
-  val mat1_par = 1 // param [1,2] | 128 % p == 0
-  val mat2_par = 1 // param [1,2] | 10 % p == 0
+val batch_par = 1
+val conv1_par = 2
+val conv2_par = 4
+val mat1_par = 2
+val mat2_par = 1
 
   val ip = 16
 
@@ -82,11 +82,9 @@ object lenet_loops extends SpatialApp {
       
       Foreach(BATCH_SIZE by 1 par batch_par) { batch_img =>
 
-        // Move data on-chip
         val i0_SRAM = SRAM[T](28,32)
         i0_SRAM load i0_DRAM(batch_img, 0::28, 0::32 par ip)
         
-        // Conv2D 1st layer
         val tmp1_SRAM = SRAM[T](20,12,12)
         val c0_RF = SRAM[T](20,5,16)
         c0_RF load c0_DRAM(0::20, 0::5, 0::16 par ip) // Loading kernel
@@ -113,15 +111,10 @@ object lenet_loops extends SpatialApp {
             tmp1_SRAM(outD_i, i, j) = out.value
           }
         }
-        // Optimization: BiasAdd was merged into Conv2D above
-        // Optimization: ReLU was merged into Conv2D above
-        // Optimization: MaxPool was merged into Conv2D above
 
-        // Conv2D 2nd layer
         val tmp2_SRAM = SRAM[T](50,4,4)
         val c2_RF = SRAM[T](50,5,16)
         c2_RF load c2_DRAM(0::50,0::5,0::16 par ip)                            // Banking error if parallelized
-        //Foreach(50 by 1 par conv2_par) { outD_i => // out channels
         Foreach(64 by 1 par conv2_par) { outD_i => // out channels
           val nr = 12
           val nc = 12
@@ -149,33 +142,20 @@ object lenet_loops extends SpatialApp {
             tmp2_SRAM(outD_i, i, j) = out.value
           }
         }
-        // Optimization: BiasAdd was merged into Conv2D above
-        // Optimization: ReLU was merged into Conv2D above
-        // Optimization: MaxPool was merged into Conv2D above
 
-        // Reshape
-        //val tmp3_SRAM = SRAM[T](4,4,50)
-        //Foreach(50 by 1 par 10, 4 by 1, 4 by 1) { (j,i,k) =>
-          //tmp3_SRAM(k,i,j) = tmp2_SRAM(j, i, k)
-        //}
 
-        // MatMul
         val tmp4_SRAM = SRAM[T](5,128)
         Foreach(128 by 1 par mat1_par){ out_i =>
           val c4_row_SRAM = SRAM[T](5,4,4,64)
           c4_row_SRAM load c4_DRAM(out_i, 0::5, 0::4, 0::4, 0::64 par ip)
           Foreach(5 by 1){block_i =>
             val prod = Reduce(Reg[T](0.to[T]))(50 by 1, 4 by 1, 4 by 1 par 4){ (j,i,k) =>
-              //tmp3_SRAM(j,i,k) * c4_row_SRAM(block_i,j,i,k)
               tmp2_SRAM(i,i,j) * c4_row_SRAM(block_i,j,i,k)
             }{_+_}
             tmp4_SRAM(block_i,out_i) = max(0.to[T], prod.value + c5_SRAM(block_i,out_i))
           }
         }
-        // Optimization: BiasAdd was merged into MatMul above
-        // Optimization: ReLU was merged into MatMul above
 
-        // MatMul
         val tmp5_SRAM = SRAM[T](32)
         val c6_row_SRAM = SRAM[T](10,5,128)
         c6_row_SRAM load c6_DRAM(0::10, 0::5, 0::128 par ip)
@@ -185,8 +165,6 @@ object lenet_loops extends SpatialApp {
           }{_+_}
           tmp5_SRAM(out_i) = prod.value + c7_SRAM(out_i)
         }
-        // Optimization: BiasAdd was merged into MatMul above
-        // Optimization: ReLU was merged into MatMul above
 
         tmp5_DRAM(batch_img, 0::32 par ip) store tmp5_SRAM
       } // Metapipeline over all images
