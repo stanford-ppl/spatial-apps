@@ -21,6 +21,7 @@ object StaticLSTMNetwork extends SpatialApp with DataGenerator {
 
   val nFeatures = 128
   val nHiddenUnits = 128
+  val nReduce = 128
   val nGates = 4
   val nSteps = 8
   val nLayers = 2
@@ -86,7 +87,7 @@ object StaticLSTMNetwork extends SpatialApp with DataGenerator {
 
 
   @virtualize
-  def getMemArray(src: DRAM1[T], dim0: scala.Int): SRAM[T] = {
+  def getMemTensor1D(src: DRAM1[T], dim0: scala.Int): SRAM[T] = {
     /**
     * Loads an array from mem into a 1D SRAM
     * @param src: source DRAM 
@@ -98,7 +99,7 @@ object StaticLSTMNetwork extends SpatialApp with DataGenerator {
   }
 
   @virtualize
-  def getMemMatrix(src: DRAM2[T], dim0: scala.Int,
+  def getMemTensor2D(src: DRAM2[T], dim0: scala.Int,
     dim1: scala.Int): SRAM2[T] = {
     /**
     * Loads a matrix from mem into a 1D SRAM
@@ -113,7 +114,7 @@ object StaticLSTMNetwork extends SpatialApp with DataGenerator {
   }
 
   @virtualize
-  def getMemCube(src: DRAM3[T], dim0: scala.Int, dim1: scala.Int,
+  def getMemTensor3D(src: DRAM3[T], dim0: scala.Int, dim1: scala.Int,
     dim2: scala.Int): SRAM3[T] = {
     /**
     * Loads a cube from mem into a 3D SRAM
@@ -159,7 +160,7 @@ object StaticLSTMNetwork extends SpatialApp with DataGenerator {
     */
 
     val re = SRAM[T](dim0, dim1, dim2, dim3, dim4)
-    re load src(0::dim0, 0::dim1, 0::dim2, 0::dim3, 0::dim4)
+    re load src(0::dim0, 0::dim1, 0::dim2, 0::dim3, 0::dim4 par ldPar)
     re
   }
 
@@ -179,9 +180,12 @@ object StaticLSTMNetwork extends SpatialApp with DataGenerator {
     val absin = abs(in)
     val div4 = absin >> sftOffset
     val li = div4 + bi
-    val absout = if (absin > up) (1.to[T])
-      else if (mi < absin && absin < up) (li)
-      else (absin)
+    //val absout = if (absin > up) (1.to[T])
+      //else if (mi < absin && absin < up) (li)
+      //else (absin)
+    val absout = mux(absin > up, 1.to[T], 
+      mux(mi < absin && absin < up, li, absin)
+    )
     val negout = zero - absout 
     val re = mux(in < zero, negout, absout)
     re
@@ -194,15 +198,19 @@ object StaticLSTMNetwork extends SpatialApp with DataGenerator {
     */
     val up = (2.5).to[T]
     val dn = (-2.5).to[T]
-    val mu = (2.0).to[T]
+    //val mu = (2.0).to[T]
     val scale = (0.2).to[T]
     val offset = (0.5).to[T]
-    val re = if (in < dn) (0.to[T]) else if (in >= up) (1.to[T]) else (scale * in + offset)
+    //val re = if (in < dn) (0.to[T]) else if (in >= up) (1.to[T]) else (scale * in + offset)
+    val re = mux(in < dn, 0.to[T], mux(in >= up, 1.to[T], scale * in + offset))
     re
   }
 
-  case class LSTMIOs(xInit: DRAM2[T], cInit: DRAM2[T], hInit: DRAM2[T], bInit: DRAM3[T],
-    wInit: DRAM5[T], out: DRAM2[T])
+  case class LSTMIOs(xInit: DRAM2[T], cInit: DRAM2[T], hInit: DRAM2[T], 
+    biInit: DRAM2[T], bjInit: DRAM2[T], bfInit: DRAM2[T], boInit: DRAM2[T],
+    wxiInit: DRAM3[T], wxjInit: DRAM3[T], wxfInit: DRAM3[T], wxoInit: DRAM3[T], 
+    whiInit: DRAM3[T], whjInit: DRAM3[T], whfInit: DRAM3[T], whoInit: DRAM3[T], 
+    out: DRAM2[T])
 
   @virtualize
   def lstmCore(io: LSTMIOs): Matrix[T] = {
@@ -213,63 +221,104 @@ object StaticLSTMNetwork extends SpatialApp with DataGenerator {
     * @param xInit: initial values for inputs
     * @param cInit: initial values for memory states
     * @param hInit: initial values for hidden states
-    * @param wInit: initial values for kernel
+    * @param wxInit: initial values for kernel with x
+    * @param whInit: init values for kenrel with h
     * @param bInit: initial values for bias
     */
 
+   /*
+    * pmu count
+    * x c h init 3
+    * x h 2
+    * w per gate 8
+    * b per gate 4
+    *
+    * pcu
+    * w pmu addr calculation 8
+    * reduction 8 (2 per gate)
+    *
+    * */
     Accel {
-      val x = getMemMatrix(io.xInit, nSteps, nFeatures) // pack all the x's.
-      val c = getMemMatrix(io.cInit, nLayers, nHiddenUnits) 
-      val h = getMemMatrix(io.hInit, nLayers, nHiddenUnits)
-      val w = getMemTensor6D(io.wInit, nLayers, nGates, nXH, nHiddenUnits, nFeatures)
-      val b = getMemCube(io.bInit, nLayers, nGates, nFeatures)
+      val x = getMemTensor2D(io.xInit, nSteps, nFeatures) // pack all the x's.
+      val c = getMemTensor2D(io.cInit, nLayers, nFeatures) 
+      val h = getMemTensor2D(io.hInit, nLayers, nFeatures)
+
+      val wxi = getMemTensor3D(io.wxiInit, nLayers, nHiddenUnits, nFeatures)
+      val wxj = getMemTensor3D(io.wxjInit, nLayers, nHiddenUnits, nFeatures)
+      val wxf = getMemTensor3D(io.wxfInit, nLayers, nHiddenUnits, nFeatures)
+      val wxo = getMemTensor3D(io.wxoInit, nLayers, nHiddenUnits, nFeatures)
+
+      val whi = getMemTensor3D(io.whiInit, nLayers, nHiddenUnits, nFeatures)
+      val whj = getMemTensor3D(io.whjInit, nLayers, nHiddenUnits, nFeatures)
+      val whf = getMemTensor3D(io.whfInit, nLayers, nHiddenUnits, nFeatures)
+      val who = getMemTensor3D(io.whoInit, nLayers, nHiddenUnits, nFeatures)
+
+      val bi = getMemTensor2D(io.biInit, nLayers, nFeatures)
+      val bj = getMemTensor2D(io.bjInit, nLayers, nFeatures)
+      val bf = getMemTensor2D(io.bfInit, nLayers, nFeatures)
+      val bo = getMemTensor2D(io.boInit, nLayers, nFeatures)
 
       Foreach (nSteps by 1 par stepPar) { iStep =>
         Foreach (nLayers by 1 par layerPar) { iLayer =>
           // Q: would this form a wavefront processor?  
           // core in a 2-D grid of (nSteps. nLayers)
+          //
           Foreach (nFeatures by 1 par nParallelFeatureGenerator) { iFeature => // output feature
+            val xfifo = FIFO[T](1)
+            val hfifo = FIFO[T](1)
+            Foreach(nHiddenUnits by 1 par innerPar) { iReduce =>
+              xfifo.enq(x(iStep, iReduce))
+              hfifo.enq(h(iLayer, iReduce))
+            }
+            def reduceGate(memx: SRAM3[T], memh: SRAM3[T]): (T, T) = {
+              val xReduceReg = Reg[T](0)
+              val hReduceReg = Reg[T](0)
+              Reduce(xReduceReg)(nHiddenUnits by 1 par innerPar) { iReduce =>
+                val xEle = xfifo.deq()
+                val xProduct = xEle * memx(iLayer, iFeature, iReduce) 
+                xProduct
+              }{_+_}
+              Reduce(hReduceReg)(nHiddenUnits by 1 par innerPar) { iReduce =>
+                val hEle = hfifo.deq()
+                val hProduct = hEle * memh(iLayer, iFeature, iReduce)
+                hProduct
+              }{_+_}
+
+              // val result = xReduceReg.value + hReduceReg.value + b(iLayer, iGate, iFeature)
+              (xReduceReg.value, hReduceReg.value)
+            }
+
             val i = Reg[T](0)
             val j = Reg[T](0)
             val f = Reg[T](0)
             val o = Reg[T](0)
-
-            def reduceGate(iGate: Index): T = {
-              val xReduceReg = Reg[T](0)
-              val hReduceReg = Reg[T](0)
-
-              Reduce(xReduceReg)(nHiddenUnits by 1 par innerPar) { iReduce =>
-                val xEle = x(iStep, iReduce)
-                val xProduct = xEle * w(iLayer, iGate, 0, iReduce, iFeature)
-                xProduct
-              }{_+_}
-
-              Reduce(hReduceReg)(nHiddenUnits by 1 par innerPar) { iReduce =>
-                val hEle = h(iLayer, iReduce)
-                val hProduct = hEle * w(iLayer, iGate, 0, iReduce, iFeature) 
-                hProduct
-              }{_+_}
-
-              (xProduct, hProduct)
+            Pipe { // 12 cu
+              val (xi, hi) = reduceGate(wxi, whi)
+              i := sigmoid(xi + hi + bi(iLayer, iFeature))
+              val (xj, hj) = reduceGate(wxj, whj)
+              j := activation(xj + hj + bj(iLayer, iFeature))
+              val (xf, hf) = reduceGate(wxf, whf)
+              f := sigmoid(xf + hf + bf(iLayer, iFeature) + forgetBias)
+              val (xo, ho)  = reduceGate(wxo, who)
+              o := sigmoid(xo + ho + bo(iLayer, iFeature))
             }
 
-            i := Pipe { sigmoid(xReduceReg.value + hReduceReg.value + b(iLayer, 0, iFeature)) }
-            j := Pipe { activation(reduceGate(1)) }
-            f := sigmoid(reduceGate(2) + forgetBias)
-            o := sigmoid(reduceGate(3))
+            // TODO: Do we have any dependency issues here? 
 
-            Pipe{
+            Pipe {
+              val cEleNewReg = Reg[T](0)
+              val hEleNewReg = Reg[T](0)
+
               Pipe {
                 val cEle = c(iLayer, iFeature)
                 val cEleNew = cEle * f.value + i.value * j.value
-                val hEleNew = activation(cEleNew) + o.value
+                cEleNewReg := cEleNew
               }
+              
               Pipe {
-                c(iLayer, iFeature) = cEleNew
-                h(iLayer, iFeature) = hEleNew
-                // enable updating the next layer if not working on the last layer
-                // we don't care about the original value of x
-                x(iStep, iFeature) = hEleNew
+                c(iLayer, iFeature) = cEleNewReg.value
+                h(iLayer, iFeature) = hEleNewReg.value
+                x(iStep, iFeature) = activation(cEleNewReg.value) + o.value
               }
             }
           }
@@ -287,10 +336,28 @@ object StaticLSTMNetwork extends SpatialApp with DataGenerator {
     val xInit = getDRAMCSV2D("x_cat", nSteps, nFeatures)
     val cInit = getDRAMCSV2D("c_cat", nLayers, nHiddenUnits)
     val hInit = getDRAMCSV2D("h_cat", nLayers, nHiddenUnits)
-    val bInit = getDRAMCSV3D("b_cat", nLayers, nGates, nHiddenUnits)
-    val wInit = getDRAMCSV5D("w_cat", nLayers, nGates, nXH, nHiddenUnits, nHiddenUnits)
+
+    val biInit = getDRAMCSV2D("bi_cat", nLayers, nHiddenUnits)
+    val bjInit = getDRAMCSV2D("bj_cat", nLayers, nHiddenUnits)
+    val bfInit = getDRAMCSV2D("bf_cat", nLayers, nHiddenUnits)
+    val boInit = getDRAMCSV2D("bo_cat", nLayers, nHiddenUnits)
+
+    val wxiInit = getDRAMCSV3D("wxi_cat", nLayers, nHiddenUnits, nReduce)
+    val wxjInit = getDRAMCSV3D("wxj_cat", nLayers, nHiddenUnits, nReduce)
+    val wxfInit = getDRAMCSV3D("wxf_cat", nLayers, nHiddenUnits, nReduce)
+    val wxoInit = getDRAMCSV3D("wxo_cat", nLayers, nHiddenUnits, nReduce)
+
+    val whiInit = getDRAMCSV3D("whi_cat", nLayers, nHiddenUnits, nReduce)
+    val whjInit = getDRAMCSV3D("whj_cat", nLayers, nHiddenUnits, nReduce)
+    val whfInit = getDRAMCSV3D("whf_cat", nLayers, nHiddenUnits, nReduce)
+    val whoInit = getDRAMCSV3D("who_cat", nLayers, nHiddenUnits, nReduce)
+
     val out = DRAM[T](nSteps, nFeatures)
-    val io = LSTMIOs(xInit, cInit, hInit, bInit, wInit, out)
+    val io = LSTMIOs(xInit, cInit, hInit,
+      biInit, bjInit, bfInit, boInit,
+      wxiInit, wxjInit, wxfInit, wxoInit,
+      whiInit, whjInit, whfInit, whoInit,
+      out)
     io
   }
 
@@ -299,17 +366,35 @@ object StaticLSTMNetwork extends SpatialApp with DataGenerator {
     val xInit = genDRAMData2D[T](nSteps, nFeatures)
     val cInit = genDRAMData2D[T](nLayers, nHiddenUnits)
     val hInit = genDRAMData2D[T](nLayers, nHiddenUnits)
-    val bInit = genDRAMData3D[T](nLayers, nGates, nHiddenUnits)
-    val wInit = genDRAMData5D[T](nLayers, nGates, nXH, nHiddenUnits, nHiddenUnits)
+
+    val biInit = genDRAMData2D[T](nLayers, nHiddenUnits)
+    val bjInit = genDRAMData2D[T](nLayers, nHiddenUnits)
+    val bfInit = genDRAMData2D[T](nLayers, nHiddenUnits)
+    val boInit = genDRAMData2D[T](nLayers, nHiddenUnits)
+
+    val wxiInit = genDRAMData3D[T](nLayers, nHiddenUnits, nReduce)
+    val wxjInit = genDRAMData3D[T](nLayers, nHiddenUnits, nReduce)
+    val wxfInit = genDRAMData3D[T](nLayers, nHiddenUnits, nReduce)
+    val wxoInit = genDRAMData3D[T](nLayers, nHiddenUnits, nReduce)
+
+    val whiInit = genDRAMData3D[T](nLayers, nHiddenUnits, nReduce)
+    val whjInit = genDRAMData3D[T](nLayers, nHiddenUnits, nReduce)
+    val whfInit = genDRAMData3D[T](nLayers, nHiddenUnits, nReduce)
+    val whoInit = genDRAMData3D[T](nLayers, nHiddenUnits, nReduce)
+
     val out = DRAM[T](nSteps, nFeatures)
-    val io = LSTMIOs(xInit, cInit, hInit, bInit, wInit, out)
+    val io = LSTMIOs(xInit, cInit, hInit,
+      biInit, bjInit, bfInit, boInit,
+      wxiInit, wxjInit, wxfInit, wxoInit,
+      whiInit, whjInit, whfInit, whoInit,
+      out)
     io
   }
 
   @virtualize 
   def main(): Unit = {
-    val io = setupLSTMIOs()
-    // val io = setupTestLSTMIOs() 
+    // val io = setupLSTMIOs()
+    val io = setupTestLSTMIOs() 
     val result = lstmCore(io)
     printMatrix(result, "result = ")
     // Can do softmax here if needed
