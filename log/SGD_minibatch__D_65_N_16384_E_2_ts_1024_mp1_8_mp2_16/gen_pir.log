@@ -1,0 +1,26 @@
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss16M
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/spatial-lang/project[0m
+[0m[[0minfo[0m] [0mSet current project to spatial-lang (in build file:/home/yaqiz/spatial-lang/)[0m
+[0m[[33mwarn[0m] [0mThe `-` command is deprecated in favor of `onFailure` and will be removed in 0.14.0[0m
+[0m[[0minfo[0m] [0mCompiling 2 Scala sources to /home/yaqiz/spatial-lang/apps/target/scala-2.12/classes...[0m
+[0m[[0minfo[0m] [0mRunning SGD_minibatch__D_65_N_16384_E_2_ts_1024_mp1_8_mp2_16 --dot --cgra+ --pirsrc /home/yaqiz/pir/pir/apps/src[0m
+java.lang.ClassNotFoundException: SGD_minibatch__D_65_N_16384_E_2_ts_1024_mp1_8_mp2_16
+	at java.lang.ClassLoader.findClass(ClassLoader.java:530)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+[0m[[31mtrace[0m] [0mStack trace suppressed: run [34mlast apps/compile:runMain[0m for the full output.[0m
+java.lang.RuntimeException: java.lang.ClassNotFoundException: SGD_minibatch__D_65_N_16384_E_2_ts_1024_mp1_8_mp2_16
+	at scala.sys.package$.error(package.scala:27)
+[0m[[31mtrace[0m] [0mStack trace suppressed: run [34mlast apps/compile:runMain[0m for the full output.[0m
+[0m[[31merror[0m] [0m(apps/compile:[31mrunMain[0m) java.lang.ClassNotFoundException: SGD_minibatch__D_65_N_16384_E_2_ts_1024_mp1_8_mp2_16[0m
+[0m[[31merror[0m] [0mTotal time: 15 s, completed Jul 25, 2018 5:15:41 PM[0m
+[0m[[31merror[0m] [0mNot a valid command: batch (similar: boot, last)[0m
+[0m[[31merror[0m] [0mNot a valid project ID: batch[0m
+[0m[[31merror[0m] [0mExpected ':' (if selecting a configuration)[0m
+[0m[[31merror[0m] [0mNot a valid key: batch (similar: watch)[0m
+[0m[[31merror[0m] [0mbatch[0m
+[0m[[31merror[0m] [0m     ^[0m
+sbt -batch "apps/run-main SGD_minibatch__D_65_N_16384_E_2_ts_1024_mp1_8_mp2_16 --dot --cgra+ --pirsrc /home/yaqiz/pir/pir/apps/src"
+[[91merror[0m] Spatial compilation failed
+-------------PASS (DONE)------------
