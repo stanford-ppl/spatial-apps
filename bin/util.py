@@ -12,25 +12,14 @@ SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 PAPER_HOME = os.environ['HOME'] + "/papers/"
 
-# passes=["gen_pir","fit_pir","gen_chisel","make_vcs","map_pir","run_simulation"]
-# passes=["gen_pir","fit_pir", "psim_asic", "psim_p2p", "psim_static"]
-passes=["gen_pir","psim_p2p", "psim_asic", "psim_static", "psim_dynamic", "psim_dynamic_s1",
-"psim_dynamic_s2","psim_dynamic_s3"]
 APPS = ["lenet_loops"]
 # APPS = ['DotProduct', 'OuterProduct', 'GDA', 'BlackScholes', 'TPCHQ6']
 # APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
 # APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
 # APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
 
-LOG_DIR='{}/apps/log'.format(SPATIAL_HOME)
-APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
-JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
-SUMMARY_PATH="{}/apps/summary.pickle".format(SPATIAL_HOME)
-SUMMARY_CSV_PATH="{}/apps/summary.csv".format(SPATIAL_HOME)
-BEST_SUMMARY_CSV_PATH="{}/apps/best.csv".format(SPATIAL_HOME)
-
-cycle_cache = {}
-
+passes=["gen_pir","psim_p2p", "psim_asic", "psim_static", "psim_dynamic", "psim_dynamic_s1",
+"psim_dynamic_s2","psim_dynamic_s3", "link_count"]
 dependency = {
         "gen_pir":[],
         "fit_pir":["gen_pir"],
@@ -45,8 +34,17 @@ dependency = {
         "psim_dynamic_s1":["psim_p2p"],
         "psim_dynamic_s2":["psim_p2p"],
         "psim_dynamic_s3":["psim_p2p"],
+        "link_count":["psim_p2p"],
         }
 
+LOG_DIR='{}/apps/log'.format(SPATIAL_HOME)
+APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
+JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
+SUMMARY_PATH="{}/apps/summary.pickle".format(SPATIAL_HOME)
+SUMMARY_CSV_PATH="{}/apps/summary.csv".format(SPATIAL_HOME)
+BEST_SUMMARY_CSV_PATH="{}/apps/best.csv".format(SPATIAL_HOME)
+
+cycle_cache = {}
 
 class bcolors:
     HEADER    = '\033[95m'
