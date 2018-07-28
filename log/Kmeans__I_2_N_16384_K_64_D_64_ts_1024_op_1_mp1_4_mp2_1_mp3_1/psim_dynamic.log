@@ -4,66 +4,66 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
 [0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
 [0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mRunning Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1 --out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --net=dynamic --psim=true --routing-algo=proute --psim-out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic --run-psim=false --trace=true --ctrl=true --bp=false --stat=false --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4 --vc=8[0m
-[pir] args=[--load-pir=false, --run-psim=true, --trace=true, --net=p2p, --stat=true, --psim-timeout=100000000, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --net=dynamic, --psim=true, --routing-algo=proute, --psim-out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=false, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8]
+[0m[[0minfo[0m] [0mRunning Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1 --out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --net=dynamic --psim=true --routing-algo=proute --proute-iter=100 --psim-out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic --run-psim=false --trace=true --ctrl=true --bp=false --stat=false --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4 --vc=8[0m
+[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=p2p, --stat=false, --psim-timeout=100000000, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --net=dynamic, --psim=true, --routing-algo=proute, --proute-iter=100, --psim-out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=false, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8]
 [pir] Output directory set to [36m/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic[0m
 [pir] Finishing graph construction for Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1
 [pir] Configuring spade MyDesign ...
-New design elapsed time: 5536.871ms
-[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 687.943497ms
-[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 5.039538ms
-[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 65.194753ms
-[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 945.380993ms
-[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 475.568693ms
-[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 2.151151ms
-[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 578.920056ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 81.376ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 55.755197ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 2008.642444ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 447.833669ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 396.479563ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 1254.742853ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 145.216501ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 251.300416ms
-[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 550.78654ms
-[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer2538 in 302.165729ms[pir] Split CUContainer6021 in 320.302525ms[pir] Split CUContainer6024 in 240.436868ms[pir] Split CUContainer6025 in 235.255441ms[pir] Split CUContainer2547 in 274.931496ms[pir] Split CUContainer2548 in 244.445835ms[pir] Split CUContainer2549 in 248.085905ms[pir] Split CUContainer2550 in 249.624292ms[pir] Split CUContainer2555 in 342.016755ms[pir] Split CUContainer6038 in 287.435176ms[pir] Split CUContainer2557 in 279.112952ms[pir] Split CUContainer6042 in 246.582478ms[pir] Split CUContainer2559 in 245.706947ms[pir] Split CUContainer6046 in 256.675207ms[pir] Split CUContainer2561 in 235.094134ms[pir] Split CUContainer6050 in 235.324977ms[pir] Split CUContainer2563 in 246.418155ms[pir] Split CUContainer2564 in 278.644355ms[pir] Split CUContainer2565 in 307.108467ms[pir] Split CUContainer2566 in 226.285982ms[pir] Split CUContainer2567 in 217.762474ms[pir] Finished 24-IgraphPartioner in 7541.221803ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 5927.04361ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 2294.380324ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 15.795773ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 74.097267ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 181.500514ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 10747.439324ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 448.225134ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 483.166028ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 5070.990741ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 8586.290426ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 743.850023ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 250.893889ms
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 604.387042ms
+New design elapsed time: 7738.087ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 809.607521ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 6.282832ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 90.504441ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 1393.168502ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 620.790961ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 2.364312ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 781.187051ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 120.64223ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 82.950187ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 3048.545679ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 498.461022ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 568.75204ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 1576.853392ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 168.929371ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 322.665511ms
+[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 793.143838ms
+[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer2538 in 396.269525ms[pir] Split CUContainer5789 in 393.153891ms[pir] Split CUContainer5792 in 277.819797ms[pir] Split CUContainer5793 in 279.482297ms[pir] Split CUContainer2547 in 412.084535ms[pir] Split CUContainer2548 in 262.794914ms[pir] Split CUContainer2549 in 269.787762ms[pir] Split CUContainer2550 in 363.102238ms[pir] Split CUContainer2555 in 316.472744ms[pir] Split CUContainer5806 in 470.310071ms[pir] Split CUContainer2557 in 317.82723ms[pir] Split CUContainer5810 in 373.480456ms[pir] Split CUContainer2559 in 261.013849ms[pir] Split CUContainer5814 in 273.247009ms[pir] Split CUContainer2561 in 338.263877ms[pir] Split CUContainer5818 in 265.078567ms[pir] Split CUContainer2563 in 273.526695ms[pir] Split CUContainer2564 in 239.658735ms[pir] Split CUContainer2565 in 261.406095ms[pir] Split CUContainer2566 in 262.10157ms[pir] Split CUContainer2567 in 283.838063ms[pir] Finished 24-IgraphPartioner in 8451.925546ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 6998.312595ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 2463.286993ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 17.140236ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 75.523245ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 206.253065ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 12766.632516ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 490.499874ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 482.972539ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 8666.87041ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 12005.413858ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 889.765914ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 294.945779ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 664.698028ms
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1.pir
 [pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/traces
 [[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/trace_classes
 [[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic
 [[33mtrace[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 19943.970465ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 19890.634303ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 10302.89095ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 589.262819ms
-[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1.pir
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 2560.76416ms
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 13064.470803ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 26886.266807ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 10766.340105ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 559.527735ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1759.365433ms
 [pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 66361.297686ms
-[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 990.744769ms
-[pir] Running 64-LinkCSVCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/node.csv -l /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/link.csv -o /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/proute.place -r 16 -c 8 -s1 -x0
+[pir] Finished 59-CUPlacer in 68534.193827ms
+[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 5.097776ms
+[pir] Running 64-LinkCSVCodegen ...[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 10074.245391ms
+[pir] Running 65-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/node.csv -l /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/link.csv -o /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/final.place -r 16 -c 8 -s1 -x0 -i 100
 [[33mproute[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/proute.log
-[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 9137.250501ms
-[pir] Running 65-PlastisimDotCodegen ...[pir] Finished 65-PlastisimDotCodegen to [36mpsim.dot[0m in 8534.724633ms
-[pir] Running 66-PlastisimPlacementCodegen ...[pir] Finished 66-PlastisimPlacementCodegen to [36mpir.place[0m in 8681.011002ms
+[pir] Finished 65-PlastisimPlacementCodegen to [36mfinal.place[0m in 10688.79429ms
+[pir] Running 66-PlastisimDotCodegen ...[pir] Finished 66-PlastisimDotCodegen to [36mpsim.dot[0m in 10905.788368ms
 [pir] Running 67-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/
 [pir] To run simulation manually, use following command, or use --run-psim to launch simulation automatically
-[pir] [33m/home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/config.psim -p /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/proute.place -c 100000000[0m
-[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 9944.184889ms
-[pir] Saving node prism.Session@7d0856cc to /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1.sess
-[0m[[32msuccess[0m] [0mTotal time: 218 s, completed Jul 23, 2018 10:31:23 AM[0m
+[pir] [33m/home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/config.psim -p /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/final.place -c 100000000[0m
+[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 10164.016462ms
+[pir] Saving node prism.Session@4fbbb981 to /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1.sess
+[0m[[32msuccess[0m] [0mTotal time: 244 s, completed Jul 28, 2018 12:37:48 PM[0m
 Changing to config directory: /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic
 Constructing NetworkLink.
 Constructing NetworkLink.
@@ -153,1767 +153,1592 @@ Constructing NetworkLink.
 Constructing NetworkLink.
 Constructing NetworkLink.
 Added all names to the symbol table.
+Adding static hop for route 6469 (2521->2190, lat 1).
+Adding static hop for route 6498 (2521->2190, lat 1).
+Adding static hop for route 6392 (2516->78, lat 1).
+Adding static hop for route 6363 (2516->78, lat 1).
 Printing hop routes
-0	6648: S, vc0
-	6677: S, vc0
-1	6648: W, vc0
-	6677: W, vc0
-	6861: X, vc0
-	6919: X, vc1
-	7236: X, vc2
-2	6861: W, vc0
-	6919: W, vc0
-	7236: W, vc0
-	11209: E, vc0
-	11856: X, vc0
-3	6861: W, vc0
-	6919: W, vc0
-	7236: W, vc0
-	8057: X, vc1
-	8081: X, vc0
-	9986: S, vc0
-	11209: E, vc0
-	11856: W, vc0
-4	6811: X, vc1
-	6861: EWS, vc0
-	6892: E, vc0
-	6919: EWS, vc0
-	6972: E, vc0
-	7236: W, vc0
-	7528: E, vc1
-	9856: X, vc0
-	11209: E, vc2
-	11856: EW, vc0
-5	6861: ESX, vc0
-	6892: E, vc0
-	6919: ESX, vc0
-	6972: E, vc0
-	7528: E, vc1
-	10179: E, vc2
-	10370: X, vc1
-	10393: X, vc0
-	11209: X, vc2
-	11856: ES, vc0
-6	6861: ES, vc0
-	6892: E, vc0
-	6919: ES, vc0
-	6972: E, vc0
-	7528: E, vc1
-	10179: X, vc1
-	10205: X, vc0
-	10228: E, vc2
-	11856: SE, vc0
-7	6861: E, vc0
-	6892: E, vc0
-	6919: E, vc0
-	6972: E, vc0
-	7528: E, vc2
-	7559: E, vc1
-	8057: X, vc1
-	8081: X, vc0
-	10228: S, vc0
-	11856: E, vc0
-8	6861: E, vc0
-	6892: E, vc0
-	6919: E, vc0
-	6972: E, vc0
-	7528: X, vc1
-	7559: X, vc0
-	9380: E, vc1
-	11856: E, vc0
-9	6861: S, vc0
-	6892: E, vc0
-	6919: S, vc0
-	6972: E, vc0
-	9380: X, vc0
-	9474: S, vc1
-	11856: S, vc0
-10	6892: S, vc0
-	6972: S, vc0
-16	6648: S, vc0
-	6677: S, vc0
-19	8057: N, vc0
-	8081: N, vc1
-	9960: X, vc1
-	9986: X, vc0
-	10009: E, vc0
-20	6811: N, vc0
-	6861: X, vc1
-	6919: X, vc2
-	7161: S, vc0
-	7876: X, vc0
-	9856: N, vc1
-	10009: E, vc0
-21	6861: S, vc0
-	6919: S, vc0
-	7104: S, vc1
-	10009: S, vc2
-	10370: N, vc0
-	10393: N, vc1
-	11011: E, vc0
-	11856: XS, vc0
-22	6861: XS, vc0
-	6919: X, vc2
-	7104: W, vc0
-	7876: X, vc0
-	9615: S, vc1
-	10205: N, vc0
-	11011: E, vc0
-	11856: S, vc0
-23	7801: S, vc0
-	8057: N, vc0
-	8081: N, vc1
-	9615: W, vc0
-	10228: X, vc0
-	11011: E, vc0
-24	9615: W, vc0
-	11011: E, vc0
-25	6861: SX, vc0
-	6919: SX, vc0
-	9474: S, vc1
-	9615: W, vc0
-	11011: S, vc2
-	11856: SX, vc2
-26	6892: S, vc0
-	6972: S, vc0
-32	6648: S, vc0
-	6677: S, vc0
-35	8057: N, vc0
-	8081: N, vc1
-	9960: N, vc2
-36	6811: N, vc0
-	7130: X, vc1
-	7161: X, vc0
-	7876: N, vc1
-	9856: N, vc2
-	9960: W, vc0
-	10393: E, vc0
-37	6811: W, vc0
-	6861: SX, vc3
-	6919: SX, vc4
-	7104: S, vc1
-	9960: W, vc1
-	10009: S, vc2
-	10370: NX, vc1
-	10393: ENX, vc0
-	10615: X, vc2
-	11856: S, vc0
-38	6811: W, vc0
-	6861: S, vc0
-	7876: N, vc0
-	9615: S, vc2
-	10205: N, vc1
-	10393: ES, vc1
-	10417: S, vc3
-	11856: SX, vc0
-39	6811: W, vc0
-	7631: S, vc0
-	7801: S, vc1
-	8057: NX, vc1
-	8081: XN, vc1
-	10393: E, vc0
-40	6811: W, vc0
-	6837: X, vc0
-	10106: S, vc0
-	10393: E, vc0
-41	6837: W, vc0
-	6861: SX, vc3
-	6919: SX, vc4
-	9474: S, vc2
-	10106: W, vc1
-	10370: X, vc1
-	10393: XS, vc1
-	11011: X, vc2
-	11856: S, vc0
-42	6701: E, vc0
-	6730: E, vc0
-	6837: W, vc0
-	6892: S, vc0
-	6972: X, vc0
-43	6701: X, vc1
-	6730: X, vc2
-	6754: X, vc0
-	6837: W, vc0
-48	6648: X, vc0
-	6677: X, vc1
-	8057: E, vc0
-49	8057: E, vc0
-50	8057: ES, vc0
-51	8057: NE, vc0
-	8081: N, vc1
-	10033: X, vc0
-	10059: X, vc1
-	10082: E, vc1
-52	7130: N, vc1
-	7876: N, vc0
-	8057: EX, vc0
-	8081: X, vc0
-	9856: N, vc2
-	10059: W, vc0
-	10082: S, vc0
-53	6861: S, vc1
-	6919: S, vc1
-	7104: X, vc0
-	7130: W, vc0
-	8057: SE, vc0
-	10009: S, vc2
-	10370: N, vc0
-	10615: N, vc1
-	11856: S, vc1
-54	6754: E, vc1
-	6861: X, vc3
-	7876: N, vc0
-	8057: E, vc0
-	9568: S, vc2
-	9615: S, vc1
-	10205: N, vc1
-	10370: WX, vc1
-	10393: X, vc0
-	10417: X, vc2
-	11856: S, vc0
-55	6754: E, vc2
-	7600: X, vc1
-	7631: X, vc0
-	7801: S, vc0
-	8057: EN, vc0
-	8081: N, vc1
-	9426: E, vc1
-	9568: W, vc1
-	10370: W, vc0
-56	6754: E, vc1
-	8057: S, vc0
-	9426: X, vc0
-	9449: E, vc0
-	9568: W, vc1
-	10106: S, vc1
-	10370: W, vc0
-57	6754: E, vc0
-	6861: S, vc1
-	6919: S, vc1
-	9449: X, vc0
-	9474: X, vc1
-	9568: W, vc1
-	10370: SNW, vc0
-	10393: S, vc2
-	11856: S, vc1
-58	6595: E, vc0
-	6624: E, vc0
-	6754: E, vc1
-	6892: X, vc0
-	10370: W, vc0
-59	6595: X, vc1
-	6624: X, vc0
-	6754: N, vc0
-	10370: W, vc0
-66	8057: S, vc0
-67	8081: N, vc0
-	10033: N, vc1
-68	7715: E, vc0
-	7876: N, vc0
-	8081: N, vc1
-	9856: N, vc2
-	10033: W, vc0
-	10082: X, vc0
-69	6861: S, vc1
-	6919: S, vc1
-	7715: S, vc3
-	8057: XS, vc0
-	8081: X, vc0
-	10009: S, vc2
-	10033: W, vc0
-	10205: E, vc0
-	10615: N, vc0
-	11856: S, vc1
-70	7876: N, vc0
-	9568: S, vc1
-	9615: S, vc0
-	10033: W, vc1
-	10205: N, vc1
-	10615: W, vc0
-	11856: X, vc0
-71	7600: N, vc1
-	7801: S, vc0
-	8081: N, vc0
-	10033: W, vc0
-72	7600: W, vc0
-	8057: S, vc0
-	9936: X, vc0
-	10033: W, vc1
-	10106: S, vc1
-73	6861: SX, vc3
-	6919: SX, vc4
-	10033: W, vc0
-	10370: X, vc1
-	10393: X, vc0
-	10813: X, vc2
-	11856: S, vc0
-82	8057: S, vc0
-	8081: S, vc1
-83	8081: NW, vc0
-84	7876: N, vc0
-	8081: WN, vc0
-	9856: N, vc2
-85	6861: X, vc0
-	6919: X, vc1
-	7715: S, vc3
-	8057: S, vc0
-	8081: WESN, vc0
-	9856: W, vc1
-	10009: S, vc2
-	11856: X, vc2
-86	7876: N, vc0
-	8081: E, vc0
-	9568: S, vc1
-	9615: S, vc0
-	9856: W, vc0
-87	7801: S, vc0
-	8081: EN, vc0
-	9856: W, vc0
-	9879: X, vc0
-	9908: X, vc1
-	9936: E, vc1
-88	8057: S, vc0
-	8081: S, vc1
-	9856: W, vc0
-	9936: N, vc0
-	10106: S, vc2
-89	6861: S, vc0
-	6919: S, vc0
-	9799: X, vc0
-	9828: X, vc1
-	9856: W, vc0
-	10813: N, vc0
-	11856: S, vc0
-98	8057: S, vc0
-	8081: S, vc1
-100	7314: X, vc0
-	7876: N, vc0
-	9828: E, vc0
-101	7715: S, vc3
-	8057: S, vc0
-	8081: S, vc1
-	9334: X, vc0
-	9522: E, vc1
-	9828: E, vc0
-	10009: S, vc2
-102	7876: N, vc0
-	8855: E, vc2
-	9522: E, vc1
-	9545: X, vc3
-	9568: X, vc1
-	9591: X, vc2
-	9615: X, vc0
-	9828: E, vc0
-103	7801: S, vc1
-	8855: XS, vc0
-	9522: E, vc1
-	9545: W, vc0
-	9591: W, vc1
-	9828: E, vc0
-	9879: N, vc1
-	9908: N, vc0
-104	8057: S, vc0
-	8081: S, vc1
-	9497: X, vc0
-	9522: X, vc1
-	9591: W, vc0
-	9828: E, vc0
-	10106: S, vc2
-105	6861: S, vc0
-	6919: S, vc0
-	9116: X, vc0
-	9799: N, vc1
-	9828: N, vc0
-	10813: N, vc2
-	11856: S, vc0
-114	8057: S, vc0
-	8081: S, vc1
-116	7314: N, vc1
-	7876: N, vc0
-117	7314: W, vc0
-	7672: E, vc0
-	7715: S, vc2
-	8057: S, vc0
-	8081: S, vc1
-	9334: N, vc0
-	10009: X, vc0
-118	7314: W, vc0
-	7672: E, vc0
-	7876: N, vc0
-	9116: X, vc0
-119	7672: E, vc0
-	7801: X, vc0
-	8855: S, vc1
-	Error setting saddr = 4
-Error setting daddr = 42
+0	6522: X, vc0
+	6605: E, vc0
+1	6605: S, vc0
+	6660: S, vc1
+	6740: X, vc0
+2	6629: SX, vc0
+	6660: W, vc0
+	6687: SX, vc0
+	6740: W, vc0
+	9728: S, vc1
+	10138: X, vc2
+	10161: X, vc1
+	10383: X, vc0
+	11624: S, vc0
+3	6629: XW, vc0
+	6660: W, vc0
+	6687: XW, vc0
+	6740: W, vc0
+	10383: W, vc1
+	11624: XW, vc0
+4	6579: X, vc2
+	6629: EWSX, vc0
+	6660: W, vc0
+	6687: EWS, vc0
+	6740: W, vc0
+	7004: E, vc0
+	10185: E, vc1
+	11624: EWSX, vc0
+5	6629: ES, vc0
+	6687: ES, vc0
+	7004: S, vc0
+	10185: S, vc1
+	11624: E, vc0
+6	6629: ESX, vc1
+	6687: ESX, vc2
+	6872: E, vc1
+	7644: X, vc0
+	11624: ES, vc0
+7	6629: ES, vc0
+	6687: ES, vc0
+	6872: E, vc1
+	7055: X, vc0
+	9516: S, vc1
+	11624: ES, vc0
+8	6629: ES, vc0
+	6687: ES, vc0
+	6872: E, vc1
+	11624: E, vc0
+9	6629: XS, vc0
+	6687: XS, vc0
+	6872: E, vc0
+	10977: S, vc1
+	11624: X, vc2
+10	6872: S, vc0
+16	6522: N, vc0
+17	6522: W, vc0
+	6579: E, vc0
+	6605: X, vc0
+	6660: S, vc0
+18	6522: W, vc0
+	6579: E, vc0
+	6629: S, vc0
+	6687: S, vc0
+	7183: S, vc1
+	9728: X, vc1
+	9754: X, vc0
+	9777: E, vc1
+	10138: N, vc0
+	10161: N, vc1
+	11624: S, vc0
+19	6522: W, vc1
+	6579: E, vc0
+	7183: W, vc0
+	7825: X, vc0
+	7849: X, vc1
+	9777: S, vc0
+20	6522: W, vc0
+	6579: N, vc0
+	6629: S, vc0
+	6687: S, vc0
+	7028: X, vc0
+	9436: S, vc1
+	11624: S, vc0
+21	6522: W, vc0
+	6629: SX, vc3
+	6687: S, vc0
+	7004: S, vc0
+	10138: X, vc1
+	10161: X, vc0
+	10185: X, vc2
+22	6629: S, vc0
+	6687: S, vc0
+	7483: E, vc0
+	7644: N, vc0
+	9850: X, vc0
+	11624: S, vc0
+23	6629: S, vc0
+	6687: S, vc0
+	7055: N, vc0
+	7483: E, vc0
+	8798: X, vc0
+	9516: S, vc1
+	11624: S, vc0
+24	6629: S, vc0
+	6687: S, vc0
+	7483: X, vc0
+	8798: WS, vc1
+25	6629: X, vc3
+	6687: X, vc4
+	9947: S, vc0
+	10138: X, vc2
+	10161: X, vc1
+	10977: X, vc0
+26	6872: S, vc0
+32	10138: E, vc0
+33	6660: X, vc0
+	10138: E, vc0
+34	6629: SX, vc3
+	6687: SX, vc4
+	7183: S, vc1
+	9754: N, vc2
+	9874: S, vc2
+	10138: ENX, vc2
+	10161: NX, vc1
+	10779: X, vc0
+	11624: S, vc0
+35	7440: E, vc1
+	7825: N, vc0
+	7849: N, vc1
+	9777: X, vc0
+	10138: E, vc0
+36	6629: SX, vc3
+	6687: SX, vc4
+	7028: N, vc0
+	7440: E, vc1
+	9436: S, vc1
+	9801: E, vc2
+	10138: EX, vc0
+	10161: X, vc1
+	10581: X, vc0
+	11624: S, vc0
+37	6629: S, vc0
+	6687: S, vc0
+	7004: S, vc0
+	7028: W, vc0
+	7440: S, vc1
+	9801: X, vc0
+	9827: X, vc1
+	9850: E, vc1
+	10138: NE, vc0
+	10161: N, vc1
+	10581: W, vc1
+38	6629: S, vc0
+	6687: S, vc0
+	7028: W, vc0
+	7644: N, vc0
+	8712: X, vc0
+	9850: N, vc1
+	10138: E, vc0
+	10581: W, vc1
+	11624: S, vc0
+39	6629: SX, vc0
+	6687: SX, vc1
+	9487: S, vc2
+	9516: S, vc1
+	10138: E, vc0
+	10581: W, vc0
+	11624: X, vc2
+40	6629: S, vc0
+	6687: S, vc0
+	8798: X, vc0
+	9487: W, vc0
+	10138: E, vc0
+41	9947: S, vc0
+	10138: N, vc0
+	10161: N, vc1
+42	6872: S, vc0
+50	6629: S, vc0
+	6687: S, vc0
+	7152: X, vc1
+	7183: X, vc0
+	9056: E, vc0
+	9754: N, vc1
+	9874: S, vc1
+	10161: N, vc0
+	10779: N, vc2
+	11624: S, vc0
+51	7825: N, vc0
+	7849: N, vc1
+	9056: X, vc0
+	9217: E, vc0
+	9313: S, vc0
+	10161: W, vc0
+	10779: W, vc1
+52	6629: S, vc0
+	6687: S, vc0
+	9217: X, vc1
+	9242: X, vc0
+	9313: W, vc1
+	9436: S, vc1
+	10161: NW, vc0
+	10779: W, vc2
+	11624: S, vc0
+53	6629: S, vc0
+	6687: S, vc0
+	7004: S, vc0
+	7440: S, vc1
+	7825: X, vc0
+	7849: X, vc1
+	9827: N, vc1
+	10161: WN, vc0
+	10779: W, vc1
+54	6629: X, vc0
+	6687: X, vc1
+	7644: N, vc0
+	8712: N, vc1
+	10161: W, vc0
+	10779: W, vc1
+	11624: X, vc2
+55	6629: S, vc0
+	6687: S, vc0
+	7825: X, vc0
+	7849: X, vc1
+	9487: S, vc2
+	9516: S, vc1
+	9973: E, vc0
+	10161: W, vc0
+56	6629: S, vc0
+	6687: S, vc0
+	6898: X, vc1
+	6929: X, vc0
+	9973: E, vc1
+	10161: WE, vc0
+57	6898: W, vc0
+	9947: X, vc1
+	9973: X, vc0
+	9996: S, vc0
+	10161: N, vc0
+58	6872: X, vc0
+	6898: W, vc0
+66	6629: X, vc0
+	6687: X, vc1
+	7152: N, vc1
+	9337: E, vc0
+	9754: N, vc0
+	9874: S, vc0
+	11624: X, vc2
+67	7825: N, vc0
+	7849: N, vc1
+	8623: SE, vc0
+	9265: X, vc1
+	9289: X, vc0
+	9313: X, vc2
+	9337: X, vc3
+68	6629: S, vc0
+	6687: S, vc0
+	8623: X, vc0
+	9242: N, vc0
+	9265: W, vc0
+	9436: S, vc1
+	11624: S, vc0
+69	6629: S, vc0
+	6687: S, vc0
+	7004: S, vc0
+	7440: X, vc0
+	7825: N, vc0
+	7849: N, vc1
+	8712: ES, vc1
+70	7327: E, vc0
+	7644: N, vc0
+	7825: X, vc0
+	7849: X, vc1
+	8712: N, vc1
+71	6629: S, vc0
+	6687: S, vc0
+	7327: S, vc1
+	7825: N, vc0
+	7849: N, vc1
+	9487: X, vc0
+	9516: X, vc1
+	9544: E, vc0
+72	6629: X, vc1
+	6687: X, vc2
+	6929: N, vc0
+	7644: X, vc0
+	9544: S, vc0
+73	9996: S, vc0
+82	7152: N, vc1
+	7849: S, vc0
+	9754: N, vc0
+	9874: X, vc1
+	9900: X, vc0
+	9923: E, vc0
+83	6822: E, vc0
+	7825: N, vc0
+	7849: WSN, vc1
+	8623: X, vc0
+	9289: N, vc2
+	9923: E, vc1
+84	6629: X, vc0
+	6687: X, vc1
+	6822: E, vc1
+	7849: EWS, vc0
+	9242: N, vc0
+	9289: W, vc1
+	9407: S, vc2
+	9436: S, vc1
+	9923: E, vc2
+	11624: X, vc2
+85	6629: S, vc0
+	6687: S, vc0
+	6822: E, vc1
+	7004: S, vc0
+	7825: N, vc0
+	7849: EN, vc1
+	8712: X, vc0
+	9289: W, vc1
+	9407: W, vc0
+	9923: S, vc1
+86	6822: E, vc1
+	7644: N, vc1
+	7825: N, vc0
+	7849: EN, vc2
+	9289: W, vc0
+	9361: X, vc1
+	9384: X, vc0
+87	6629: S, vc0
+	6687: S, vc0
+	6822: S, vc2
+	7224: S, vc3
+	7296: X, vc1
+	7327: X, vc0
+	7825: N, vc0
+	7849: NE, vc0
+	9148: S, vc1
+	9361: W, vc0
+88	7224: W, vc1
+	7644: N, vc0
+	7849: S, vc0
+	9361: W, vc0
+	9544: X, vc0
+89	9194: X, vc0
+	9361: W, vc0
+	9996: S, vc0
+96	6416: X, vc0
+	6445: X, vc1
+	7825: E, vc0
+97	6416: W, vc0
+	6445: W, vc0
+	7825: E, vc0
+98	6416: W, vc0
+	6445: W, vc0
+	7152: N, vc2
+	7825: EX, vc0
+	7849: X, vc1
+	9754: N, vc0
+	9900: N, vc1
+99	6416: W, vc0
+	6445: W, vc0
+	7082: X, vc0
+	7825: ENS, vc0
+	7849: S, vc1
+	9596: E, vc1
+100	6416: W, vc0
+	6445: W, vc0
+	7082: W, vc1
+	7825: ES, vc0
+	7849: S, vc1
+	8884: X, vc0
+	9242: N, vc0
+	9407: S, vc3
+	9436: S, vc2
+	9596: E, vc1
+101	6416: W, vc0
+	6445: W, vc0
+	6629: X, vc0
+	6687: X, vc1
+	7004: X, vc2
+	7825Error setting saddr = 4
+Error setting daddr = 1
 Error setting class = 0
-Error setting saddr = 48
-Error setting daddr = 242
-Error setting daddr = 133
-Error setting daddr = 7
-Error setting daddr = 39
+Error setting saddr = 4
+Error setting daddr = 4
+Error setting daddr = 66
+Error setting daddr = 101
+Error setting daddr = 2
+Error setting daddr = 36
+Error setting daddr = 34
+Error setting daddr = 25
 Error setting daddr = 3
-Error setting daddr = 52
-Error setting daddr = 248
-Error setting daddr = 69
+Error setting daddr = 39
+Error setting daddr = 54
+Error setting daddr = 9
+Error setting daddr = 72
+Error setting daddr = 6
+Error setting daddr = 103
+Error setting daddr = 84
+Error setting daddr = 21
+Error setting class = 3
+Error setting class = 0
+Error setting class = 0
 Error setting class = 1
+Error setting class = 0
+Error setting class = 3
+Error setting class = 3
+Error setting class = 3
+Error setting class = 3
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
 Error setting class = 1
-Error setting class = 1
-Error setting class = 1
-Error setting class = 1
-9202: S, vc0
-	9879: N, vc1
-	9908: N, vc0
-120	7672: E, vc0
-	8057: S, vc0
-	8081: S, vc1
-	9497: N, vc0
-	10106: S, vc2
-121	6861: S, vc0
-	6919: S, vc0
-	7672: S, vc1
-	9116: N, vc0
-	10813: N, vc1
-	11856: X, vc0
-130	8057: S, vc0
-	8081: S, vc1
-131	9696: S, vc0
-132	7456: X, vc1
-	7487: X, vc0
-	7876: N, vc0
-	9334: E, vc0
-	9696: W, vc0
-133	7487: W, vc0
-	7715: S, vc0
-	8057: X, vc1
-	8081: X, vc0
-	9334: N, vc0
-	9696: W, vc1
-134	7341: X, vc0
-	7876: N, vc0
-	9116: N, vc1
-	9696: W, vc0
-	9908: E, vc0
-135	7341: W, vc0
-	8855: S, vc1
-	9202: SX, vc0
-	9696: W, vc1
-	9879: N, vc1
-	9908: N, vc0
-136	8057: S, vc0
-	8081: S, vc1
-	9497: N, vc0
-	9639: X, vc0
-	9668: X, vc1
-	9696: W, vc0
-	10106: S, vc2
-137	6861: S, vc0
-	6919: S, vc0
-	7672: S, vc1
-	8944: X, vc0
-	9116: N, vc0
-	9639: W, vc0
-146	7384: S, vc2
-	8057: S, vc0
-	8081: S, vc1
-	9288: X, vc0
-	9497: E, vc0
-147	7384: W, vc0
-	9497: E, vc0
-	9696: X, vc0
-148	7456: N, vc1
-	7876: N, vc0
-	9497: E, vc0
-149	7715: S, vc0
-	9497: E, vc0
-150	7876: N, vc0
-	9116: N, vc1
-	9497: E, vc0
-151	8855: S, vc1
-	9202: S, vc0
-	9497: E, vc0
-	9879: N, vc0
-152	8057: S, vc0
-	8081: S, vc1
-	9497: N, vc1
-	9668: N, vc0
-	10106: S, vc2
-153	6861: S, vc0
-	6919: S, vc0
-	7672: X, vc0
-	8944: NS, vc1
-	9116: N, vc1
-162	7384: S, vc2
-	8057: S, vc0
-	8081: S, vc1
-	9288: N, vc0
-164	7456: N, vc1
-	7876: N, vc0
-165	7715: S, vc0
-166	7876: N, vc0
-	9116: N, vc1
-167	7054: E, vc0
-	8855: X, vc0
-	9202: S, vc0
-	9879: N, vc0
-168	7054: E, vc0
-	7260: X, vc0
-	8057: S, vc0
-	8081: S, vc1
-	9668: N, vc0
-	10106: S, vc2
-169	6861: S, vc0
-	6919: S, vc0
-	7054: S, vc1
-	7260: W, vc0
-	8944: X, vc0
-	9116: N, vc0
-178	7384: S, vc2
-	8057: S, vc0
-	8081: S, vc1
-	9288: N, vc0
-180	7456: N, vc1
-	7876: N, vc0
-181	7715: S, vc0
-	7876: W, vc0
-182	7876: WN, vc0
-	9116: N, vc1
-183	7876: W, vc0
-	9202: S, vc0
-	9879: N, vc0
-184	7876: W, vc0
-	8057: S, vc0
-	8081: S, vc1
-	10106: S, vc2
-185	6861: X, vc2
-	6919: X, vc3
-	7054: X, vc1
-	7079: X, vc0
-	7876: SW, vc0
-	9116: N, vc0
-194	7384: S, vc2
-	8057: S, vc0
-	8081: S, vc1
-	9288: N, vc0
-196	7456: N, vc0
-197	7715: S, vc0
-198	9116: N, vc0
-199	9202: X, vc0
-	9879: N, vc0
-200	8057: S, vc0
-	8081: S, vc1
-	10106: S, vc2
-201	7079: N, vc1
-	7876: X, vc0
-	9116: N, vc0
-210	7384: S, vc2
-	8057: S, vc0
-	8081: S, vc1
-	9288: N, vc0
-212	7456: N, vc0
-213	7715: S, vc0
-214	9116: N, vc0
-215	9116: W, vc0
-216	8057: S, vc0
-	8081: S, vc1
-	9116: W, vc0
-	10106: S, vc2
-217	7758: X, vc0
-	9116: WN, vc0
-226	7384: X, vc1
-	7415: X, vc0
-	8057: S, vc0
-	8081: S, vc1
-	9288: N, vc0
-228	7456: N, vc0
-	9776: X, vc0
-229	7715: S, vc0
-	9776: W, vc0
-230	9719: X, vc0
-	9748: X, vc1
-	9776: W, vc0
-231	7287: S, vc0
-232	7287: W, vc0
-	8057: S, vc0
-	8081: S, vc1
-	10106: X, vc1
-	10132: X, vc0
-	10155: E, vc0
-233	7287: W, vc0
-	7758: N, vc0
-	9030: X, vc0
-	10155: S, vc0
-242	7415: N, vc0
-	8057: X, vc1
-	8081: X, vc0
-245	7715: X, vc0
-	9030: E, vc0
-246	9030: EX, vc0
-	9719: N, vc1
-	9748: N, vc0
-247	7287: X, vc0
-	9030: E, vc0
-	9748: W, vc0
-248	8057: X, vc1
-	8081: X, vc0
-	9030: E, vc0
-	10132: N, vc0
-249	7758: N, vc1
-	9030: N, vc0
-	10155: X, vc0
+Error setting class = 0
+Error setting class = 0
+Error setting class = 2
+Error setting saddr = 96
+Error setting daddr = 19
+Error setting daddr = 132
+Error setting daddr = 70
+Error setting daddr = 104
+Error setting daddr = 115
+Error setting daddr = 53
+Error setting daddr = 98
+Error setting daddr = 55
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+: EN, vc0
+	8884: W, vc1
+	9596: E, vc1
+	9923: S, vc0
+102	7526: X, vc0
+	7644: N, vc1
+	7825: EN, vc0
+	8884: WS, vc1
+	9384: N, vc2
+	9596: S, vc0
+103	6629: X, vc2
+	6687: X, vc3
+	6822: X, vc1
+	6847: X, vc0
+	7224: S, vc1
+	7296: N, vc1
+	7644: WE, vc1
+	7825: NE, vc0
+	9148: S, vc0
+104	7399: E, vc1
+	7644: EN, vc0
+	7825: X, vc0
+	7849: X, vc1
+105	7368: X, vc1
+	7399: X, vc0
+	7644: S, vc0
+	9194: N, vc0
+	9996: S, vc1
+114	7152: N, vc1
+	9464: X, vc0
+	9754: N, vc0
+115	7825: X, vc0
+	7849: X, vc1
+	9464: W, vc1
+	9754: W, vc0
+116	7825: S, vc0
+	7849: S, vc1
+	9242: N, vc0
+	9407: X, vc0
+	9436: X, vc1
+	9464: W, vc0
+117	7526: E, vc0
+	9102: S, vc0
+	9923: X, vc0
+118	7526: N, vc1
+	8884: S, vc0
+	9102: W, vc0
+	9384: N, vc0
+	9567: X, vc0
+	9596: X, vc1
+	9624: E, vc0
+119	6847: N, vc0
+	7224: X, vc1
+	7255: X, vc0
+	7296: N, vc1
+	9102: W, vc0
+	9148: S, vc0
+	9624: E, vc0
+120	6847: W, vc0
+	7296: W, vc1
+	9624: X, vc0
+121	6847: W, vc0
+	7368: N, vc0
+	7644: X, vc0
+	9996: S, vc0
+132	7255: E, vc0
+	7825: X, vc0
+	7849: X, vc1
+	9242: N, vc0
+133	7255: E, vc0
+	9102: S, vc0
+134	7255: E, vc0
+	8884: X, vc0
+	9384: N, vc1
+	9567: N, vc0
+135	7255: N, vc0
+	9148: S, vc0
+136	8970: X, vc0
+	9647: S, vc0
+137	7368: N, vc0
+	7569: S, vc0
+	9996: X, vc0
+148	9242: N, vc0
+149	9102: X, vc0
+	9242: W, vc0
+150	9384: N, vc0
+151	9148: X, vc0
+	9384: W, vc0
+152	8970: NS, vc0
+	9647: X, vc0
+	9676: X, vc1
+	9704: E, vc0
+153	7368: N, vc0
+	7569: X, vc0
+	8970: W, vc0
+	9704: S, vc0
+168	7109: S, vc0
+	8970: X, vc0
+	9676: N, vc0
+169	7368: N, vc0
+	9704: X, vc0
+184	7109: X, vc0
+	9676: N, vc0
 Parsed placement file.
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 6972
-1 hops for route 6972
-1 hops for route 6972
-1 hops for route 6972
-1 hops for route 6972
-1 hops for route 6972
-1 hops for route 6972
-1 hops for route 6972
-1 hops for route 6972
-Set exit class for pos 0 to 0 (rt 6972)
+1 hops for route 6740
+Set exit class for pos 0 to 0 (rt 6740)
+1 hops for route 6740
+1 hops for route 6740
+1 hops for route 6740
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 8057
-Set exit class for pos 4 to 1 (rt 8057)
-1 hops for route 8057
-Set exit class for pos 2 to 1 (rt 8057)
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-2 hops for route 8057
-Set exit class for pos 3 to 1 (rt 8057)
-8 hops for route 8057
-8 hops for route 8057
-8 hops for route 8057
-7 hops for route 8057
-6 hops for route 8057
-Set exit class for pos 5 to 1 (rt 8057)
-5 hops for route 8057
-3 hops for route 8057
-3 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-2 hops for route 8057
-Set exit class for pos 7 to 1 (rt 8057)
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-Error setting class = 1
-Error setting class = 1
-Error setting class = 1
-Error setting saddr = 85
-Error setting daddr = 242
-Error setting daddr = 133
-Error setting daddr = 7
-Error setting daddr = 39
-Error setting daddr = 3
-Error setting daddr = 52
-Error setting daddr = 248
-Error setting daddr = 69
-Error setting class = 0
-Error setting class = 0
-Error setting class = 0
-Error setting class = 0
-Error setting class = 0
-Error setting class = 0
-Error setting class = 0
-Error setting class = 0
-Error setting saddr = 4
-Error setting daddr = 25
-Error setting daddr = 1
-Error setting daddr = 37
-Error setting daddr = 73
-Error setting daddr = 41
-Error setting daddr = 5
-Error setting daddr = 20
-Error setting daddr = 22
-Error setting daddr = 185
-Error setting daddr = 85
-Error setting daddr = 54
-Error setting class = 0
-Error setting class = 3
-Error setting class = 1
-Error setting class = 1
-Error setting class = 0
-Error setting class = 3
-Error setting class = 3
-Error setting class = 3
-Error setting class = 3
-Error setting class = 0
-Error setting class = 2
-Error setting saddr = 201
-Error setting daddr = 185
-Error setting class = 0
-Error setting saddr = 103
-Error setting daddr = 102
-Error setting class = 3
-Error setting saddr = 167
-Error setting daddr = 185
-Error setting class = 1
-Error setting saddr = 5
-Error setting daddr = 6
-Error setting class = 1
-Error setting saddr = 232
-Error setting daddr = 249
-Error setting class = 0
-Error setting saddr = 41
-Error setting daddr = 232
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-Set exit class for pos 1 to 1 (rt 8057)
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-1 hops for route 8057
-Set exit class for pos 0 to 1 (rt 8057)
-1 hops for route 8057
-Set exit class for pos 6 to 1 (rt 8057)
+3 hops for route 6629
+Set exit class for pos 3 to 3 (rt 6629)
+4 hops for route 6629
+Set exit class for pos 7 to 0 (rt 6629)
+16 hops for route 6629
+Set exit class for pos 0 to 0 (rt 6629)
+9 hops for route 6629
+7 hops for route 6629
+Set exit class for pos 12 to 1 (rt 6629)
+5 hops for route 6629
+3 hops for route 6629
+2 hops for route 6629
+Set exit class for pos 10 to 0 (rt 6629)
+2 hops for route 6629
+2 hops for route 6629
+2 hops for route 6629
+Set exit class for pos 15 to 3 (rt 6629)
+1 hops for route 6629
+2 hops for route 6629
+1 hops for route 6629
+1 hops for route 6629
+Set exit class for pos 6 to 3 (rt 6629)
+2 hops for route 6629
+Set exit class for pos 5 to 3 (rt 6629)
+2 hops for route 6629
+Set exit class for pos 4 to 3 (rt 6629)
+1 hops for route 6629
+1 hops for route 6629
+2 hops for route 6629
+Set exit class for pos 8 to 0 (rt 6629)
+1 hops for route 6629
+1 hops for route 6629
+1 hops for route 6629
+1 hops for route 6629
+1 hops for route 6629
+Set exit class for pos 9 to 0 (rt 6629)
+1 hops for route 6629
+1 hops for route 6629
+1 hops for route 6629
+Set exit class for pos 1 to 0 (rt 6629)
+1 hops for route 6629
+1 hops for route 6629
+1 hops for route 6629
+1 hops for route 6629
+Set exit class for pos 11 to 1 (rt 6629)
+1 hops for route 6629
+Set exit class for pos 14 to 0 (rt 6629)
+1 hops for route 6629
+1 hops for route 6629
+1 hops for route 6629
+Set exit class for pos 2 to 0 (rt 6629)
+1 hops for route 6629
+Set exit class for pos 13 to 2 (rt 6629)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 8081
-Set exit class for pos 4 to 0 (rt 8081)
-1 hops for route 8081
-Set exit class for pos 2 to 0 (rt 8081)
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-2 hops for route 8081
-Set exit class for pos 3 to 0 (rt 8081)
-1 hops for route 8081
-1 hops for route 8081
-Set exit class for pos 5 to 0 (rt 8081)
-2 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-Set exit class for pos 7 to 0 (rt 8081)
-2 hops for route 8081
-1 hops for route 8081
-2 hops for route 8081
-3 hops for route 8081
-8 hops for route 8081
-3 hops for route 8081
-3 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-Set exit class for pos 1 to 0 (rt 8081)
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-1 hops for route 8081
-Set exit class for pos 0 to 0 (rt 8081)
-1 hops for route 8081
-Set exit class for pos 6 to 0 (rt 8081)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6861
-Set exit class for pos 1 to 0 (rt 6861)
-1 hops for route 6861
-1 hops for route 6861
-11 hops for route 6861
-9 hops for route 6861
-Set exit class for pos 5 to 3 (rt 6861)
-6 hops for route 6861
-4 hops for route 6861
-4 hops for route 6861
-4 hops for route 6861
-1 hops for route 6861
-Set exit class for pos 6 to 1 (rt 6861)
-2 hops for route 6861
-2 hops for route 6861
-Set exit class for pos 7 to 1 (rt 6861)
-4 hops for route 6861
-Set exit class for pos 0 to 0 (rt 6861)
-2 hops for route 6861
-Set exit class for pos 2 to 3 (rt 6861)
-1 hops for route 6861
-3 hops for route 6861
-Set exit class for pos 4 to 3 (rt 6861)
-1 hops for route 6861
-1 hops for route 6861
-Set exit class for pos 10 to 3 (rt 6861)
-2 hops for route 6861
-1 hops for route 6861
-2 hops for route 6861
-Set exit class for pos 3 to 3 (rt 6861)
-1 hops for route 6861
-Set exit class for pos 9 to 0 (rt 6861)
-1 hops for route 6861
-1 hops for route 6861
-1 hops for route 6861
-1 hops for route 6861
-1 hops for route 6861
-1 hops for route 6861
-1 hops for route 6861
-Set exit class for pos 8 to 2 (rt 6861)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7079
-Set exit class for pos 0 to 0 (rt 7079)
-1 hops for route 7079
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9545
-Set exit class for pos 0 to 3 (rt 9545)
-1 hops for route 9545
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7054
-1 hops for route 7054
-1 hops for route 7054
-1 hops for route 7054
-Set exit class for pos 0 to 1 (rt 7054)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10179
-1 hops for route 10179
-Set exit class for pos 0 to 1 (rt 10179)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10155
-1 hops for route 10155
-1 hops for route 10155
-Set exit class for pos 0 to 0 (rt 10155)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10106
-1 hops for route 10106
-1 hops for route 10106
-1 hops for route 10106
-1 hops for route 10106
-1 hops for route 10106
-1 hops foError setting class = 1
-Error setting saddr = 73
-Error setting daddr = 51
+1 hops for route 7825
+Set exit class for pos 0 to 0 (rt 7825)
+1 hops for route 7825
+1 hops for route 7825
+1 hops for route 7825
+Set exit class for pos 5 to 0 (rt 7825)
+1 hops for route 7825
+Set exit class for pos 7 to 0 (rt 7825)
+1 hops for route 7825
+1 hops for route 7825
+1 hops for route 7825
+Set exit class for pos 2 to 0 (rt 7825)
+1 hops for route 7825
+1 hops for route 7825
+1 hops for route 7825
+1 hops for route 7825
+1 hops for route 7825
+8 hops for route 7825
+8 hops for route 7825
+8 hops for route 7825
+Set exit class for pos 6 to 0 (rt 7825)
+7 hops for route 7825
+5 hops for route 7825
+4 hops for route 7825
+3 hops for route 7825
+2 hops for route 7825
+1 hops for route 7825
+Set exit class for pos 3 to 0 (rt 7825)
+1 hops for route 7825
+Set exit class Error setting class = 0
 Error setting class = 0
-Error setting saddr = 19
-Error setting daddr = 117
-Error setting class = 0
-Error setting saddr = 37
+Error setting saddr = 84
 Error setting daddr = 19
+Error setting daddr = 132
+Error setting daddr = 70
+Error setting daddr = 104
+Error setting daddr = 115
+Error setting daddr = 53
+Error setting daddr = 98
+Error setting daddr = 55
 Error setting class = 1
-Error setting saddr = 20
-Error setting daddr = 36
+Error setting class = 1
+Error setting class = 1
+Error setting class = 1
+Error setting class = 1
+Error setting class = 1
+Error setting class = 1
+Error setting class = 1
+Error setting saddr = 121
+Error setting daddr = 103
 Error setting class = 0
 Error setting saddr = 6
-Error setting daddr = 23
+Error setting daddr = 58
 Error setting class = 0
-Error setting saddr = 51
-Error setting daddr = 68
-Error setting class = 0
-Error setting saddr = 22
-Error setting daddr = 53
-Error setting class = 0
-Error setting saddr = 118
-Error setting daddr = 100
-Error setting class = 0
-Error setting saddr = 89
-Error setting daddr = 4
-Error setting class = 0
-Error setting saddr = 105
-Error setting daddr = 89
-Error setting class = 0
-Error setting saddr = 169
-Error setting daddr = 168
-Error setting class = 0
-Error setting saddr = 136
-Error setting daddr = 147
-Error setting class = 0
-Error setting saddr = 137
-Error setting daddr = 136
-Error setting class = 0
-Error setting saddr = 135
-Error setting daddr = 134
-Error setting class = 0
-Error setting saddr = 87
-Error setting daddr = 72
-Error setting class = 0
-Error setting saddr = 199
-Error setting daddr = 87
-Error setting class = 0
-Error setting saddr = 233
-Error setting daddr = 247
-Error setting class = 0
-Error setting saddr = 230
-Error setting daddr = 228
-Error setting class = 0
-Error setting saddr = 246
-Error setting daddr = 230
-Error setting class = 0
-Error setting saddr = 57
-Error setting daddr = 102
-r route 10106
-1 hops for route 10106
-1 hops for route 10106
-1 hops for route 10106
-1 hops for route 10106
-1 hops for route 10106
-1 hops for route 10106
-1 hops for route 10106
-Set exit class for pos 0 to 1 (rt 10106)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10033
-Set exit class for pos 0 to 0 (rt 10033)
-1 hops for route 10033
-1 hops for route 10033
-1 hops for route 10033
-1 hops for route 10033
-1 hops for route 10033
-1 hops for route 10033
-1 hops for route 10033
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10009
-1 hops for route 10009
-1 hops for route 10009
-1 hops for route 10009
-1 hops for route 10009
-1 hops for route 10009
-1 hops for route 10009
-1 hops for route 10009
-1 hops for route 10009
-Set exit class for pos 0 to 0 (rt 10009)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9960
-Set exit class for pos 0 to 1 (rt 9960)
-1 hops for route 9960
-1 hops for route 9960
-1 hops for route 9960
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7161
-1 hops for route 7161
-Set exit class for pos 0 to 0 (rt 7161)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10228
-1 hops for route 10228
-1 hops for route 10228
-Set exit class for pos 0 to 0 (rt 10228)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10082
-1 hops for route 10082
-1 hops for route 10082
-Set exit class for pos 0 to 0 (rt 10082)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7104
-1 hops for route 7104
-1 hops for route 7104
-1 hops for route 7104
-Set exit class for pos 0 to 0 (rt 7104)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7314
-Set exit class for pos 0 to 0 (rt 7314)
-1 hops for route 7314
-1 hops for route 7314
-1 hops for route 7314
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9856
-Set exit class for pos 0 to 0 (rt 9856)
-1 hops for route 9856
-1 hops for route 9856
-1 hops for route 9856
-1 hops for route 9856
-1 hops for route 9856
-1 hops for route 9856
-1 hops for route 9856
-1 hops for route 9856
-1 hops for route 9856
-1 hops for route 9856
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9799
-Set exit class for pos 0 to 0 (rt 9799)
-1 hops for route 9799
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7260
-Set exit class for pos 0 to 0 (rt 7260)
-1 hops for route 7260
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
-Set exit class for pos 0 to 0 (rt 9696)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9639
-Set exit class for pos 0 to 0 (rt 9639)
-1 hops for route 9639
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7341
-Set exit class for pos 0 to 0 (rt 7341)
-1 hops for route 7341
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9936
-Set exit class for pos 0 to 0 (rt 9936)
-1 hops for route 9936
-1 hops for route 9936
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9879
-Set exit class for pos 0 to 0 (rt 9879)
-1 hops for route 9879
-1 hops for route 9879
-1 hops for route 9879
-1 hops for route 9879
-1 hops for route 9879
-1 hops for route 9879
-1 hops for route 9879
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7287
-1 hops for route 7287
-1 hops for route 7287
-1 hops for route 7287
-Set exit class for pos 0 to 0 (rt 7287)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9776
-Set exit class for pos 0 to 0 (rt 9776)
-1 hops for route 9776
-1 hops for route 9776
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9719
-Set exit class for pos 0 to 0 (rt 9719)
-1 hops for route 9719
-Link specifieError setting class = 1
-Error setting saddr = 56
-Error setting daddr = 57
-Error setting class = 0
-Error setting saddr = 55
+Error setting saddr = 72
 Error setting daddr = 56
 Error setting class = 0
-Error setting saddr = 9
-Error setting daddr = 57
+Error setting saddr = 68
+Error setting daddr = 67
 Error setting class = 1
-Error setting saddr = 8
-Error setting daddr = 9
-Error setting class = 0
-Error setting saddr = 104
-Error setting daddr = 102
-Error setting class = 2
-Error setting saddr = 242
-Error setting daddr = 226
-Error setting class = 0
-Error setting saddr = 133
-Error setting daddr = 132
-Error setting class = 0
-Error setting saddr = 7
-Error setting daddr = 8
-Error setting class = 0
-Error setting saddr = 39
-Error setting daddr = 55
-Error setting class = 0
-Error setting saddr = 3
-Error setting daddr = 19
-Error setting class = 0
-Error setting saddr = 52
-Error setting daddr = 51
+Error setting saddr = 83
+Error setting daddr = 103
 Error setting class = 1
-Error setting saddr = 248
-Error setting daddr = 232
-Error setting class = 0
-Error setting saddr = 69
-Error setting daddr = 6
-Error setting class = 0
 Error setting saddr = 25
-Error setting daddr = 102
-Error setting class = 0
-Error setting saddr = 38
-Error setting daddr = 54
-Error setting class = 2
-Error setting saddr = 70
-Error setting daddr = 37
-Error setting class = 2
-Error setting saddr = 121
-Error setting daddr = 73
-Error setting class = 2
-Error setting saddr = 21
-Error setting daddr = 41
-Error setting class = 2
-Error setting saddr = 2
-Error setting daddr = 5
-Error setting class = 2
-Error setting saddr = 226
-Error setting daddr = 146
-Error setting class = 0
-Error setting saddr = 146
-Error setting daddr = 104
-Error setting class = 0
-d in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9568
-1 hops for route 9568
-1 hops for route 9568
-1 hops for route 9568
-1 hops for route 9568
-1 hops for route 9568
-1 hops for route 9568
-Set exit class for pos 0 to 1 (rt 9568)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9449
-1 hops for route 9449
-Set exit class for pos 0 to 0 (rt 9449)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9426
-1 hops for route 9426
-Set exit class for pos 0 to 0 (rt 9426)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9474
-1 hops for route 9474
-1 hops for route 9474
-1 hops for route 9474
-Set exit class for pos 0 to 1 (rt 9474)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9380
-1 hops for route 9380
-Set exit class for pos 0 to 0 (rt 9380)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9591
-Set exit class for pos 0 to 2 (rt 9591)
-1 hops for route 9591
-1 hops for route 9591
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7415
-Set exit class for pos 0 to 0 (rt 7415)
-1 hops for route 7415
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7487
-Set exit class for pos 0 to 0 (rt 7487)
-1 hops for route 7487
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7559
-1 hops for route 7559
-Set exit class for pos 0 to 0 (rt 7559)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7631
-1 hops for route 7631
-Set exit class for pos 0 to 0 (rt 7631)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9986
-1 hops for route 9986
-Set exit class for pos 0 to 0 (rt 9986)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10059
-Set exit class for pos 0 to 1 (rt 10059)
-1 hops for route 10059
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10132
-Set exit class for pos 0 to 0 (rt 10132)
-1 hops for route 10132
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10205
-Set exit class for pos 0 to 0 (rt 10205)
-1 hops for route 10205
-1 hops for route 10205
-1 hops for route 10205
-1 hops for route 10205
-1 hops for route 10205
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9615
-1 hops for route 9615
-1 hops for route 9615
-1 hops for route 9615
-1 hops for route 9615
-1 hops for route 9615
-1 hops for route 9615
-1 hops for route 9615
-1 hops for route 9615
-Set exit class for pos 0 to 0 (rt 9615)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10417
-1 hops for route 10417
-Set exit class for pos 0 to 2 (rt 10417)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10615
-Set exit class for pos 0 to 2 (rt 10615)
-1 hops for route 10615
-1 hops for route 10615
-1 hops for route 10615
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10813
-Set exit class for pos 0 to 2 (rt 10813)
-1 hops for route 10813
-1 hops for route 10813
-1 hops for route 10813
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 11011
-1 hops for route 11011
-1 hops for route 11011
-1 hops for route 11011
-1 hops for route 11011
-1 hops for route 11011
-Set exit class for pos 0 to 2 (rt 11011)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 11209
-1 hops for route 11209
-1 hops for route 11209
-1 hops for route 11209
-Set exit class for pos 0 to 2 (rt 11209)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9288
-Set exit class for pos 0 to 0 (rt 9288)
-1 hops for route 9288
-1 hops for route 9288
-1 hops for route 9288
-1 hops for route 9288
-1 hops for route 9288
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9497
-Set exit class for pos 0 to 0 (rt 9497)
-1 hops for route 9497
-1 hops for route 9497
-1 hops for route 9497
-1Error setting saddr = 132
-Error setting daddr = 101
-Error setting class = 0
-Error setting saddr = 101
-Error setting daddr = 104
-Error setting class = 1
-Error setting saddr = 1
-Error setting daddr = 48
-Error setting class = 0
-Error setting saddr = 42
-Error setting daddr = 43
-Error setting class = 1
-Error setting saddr = 58
-Error setting daddr = 59
+Error setting daddr = 57
 Error setting class = 1
 Error setting saddr = 36
 Error setting daddr = 37
-Error setting daddr = 73
-Error setting daddr = 41
-Error setting daddr = 5
-Error setting daddr = 54
 Error setting class = 0
+Error setting saddr = 82
+Error setting daddr = 117
 Error setting class = 0
+Error setting saddr = 34
+Error setting daddr = 82
+Error setting class = 1
+Error setting saddr = 18
+Error setting daddr = 35
 Error setting class = 0
+Error setting saddr = 2
+Error setting daddr = 18
+Error setting class = 1
+Error setting saddr = 57
+Error setting daddr = 137
 Error setting class = 0
-Error setting class = 0
-Error setting saddr = 59
-Error setting daddr = 54
-Error setting daddr = 37
-Error setting daddr = 73
-Error setting daddr = 41
-Error setting daddr = 5
-Error setting class = 1
-Error setting class = 1
-Error setting class = 1
-Error setting class = 1
-Error setting class = 1
-Error setting saddr = 1
-Error setting daddr = 48
-Error setting class = 1
-Error setting saddr = 42
-Error setting daddr = 43
-Error setting class = 2
-Error setting saddr = 58
-Error setting daddr = 59
-Error setting class = 0
-Error setting saddr = 4
-Error setting daddr = 25
-Error setting daddr = 1
-Error setting daddr = 37
-Error setting daddr = 73
-Error setting daddr = 41
-Error setting daddr = 5
-Error setting daddr = 20
+Error setting saddr = 37
 Error setting daddr = 22
-Error setting daddr = 185
-Error setting daddr = 85
+Error setting class = 0
+Error setting saddr = 100
+Error setting daddr = 99
+Error setting class = 0
+Error setting saddr = 118
+Error setting daddr = 120
+Error setting class = 0
+Error setting saddr = 134
+Error setting daddr = 118
+Error setting class = 0
+Error setting saddr = 38
+Error setting daddr = 20
+for pos 4 to 0 (rt 7825)
+1 hops for route 7825
+1 hops for route 7825
+Set exit class for pos 1 to 0 (rt 7825)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 7849
+Set exit class for pos 0 to 1 (rt 7849)
+1 hops for route 7849
+1 hops for route 7849
+1 hops for route 7849
+Set exit class for pos 5 to 1 (rt 7849)
+1 hops for route 7849
+Set exit class for pos 7 to 1 (rt 7849)
+1 hops for route 7849
+1 hops for route 7849
+1 hops for route 7849
+Set exit class for pos 2 to 1 (rt 7849)
+1 hops for route 7849
+1 hops for route 7849
+3 hops for route 7849
+8 hops for route 7849
+4 hops for route 7849
+3 hops for route 7849
+2 hops for route 7849
+1 hops for route 7849
+1 hops for route 7849
+Set exit class for pos 6 to 1 (rt 7849)
+1 hops for route 7849
+1 hops for route 7849
+1 hops for route 7849
+Set exit class for pos 3 to 1 (rt 7849)
+1 hops for route 7849
+Set exit class for pos 4 to 1 (rt 7849)
+1 hops for route 7849
+1 hops for route 7849
+Set exit class for pos 1 to 1 (rt 7849)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 6847
+Set exit class for pos 0 to 0 (rt 6847)
+1 hops for route 6847
+1 hops for route 6847
+1 hops for route 6847
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 6872
+1 hops for route 6872
+1 hops for route 6872
+1 hops for route 6872
+1 hops for route 6872
+1 hops for route 6872
+1 hops for route 6872
+1 hops for route 6872
+Set exit class for pos 0 to 0 (rt 6872)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 6929
+Set exit class for pos 0 to 0 (rt 6929)
+1 hops for route 6929
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9265
+Set exit class for pos 0 to 1 (rt 9265)
+1 hops for route 9265
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 6822
+1 hops for route 6822
+1 hops for route 6822
+1 hops for route 6822
+1 hops for route 6822
+1 hops for route 6822
+Set exit class for pos 0 to 1 (rt 6822)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9947
+1 hops for route 9947
+1 hops for route 9947
+Set exit class for pos 0 to 1 (rt 9947)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9801
+1 hops for route 9801
+Set exit class for pos 0 to 0 (rt 9801)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9923
+1 hops for route 9923
+1 hops for route 9923
+1 hops for route 9923
+1 hops for route 9923
+1 hops for route 9923
+Set exit class for pos 0 to 0 (rt 9923)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9874
+1 hops for route 9874
+1 hops for route 9874
+1 hops for route 9874
+Set exit class for pos 0 to 1 (rt 9874)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9777
+1 hops for route 9777
+1 hops for route 9777
+Set exit class for pos 0 to 0 (rt 9777)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9728
+1 hops for route 9728
+Set exit class for pos 0 to 1 (rt 9728)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9996
+1 hops for route 9996
+1 hops for route 9996
+1 hops for route 9996
+1 hops for route 9996
+1 hops for route 9996
+Set exit class for pos 0 to 0 (rt 9996)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9850
+Set exit class for pos 0 to 0 (rt 9850)
+1 hops for route 9850
+1 hops for route 9850
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 7082
+Set exit class for pos 0 to 0 (rt 7082)
+1 hops for route 7082
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9624
+1 hops for route 9624
+1 hops for route 9624
+Set exit class for pos 0 to 0 (rt 9624)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9567
+Set exit class for pos 0 to 0 (rt 9567)
+1 hops for route 9567
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 7028
+Set exit class for pos 0 to 0 (rt 7Error setting class = 0
+Error setting saddr = 116
+Error setting daddr = 114
+Error setting class = 0
+Error setting saddr = 85
+Error setting daddr = 116
+Error setting class = 0
+Error setting saddr = 168
+Error setting daddr = 184
+Error setting class = 0
+Error setting saddr = 152
+Error setting daddr = 169
+Error setting class = 0
+Error setting saddr = 136
+Error setting daddr = 152
+Error setting class = 0
+Error setting saddr = 23
+Error setting daddr = 7
+Error setting class = 0
+Error setting saddr = 71
+Error setting daddr = 88
+Error setting class = 0
+Error setting saddr = 40
+Error setting daddr = 71
+Error setting class = 0
+Error setting saddr = 86
+Error setting daddr = 67
+Error setting class = 0
+Error setting saddr = 89
+Error setting daddr = 86
 Error setting class = 1
-Error setting class = 4
+Error setting saddr = 105
+Error setting daddr = 89
+Error setting class = 0
+Error setting saddr = 151
+Error setting daddr = 86
+Error setting class = 0
+Error setting saddr = 87
+Error setting daddr = 151
+Error setting class = 0
+Error setting saddr = 52
+Error setting daddr = 67
 Error setting class = 2
-Error setting class = 2
+Error setting saddr = 149
+Error setting daddr = 52
+Error setting class = 0
+Error setting saddr = 119
+Error setting daddr = 149
+Error setting class = 0
+Error setting saddr = 51
+Error setting daddr = 52
 Error setting class = 1
-Error setting class = 4
-Error setting class = 4
-Error setting class = 4
+Error setting saddr = 50
+Error setting daddr = 51
+Error setting class = 0
+Error setting saddr = 9
+Error setting daddr = 25
+Error setting class = 0
+Error setting saddr = 19
+Error setting daddr = 50
+Error setting class = 0
+Error setting saddr = 132
+Error setting daddr = 119
+Error setting class = 0
+Error setting saddr = 70
+Error setting daddr = 87
+028)
+1 hops for route 7028
+1 hops for route 7028
+1 hops for route 7028
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9464
+Set exit class for pos 0 to 0 (rt 9464)
+1 hops for route 9464
+1 hops for route 9464
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9407
+1 hops for route 9407
+1 hops for route 9407
+1 hops for route 9407
+Set exit class for pos 0 to 0 (rt 9407)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 7109
+1 hops for route 7109
+Set exit class for pos 0 to 0 (rt 7109)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9704
+1 hops for route 9704
+1 hops for route 9704
+Set exit class for pos 0 to 0 (rt 9704)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9647
+1 hops for route 9647
+Set exit class for pos 0 to 0 (rt 9647)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 7055
+Set exit class for pos 0 to 0 (rt 7055)
+1 hops for route 7055
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9544
+1 hops for route 9544
+1 hops for route 9544
+Set exit class for pos 0 to 0 (rt 9544)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9487
+1 hops for route 9487
+1 hops for route 9487
+1 hops for route 9487
+Set exit class for pos 0 to 0 (rt 9487)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9289
+Set exit class for pos 0 to 0 (rt 9289)
+1 hops for route 9289
+1 hops for route 9289
+1 hops for route 9289
+1 hops for route 9289
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9361
+Set exit class for pos 0 to 1 (rt 9361)
+1 hops for route 9361
+1 hops for route 9361
+1 hops for route 9361
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9194
+Set exit class for pos 0 to 0 (rt 9194)
+1 hops for route 9194
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9384
+Set exit class for pos 0 to 0 (rt 9384)
+1 hops for route 9384
+1 hops for route 9384
+1 hops for route 9384
+1 hops for route 9384
+1 hops for route 9384
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9148
+1 hops for route 9148
+1 hops for route 9148
+1 hops for route 9148
+1 hops for route 9148
+Set exit class for pos 0 to 0 (rt 9148)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9313
+1 hops for route 9313
+1 hops for route 9313
+Set exit class for pos 0 to 2 (rt 9313)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9242
+Set exit class for pos 0 to 0 (rt 9242)
+1 hops for route 9242
+1 hops for route 9242
+1 hops for route 9242
+1 hops for route 9242
+1 hops for route 9242
+1 hops for route 9242
+1 hops for route 9242
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9102
+1 hops for route 9102
+1 hops for route 9102
+1 hops for route 9102
+1 hops for route 9102
+Set exit class for pos 0 to 0 (rt 9102)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9217
+1 hops for route 9217
+Set exit class for pos 0 to 1 (rt 9217)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9056
+1 hops for route 9056
+Set exit class for pos 0 to 0 (rt 9056)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 10977
+1 hops for route 10977
+Set exit class for pos 0 to 0 (rt 10977)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 7183
+1 hops for route 7183
+1 hops for route 7183
+1 hops for route 7183
+Set exit class for pos 0 to 0 (rt 7183)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 7255
+Set exit class for pos 0 to 0 (rt 7255)
+1 hops for route 7255
+1 hops for route 7255
+1 hops for route 7255
+1 hops for route 7255
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 7327
+1 hops for route 7327
+1 hops for rouError setting class = 0
+Error setting saddr = 104
+Error setting daddr = 105
+Error setting class = 0
+Error setting saddr = 115
+Error setting daddr = 18
+Error setting class = 0
+Error setting saddr = 53
+Error setting daddr = 37
 Error setting class = 1
+Error setting saddr = 98
+Error setting daddr = 82
+Error setting class = 0
+Error setting saddr = 55
+Error setting daddr = 57
+Error setting class = 0
+Error setting saddr = 66
+Error setting daddr = 67
 Error setting class = 3
-Error setting saddr = 185
-Error setting daddr = 20
-Error setting daddr = 22
-Error setting daddr = 201
-Error setting class = 0
-Error setting class = 0
- hops for route 9497
-1 hops for route 9497
-1 hops for route 9497
-1 hops for route 9497
-1 hops for route 9497
-1 hops for route 9497
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9334
-Set exit class for pos 0 to 0 (rt 9334)
-1 hops for route 9334
-1 hops for route 9334
-1 hops for route 9334
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9522
-1 hops for route 9522
-1 hops for route 9522
-1 hops for route 9522
-Set exit class for pos 0 to 1 (rt 9522)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6648
-1 hops for route 6648
-1 hops for route 6648
-1 hops for route 6648
-1 hops for route 6648
-Set exit class for pos 0 to 0 (rt 6648)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6701
-1 hops for route 6701
-Set exit class for pos 0 to 1 (rt 6701)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6595
-1 hops for route 6595
-Set exit class for pos 0 to 1 (rt 6595)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10393
-Set exit class for pos 3 to 0 (rt 10393)
-1 hops for route 10393
-5 hops for route 10393
-5 hops for route 10393
-Set exit class for pos 0 to 0 (rt 10393)
-3 hops for route 10393
-2 hops for route 10393
-2 hops for route 10393
-2 hops for route 10393
-Set exit class for pos 2 to 0 (rt 10393)
-1 hops for route 10393
-Set exit class for pos 4 to 0 (rt 10393)
-1 hops for route 10393
-1 hops for route 10393
-Set exit class for pos 1 to 0 (rt 10393)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 10370
-Set exit class for pos 4 to 1 (rt 10370)
-1 hops for route 10370
-2 hops for route 10370
-Set exit class for pos 1 to 1 (rt 10370)
-1 hops for route 10370
-Set exit class for pos 3 to 1 (rt 10370)
-2 hops for route 10370
-3 hops for route 10370
-Set exit class for pos 0 to 1 (rt 10370)
-3 hops for route 10370
-3 hops for route 10370
-5 hops for route 10370
-5 hops for route 10370
-5 hops for route 10370
-1 hops for route 10370
-Set exit class for pos 2 to 1 (rt 10370)
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6677
-1 hops for route 6677
-1 hops for route 6677
-1 hops for route 6677
-1 hops for route 6677
-Set exit class for pos 0 to 1 (rt 6677)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6730
-1 hops for route 6730
-Set exit class for pos 0 to 2 (rt 6730)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6624
-1 hops for route 6624
-Set exit class for pos 0 to 0 (rt 6624)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6919
-Set exit class for pos 1 to 1 (rt 6919)
-1 hops for route 6919
-1 hops for route 6919
-10 hops for route 6919
-8 hops for route 6919
-Set exit class for pos 5 to 4 (rt 6919)
-5 hops for route 6919
-4 hops for route 6919
-4 hops for route 6919
-4 hops for route 6919
-1 hops for route 6919
-Set exit class for pos 6 to 2 (rt 6919)
-2 hops for route 6919
-1 hops for route 6919
-Set exit class for pos 7 to 2 (rt 6919)
-4 hops for route 6919
-Set exit class for pos 0 to 1 (rt 6919)
-2 hops for route 6919
-Set exit class for pos 2 to 4 (rt 6919)
-3 hops for route 6919
-Set exit class for pos 4 to 4 (rt 6919)
-1 hops for route 6919
-2 hops for route 6919
-1 hops for route 6919
-2 hops for route 6919
-Set exit class for pos 3 to 4 (rt 6919)
-1 hops for route 6919
-Set exit class for pos 9 to 1 (rt 6919)
-1 hops for route 6919
-1 hops for route 6919
-1 hops for route 6919
-1 hops for route 6919
-1 hops for route 6919
-1 hops for route 6919
-1 hops for route 6919
-Set exit class for pos 8 to 3 (rt 6919)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7876
-Set exit class for pos 0 to 0 (rt 7876)
-1 hops for route 7876
-Set exit class for pos 1 to 0 (rt 7876)
-1 hops for route 7876
-1 hops for route 7876
-1 hError setting class = 0
 Error setting saddr = 4
-Error setting daddr = 25
-Error setting daddr = 85
-Error setting daddr = 38
-Error setting daddr = 70
-Error setting daddr = 121
 Error setting daddr = 21
+Error setting class = 2
+Error setting saddr = 3
 Error setting daddr = 2
 Error setting class = 0
+Error setting saddr = 39
+Error setting daddr = 36
 Error setting class = 0
+Error setting saddr = 54
+Error setting daddr = 34
+Error setting class = 0
+Error setting saddr = 33
+Error setting daddr = 32
+Error setting lat = 1
+Error setting saddr = 1
+Error setting daddr = 0
+Error setting lat = 1
+Error setting saddr = 101
+Error setting daddr = 96
+Error setting class = 0
+Error setting saddr = 56
+Error setting daddr = 2
+Error setting daddr = 36
+Error setting daddr = 34
+Error setting daddr = 25
+Error setting daddr = 21
+Error setting class = 1
+Error setting class = 0
+Error setting class = 1
+Error setting class = 1
+Error setting class = 1
+Error setting saddr = 32
+Error setting daddr = 21
+Error setting daddr = 2
+Error setting daddr = 36
+Error setting daddr = 34
+Error setting daddr = 25
 Error setting class = 2
-Error setting class = 0
-Error setting class = 0
+Error setting class = 1
 Error setting class = 2
+Error setting class = 2
+Error setting class = 2
+Error setting saddr = 1
+Error setting daddr = 0
+Error setting lat = 1
+Error setting saddr = 33
+Error setting daddr = 32
+Error setting lat = 1
+Error setting saddr = 101
+Error setting daddr = 96
+Error setting class = 1
+te 7327
+Set exit class for pos 0 to 0 (rt 7327)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 7399
+1 hops for route 7399
+Set exit class for pos 0 to 0 (rt 7399)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9754
+Set exit class for pos 0 to 0 (rt 9754)
+1 hops for route 9754
+1 hops for route 9754
+1 hops for route 9754
+1 hops for route 9754
+1 hops for route 9754
+1 hops for route 9754
+1 hops for route 9754
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9827
+Set exit class for pos 0 to 1 (rt 9827)
+1 hops for route 9827
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9900
+Set exit class for pos 0 to 0 (rt 9900)
+1 hops for route 9900
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9973
+1 hops for route 9973
+1 hops for route 9973
+Set exit class for pos 0 to 0 (rt 9973)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9337
+1 hops for route 9337
+Set exit class for pos 0 to 3 (rt 9337)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 10185
+1 hops for route 10185
+1 hops for route 10185
+Set exit class for pos 0 to 2 (rt 10185)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 10383
+Set exit class for pos 0 to 0 (rt 10383)
+1 hops for route 10383
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 10581
+Set exit class for pos 0 to 0 (rt 10581)
+1 hops for route 10581
+1 hops for route 10581
+1 hops for route 10581
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 10779
+Set exit class for pos 0 to 0 (rt 10779)
+1 hops for route 10779
+1 hops for route 10779
+1 hops for route 10779
+1 hops for route 10779
+1 hops for route 10779
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 6416
+Set exit class for pos 0 to 0 (rt 6416)
+1 hops for route 6416
+1 hops for route 6416
+1 hops for route 6416
+1 hops for route 6416
+1 hops for route 6416
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 10161
+Set exit class for pos 0 to 1 (rt 10161)
+1 hops for route 10161
+1 hops for route 10161
+Set exit class for pos 4 to 0 (rt 10161)
+1 hops for route 10161
+Set exit class for pos 3 to 1 (rt 10161)
+2 hops for route 10161
+Set exit class for pos 2 to 1 (rt 10161)
+1 hops for route 10161
+Set exit class for pos 1 to 1 (rt 10161)
+1 hops for route 10161
+1 hops for route 10161
+2 hops for route 10161
+2 hops for route 10161
+3 hops for route 10161
+4 hops for route 10161
+4 hops for route 10161
+4 hops for route 10161
+5 hops for route 10161
+1 hops for route 10161
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 10138
+Set exit class for pos 1 to 2 (rt 10138)
+1 hops for route 10138
+1 hops for route 10138
+Set exit class for pos 0 to 1 (rt 10138)
+1 hops for route 10138
+Set exit class for pos 4 to 2 (rt 10138)
+5 hops for route 10138
+5 hops for route 10138
+5 hops for route 10138
+Set exit class for pos 3 to 2 (rt 10138)
+3 hops for route 10138
+3 hops for route 10138
+Set exit class for pos 2 to 2 (rt 10138)
+2 hops for route 10138
+1 hops for route 10138
+1 hops for route 10138
+1 hops for route 10138
+1 hops for route 10138
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 6445
+Set exit class for pos 0 to 1 (rt 6445)
+1 hops for route 6445
+1 hops for roError setting saddr = 103
+Error setting daddr = 72
+Error setting daddr = 6
+Error setting daddr = 121
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+Error setting saddr = 4
+Error setting daddr = 4
+Error setting daddr = 66
+Error setting daddr = 3
+Error setting daddr = 39
+Error setting daddr = 54
+Error setting daddr = 9
+Error setting daddr = 84
+Error setting class = 2
+Error setting class = 1
+Error setting class = 2
+Error setting class = 2
+Error setting class = 2
+Error setting class = 2
+Error setting class = 2
+Error setting saddr = 4
+Error setting daddr = 66
+Error setting daddr = 101
+Error setting daddr = 2
+Error setting daddr = 36
+Error setting daddr = 34
+Error setting daddr = 25
+Error setting daddr = 3
+Error setting daddr = 39
+Error setting daddr = 54
+Error setting daddr = 9
+Error setting daddr = 72
+Error setting daddr = 6
+Error setting daddr = 103
+Error setting daddr = 84
+Error setting class = 4
+Error setting class = 1
+Error setting class = 2
+Error setting class = 1
+Error setting class = 4
+Error setting class = 4
+Error setting class = 4
+Error setting class = 1
+Error setting class = 1
+Error setting class = 1
+Error setting class = 2
+Error setting class = 1
+Error setting class = 1
+Error setting class = 3
+Error setting saddr = 67
+Error setting daddr = 83
+Error setting daddr = 68
+Error setting class = 0
 Error setting class = 0
 Error setting saddr = 102
-Error setting daddr = 167
-Error setting daddr = 103
+Error setting daddr = 134
+Error setting daddr = 100
 Error setting class = 0
 Error setting class = 0
-Error setting saddr = 217
-Error setting daddr = 105
-Error setting daddr = 118
+Error setting saddr = 69
+Error setting daddr = 85
+Error setting daddr = 38
 Error setting class = 0
 Error setting class = 0
 Error setting saddr = 153
-Error setting daddr = 137
-Error setting daddr = 169
+Error setting daddr = 136
+Error setting daddr = 168
 Error setting class = 0
 Error setting class = 0
-Error setting saddr = 119
-Error setting daddr = 199
-Error setting daddr = 135
-Error setting class = 0
-Error setting class = 0
-Error setting saddr = 245
-Error setting daddr = 246
-Error setting daddr = 233
-Error setting class = 0
-Error setting class = 0
-Error setting saddr = 43
+Error setting saddr = 24
 Error setting daddr = 40
+Error setting daddr = 23
+ute 6445
+1 hops for route 6445
+1 hops for route 6445
+1 hops for route 6445
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 7644
+Set exit class for pos 1 to 0 (rt 7644)
+1 hops for route 7644
+1 hops for route 7644
+1 hops for route 7644
+1 hops for route 7644
+1 hops for route 7644
+Set exit class for pos 0 to 0 (rt 7644)
+1 hops for route 7644
+1 hops for route 7644
+1 hops for route 7644
+3 hops for route 7644
+2 hops for route 7644
+1 hops for route 7644
+1 hops for route 7644
+Set exit class for pos 2 to 0 (rt 7644)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 11624
+2 hops for route 11624
+Set exit class for pos 2 to 2 (rt 11624)
+7 hops for route 11624
+Set exit class for pos 0 to 1 (rt 11624)
+3 hops for route 11624
+3 hops for route 11624
+2 hops for route 11624
+1 hops for route 11624
+1 hops for route 11624
+Set exit class for pos 5 to 2 (rt 11624)
+1 hops for route 11624
+1 hops for route 11624
+1 hops for route 11624
+1 hops for route 11624
+1 hops for route 11624
+1 hops for route 11624
+1 hops for route 11624
+1 hops for route 11624
+Set exit class for pos 3 to 2 (rt 11624)
+1 hops for route 11624
+1 hops for route 11624
+1 hops for route 11624
+Set exit class for pos 4 to 2 (rt 11624)
+1 hops for route 11624
+Set exit class for pos 1 to 2 (rt 11624)
+1 hops for route 11624
+1 hops for route 11624
+Set exit class for pos 6 to 2 (rt 11624)
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+3 hops for route 6687
+Set exit class for pos 2 to 4 (rt 6687)
+4 hops for route 6687
+Set exit class for pos 6 to 1 (rt 6687)
+14 hops for route 6687
+8 hops for route 6687
+7 hops for route 6687
+Set exit class for pos 11 to 2 (rt 6687)
+5 hops for route 6687
+3 hops for route 6687
+2 hops for route 6687
+Set exit class for pos 9 to 1 (rt 6687)
+2 hops for route 6687
+2 hops for route 6687
+1 hops for route 6687
+1 hops for route 6687
+2 hops for route 6687
+1 hops for route 6687
+1 hops for route 6687
+Set exit class for pos 5 to 4 (rt 6687)
+2 hops for route 6687
+Set exit class for pos 4 to 4 (rt 6687)
+2 hops for route 6687
+Set exit class for pos 3 to 4 (rt 6687)
+1 hops for route 6687
+1 hops for route 6687
+2 hops for route 6687
+Set exit class for pos 7 to 1 (rt 6687)
+1 hops for route 6687
+1 hops for route 6687
+1 hops for route 6687
+1 hops for route 6687
+1 hops for route 6687
+Set exit class for pos 8 to 1 (rt 6687)
+1 hops for route 6687
+1 hops for route 6687
+1 hops for route 6687
+Set exit class for pos 0 to 1 (rt 6687)
+1 hops for route 6687
+1 hops for route 6687
+1 hops for route 6687
+1 hops for route 6687
+Set exit class for pos 10 to 2 (rt 6687)
+1 hops for route 6687
+Set exit class for pos 13 to 1 (rt 6687)
+1 hops for route 6687
+1 hops for route 6687
+1 hops for route 6687
+Set exit class for pos 1 to 1 (rt 6687)
+1 hops for route 6687
+Set exit class for pos 12 to 3 (rt 6687)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+2 hops for route 8623
+1 hops for route 8623
+Set exit class for pos 1 to 0 (rt 8623)
+1 hops for route 8623
+Set exit class for pos 0 to 0 (rt 8623)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 8884
+Set exit class for pos 1 to 0 (rt 8884)
+1 hops for route 8884
+2 hops for route 8884
+1 hops for route 8884
+1 hops for route 8884
+Set exit class for pos 0 to 0 (rt 8884)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 8712
+Set exit class for pos 1 to 0 (rt 8712)
+1 hops for route 8712
+2 hops for route 8712
+1 hops for route 8712
+1 hops for route 8712
+Set exit class for pos 0 to 0 (rt 8712)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 8970
+Set exit class for pos 0 to 0 (rt 8970)
+2 hops for route 8970
+2 hops for route 8970
+1 hops for route 8970
+Set exit class for pos 1 to 0 (rt 8970)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 8798
+Set exit class for pos Error setting class = 0
 Error setting class = 0
-Error setting saddr = 40
+Error setting saddr = 0
+Error setting daddr = 17
+Error setting class = 0
+Error setting saddr = 17
 Error setting daddr = 4
-Error setting class = 1
-ops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-1 hops for route 7876
-2 hops for route 7876
-2 hops for route 7876
-2 hops for route 7876
-3 hops for route 7876
-1 hops for route 7876
-Set exit class for pos 2 to 0 (rt 7876)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 11856
-Set exit class for pos 6 to 0 (rt 11856)
-1 hops for route 11856
-7 hops for route 11856
-6 hops for route 11856
-4 hops for route 11856
-2 hops for route 11856
-2 hops for route 11856
-2 hops for route 11856
-2 hops for route 11856
-Set exit class for pos 5 to 0 (rt 11856)
-2 hops for route 11856
-2 hops for route 11856
-Set exit class for pos 0 to 2 (rt 11856)
-1 hops for route 11856
-2 hops for route 11856
-Set exit class for pos 2 to 0 (rt 11856)
-1 hops for route 11856
-1 hops for route 11856
-1 hops for route 11856
-1 hops for route 11856
-1 hops for route 11856
-1 hops for route 11856
-Set exit class for pos 3 to 0 (rt 11856)
-1 hops for route 11856
-1 hops for route 11856
-Set exit class for pos 1 to 2 (rt 11856)
-1 hops for route 11856
-1 hops for route 11856
-1 hops for route 11856
-Set exit class for pos 4 to 0 (rt 11856)
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Updating dynamic link exit VCs.
-2 hops for route 8855
-2 hops for route 8855
-Set exit class for pos 1 to 0 (rt 8855)
-1 hops for route 8855
-1 hops for route 8855
-1 hops for route 8855
-1 hops for route 8855
-Set exit class for pos 0 to 0 (rt 8855)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9116
-Set exit class for pos 0 to 0 (rt 9116)
-1 hops for route 9116
-Set exit class for pos 1 to 0 (rt 9116)
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-1 hops for route 9116
-2 hops for route 9116
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 8944
-Set exit class for pos 0 to 0 (rt 8944)
-2 hops for route 8944
-1 hops for route 8944
-Set exit class for pos 1 to 0 (rt 8944)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-2 hops for route 9202
-2 hops for route 9202
-Set exit class for pos 1 to 0 (rt 9202)
-1 hops for route 9202
-1 hops for route 9202
-1 hops for route 9202
-1 hops for route 9202
-Set exit class for pos 0 to 0 (rt 9202)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9030
-Set exit class for pos 1 to 0 (rt 9030)
-2 hops for route 9030
-2 hops for route 9030
-Set exit class for pos 0 to 0 (rt 9030)
-1 hops for route 9030
-1 hops for route 9030
-1 hops for route 9030
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6837
-Set exit class for pos 0 to 0 (rt 6837)
-1 hops for route 6837
-1 hops for route 6837
-1 hops for route 6837
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6811
-Set exit class for pos 0 to 1 (rt 6811)
-1 hops for route 6811
-1 hops for route 6811
-1 hops for route 6811
-1 hops for route 6811
-1 hops for route 6811
-1 hops for route 6811
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 frError setting saddr = 4
-Error setting daddr = 58
-Error setting class = 0
-Error setting saddr = 4
-Error setting daddr = 1
 Error setting class = 2
-Error setting saddr = 54
-Error setting daddr = 43
+Error setting saddr = 4
+Error setting daddr = 101
+Error setting class = 2
+Error setting saddr = 4
+Error setting daddr = 33
 Error setting class = 0
-Error setting saddr = 53
-Error setting daddr = 36
+Error setting saddr = 21
+Error setting daddr = 0
+Error setting class = 0
+Error setting saddr = 58
+Error setting daddr = 56
 Error setting class = 1
-Error setting saddr = 249
-Error setting daddr = 217
-Error setting class = 0
 Error setting saddr = 117
+Error setting daddr = 102
+Error setting class = 0
+Error setting saddr = 35
+Error setting daddr = 69
+Error setting class = 0
+Error setting saddr = 137
 Error setting daddr = 153
 Error setting class = 0
-Error setting saddr = 23
-Error setting daddr = 119
+Error setting saddr = 22
+Error setting daddr = 24
 Error setting class = 0
-Error setting saddr = 68
-Error setting daddr = 245
-Error setting class = 0
-Error setting saddr = 134
+Error setting saddr = 99
+Error setting daddr = 118
+Error setting class = 1
+Error setting saddr = 7
+Error setting daddr = 71
+Error setting class = 1
+Error setting saddr = 20
+Error setting daddr = 116
+Error setting class = 1
+Error setting saddr = 184
+Error setting daddr = 152
+Error setting class = 1
+Error setting saddr = 169
+Error setting daddr = 105
+Error setting class = 1
+Error setting saddr = 120
 Error setting daddr = 87
 Error setting class = 1
-Error setting saddr = 100
-Error setting daddr = 89
-Error setting class = 1
-Error setting saddr = 247
-Error setting daddr = 230
-Error setting class = 1
-Error setting saddr = 168
-Error setting daddr = 136
-Error setting class = 1
-Error setting saddr = 72
-Error setting daddr = 55
-Error setting class = 1
-Error setting saddr = 4
-Error setting daddr = 8
-Error setting class = 1
-Error setting saddr = 228
-Error setting daddr = 132
-Error setting class = 1
-Error setting saddr = 147
-Error setting daddr = 226
-Error setting class = 1
-om 0 to 0
+Error setting saddr = 88
+Error setting daddr = 119
+1 to 0 (rt 8798)
+2 hops for route 8798
+1 hops for route 8798
+Set exit class for pos 0 to 0 (rt 8798)
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 6605
+1 hops for route 6605
+1 hops for route 6605
+Set exit class for pos 0 to 0 (rt 6605)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 6579
+Set exit class for pos 0 to 2 (rt 6579)
+1 hops for route 6579
+1 hops for route 6579
+1 hops for route 6579
+1 hops for route 6579
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
@@ -1921,149 +1746,137 @@ Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-Set exit class for pos 0 to 0 (rt 6892)
+1 hops for route 7004
+1 hops for route 7004
+1 hops for route 7004
+1 hops for route 7004
+1 hops for route 7004
+1 hops for route 7004
+1 hops for route 7004
+1 hops for route 7004
+Set exit class for pos 0 to 2 (rt 7004)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 7236
-Set exit class for pos 0 to 2 (rt 7236)
-1 hops for route 7236
-1 hops for route 7236
-1 hops for route 7236
+1 hops for route 6660
+1 hops for route 6660
+1 hops for route 6660
+1 hops for route 6660
+1 hops for route 6660
+1 hops for route 6660
+Set exit class for pos 0 to 0 (rt 6660)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 6754
-Set exit class for pos 0 to 0 (rt 6754)
-1 hops for route 6754
-1 hops for route 6754
-1 hops for route 6754
-1 hops for route 6754
-1 hops for route 6754
-1 hops for route 6754
+1 hops for route 6522
+Set exit class for pos 0 to 0 (rt 6522)
+1 hops for route 6522
+1 hops for route 6522
+1 hops for route 6522
+1 hops for route 6522
+1 hops for route 6522
+1 hops for route 6522
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 7130
-Set exit class for pos 0 to 1 (rt 7130)
-1 hops for route 7130
-1 hops for route 7130
+1 hops for route 6898
+Set exit class for pos 0 to 1 (rt 6898)
+1 hops for route 6898
+1 hops for route 6898
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 7758
-Set exit class for pos 0 to 0 (rt 7758)
-1 hops for route 7758
-1 hops for route 7758
+1 hops for route 7526
+Set exit class for pos 0 to 0 (rt 7526)
+1 hops for route 7526
+1 hops for route 7526
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 7672
-1 hops for route 7672
-1 hops for route 7672
-1 hops for route 7672
-1 hops for route 7672
-1 hops for route 7672
-1 hops for route 7672
-Set exit class for pos 0 to 0 (rt 7672)
+1 hops for route 7440
+1 hops for route 7440
+1 hops for route 7440
+1 hops for route 7440
+1 hops for route 7440
+Set exit class for pos 0 to 0 (rt 7440)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 7801
-1 hops for route 7801
-1 hops for route 7801
-1 hops for route 7801
-1 hops for route 7801
-1 hops for route 7801
-1 hops for route 7801
-Set exit class for pos 0 to 0 (rt 7801)
+1 hops for route 7569
+1 hops for route 7569
+Set exit class for pos 0 to 0 (rt 7569)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-Set exit class for pos 0 to 0 (rt 7715)
+1 hops for route 7483
+1 hops for route 7483
+1 hops for route 7483
+Set exit class for pos 0 to 0 (rt 7483)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 9908
-Set exit class for pos 0 to 1 (rt 9908)
-1 hops for route 9908
-1 hops for route 9908
-1 hops for route 9908
-1 hops for route 9908
+1 hops for route 9596
+1 hops for route 9596
+1 hops for route 9596
+1 hops for route 9596
+1 hops for route 9596
+Set exit class for pos 0 to 1 (rt 9596)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 9828
-Set exit class for pos 0 to 1 (rt 9828)
-1 hops for route 9828
-1 hops for route 9828
-1 hops for route 9828
-1 hops for route 9828
-1 hops for route 9828
-1 hops for route 9828
+1 hops for route 9516
+1 hops for route 9516
+1 hops for route 9516
+1 hops for route 9516
+1 hops for route 9516
+Set exit class for pos 0 to 1 (rt 9516)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 9748
-Set exit class for pos 0 to 1 (rt 9748)
-1 hops for route 9748
-1 hops for route 9748
+1 hops for route 9436
+1 hops for route 9436
+1 hops for route 9436
+1 hops for route 9436
+1 hops for route 9436
+1 hops for route 9436
+1 hops for route 9436
+Set exit class for pos 0 to 1 (rt 9436)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 9668
-Set exit class for pos 0 to 1 (rt 9668)
-1 hops for route 9668
-1 hops for route 9668
+1 hops for route 9676
+Set exit class for pos 0 to 1 (rt 9676)
+1 hops for route 9676
+1 hops for route 9676
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 7600
-Set exit class for pos 0 to 1 (rt 7600)
-1 hops for route 7600
-1 hops for route 7600
+1 hops for route 7368
+Set exit class for pos 0 to 1 (rt 7368)
+1 hops for route 7368
+1 hops for route 7368
+1 hops for route 7368
+1 hops for route 7368
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 7528
-1 hops for route 7528
-1 hops for route 7528
-1 hops for route 7528
-1 hops for route 7528
-Set exit class for pos 0 to 1 (rt 7528)
+1 hops for route 7296
+Set exit class for pos 0 to 1 (rt 7296)
+1 hops for route 7296
+1 hops for route 7296
+1 hops for route 7296
+Link specified in placement file.
+Updating dynamic linkError setting class = 1
+Error setting saddr = 114
+Error setting daddr = 50
+Error setting class = 1
+ exit VCs.
+1 hops for route 7224
+1 hops for route 7224
+1 hops for route 7224
+1 hops for route 7224
+Set exit class for pos 0 to 1 (rt 7224)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 7456
-Set exit class for pos 0 to 1 (rt 7456)
-1 hops for route 7456
-1 hops for route 7456
-1 hops for route 7456
-1 hops for route 7456
-1 hops for route 7456
-1 hops for route 7456
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7384
-1 hops for route 7384
-1 hops for route 7384
-1 hops for route 7384
-1 hops for route 7384
-1 hops for route 7384
-1 hops for route 7384
-Set exit class for pos 0 to 1 (rt 7384)
-Child process has pid 7773
+1 hops for route 7152
+Set exit class for pos 0 to 1 (rt 7152)
+1 hops for route 7152
+1 hops for route 7152
+1 hops for route 7152
+1 hops for route 7152
+Child process has pid 6931
 == Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
 == Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
 ===== MemorySystem 0 =====
@@ -2078,117 +1891,117 @@ Parsed definitions of all elements.
 Total of 127 links:
   0: DramAddress2138
     
-  1: RetimingFIFO3949_RetimingFIFO3973_RetimingFIFO3996_RetimingFIFO4019_RetimingFIFO4042_RetimingFIFO4065_RetimingFIFO4088_RetimingFIFO4111
+  1: ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142
     
-  2: RetimingFIFO3957_RetimingFIFO3981_RetimingFIFO4004_RetimingFIFO4027_RetimingFIFO4050_RetimingFIFO4073_RetimingFIFO4096_RetimingFIFO4119
+  2: RetimingFIFO3909_RetimingFIFO3933_RetimingFIFO3956_RetimingFIFO3979_RetimingFIFO4002_RetimingFIFO4025_RetimingFIFO4048_RetimingFIFO4071
     
-  3: ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951
+  3: RetimingFIFO3917_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056_RetimingFIFO4079
     
-  4: RetimingFIFO3416
+  4: RetimingFIFO3392
     
-  5: RetimingFIFO4429
+  5: RetimingFIFO3564
     
-  6: RetimingFIFO3355
+  6: RetimingFIFO3617
     
-  7: RetimingFIFO5953
+  7: RetimingFIFO4349
     
-  8: RetimingFIFO6144
+  8: RetimingFIFO3339
     
-  9: RetimingFIFO5773
+  9: RetimingFIFO5721
     
-  10: RetimingFIFO5593
+  10: RetimingFIFO5393
     
-  11: RetimingFIFO6126
+  11: RetimingFIFO5912
     
-  12: RetimingFIFO5413
+  12: RetimingFIFO5557
     
-  13: RetimingFIFO3657
+  13: RetimingFIFO5894
     
-  14: RetimingFIFO6153
+  14: RetimingFIFO5229
     
-  15: RetimingFIFO6135
+  15: RetimingFIFO5921
     
-  16: RetimingFIFO3596
+  16: RetimingFIFO5903
     
-  17: RetimingFIFO4612
+  17: RetimingFIFO4511
     
-  18: RetimingFIFO6108
+  18: RetimingFIFO5876
     
-  19: RetimingFIFO4752
+  19: RetimingFIFO4623
     
-  20: RetimingFIFO4542
+  20: RetimingFIFO4455
     
-  21: RetimingFIFO6090
+  21: RetimingFIFO5858
     
-  22: RetimingFIFO4682
+  22: RetimingFIFO4567
     
-  23: RetimingFIFO4647
+  23: RetimingFIFO4539
     
-  24: RetimingFIFO6117
+  24: RetimingFIFO5885
     
-  25: RetimingFIFO4787
+  25: RetimingFIFO4651
     
-  26: RetimingFIFO4577
+  26: RetimingFIFO4483
     
-  27: RetimingFIFO6099
+  27: RetimingFIFO5867
     
-  28: RetimingFIFO4717
+  28: RetimingFIFO4595
     
-  29: RetimingFIFO6063
+  29: RetimingFIFO5831
     
-  30: RetimingFIFO4368
+  30: RetimingFIFO4296
     
-  31: RetimingFIFO5247
+  31: RetimingFIFO5079
     
-  32: RetimingFIFO4307
+  32: RetimingFIFO4243
     
-  33: RetimingFIFO5121
+  33: RetimingFIFO4961
     
-  34: RetimingFIFO6072
+  34: RetimingFIFO5840
     
-  35: RetimingFIFO4859
+  35: RetimingFIFO4190
     
-  36: RetimingFIFO4985
+  36: RetimingFIFO4843
     
-  37: RetimingFIFO5111
+  37: RetimingFIFO4137
     
-  38: RetimingFIFO5237
+  38: RetimingFIFO4725
     
-  39: RetimingFIFO5352
+  39: RetimingFIFO5966
     
-  40: RetimingFIFO5532
+  40: RetimingFIFO4715
     
-  41: RetimingFIFO5712
+  41: RetimingFIFO4833
     
-  42: RetimingFIFO5892
+  42: RetimingFIFO4951
     
-  43: RetimingFIFO6081
+  43: RetimingFIFO5069
     
-  44: RetimingFIFO6162
+  44: RetimingFIFO5176
     
-  45: RetimingFIFO6171
+  45: RetimingFIFO5340
     
-  46: RetimingFIFO6180
+  46: RetimingFIFO5504
     
-  47: RetimingFIFO6189
+  47: RetimingFIFO5668
     
-  48: RetimingFIFO6198
+  48: RetimingFIFO5849
     
-  49: RetimingFIFO4869
+  49: RetimingFIFO5930
     
-  50: RetimingFIFO4185
+  50: RetimingFIFO5939
     
-  51: RetimingFIFO4995
+  51: RetimingFIFO5948
     
-  52: RetimingFIFO4246
+  52: RetimingFIFO5957
     
-  53: StreamOut184
+  53: StreamOut36
     
   54: StreamOut2115
     
-  55: StreamOut36
+  55: StreamOut184
     
-  56: RetimingFIFO3667_RetimingFIFO3721_RetimingFIFO3775_RetimingFIFO3829_RetimingFIFO3883
+  56: RetimingFIFO3627_RetimingFIFO3681_RetimingFIFO3735_RetimingFIFO3789_RetimingFIFO3843
     
   57: RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189
     
@@ -2208,99 +2021,99 @@ Total of 127 links:
     
   65: SRAM316
     
-  66: StreamOut185
+  66: StreamOut2116
     
-  67: StreamOut2116
+  67: StreamOut37
     
-  68: StreamOut37
+  68: StreamOut185
     
-  69: ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970
+  69: RetimingFIFO3402_RetimingFIFO3456_RetimingFIFO3510
     
-  70: RetimingFIFO3426_RetimingFIFO3480_RetimingFIFO3534
+  70: TokenIn11539_TokenIn11552_TokenIn11564_TokenIn11576_TokenIn11588_TokenIn11600_TokenIn11612
     
-  71: TokenIn11771_TokenIn11784_TokenIn11796_TokenIn11808_TokenIn11820_TokenIn11832_TokenIn11844
+  71: SRAM153
     
-  72: SRAM153
+  72: SRAM154
     
-  73: SRAM154
+  73: SRAM155
     
-  74: SRAM155
+  74: SRAM156
     
-  75: SRAM156
+  75: SRAM157
     
-  76: SRAM157
+  76: SRAM158
     
-  77: SRAM158
+  77: SRAM159
     
-  78: SRAM159
+  78: SRAM160
     
-  79: SRAM160
+  79: ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161
     
-  80: RetimingFIFO4439_RetimingFIFO4493
+  80: RetimingFIFO4359_RetimingFIFO4413
     
-  81: RetimingFIFO5783_RetimingFIFO5812
+  81: RetimingFIFO5567_RetimingFIFO5596
     
-  82: RetimingFIFO5423_RetimingFIFO5452
+  82: RetimingFIFO5239_RetimingFIFO5268
     
-  83: RetimingFIFO5963_RetimingFIFO5992
+  83: RetimingFIFO5731_RetimingFIFO5760
     
-  84: RetimingFIFO5603_RetimingFIFO5632
+  84: RetimingFIFO5403_RetimingFIFO5432
     
   85: SRAM135
     
   86: SRAM134
     
-  87: SRAM288
+  87: SRAM133
     
-  88: SRAM287
+  88: SRAM288
     
-  89: SRAM19
+  89: SRAM287
     
-  90: SRAM18
+  90: SRAM19
     
   91: SRAM17
     
-  92: SRAM16
+  92: SRAM18
     
-  93: SRAM15
+  93: SRAM16
     
-  94: SRAM133
+  94: SRAM15
     
   95: SRAM1416
     
   96: SRAM1415
     
-  97: SRAM1413
+  97: SRAM1414
     
-  98: SRAM1414
+  98: SRAM1413
     
   99: StreamIn2118
     
   100: TokenOut2294
     
-  101: TokenIn10344
+  101: TokenIn10912
     
-  102: TokenIn10357
+  102: TokenIn10925
     
-  103: TokenIn10563
+  103: TokenIn10112
     
-  104: TokenIn10550
+  104: TokenIn10125
     
-  105: TokenIn10761
+  105: TokenIn10331
     
-  106: TokenIn10748
+  106: TokenIn10318
     
-  107: TokenIn10959
+  107: TokenIn10529
     
-  108: TokenIn10946
+  108: TokenIn10516
     
-  109: TokenIn11157
+  109: TokenIn10727
     
-  110: TokenIn11144
+  110: TokenIn10714
     
-  111: DramAddress58
+  111: DramAddress210
     
-  112: DramAddress210
+  112: DramAddress58
     
   113: StreamOut2117
     
@@ -2314,13 +2127,13 @@ Total of 127 links:
     
   118: Reg468
     
-  119: Reg845
+  119: Reg843
     
-  120: Reg843
+  120: Reg841
     
-  121: Reg841
+  121: Reg839
     
-  122: Reg839
+  122: Reg845
     
   123: Reg1102
     
@@ -2331,347 +2144,223 @@ Total of 127 links:
   126: Reg1096
     
 Total of 115 nodes:
-  0: CE12251
+  0: CE12470
     [StreamOut37 *4 /1] [StreamOut36 *4 /1]  => [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189] 
-  1: CE12265
-    [StreamOut185 *4 /1] [StreamOut184 *4 /1]  => [RetimingFIFO3949_RetimingFIFO3973_RetimingFIFO3996_RetimingFIFO4019_RetimingFIFO4042_RetimingFIFO4065_RetimingFIFO4088_RetimingFIFO4111] 
-  2: CE12303
-     => [DramAddress2138] [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951] [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970] [TokenIn11771_TokenIn11784_TokenIn11796_TokenIn11808_TokenIn11820_TokenIn11832_TokenIn11844] [DramAddress58] [DramAddress210] 
-  3: CE12319
+  1: CE12484
+    [StreamOut185 *4 /1] [StreamOut184 *4 /1]  => [RetimingFIFO3909_RetimingFIFO3933_RetimingFIFO3956_RetimingFIFO3979_RetimingFIFO4002_RetimingFIFO4025_RetimingFIFO4048_RetimingFIFO4071] 
+  2: CE12522
+     => [DramAddress2138] [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142] [TokenIn11539_TokenIn11552_TokenIn11564_TokenIn11576_TokenIn11588_TokenIn11600_TokenIn11612] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161] [DramAddress58] [DramAddress210] 
+  3: CE12538
     [TokenOut2294 *1 /1]  => 
-  4: CE12339
+  4: CE12558
     [DramAddress58 *64 /1]  => [StreamOut37] [StreamOut36] 
-  5: CE12353
+  5: CE12572
     [DramAddress2138 *64 /1]  => [StreamOut2116] [StreamOut2115] 
-  6: CE12417
-    [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970 *32768 /1] [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951 *32768 /1] [DramAddress210 *32768 /1]  => [StreamOut185] [StreamOut184] 
-  7: CE12437
-    [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951 *131072 /1] [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970 *131072 /1] [TokenIn11771_TokenIn11784_TokenIn11796_TokenIn11808_TokenIn11820_TokenIn11832_TokenIn11844 *131072 /1]  => [RetimingFIFO3957_RetimingFIFO3981_RetimingFIFO4004_RetimingFIFO4027_RetimingFIFO4050_RetimingFIFO4073_RetimingFIFO4096_RetimingFIFO4119] 
-  8: CE13139
-    [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951 *2097152 /1] [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970 *2097152 /1] [TokenIn11771_TokenIn11784_TokenIn11796_TokenIn11808_TokenIn11820_TokenIn11832_TokenIn11844 *2097152 /1]  => [RetimingFIFO6081] 
-  9: CE13395
-    [TokenIn11771_TokenIn11784_TokenIn11796_TokenIn11808_TokenIn11820_TokenIn11832_TokenIn11844 *256 /1]  => [RetimingFIFO6162] 
-  10: CE13459
-    [TokenIn11771_TokenIn11784_TokenIn11796_TokenIn11808_TokenIn11820_TokenIn11832_TokenIn11844 *256 /1]  => [RetimingFIFO6171] 
-  11: CE13527
-    [TokenIn11771_TokenIn11784_TokenIn11796_TokenIn11808_TokenIn11820_TokenIn11832_TokenIn11844 *256 /1]  => [RetimingFIFO6180] 
-  12: CE13595
-    [TokenIn11771_TokenIn11784_TokenIn11796_TokenIn11808_TokenIn11820_TokenIn11832_TokenIn11844 *256 /1]  => [RetimingFIFO6189] 
-  13: CE13663
-    [TokenIn11771_TokenIn11784_TokenIn11796_TokenIn11808_TokenIn11820_TokenIn11832_TokenIn11844 *256 /1]  => [RetimingFIFO6198] 
-  14: CE12675
-    [RetimingFIFO3949_RetimingFIFO3973_RetimingFIFO3996_RetimingFIFO4019_RetimingFIFO4042_RetimingFIFO4065_RetimingFIFO4088_RetimingFIFO4111 *1 /1] [RetimingFIFO3957_RetimingFIFO3981_RetimingFIFO4004_RetimingFIFO4027_RetimingFIFO4050_RetimingFIFO4073_RetimingFIFO4096_RetimingFIFO4119 *1 /1]  => [SRAM153] 
-  15: CE12663
-    [SRAM153 *65536 /1]  => [RetimingFIFO4859] 
-  16: CE12699
-    [RetimingFIFO3949_RetimingFIFO3973_RetimingFIFO3996_RetimingFIFO4019_RetimingFIFO4042_RetimingFIFO4065_RetimingFIFO4088_RetimingFIFO4111 *1 /1] [RetimingFIFO3957_RetimingFIFO3981_RetimingFIFO4004_RetimingFIFO4027_RetimingFIFO4050_RetimingFIFO4073_RetimingFIFO4096_RetimingFIFO4119 *1 /1]  => [SRAM154] 
-  17: CE12687
-    [SRAM154 *65536 /1]  => [RetimingFIFO4985] 
-  18: CE12723
-    [RetimingFIFO3949_RetimingFIFO3973_RetimingFIFO3996_RetimingFIFO4019_RetimingFIFO4042_RetimingFIFO4065_RetimingFIFO4088_RetimingFIFO4111 *1 /1] [RetimingFIFO3957_RetimingFIFO3981_RetimingFIFO4004_RetimingFIFO4027_RetimingFIFO4050_RetimingFIFO4073_RetimingFIFO4096_RetimingFIFO4119 *1 /1]  => [SRAM155] 
-  19: CE12711
-    [SRAM155 *65536 /1]  => [RetimingFIFO5111] 
-  20: CE12747
-    [RetimingFIFO3949_RetimingFIFO3973_RetimingFIFO3996_RetimingFIFO4019_RetimingFIFO4042_RetimingFIFO4065_RetimingFIFO4088_RetimingFIFO4111 *1 /1] [RetimingFIFO3957_RetimingFIFO3981_RetimingFIFO4004_RetimingFIFO4027_RetimingFIFO4050_RetimingFIFO4073_RetimingFIFO4096_RetimingFIFO4119 *1 /1]  => [SRAM156] 
-  21: CE12735
-    [SRAM156 *65536 /1]  => [RetimingFIFO5237] 
-  22: CE12771
-    [RetimingFIFO3949_RetimingFIFO3973_RetimingFIFO3996_RetimingFIFO4019_RetimingFIFO4042_RetimingFIFO4065_RetimingFIFO4088_RetimingFIFO4111 *1 /1] [RetimingFIFO3957_RetimingFIFO3981_RetimingFIFO4004_RetimingFIFO4027_RetimingFIFO4050_RetimingFIFO4073_RetimingFIFO4096_RetimingFIFO4119 *1 /1]  => [SRAM157] 
-  23: CE12759
-    [SRAM157 *65536 /1]  => [RetimingFIFO5352] 
-  24: CE12795
-    [RetimingFIFO3949_RetimingFIFO3973_RetimingFIFO3996_RetimingFIFO4019_RetimingFIFO4042_RetimingFIFO4065_RetimingFIFO4088_RetimingFIFO4111 *1 /1] [RetimingFIFO3957_RetimingFIFO3981_RetimingFIFO4004_RetimingFIFO4027_RetimingFIFO4050_RetimingFIFO4073_RetimingFIFO4096_RetimingFIFO4119 *1 /1]  => [SRAM158] 
-  25: CE12783
-    [SRAM158 *65536 /1]  => [RetimingFIFO5532] 
-  26: CE12819
-    [RetimingFIFO3949_RetimingFIFO3973_RetimingFIFO3996_RetimingFIFO4019_RetimingFIFO4042_RetimingFIFO4065_RetimingFIFO4088_RetimingFIFO4111 *1 /1] [RetimingFIFO3957_RetimingFIFO3981_RetimingFIFO4004_RetimingFIFO4027_RetimingFIFO4050_RetimingFIFO4073_RetimingFIFO4096_RetimingFIFO4119 *1 /1]  => [SRAM159] 
-  27: CE12807
-    [SRAM159 *65536 /1]  => [RetimingFIFO5712] 
-  28: CE12843
-    [RetimingFIFO3949_RetimingFIFO3973_RetimingFIFO3996_RetimingFIFO4019_RetimingFIFO4042_RetimingFIFO4065_RetimingFIFO4088_RetimingFIFO4111 *1 /1] [RetimingFIFO3957_RetimingFIFO3981_RetimingFIFO4004_RetimingFIFO4027_RetimingFIFO4050_RetimingFIFO4073_RetimingFIFO4096_RetimingFIFO4119 *1 /1]  => [SRAM160] 
-  29: CE12831
-    [SRAM160 *65536 /1]  => [RetimingFIFO5892] 
-  30: CE12327
+  6: CE12636
+    [DramAddress210 *32768 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *32768 /1] [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *32768 /1]  => [StreamOut185] [StreamOut184] 
+  7: CE12656
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *131072 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *131072 /1] [TokenIn11539_TokenIn11552_TokenIn11564_TokenIn11576_TokenIn11588_TokenIn11600_TokenIn11612 *131072 /1]  => [RetimingFIFO3917_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056_RetimingFIFO4079] 
+  8: CE13358
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *2097152 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *2097152 /1] [TokenIn11539_TokenIn11552_TokenIn11564_TokenIn11576_TokenIn11588_TokenIn11600_TokenIn11612 *2097152 /1]  => [RetimingFIFO5849] 
+  9: CE13670
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *512 /1] [TokenIn11539_TokenIn11552_TokenIn11564_TokenIn11576_TokenIn11588_TokenIn11600_TokenIn11612 *512 /1]  => [RetimingFIFO5930] 
+  10: CE13744
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *2097152 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *2097152 /1] [TokenIn11539_TokenIn11552_TokenIn11564_TokenIn11576_TokenIn11588_TokenIn11600_TokenIn11612 *2097152 /1]  => [RetimingFIFO5939] 
+  11: CE13820
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *2097152 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *2097152 /1] [TokenIn11539_TokenIn11552_TokenIn11564_TokenIn11576_TokenIn11588_TokenIn11600_TokenIn11612 *2097152 /1]  => [RetimingFIFO5948] 
+  12: CE13896
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *2097152 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *2097152 /1] [TokenIn11539_TokenIn11552_TokenIn11564_TokenIn11576_TokenIn11588_TokenIn11600_TokenIn11612 *2097152 /1]  => [RetimingFIFO5957] 
+  13: CE13972
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *2097152 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *2097152 /1] [TokenIn11539_TokenIn11552_TokenIn11564_TokenIn11576_TokenIn11588_TokenIn11600_TokenIn11612 *2097152 /1]  => [RetimingFIFO5966] 
+  14: CE12894
+    [RetimingFIFO3909_RetimingFIFO3933_RetimingFIFO3956_RetimingFIFO3979_RetimingFIFO4002_RetimingFIFO4025_RetimingFIFO4048_RetimingFIFO4071 *1 /1] [RetimingFIFO3917_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056_RetimingFIFO4079 *1 /1]  => [SRAM153] 
+  15: CE12882
+    [SRAM153 *65536 /1]  => [RetimingFIFO4715] 
+  16: CE12918
+    [RetimingFIFO3909_RetimingFIFO3933_RetimingFIFO3956_RetimingFIFO3979_RetimingFIFO4002_RetimingFIFO4025_RetimingFIFO4048_RetimingFIFO4071 *1 /1] [RetimingFIFO3917_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056_RetimingFIFO4079 *1 /1]  => [SRAM154] 
+  17: CE12906
+    [SRAM154 *65536 /1]  => [RetimingFIFO4833] 
+  18: CE12942
+    [RetimingFIFO3909_RetimingFIFO3933_RetimingFIFO3956_RetimingFIFO3979_RetimingFIFO4002_RetimingFIFO4025_RetimingFIFO4048_RetimingFIFO4071 *1 /1] [RetimingFIFO3917_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056_RetimingFIFO4079 *1 /1]  => [SRAM155] 
+  19: CE12930
+    [SRAM155 *65536 /1]  => [RetimingFIFO4951] 
+  20: CE12966
+    [RetimingFIFO3909_RetimingFIFO3933_RetimingFIFO3956_RetimingFIFO3979_RetimingFIFO4002_RetimingFIFO4025_RetimingFIFO4048_RetimingFIFO4071 *1 /1] [RetimingFIFO3917_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056_RetimingFIFO4079 *1 /1]  => [SRAM156] 
+  21: CE12954
+    [SRAM156 *65536 /1]  => [RetimingFIFO5069] 
+  22: CE12990
+    [RetimingFIFO3909_RetimingFIFO3933_RetimingFIFO3956_RetimingFIFO3979_RetimingFIFO4002_RetimingFIFO4025_RetimingFIFO4048_RetimingFIFO4071 *1 /1] [RetimingFIFO3917_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056_RetimingFIFO4079 *1 /1]  => [SRAM157] 
+  23: CE12978
+    [SRAM157 *65536 /1]  => [RetimingFIFO5176] 
+  24: CE13014
+    [RetimingFIFO3909_RetimingFIFO3933_RetimingFIFO3956_RetimingFIFO3979_RetimingFIFO4002_RetimingFIFO4025_RetimingFIFO4048_RetimingFIFO4071 *1 /1] [RetimingFIFO3917_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056_RetimingFIFO4079 *1 /1]  => [SRAM158] 
+  25: CE13002
+    [SRAM158 *65536 /1]  => [RetimingFIFO5340] 
+  26: CE13038
+    [RetimingFIFO3909_RetimingFIFO3933_RetimingFIFO3956_RetimingFIFO3979_RetimingFIFO4002_RetimingFIFO4025_RetimingFIFO4048_RetimingFIFO4071 *1 /1] [RetimingFIFO3917_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056_RetimingFIFO4079 *1 /1]  => [SRAM159] 
+  27: CE13026
+    [SRAM159 *65536 /1]  => [RetimingFIFO5504] 
+  28: CE13062
+    [RetimingFIFO3909_RetimingFIFO3933_RetimingFIFO3956_RetimingFIFO3979_RetimingFIFO4002_RetimingFIFO4025_RetimingFIFO4048_RetimingFIFO4071 *1 /1] [RetimingFIFO3917_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056_RetimingFIFO4079 *1 /1]  => [SRAM160] 
+  29: CE13050
+    [SRAM160 *65536 /1]  => [RetimingFIFO5668] 
+  30: CE12546
     [StreamIn2118 *1 /1]  => [TokenOut2294] 
-  31: CE12387
-    [RetimingFIFO3596 *1 /1]  => [Reg2012] 
-  32: CE12451
-    [RetimingFIFO4542 *1 /1]  => [Reg839] 
-  33: CE12461
-    [RetimingFIFO4577 *1 /1]  => [Reg841] 
-  34: CE12471
-    [RetimingFIFO4612 *1 /1]  => [Reg843] 
-  35: CE12481
-    [RetimingFIFO4647 *1 /1]  => [Reg845] 
-  36: CE12547
-    [Reg339 *1 /1]  => [RetimingFIFO5423_RetimingFIFO5452] 
-  37: CE12905
-    [RetimingFIFO5423_RetimingFIFO5452 *1 /1]  => [SRAM314] 
-  38: CE12895
-    [SRAM314 *4 /1]  => [RetimingFIFO4682] 
-  39: CE12925
-    [RetimingFIFO5423_RetimingFIFO5452 *1 /1]  => [SRAM315] 
-  40: CE12915
-    [SRAM315 *4 /1]  => [RetimingFIFO4542] 
-  41: CE13205
-    [Reg839 *4 /1] [RetimingFIFO4682 *1 /1]  => [RetimingFIFO6090] 
-  42: CE13217
-    [RetimingFIFO6090 *1 /1]  => [Reg1096] 
-  43: CE12493
-    [Reg1096 *256 /1] [RetimingFIFO4859 *1 /1]  => [RetimingFIFO4869] 
-  44: CE13065
-    [RetimingFIFO4869 *1 /1]  => [SRAM1413] 
-  45: CE13055
-    [SRAM1413 *256 /1]  => [RetimingFIFO4185] 
-  46: CE12557
-    [Reg468 *1 /1]  => [RetimingFIFO5603_RetimingFIFO5632] 
-  47: CE12945
-    [RetimingFIFO5603_RetimingFIFO5632 *1 /1]  => [SRAM316] 
-  48: CE12935
-    [SRAM316 *4 /1]  => [RetimingFIFO4717] 
-  49: CE12965
-    [RetimingFIFO5603_RetimingFIFO5632 *1 /1]  => [SRAM317] 
-  50: CE12955
-    [SRAM317 *4 /1]  => [RetimingFIFO4577] 
-  51: CE13229
-    [Reg841 *4 /1] [RetimingFIFO4717 *1 /1]  => [RetimingFIFO6099] 
-  52: CE13241
-    [RetimingFIFO6099 *1 /1]  => [Reg1098] 
-  53: CE12507
-    [Reg1098 *256 /1] [RetimingFIFO4985 *1 /1]  => [RetimingFIFO4995] 
-  54: CE13085
-    [RetimingFIFO4995 *1 /1]  => [SRAM1414] 
-  55: CE13075
-    [SRAM1414 *256 /1]  => [RetimingFIFO4246] 
-  56: CE13169
-    [RetimingFIFO4185 *1 /1] [RetimingFIFO4246 *1 /1]  => [RetimingFIFO6072] 
-  57: CE12567
-    [Reg597 *1 /1]  => [RetimingFIFO5783_RetimingFIFO5812] 
-  58: CE12985
-    [RetimingFIFO5783_RetimingFIFO5812 *1 /1]  => [SRAM318] 
-  59: CE12975
-    [SRAM318 *4 /1]  => [RetimingFIFO4752] 
-  60: CE13005
-    [RetimingFIFO5783_RetimingFIFO5812 *1 /1]  => [SRAM319] 
-  61: CE12995
-    [SRAM319 *4 /1]  => [RetimingFIFO4612] 
-  62: CE13253
-    [Reg843 *4 /1] [RetimingFIFO4752 *1 /1]  => [RetimingFIFO6108] 
-  63: CE13265
-    [RetimingFIFO6108 *1 /1]  => [Reg1100] 
-  64: CE12521
-    [Reg1100 *256 /1] [RetimingFIFO5111 *1 /1]  => [RetimingFIFO5121] 
-  65: CE13105
-    [RetimingFIFO5121 *1 /1]  => [SRAM1415] 
-  66: CE13095
-    [SRAM1415 *256 /1]  => [RetimingFIFO4307] 
-  67: CE12577
-    [Reg726 *1 /1]  => [RetimingFIFO5963_RetimingFIFO5992] 
-  68: CE13025
-    [RetimingFIFO5963_RetimingFIFO5992 *1 /1]  => [SRAM320] 
-  69: CE13015
-    [SRAM320 *4 /1]  => [RetimingFIFO4787] 
-  70: CE13045
-    [RetimingFIFO5963_RetimingFIFO5992 *1 /1]  => [SRAM321] 
-  71: CE13035
-    [SRAM321 *4 /1]  => [RetimingFIFO4647] 
-  72: CE13277
-    [Reg845 *4 /1] [RetimingFIFO4787 *1 /1]  => [RetimingFIFO6117] 
-  73: CE13289
-    [RetimingFIFO6117 *1 /1]  => [Reg1102] 
-  74: CE12535
-    [Reg1102 *256 /1] [RetimingFIFO5237 *1 /1]  => [RetimingFIFO5247] 
-  75: CE13125
-    [RetimingFIFO5247 *1 /1]  => [SRAM1416] 
-  76: CE13115
-    [SRAM1416 *256 /1]  => [RetimingFIFO4368] 
-  77: CE13155
-    [RetimingFIFO4368 *1 /1] [RetimingFIFO4307 *1 /1]  => [RetimingFIFO6063] 
-  78: CE12653
-    [RetimingFIFO3426_RetimingFIFO3480_RetimingFIFO3534 *1 /1]  => [SRAM135] 
-  79: CE12643
-    [SRAM135 *256 /1]  => [RetimingFIFO3416] 
-  80: CE12865
-    [RetimingFIFO4439_RetimingFIFO4493 *1 /1]  => [SRAM287] 
-  81: CE12855
-    [SRAM287 *256 /1]  => [RetimingFIFO3355] 
-  82: CE12371
-    [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970 *8192 /1] [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951 *8192 /1] [RetimingFIFO3355 *1 /1] [RetimingFIFO3416 *1 /1]  => [RetimingFIFO3426_RetimingFIFO3480_RetimingFIFO3534] 
-  83: CE12601
-    [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970 *8192 /1] [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951 *8192 /1] [RetimingFIFO3426_RetimingFIFO3480_RetimingFIFO3534 *1 /1]  => [SRAM133] 
-  84: CE12587
-    [SRAM133 *256 /1]  => [RetimingFIFO3657] 
-  85: CE12629
-    [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970 *8192 /1] [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951 *8192 /1] [RetimingFIFO3426_RetimingFIFO3480_RetimingFIFO3534 *1 /1]  => [SRAM134] 
-  86: CE12615
-    [SRAM134 *64 /1]  => [RetimingFIFO3596] 
-  87: CE12399
-    [Reg2012 *4 /1] [RetimingFIFO3657 *1 /1]  => [RetimingFIFO3667_RetimingFIFO3721_RetimingFIFO3775_RetimingFIFO3829_RetimingFIFO3883] 
-  88: CE13423
-    [RetimingFIFO6162 *1 /1] [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189 *1 /1]  => [TokenIn10344] 
-  89: CE13443
-    [TokenIn10344 *512 /1] [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951 *512 /1] [RetimingFIFO3667_RetimingFIFO3721_RetimingFIFO3775_RetimingFIFO3829_RetimingFIFO3883 *1 /1]  => [TokenIn10357] [SRAM15] 
-  90: CE13407
-    [TokenIn10357 *256 /1] [SRAM15 *256 /1]  => [StreamOut2117] 
-  91: CE13499
-    [RetimingFIFO6171 *1 /1] [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189 *1 /1]  => [TokenIn10550] [SRAM16] 
-  92: CE13477
-    [TokenIn10550 *2097152 /1] [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970 *2097152 /1] [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951 *2097152 /1] [SRAM16 *1048576 /1]  => [TokenIn10563] [RetimingFIFO5413] 
-  93: CE13515
-    [TokenIn10563 *256 /1] [RetimingFIFO3667_RetimingFIFO3721_RetimingFIFO3775_RetimingFIFO3829_RetimingFIFO3883 *1 /1]  => [SRAM16] 
-  94: CE13567
-    [RetimingFIFO6180 *1 /1] [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189 *1 /1]  => [TokenIn10748] [SRAM17] 
-  95: CE13545
-    [TokenIn10748 *2097152 /1] [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970 *2097152 /1] [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_Aom 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
+  31: CE12606
+    [RetimingFIFO3564 *1 /1]  => [Reg2012] 
+  32: CE12670
+    [RetimingFIFO4455 *1 /1]  => [Reg839] 
+  33: CE12680
+    [RetimingFIFO4483 *1 /1]  => [Reg841] 
+  34: CE12690
+    [RetimingFIFO4511 *1 /1]  => [Reg843] 
+  35: CE12700
+    [RetimingFIFO4539 *1 /1]  => [Reg845] 
+  36: CE12766
+    [Reg339 *1 /1]  => [RetimingFIFO5239_RetimingFIFO5268] 
+  37: CE13124
+    [RetimingFIFO5239_RetimingFIFO5268 *1 /1]  => [SRAM314] 
+  38: CE13114
+    [SRAM314 *4 /1]  => [RetimingFIFO4567] 
+  39: CE13144
+    [RetimingFIFO5239_RetimingFIFO5268 *1 /1]  => [SRAM315] 
+  40: CE13134
+    [SRAM315 *4 /1]  => [RetimingFIFO4455] 
+  41: CE13424
+    [Reg839 *4 /1] [RetimingFIFO4567 *1 /1]  => [RetimingFIFO5858] 
+  42: CE13436
+    [RetimingFIFO5858 *1 /1]  => [Reg1096] 
+  43: CE12712
+    [Reg1096 *256 /1] [RetimingFIFO4715 *1 /1]  => [RetimingFIFO4725] 
+  44: CE13284
+    [RetimingFIFO4725 *1 /1]  => [SRAM1413] 
+  45: CE13274
+    [SRAM1413 *256 /1]  => [RetimingFIFO4137] 
+  46: CE12776
+    [Reg468 *1 /1]  => [RetimingFIFO5403_RetimingFIFO5432] 
+  47: CE13164
+    [RetimingFIFO5403_RetimingFIFO5432 *1 /1]  => [SRAM316] 
+  48: CE13154
+    [SRAM316 *4 /1]  => [RetimingFIFO4595] 
+  49: CE13184
+    [RetimingFIFO5403_RetimingFIFO5432 *1 /1]  => [SRAM317] 
+  50: CE13174
+    [SRAM317 *4 /1]  => [RetimingFIFO4483] 
+  51: CE13448
+    [Reg841 *4 /1] [RetimingFIFO4595 *1 /1]  => [RetimingFIFO5867] 
+  52: CE13460
+    [RetimingFIFO5867 *1 /1]  => [Reg1098] 
+  53: CE12726
+    [Reg1098 *256 /1] [RetimingFIFO4833 *1 /1]  => [RetimingFIFO4843] 
+  54: CE13304
+    [RetimingFIFO4843 *1 /1]  => [SRAM1414] 
+  55: CE13294
+    [SRAM1414 *256 /1]  => [RetimingFIFO4190] 
+  56: CE13374
+    [RetimingFIFO4137 *1 /1] [RetimingFIFO4190 *1 /1]  => [RetimingFIFO5840] 
+  57: CE12786
+    [Reg597 *1 /1]  => [RetimingFIFO5567_RetimingFIFO5596] 
+  58: CE13204
+    [RetimingFIFO5567_RetimingFIFO5596 *1 /1]  => [SRAM318] 
+  59: CE13194
+    [SRAM318 *4 /1]  => [RetimingFIFO4623] 
+  60: CE13224
+    [RetimingFIFO5567_RetimingFIFO5596 *1 /1]  => [SRAM319] 
+  61: CE13214
+    [SRAM319 *4 /1]  => [RetimingFIFO4511] 
+  62: CE13472
+    [Reg843 *4 /1] [RetimingFIFO4623 *1 /1]  => [RetimingFIFO5876] 
+  63: CE13484
+    [RetimingFIFO5876 *1 /1]  => [Reg1100] 
+  64: CE12740
+    [Reg1100 *256 /1] [RetimingFIFO4951 *1 /1]  => [RetimingFIFO4961] 
+  65: CE13324
+    [RetimingFIFO4961 *1 /1]  => [SRAM1415] 
+  66: CE13314
+    [SRAM1415 *256 /1]  => [RetimingFIFO4243] 
+  67: CE12796
+    [Reg726 *1 /1]  => [RetimingFIFO5731_RetimingFIFO5760] 
+  68: CE13244
+    [RetimingFIFO5731_RetimingFIFO5760 *1 /1]  => [SRAM320] 
+  69: CE13234
+    [SRAM320 *4 /1]  => [RetimingFIFO4651] 
+  70: CE13264
+    [RetimingFIFO5731_RetimingFIFO5760 *1 /1]  => [SRAM321] 
+  71: CE13254
+    [SRAM321 *4 /1]  => [RetimingFIFO4539] 
+  72: CE13496
+    [Reg845 *4 /1] [RetimingFIFO4651 *1 /1]  => [RetimingFIFO5885] 
+  73: CE13508
+    [RetimingFIFO5885 *1 /1]  => [Reg1102] 
+  74: CE12754
+    [Reg1102 *256 /1] [RetimingFIFO5069 *1 /1]  => [RetimingFIFO5079] 
+  75: CE13344
+    [RetimingFIFO5079 *1 /1]  => [SRAM1416] 
+  76: CE13334
+    [SRAM1416 *256 /1]  => [RetimingFIFO4296] 
+  77: CE13410
+    [RetimingFIFO4296 *1 /1] [RetimingFIFO4243 *1 /1]  => [RetimingFIFO5831] 
+  78: CE12872
+    [RetimingFIFO3402_RetimingFIFO3456_RetimingFIFO3510 *1 /1]  => [SRAM135] 
+  79: CE12862
+    [SRAM135 *256 /1]  => [RetimingFIFO3392] 
+  80: CE13084
+    [RetimingFIFO4359_RetimingFIFO4413 *1 /1]  => [SRAM287] 
+  81: CE13074
+    [SRAM287 *256 /1]  => [RetimingFIFO3339] 
+  82: CE12590
+    [RetimingFIFO3339 *1 /1] [RetimingFIFO3392 *1 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *8192 /1] [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *8192 /1]  => [RetimingFIFO3402_RetimingFIFO3456_RetimingFIFO3510] 
+  83: CE12820
+    [RetimingFIFO3402_RetimingFIFO3456_RetimingFIFO3510 *1 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *8192 /1] [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *8192 /1]  => [SRAM133] 
+  84: CE12806
+    [SRAM133 *256 /1]  => [RetimingFIFO3617] 
+  85: CE12848
+    [RetimingFIFO3402_RetimingFIFO3456_RetimingFIFO3510 *1 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *8192 /1] [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *8192 /1]  => [SRAM134] 
+  86: CE12834
+    [SRAM134 *64 /1]  => [RetimingFIFO3564] 
+  87: CE12618
+    [Reg2012 *4 /1] [RetimingFIFO3617 *1 /1]  => [RetimingFIFO3627_RetimingFIFO3681_RetimingFIFO3735_RetimingFIFO3789_RetimingFIFO3843] 
+  88: CE13630
+    [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189 *1 /1]  => [TokenIn10112] 
+  89: CE13650
+    [TokenIn10112 *512 /1] [RetimingFIFO5930 *1 /1] [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *512 /1] [RetimingFIFO3627_RetimingFIFO3681_RetimingFIFO3735_RetimingFIFO3789_RetimingFIFO3843 *1 /1]  => [TokenIn10125] [SRAM15] 
+  90: CE13616
+    [TokenIn10125 *256 /1] [SRAM15 *256 /1]  => [StreamOut2117] 
+  91: CE13714
+    [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189 *1 /1]  => [TokenIn10318] [SRAM16] 
+  92: CE13692
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *2097152 /1] [RetimingFIFO5939 *1 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *2097152 /1] [SRAM16 *1048576 /1] [TokenIn10318 *2097152 /1]  => [TokenIn10331] [RetimingFIFO5229] 
+  93: CE13728
+    [TokenIn10331 *256 /1] [RetimingFIFO3627_RetimingFIFO3681_RetimingFIFO3735_RetimingFIFO3789_RetimingFIFO3843 *1 /1]  => [SRAM16] 
+  94: CE13790
+    [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189 *1 /1]  => [TokenIn10516] [SRAM17] 
+  95: CE13768
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *2097152 /1] [RetimingFIFO5948 *1 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *2097152 /1] [SRAM17 *1048576 /1] [TokenIn10516 *2097152 /1]  => [TokenIn10529] [RetimingFIFO5393] 
+  96: CE13804
+    [TokenIn10529 *256 /1] [RetimingFIFO3627_RetimingFIFO3681_RetimingFIFO3735_RetimingFIFO3789_RetimingFIFO3843 *1 /1]  => [SRAM17] 
+  97: CE13866
+    [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189 *1 /1]  => [TokenIn10714] [SRAM18] 
+  98: CE13844
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *2097152 /1] [RetimingFIFO5957 *1 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn10242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *2097152 /1] [SRAM18 *1048576 /1] [TokenIn10714 *2097152 /1]  => [TokenIn10727] [RetimingFIFO5557] 
+  99: CE13880
+    [TokenIn10727 *256 /1] [RetimingFIFO3627_RetimingFIFO3681_RetimingFIFO3735_RetimingFIFO3789_RetimingFIFO3843 *1 /1]  => [SRAM18] 
+  100: CE13942
+    [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189 *1 /1]  => [TokenIn10912] [SRAM19] 
+  101: CE13920
+    [ArgIn6783_ArgIn6969_ArgIn10036_ArgIn11074_ArgIn11117_ArgIn11197_ArgIn11258_ArgIn11319_ArgIn11380_ArgIn11644_ArgIn11719_ArgIn11818_ArgIn11869_ArgIn11960_ArgIn12051_ArgIn12142 *2097152 /1] [RetimingFIFO5966 *1 /1] [ArgIn2882_ArgIn2931_ArgIn7596_ArgIn7668_ArgIn1 exit VCs.
+1 hops for route 7224
+1 hops for route 7224
+1 hops for route 7224
+1 hops for route 7224
+Set exit class for pos 0 to 1 (rt 7224)
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-1 hops for route 6892
-Set exit class for pos 0 to 0 (rt 6892)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7236
-Set exit class for pos 0 to 2 (rt 7236)
-1 hops for route 7236
-1 hops for route 7236
-1 hops for route 7236
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 6754
-Set exit class for pos 0 to 0 (rt 6754)
-1 hops for route 6754
-1 hops for route 6754
-1 hops for route 6754
-1 hops for route 6754
-1 hops for route 6754
-1 hops for route 6754
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7130
-Set exit class for pos 0 to 1 (rt 7130)
-1 hops for route 7130
-1 hops for route 7130
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7758
-Set exit class for pos 0 to 0 (rt 7758)
-1 hops for route 7758
-1 hops for route 7758
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7672
-1 hops for route 7672
-1 hops for route 7672
-1 hops for route 7672
-1 hops for route 7672
-1 hops for route 7672
-1 hops for route 7672
-Set exit class for pos 0 to 0 (rt 7672)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7801
-1 hops for route 7801
-1 hops for route 7801
-1 hops for route 7801
-1 hops for route 7801
-1 hops for route 7801
-1 hops for route 7801
-Set exit class for pos 0 to 0 (rt 7801)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-1 hops for route 7715
-Set exit class for pos 0 to 0 (rt 7715)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9908
-Set exit class for pos 0 to 1 (rt 9908)
-1 hops for route 9908
-1 hops for route 9908
-1 hops for route 9908
-1 hops for route 9908
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9828
-Set exit class for pos 0 to 1 (rt 9828)
-1 hops for route 9828
-1 hops for route 9828
-1 hops for route 9828
-1 hops for route 9828
-1 hops for route 9828
-1 hops for route 9828
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9748
-Set exit class for pos 0 to 1 (rt 9748)
-1 hops for route 9748
-1 hops for route 9748
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9668
-Set exit class for pos 0 to 1 (rt 9668)
-1 hops for route 9668
-1 hops for route 9668
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7600
-Set exit class for pos 0 to 1 (rt 7600)
-1 hops for route 7600
-1 hops for route 7600
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7528
-1 hops for route 7528
-1 hops for route 7528
-1 hops for route 7528
-1 hops for route 7528
-Set exit class for pos 0 to 1 (rt 7528)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7456
-Set exit class for pos 0 to 1 (rt 7456)
-1 hops for route 7456
-1 hops for route 7456
-1 hops for route 7456
-1 hops for route 7456
-1 hops for route 7456
-1 hops for route 7456
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 7384
-1 hops for route 7384
-1 hops for route 7384
-1 hops for route 7384
-1 hops for route 7384
-1 hops for route 7384
-1 hops for route 7384
-Set exit class for pos 0 to 1 (rt 7384)
+1 hops for route 7152
+Set exit class for pos 0 to 1 (rt 7152)
+1 hops for route 7152
+1 hops for route 7152
+1 hops for route 7152
+1 hops for route 7152
 I'm the child process!
 GPGPU-Sim uArch: interconnect node map (shaderID+MemID to icntID)
 GPGPU-Sim uArch: Memory nodes ID start from index: 256
@@ -2709,45 +2398,33 @@ GPGPU-Sim uArch:  192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 20
 GPGPU-Sim uArch:  208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223
 GPGPU-Sim uArch:  224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239
 GPGPU-Sim uArch:  240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255
-rgIn11612_ArgIn11876_ArgIn11951 *2097152 /1] [SRAM17 *1048576 /1]  => [TokenIn10761] [RetimingFIFO5593] 
-  96: CE13583
-    [TokenIn10761 *256 /1] [RetimingFIFO3667_RetimingFIFO3721_RetimingFIFO3775_RetimingFIFO3829_RetimingFIFO3883 *1 /1]  => [SRAM17] 
-  97: CE13635
-    [RetimingFIFO6189 *1 /1] [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189 *1 /1]  => [TokenIn10946] [SRAM18] 
-  98: CE13613
-    [TokenIn10946 *2097152 /1] [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970 *2097152 /1] [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951 *2097152 /1] [SRAM18 *1048576 /1]  => [TokenIn10959] [RetimingFIFO5773] 
-  99: CE13651
-    [TokenIn10959 *256 /1] [RetimingFIFO3667_RetimingFIFO3721_RetimingFIFO3775_RetimingFIFO3829_RetimingFIFO3883 *1 /1]  => [SRAM18] 
-  100: CE13703
-    [RetimingFIFO6198 *1 /1] [RetimingFIFO2973_RetimingFIFO3027_RetimingFIFO3081_RetimingFIFO3135_RetimingFIFO3189 *1 /1]  => [TokenIn11144] [SRAM19] 
-  101: CE13681
-    [TokenIn11144 *2097152 /1] [ArgIn2882_ArgIn2931_ArgIn7828_ArgIn7900_ArgIn10498_ArgIn10696_ArgIn10894_ArgIn11092_ArgIn11895_ArgIn11970 *2097152 /1] [ArgIn7015_ArgIn7201_ArgIn10292_ArgIn11306_ArgIn11349_ArgIn11429_ArgIn11490_ArgIn11551_ArgIn11612_ArgIn11876_ArgIn11951 *2097152 /1] [SRAM19 *1048576 /1]  => [TokenIn11157] [RetimingFIFO5953] 
-  102: CE13719
-    [TokenIn11157 *256 /1] [RetimingFIFO3667_RetimingFIFO3721_RetimingFIFO3775_RetimingFIFO3829_RetimingFIFO3883 *1 /1]  => [SRAM19] 
-  103: CE12281
+0242_ArgIn10440_ArgIn10638_ArgIn10836_ArgIn11663_ArgIn11738_ArgIn11888_ArgIn11979_ArgIn12070_ArgIn12161 *2097152 /1] [SRAM19 *1048576 /1] [TokenIn10912 *2097152 /1]  => [TokenIn10925] [RetimingFIFO5721] 
+  102: CE13956
+    [TokenIn10925 *256 /1] [RetimingFIFO3627_RetimingFIFO3681_RetimingFIFO3735_RetimingFIFO3789_RetimingFIFO3843 *1 /1]  => [SRAM19] 
+  103: CE12500
     [StreamOut2116 *4 /1] [StreamOut2117 *1 /1] [StreamOut2115 *4 /1]  => [StreamIn2118] 
-  104: CE13301
-    [RetimingFIFO5413 *1 /1] [RetimingFIFO5352 *1 /1]  => [RetimingFIFO6126] 
-  105: CE13325
-    [RetimingFIFO5593 *1 /1] [RetimingFIFO5532 *1 /1]  => [RetimingFIFO6135] 
-  106: CE13349
-    [RetimingFIFO5773 *1 /1] [RetimingFIFO5712 *1 /1]  => [RetimingFIFO6144] 
-  107: CE13373
-    [RetimingFIFO5953 *1 /1] [RetimingFIFO5892 *1 /1]  => [RetimingFIFO6153] 
-  108: CE13313
-    [RetimingFIFO6126 *1 /1]  => [Reg339] 
-  109: CE13337
-    [RetimingFIFO6135 *1 /1]  => [Reg468] 
-  110: CE13361
-    [RetimingFIFO6144 *1 /1]  => [Reg597] 
-  111: CE13385
-    [RetimingFIFO6153 *1 /1]  => [Reg726] 
-  112: CE12885
-    [RetimingFIFO4439_RetimingFIFO4493 *1 /1]  => [SRAM288] 
-  113: CE12875
-    [SRAM288 *256 /1]  => [RetimingFIFO4429] 
-  114: CE13187
-    [RetimingFIFO4429 *1 /1] [RetimingFIFO6063 *1 /1] [RetimingFIFO6072 *1 /1] [RetimingFIFO6081 *1 /1]  => [RetimingFIFO4439_RetimingFIFO4493] 
+  104: CE13520
+    [RetimingFIFO5229 *1 /1] [RetimingFIFO5176 *1 /1]  => [RetimingFIFO5894] 
+  105: CE13544
+    [RetimingFIFO5393 *1 /1] [RetimingFIFO5340 *1 /1]  => [RetimingFIFO5903] 
+  106: CE13568
+    [RetimingFIFO5557 *1 /1] [RetimingFIFO5504 *1 /1]  => [RetimingFIFO5912] 
+  107: CE13592
+    [RetimingFIFO5721 *1 /1] [RetimingFIFO5668 *1 /1]  => [RetimingFIFO5921] 
+  108: CE13532
+    [RetimingFIFO5894 *1 /1]  => [Reg339] 
+  109: CE13556
+    [RetimingFIFO5903 *1 /1]  => [Reg468] 
+  110: CE13580
+    [RetimingFIFO5912 *1 /1]  => [Reg597] 
+  111: CE13604
+    [RetimingFIFO5921 *1 /1]  => [Reg726] 
+  112: CE13104
+    [RetimingFIFO4359_RetimingFIFO4413 *1 /1]  => [SRAM288] 
+  113: CE13094
+    [SRAM288 *256 /1]  => [RetimingFIFO4349] 
+  114: CE13392
+    [RetimingFIFO4349 *1 /1] [RetimingFIFO5831 *1 /1] [RetimingFIFO5840 *1 /1] [RetimingFIFO5849 *1 /1]  => [RetimingFIFO4359_RetimingFIFO4413] 
 
 DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
 10000...
@@ -3598,447 +3275,508 @@ DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
 8460000...
 8470000...
 8480000...
-8490000...
-8500000...
-8510000...
-Simulation complete at cycle: 8510512
-CE12251: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
+Simulation complete at cycle: 8487246
+CE12470: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
 	     256      256 
 	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
-CE12265: Active:   1.5 Stalled:  77.0 Starved:  21.4 Total Active:   131072 Expected Active:   131072
+CE12484: Active:   1.5 Stalled:  77.0 Starved:  21.4 Total Active:   131072 Expected Active:   131072
 	  131072   131072 
 	DRAM:   0.99 GB/s (  0.99 GB/s R,   0.00 GB/s W)
-CE12303: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
+CE12522: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
 	
-CE12319: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
+CE12538: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
 	       1 
-CE12339: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       64 Expected Active:       64
+CE12558: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       64 Expected Active:       64
 	      64 
-CE12353: Active:   0.0 Stalled: 100.0 Starved:   0.0 Total Active:       64 Expected Active:       64
+CE12572: Active:   0.0 Stalled: 100.0 Starved:   0.0 Total Active:       64 Expected Active:       64
 	      64 
-CE12417: Active:   0.4 Stalled:  78.2 Starved:  21.5 Total Active:    32768 Expected Active:    32768
+CE12636: Active:   0.4 Stalled:  78.1 Starved:  21.5 Total Active:    32768 Expected Active:    32768
 	   32768    32768    32768 
-CE12437: Active:   1.5 Stalled:  77.0 Starved:  21.4 Total Active:   131072 Expected Active:   131072
+CE12656: Active:   1.5 Stalled:  77.0 Starved:  21.4 Total Active:   131072 Expected Active:   131072
 	  131072   131072   131072 
-CE13139: Active:  24.6 Stalled:  75.3 Starved:   0.0 Total Active:  2097152 Expected Active:  2097152
+CE13358: Active:  24.7 Stalled:  75.3 Starved:   0.0 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152  2097152 
-CE13395: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
+CE13670: Active:   0.0 Stalled: 100.0 Starved:   0.0 Total Active:      512 Expected Active:      512
+	     512      512 
+CE13744: Active:  24.7 Stalled:  73.8 Starved:   1.5 Total Active:  2097152 Expected Active:  2097152
+	 2097152  2097152  2097152 
+CE13820: Active:  24.7 Stalled:  73.9 Starved:   1.4 Total Active:  2097152 Expected Active:  2097152
+	 2097152  2097152  2097152 
+CE13896: Active:  24.7 Stalled:  73.9 Starved:   1.4 Total Active:  2097152 Expected Active:  2097152
+	 2097152  2097152  2097152 
+CE13972: Active:  24.7 Stalled:  73.8 Starved:   1.5 Total Active:  2097152 Expected Active:  2097152
+	 2097152  2097152  2097152 
+CE12894: Active:   1.5 Stalled:  66.6 Starved:  34.5 Total Active:   131072 Expected Active:   131072
+	  131072   131072 
+CE12882: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
+	 2097152 
+CE12918: Active:   1.5 Stalled:  66.6 Starved:  34.6 Total Active:   131072 Expected Active:   131072
+	  131072   131072 
+CE12906: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
+	 2097152 
+CE12942: Active:   1.5 Stalled:  66.6 Starved:  34.6 Total Active:   131072 Expected Active:   131072
+	  131072   131072 
+CE12930: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
+	 2097152 
+CE12966: Active:   1.5 Stalled:  66.6 Starved:  34.5 Total Active:   131072 Expected Active:   131072
+	  131072   131072 
+CE12954: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
+	 2097152 
+CE12990: Active:   1.5 Stalled:  31.4 Starved:  68.3 Total Active:   131072 Expected Active:   131072
+	  131072   131072 
+CE12978: Active:  24.7 Stalled:  73.4 Starved:   1.9 Total Active:  2097152 Expected Active:  2097152
+	 2097152 
+CE13014: Active:   1.5 Stalled:  33.8 Starved:  66.0 Total Active:   131072 Expected Active:   131072
+	  131072   131072 
+CE13002: Active:  24.7 Stalled:  73.5 Starved:   1.8 Total Active:  2097152 Expected Active:  2097152
+	 2097152 
+CE13038: Active:   1.5 Stalled:  35.0 Starved:  64.9 Total Active:   131072 Expected Active:   131072
+	  131072   131072 
+CE13026: Active:  24.7 Stalled:  73.5 Starved:   1.8 Total Active:  2097152 Expected Active:  2097152
+	 2097152 
+CE13062: Active:   1.5 Stalled:  32.6 Starved:  67.2 Total Active:   131072 Expected Active:   131072
+	  131072   131072 
+CE13050: Active:  24.7 Stalled:  73.4 Starved:   1.9 Total Active:  2097152 Expected Active:  2097152
+	 2097152 
+CE12546: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
 	     256 
-CE13459: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE13527: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE13595: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE13663: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE12675: Active:   1.5 Stalled:  66.2 Starved:  34.9 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12663: Active:  24.6 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12699: Active:   1.5 Stalled:  66.3 Starved:  34.8 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12687: Active:  24.6 Stalled:  74.9 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12723: Active:   1.5 Stalled:  66.3 Starved:  34.9 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12711: Active:  24.6 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12747: Active:   1.5 Stalled:  66.3 Starved:  34.8 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12735: Active:  24.6 Stalled:  74.9 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12771: Active:   1.5 Stalled:  25.2 Starved:  74.3 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12759: Active:  24.6 Stalled:  73.2 Starved:   2.2 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12795: Active:   1.5 Stalled:  27.3 Starved:  72.2 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12783: Active:  24.6 Stalled:  73.3 Starved:   2.1 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12819: Active:   1.5 Stalled:  27.5 Starved:  72.1 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12807: Active:  24.6 Stalled:  73.3 Starved:   2.1 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12843: Active:   1.5 Stalled:  33.3 Starved:  66.5 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12831: Active:  24.6 Stalled:  73.5 Starved:   1.8 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12327: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE12387: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      128 Expected Active:      128
+CE12606: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      128 Expected Active:      128
 	     128 
-CE12451: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
+CE12670: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE12461: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
+CE12680: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE12471: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
+CE12690: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE12481: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
+CE12700: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE12547: Active:   6.2 Stalled:  87.0 Starved:   6.8 Total Active:   524288 Expected Active:   524288
+CE12766: Active:   6.2 Stalled:  87.9 Starved:   5.9 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE12905: Active:   6.2 Stalled:  86.8 Starved:   7.2 Total Active:   524288 Expected Active:   524288
+CE13124: Active:   6.2 Stalled:  87.7 Starved:   6.3 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE12895: Active:   0.4 Stalled:  92.8 Starved:   6.9 Total Active:    32768 Expected Active:    32768
+CE13114: Active:   0.4 Stalled:  93.7 Starved:   5.9 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE12925: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
+CE13144: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE12915: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
+CE13134: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE13205: Active:   0.4 Stalled:  93.5 Starved:   6.2 Total Active:    32768 Expected Active:    32768
+CE13424: Active:   0.4 Stalled:  94.6 Starved:   5.1 Total Active:    32768 Expected Active:    32768
 	   32768    32768 
-CE13217: Active:   0.4 Stalled:  94.6 Starved:   5.1 Total Active:    32768 Expected Active:    32768
+CE13436: Active:   0.4 Stalled:  95.4 Starved:   4.3 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE12493: Active:  24.6 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
+CE12712: Active:  24.7 Stalled:  65.5 Starved:   9.9 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152 
-CE13065: Active:  24.6 Stalled:  74.7 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
+CE13284: Active:  24.7 Stalled:  72.5 Starved:   2.9 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE13055: Active:  24.6 Stalled:  74.9 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
+CE13274: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE12557: Active:   6.2 Stalled:  87.4 Starved:   6.4 Total Active:   524288 Expected Active:   524288
+CE12776: Active:   6.2 Stalled:  88.3 Starved:   5.6 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE12945: Active:   6.2 Stalled:  86.3 Starved:   7.7 Total Active:   524288 Expected Active:   524288
+CE13164: Active:   6.2 Stalled:  88.0 Starved:   5.9 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE12935: Active:   0.4 Stalled:  93.2 Starved:   6.5 Total Active:    32768 Expected Active:    32768
+CE13154: Active:   0.4 Stalled:  94.1 Starved:   5.5 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE12965: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
+CE13184: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE12955: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
+CE13174: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE13229: Active:   0.4 Stalled:  93.8 Starved:   5.8 Total Active:    32768 Expected Active:    32768
+CE13448: Active:   0.4 Stalled:  95.0 Starved:   4.7 Total Active:    32768 Expected Active:    32768
 	   32768    32768 
-CE13241: Active:   0.4 Stalled:  94.6 Starved:   5.1 Total Active:    32768 Expected Active:    32768
+CE13460: Active:   0.4 Stalled:  95.7 Starved:   3.9 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE12507: Active:  24.6 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
+CE12726: Active:  24.7 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152 
-CE13085: Active:  24.6 Stalled:  74.7 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
+CE13304: Active:  24.7 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE13075: Active:  24.6 Stalled:  74.9 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
+CE13294: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE13169: Active:  24.6 Stalled:  74.9 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
+CE13374: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152 
-CE12567: Active:   6.2 Stalled:  87.4 Starved:   6.5 Total Active:   524288 Expected Active:   524288
+CE12786: Active:   6.2 Stalled:  88.4 Starved:   5.4 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE12985: Active:   6.2 Stalled:  87.4 Starved:   6.4 Total Active:   524288 Expected Active:   524288
+CE13204: Active:   6.2 Stalled:  88.5 Starved:   5.4 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE12975: Active:   0.4 Stalled:  93.2 Starved:   6.5 Total Active:    32768 Expected Active:    32768
+CE13194: Active:   0.4 Stalled:  94.3 Starved:   5.4 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE13005: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
+CE13224: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE12995: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
+CE13214: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE13253: Active:   0.4 Stalled:  93.8 Starved:   5.9 Total Active:    32768 Expected Active:    32768
+CE13472: Active:   0.4 Stalled:  95.0 Starved:   4.7 Total Active:    32768 Expected Active:    32768
 	   32768    32768 
-CE13265: Active:   0.4 Stalled:  95.4 Starved:   4.3 Total Active:    32768 Expected Active:    32768
+CE13484: Active:   0.4 Stalled:  95.7 Starved:   3.9 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE12521: Active:  24.6 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
+CE12740: Active:  24.7 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152 
-CE13105: Active:  24.6 Stalled:  74.7 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
+CE13324: Active:  24.7 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE13095: Active:  24.6 Stalled:  74.9 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
+CE13314: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE12577: Active:   6.2 Stalled:  88.3 Starved:   5.6 Total Active:   524288 Expected Active:   524288
+CE12796: Active:   6.2 Stalled:  88.1 Starved:   5.7 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE13025: Active:   6.2 Stalled:  88.3 Starved:   5.5 Total Active:   524288 Expected Active:   524288
+CE13244: Active:   6.2 Stalled:  87.9 Starved:   6.1 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE13015: Active:   0.4 Stalled:  94.1 Starved:   5.5 Total Active:    32768 Expected Active:    32768
+CE13234: Active:   0.4 Stalled:  93.9 Starved:   5.7 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE13045: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
+CE13264: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
 	  524288 
-CE13035: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
+CE13254: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE13277: Active:   0.4 Stalled:  95.4 Starved:   4.3 Total Active:    32768 Expected Active:    32768
+CE13496: Active:   0.4 Stalled:  94.6 Starved:   5.1 Total Active:    32768 Expected Active:    32768
 	   32768    32768 
-CE13289: Active:   0.4 Stalled:  96.1 Starved:   3.6 Total Active:    32768 Expected Active:    32768
+CE13508: Active:   0.4 Stalled:  95.4 Starved:   4.3 Total Active:    32768 Expected Active:    32768
 	   32768 
-CE12535: Active:  24.6 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
+CE12754: Active:  24.7 Stalled:  74.5 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152 
-CE13125: Active:  24.6 Stalled:  74.5 Starved:   0.9 Total Active:  2097152 Expected Active:  2097152
+CE13344: Active:  24.7 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE13115: Active:  24.6 Stalled:  74.9 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
+CE13334: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE13155: Active:  24.6 Stalled:  74.9 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
+CE13410: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152 
-CE12653: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:     8192 Expected Active:     8192
+CE12872: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:     8192 Expected Active:     8192
 	    8192 
-CE12643: Active:   0.1 Stalled:  99.8 Starved:   0.1 Total Active:     8245 Expected Active:     8192
+CE12862: Active:   0.1 Stalled:  99.8 Starved:   0.1 Total Active:     8261 Expected Active:     8192
 	    8192 
-CE12865: Active:  24.6 Stalled:   0.0 Starved:  75.4 Total Active:  2097152 Expected Active:  2097152
+CE13084: Active:  24.7 Stalled:   0.0 Starved:  75.3 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE12855: Active:   0.1 Stalled:   0.1 Starved:  99.8 Total Active:     8192 Expected Active:     8192
+CE13074: Active:   0.1 Stalled:   0.1 Starved:  99.8 Total Active:     8192 Expected Active:     8192
 	    8192 
-CE12371: Active:   0.1 Stalled:   0.2 Starved:  99.7 Total Active:     8192 Expected Active:     8192
-	    8192     8192     8192     8193 
-CE12601: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:     8192 Expected Active:     8192
+CE12590: Active:   0.1 Stalled:   0.2 Starved:  99.7 Total Active:     8192 Expected Active:     8192
+	    8192     8193     8192     8192 
+CE12820: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:     8192 Expected Active:     8192
 	    8192     8192     8192 
-CE12587: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
+CE12806: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
 	     512 
-CE12629: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:     8192 Expected Active:     8192
+CE12848: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:     8192 Expected Active:     8192
 	    8192     8192     8192 
-CE12615: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      128 Expected Active:      128
+CE12834: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      128 Expected Active:      128
 	     128 
-CE12399: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
+CE12618: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
 	     512      512 
-CE13423: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
+CE13630: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
+	     256 
+CE13650: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
+	     512      512      512      512 
+CE13616: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
 	     256      256 
-CE13443: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
-	     512      512      512 
-CE13407: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256      256 
-CE13499: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256      256 
-CE13477: Active:  24.6 Stalled:  71.8 Starved:   3.6 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152  3145728 
-CE13515: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
+CE13714: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
+	     256 
+CE13692: Active:  24.7 Stalled:  72.2 Starved:   3.1 Total Active:  2097152 Expected Active:  2097152
+	 2097152  2097152  2097152  3145728  2097152 
+CE13728: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
 	     512      512 
-CE13567: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256      256 
-CE13545: Active:  24.6 Stalled:  72.0 Starved:   3.4 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152  3145728 
-CE13583: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
+CE13790: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
+	     256 
+CE13768: Active:  24.7 Stalled:  72.4 Starved:   2.9 Total Active:  2097152 Expected Active:  2097152
+	 2097152  2097152  2097152  3145728  2097152 
+CE13804: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
 	     512      512 
-CE13635: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256      256 
-CE13613: Active:  24.6 Stalled:  72.0 Starved:   3.4 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152  3145728 
-CE13651: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
+CE13866: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
+	     256 
+CE13844: Active:  24.7 Stalled:  72.5 Starved:   2.8 Total Active:  2097152 Expected Active:  2097152
+	 2097152  2097152  2097152  3145728  2097152 
+CE13880: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
 	     512      512 
-CE13703: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256      256 
-CE13681: Active:  24.6 Stalled:  72.5 Starved:   2.9 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152  3145728 
-CE13719: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
-	     512      512Starting remote loop
+CE13942: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
+	     256 
+CE13920: Active:  24.7 Stalled:  72.3 Starved:   3.0 Total Active:  2097152 Expected Active:  2097152
+	 2097152  2097152  2097152  3145728  2097152 
+CE13956: Active:   0.0 Stalled:   0.0 SStarting remote loop
 Dumping flits:
-  Flit ID: 71871666 (0x2c36270) Packet ID: 71871666 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507845 Injection time: 8507845 Arrival time: -1 Phase: -1
-  VC: 3
-  Flit ID: 71871668 (0x3177960) Packet ID: 71871668 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507846 Injection time: 8507846 Arrival time: -1 Phase: -1
-  VC: 3
-  Flit ID: 71871670 (0x25b3810) Packet ID: 71871670 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507847 Injection time: 8507847 Arrival time: -1 Phase: -1
-  VC: 3
-  Flit ID: 71871672 (0x2efc9d0) Packet ID: 71871672 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507848 Injection time: 8507848 Arrival time: -1 Phase: -1
-  VC: 3
-  Flit ID: 71871674 (0x21db180) Packet ID: 71871674 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507849 Injection time: 8507849 Arrival time: -1 Phase: -1
-  VC: 3
-  Flit ID: 71871676 (0x3269990) Packet ID: 71871676 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507850 Injection time: 8507850 Arrival time: -1 Phase: -1
-  VC: 3
-  Flit ID: 71871678 (0x2ec8710) Packet ID: 71871678 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507851 Injection time: 8507851 Arrival time: -1 Phase: -1
-  VC: 3
-  Flit ID: 71871680 (0x31c9be0) Packet ID: 71871680 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507852 Injection time: 8507852 Arrival time: -1 Phase: -1
-  VC: 3
-  Flit ID: 71871682 (0x1a63b30) Packet ID: 71871682 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507853 Injection time: 8507853 Arrival time: -1 Phase: -1
+  Flit ID: 80259147 (0x1630000) Packet ID: 80259147 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484624 Injection time: 8484624 Arrival time: -1 Phase: -1
+  VC: 1
+  Flit ID: 80259149 (0x2ac1290) Packet ID: 80259149 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484625 Injection time: 8484625 Arrival time: -1 Phase: -1
+  VC: 1
+  Flit ID: 80259151 (0x18c7f10) Packet ID: 80259151 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484626 Injection time: 8484626 Arrival time: -1 Phase: -1
+  VC: 1
+  Flit ID: 80259153 (0x2aa5ca0) Packet ID: 80259153 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484627 Injection time: 8484627 Arrival time: -1 Phase: -1
+  VC: 1
+  Flit ID: 80259155 (0x14b3610) Packet ID: 80259155 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484628 Injection time: 8484628 Arrival time: -1 Phase: -1
+  VC: 1
+  Flit ID: 80259157 (0x2b050d0) Packet ID: 80259157 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484629 Injection time: 8484629 Arrival time: -1 Phase: -1
+  VC: 1
+  Flit ID: 80259159 (0x2acdb50) Packet ID: 80259159 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484630 Injection time: 8484630 Arrival time: -1 Phase: -1
+  VC: 1
+  Flit ID: 80259161 (0x285da00) Packet ID: 80259161 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484631 Injection time: 8484631 Arrival time: -1 Phase: -1
+  VC: 1
+  Flit ID: 80259164 (0x1b4c760) Packet ID: 80259164 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484632 Injection time: 8484632 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871684 (0x3193070) Packet ID: 71871684 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507854 Injection time: 8507854 Arrival time: -1 Phase: -1
+  Flit ID: 80259167 (0x1b253e0) Packet ID: 80259167 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484633 Injection time: 8484633 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871686 (0x1f925d0) Packet ID: 71871686 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507855 Injection time: 8507855 Arrival time: -1 Phase: -1
+  Flit ID: 80259170 (0x1a0a770) Packet ID: 80259170 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484634 Injection time: 8484634 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871688 (0x31ca370) Packet ID: 71871688 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507856 Injection time: 8507856 Arrival time: -1 Phase: -1
+  Flit ID: 80259173 (0x2b5ed20) Packet ID: 80259173 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484635 Injection time: 8484635 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871690 (0x3223710) Packet ID: 71871690 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507857 Injection time: 8507857 Arrival time: -1 Phase: -1
+  Flit ID: 80259176 (0x1b0fcb0) Packet ID: 80259176 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484636 Injection time: 8484636 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871692 (0x174e7e0) Packet ID: 71871692 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507858 Injection time: 8507858 Arrival time: -1 Phase: -1
+  Flit ID: 80259179 (0x11a55d0) Packet ID: 80259179 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484637 Injection time: 8484637 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871694 (0x3176c10) Packet ID: 71871694 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507859 Injection time: 8507859 Arrival time: -1 Phase: -1
+  Flit ID: 80259182 (0x2aaf610) Packet ID: 80259182 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484638 Injection time: 8484638 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871696 (0x1f570f0) Packet ID: 71871696 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507860 Injection time: 8507860 Arrival time: -1 Phase: -1
+  Flit ID: 80259185 (0x2acaf90) Packet ID: 80259185 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484639 Injection time: 8484639 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871699 (0x18687a0) Packet ID: 71871699 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507861 Injection time: 8507861 Arrival time: -1 Phase: -1
+  Flit ID: 80259188 (0x14b3730) Packet ID: 80259188 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484640 Injection time: 8484640 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871702 (0x31dd710) Packet ID: 71871702 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507862 Injection time: 8507862 Arrival time: -1 Phase: -1
+  Flit ID: 80259192 (0x1b0e8c0) Packet ID: 80259192 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484641 Injection time: 8484641 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871705 (0x2206990) Packet ID: 71871705 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507863 Injection time: 8507863 Arrival time: -1 Phase: -1
+  Flit ID: 80259195 (0x2b07a20) Packet ID: 80259195 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484642 Injection time: 8484642 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871709 (0x1f57b80) Packet ID: 71871709 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507864 Injection time: 8507864 Arrival time: -1 Phase: -1
+  Flit ID: 80259199 (0x2acf680) Packet ID: 80259199 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484643 Injection time: 8484643 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871712 (0x1edd280) Packet ID: 71871712 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507865 Injection time: 8507865 Arrival time: -1 Phase: -1
+  Flit ID: 80259202 (0x2a9a9c0) Packet ID: 80259202 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484644 Injection time: 8484644 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871716 (0x1be67c0) Packet ID: 71871716 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507866 Injection time: 8507866 Arrival time: -1 Phase: -1
+  Flit ID: 80259206 (0x2af5c30) Packet ID: 80259206 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484645 Injection time: 8484645 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871719 (0x1784dd0) Packet ID: 71871719 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507867 Injection time: 8507867 Arrival time: -1 Phase: -1
+  Flit ID: 80259209 (0x1905de0) Packet ID: 80259209 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484646 Injection time: 8484646 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871723 (0x3177070) Packet ID: 71871723 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507868 Injection time: 8507868 Arrival time: -1 Phase: -1
+  Flit ID: 80259213 (0x1b86cd0) Packet ID: 80259213 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484647 Injection time: 8484647 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71871726 (0x186fbd0) Packet ID: 71871726 Type: 2 Head: 1 Tail: 1
-  Source: 103  Dest: 102 Flow: 9545
-  Creation time: 8507869 Injection time: -1 Arrival time: -1 Phase: -1
+  Flit ID: 80259216 (0x2b3be10) Packet ID: 80259216 Type: 2 Head: 1 Tail: 1
+  Source: 68  Dest: 67 Flow: 9265
+  Creation time: 8484648 Injection time: -1 Arrival time: -1 Phase: -1
   VC: -1
-  Flit ID: 71872937 (0x31a3870) Packet ID: 71872937 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508669 Injection time: 8508669 Arrival time: -1 Phase: -1
+  Flit ID: 80260422 (0x19e24c0) Packet ID: 80260422 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485447 Injection time: 8485447 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872938 (0x2709470) Packet ID: 71872938 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508670 Injection time: 8508670 Arrival time: -1 Phase: -1
+  Flit ID: 80260425 (0x2080160) Packet ID: 80260425 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485448 Injection time: 8485448 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872939 (0x18a5160) Packet ID: 71872939 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508671 Injection time: 8508671 Arrival time: -1 Phase: -1
+  Flit ID: 80260428 (0x2ae6140) Packet ID: 80260428 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485449 Injection time: 8485449 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872940 (0x298c9d0) Packet ID: 71872940 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508672 Injection time: 8508672 Arrival time: -1 Phase: -1
+  Flit ID: 80260431 (0x10f2d00) Packet ID: 80260431 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485450 Injection time: 8485450 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872941 (0x3210970) Packet ID: 71872941 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508673 Injection time: 8508673 Arrival time: -1 Phase: -1
+  Flit ID: 80260434 (0x1c3e180) Packet ID: 80260434 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485451 Injection time: 8485451 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872942 (0x2d8de50) Packet ID: 71872942 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508674 Injection time: 8508674 Arrival time: -1 Phase: -1
+  Flit ID: 80260437 (0x11225b0) Packet ID: 80260437 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485452 Injection time: 8485452 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872943 (0x2d79ba0) Packet ID: 71872943 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508675 Injection time: 8508675 Arrival time: -1 Phase: -1
+  Flit ID: 80260440 (0x1631b50) Packet ID: 80260440 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485453 Injection time: 8485453 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872944 (0x19f5fd0) Packet ID: 71872944 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508676 Injection time: 8508676 Arrival time: -1 Phase: -1
+  Flit ID: 80260443 (0x123e110) Packet ID: 80260443 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485454 Injection time: 8485454 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872945 (0x1746e70) Packet ID: 71872945 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508677 Injection time: 8508677 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 71872946 (0x1940600) Packet ID: 71872946 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508678 Injection time: 8508678 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 71872947 (0x25e0bf0) Packet ID: 71872947 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508679 Injection time: 8508679 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 71872948 (0x321afe0) Packet ID: 71872948 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508680 Injection time: 8508680 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 71872949 (0x3199210) Packet ID: 71872949 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508681 Injection time: 8508681 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 71872950 (0x18e2160) Packet ID: 71872950 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508682 Injection time: 8508682 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 71872951 (0x222b5d0) Packet ID: 71872951 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508683 Injection time: 8508683 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 71872952 (0x1bf45b0) Packet ID: 71872952 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508684 Injection time: 8508684 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 71872954 (0x31c1da0) Packet ID: 71872954 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508685 Injection time: 8508685 Arrival time: -1 Phase: -1
+  Flit ID: 80260446 (0x2ae1290) Packet ID: 80260446 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485455 Injection time: 8485455 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872956 (0x31bda50) Packet ID: 71872956 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508686 Injection time: 8508686 Arrival time: -1 Phase: -1
+  Flit ID: 80260449 (0x2b18480) Packet ID: 80260449 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485456 Injection time: 8485456 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872958 (0x3246ff0) Packet ID: 71872958 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508687 Injection time: 8508687 Arrival time: -1 Phase: -1
+  Flit ID: 80260452 (0x1244870) Packet ID: 80260452 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485457 Injection time: 8485457 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872960 (0x245dc40) Packet ID: 71872960 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508688 Injection time: 8508688 Arrival time: -1 Phase: -1
+  Flit ID: 80260455 (0x2abec90) Packet ID: 80260455 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485458 Injection time: 8485458 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872962 (0x18c8920) Packet ID: 71872962 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508689 Injection time: 8508689 Arrival time: -1 Phase: -1
+  Flit ID: 80260458 (0x2b5edb0) Packet ID: 80260458 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485459 Injection time: 8485459 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872965 (0x1785cd0) Packet ID: 71872965 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508690 Injection time: 8508690 Arrival time: -1 Phase: -1
+  Flit ID: 80260461 (0x28e63a0) Packet ID: 80260461 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485460 Injection time: 8485460 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872968 (0x1e66700) Packet ID: 71872968 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508691 Injection time: 8508691 Arrival time: -1 Phase: -1
+  Flit ID: 80260464 (0x1c940c0) Packet ID: 80260464 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485461 Injection time: 8485461 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872971 (0x31ae230) Packet ID: 71872971 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508692 Injection time: 8508692 Arrival time: -1 Phase: -1
+  Flit ID: 80260467 (0x2b05cc0) Packet ID: 80260467 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485462 Injection time: 8485462 Arrival time: -1 Phase: -1
   VC: 0
-  Flit ID: 71872974 (0x32154d0) Packet ID: 71872974 Type: 2 Head: 1 Tail: 1
-  Source: 201  Dest: 185 Flow: 7079
-  Creation time: 8508693 Injection time: -1 Arrival time: -1 Phase: -1
+  Flit ID: 80260470 (0x2a98e90) Packet ID: 80260470 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485463 Injection time: 8485463 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260473 (0x2b16aa0) Packet ID: 80260473 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485464 Injection time: 8485464 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260476 (0x2b0b160) Packet ID: 80260476 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485465 Injection time: 8485465 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260479 (0x2b55bb0) Packet ID: 80260479 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485466 Injection time: 8485466 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260482 (0x11e6d40) Packet ID: 80260482 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485467 Injection time: 8485467 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260485 (0x2a9f8c0) Packet ID: 80260485 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485468 Injection time: 8485468 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260488 (0x1773480) Packet ID: 80260488 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485469 Injection time: 8485469 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260491 (0x121d450) Packet ID: 80260491 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485470 Injection time: 8485470 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260494 (0x2aa47c0) Packet ID: 80260494 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485471 Injection time: 8485471 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260497 (0x2ac3d30) Packet ID: 80260497 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485472 Injection time: 8485472 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260499 (0x2af2d90) Packet ID: 80260499 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485473 Injection time: 8485473 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260502 (0x2a9ef90) Packet ID: 80260502 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485474 Injection time: 8485474 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260505 (0x1af9870) Packet ID: 80260505 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485475 Injection time: 8485475 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260508 (0x2aef100) Packet ID: 80260508 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485476 Injection time: 8485476 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260511 (0x2aa2ab0) Packet ID: 80260511 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485477 Injection time: 8485477 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260514 (0x1afd070) Packet ID: 80260514 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485478 Injection time: 8485478 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260517 (0x2af1370) Packet ID: 80260517 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485479 Injection time: 8485479 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260520 (0x2ae9560) Packet ID: 80260520 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485480 Injection time: 8485480 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260523 (0x1609ed0) Packet ID: 80260523 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485481 Injection time: 8485481 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260526 (0x1879150) Packet ID: 80260526 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485482 Injection time: 8485482 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260529 (0x2abdb40) Packet ID: 80260529 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485483 Injection time: 8485483 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260532 (0x2acfc30) Packet ID: 80260532 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485484 Injection time: 8485484 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260535 (0x2ad6d00) Packet ID: 80260535 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485485 Injection time: 8485485 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260538 (0x12231b0) Packet ID: 80260538 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485486 Injection time: 8485486 Arrival time: -1 Phase: -1
+  VC: 0
+  Flit ID: 80260541 (0x1645ca0) Packet ID: 80260541 Type: 2 Head: 1 Tail: 1
+  Source: 121  Dest: 103 Flow: 6847
+  Creation time: 8485487 Injection time: -1 Arrival time: -1 Phase: -1
   VC: -1
-IPC layer sent 8510512 msgs recvd 8510512 msgs
- 
-CE12281: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
+IPC layer sent 8487246 msgs recvd 8487246 msgs
+tarved: 100.0 Total Active:      512 Expected Active:      512
+	     512      512 
+CE12500: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
 	     256      256      256 
 	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
-CE13301: Active:  24.6 Stalled:  51.6 Starved:  23.9 Total Active:  2097152 Expected Active:  2097152
+CE13520: Active:  24.7 Stalled:  51.7 Starved:  23.7 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152 
-CE13325: Active:  24.6 Stalled:  54.0 Starved:  21.5 Total Active:  2097152 Expected Active:  2097152
+CE13544: Active:  24.7 Stalled:  51.8 Starved:  23.5 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152 
-CE13349: Active:  24.6 Stalled:  51.5 Starved:  24.0 Total Active:  2097152 Expected Active:  2097152
+CE13568: Active:  24.7 Stalled:  52.8 Starved:  22.6 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152 
-CE13373: Active:  24.6 Stalled:  52.0 Starved:  23.4 Total Active:  2097152 Expected Active:  2097152
+CE13592: Active:  24.7 Stalled:  51.8 Starved:  23.6 Total Active:  2097152 Expected Active:  2097152
 	 2097152  2097152 
-CE13313: Active:  24.6 Stalled:  63.4 Starved:  11.9 Total Active:  2097152 Expected Active:  2097152
+CE13532: Active:  24.7 Stalled:  59.4 Starved:  16.0 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE13337: Active:  24.6 Stalled:  58.2 Starved:  17.2 Total Active:  2097152 Expected Active:  2097152
+CE13556: Active:  24.7 Stalled:  59.6 Starved:  15.8 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE13361: Active:  24.6 Stalled:  59.1 Starved:  16.3 Total Active:  2097152 Expected Active:  2097152
+CE13580: Active:  24.7 Stalled:  62.5 Starved:  12.9 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE13385: Active:  24.6 Stalled:  59.8 Starved:  15.7 Total Active:  2097152 Expected Active:  2097152
+CE13604: Active:  24.7 Stalled:  62.3 Starved:  13.1 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE12885: Active:  24.6 Stalled:   0.0 Starved:  75.4 Total Active:  2097152 Expected Active:  2097152
+CE13104: Active:  24.7 Stalled:   0.0 Starved:  75.3 Total Active:  2097152 Expected Active:  2097152
 	 2097152 
-CE12875: Active:  24.6 Stalled:  65.8 Starved:  11.0 Total Active:  2097205 Expected Active:  2097152
+CE13094: Active:  24.7 Stalled:  65.6 Starved:  11.1 Total Active:  2097205 Expected Active:  2097152
 	 2097152 
-CE13187: Active:  24.6 Stalled:   0.7 Starved:  75.0 Total Active:  2097152 Expected Active:  2097152
+CE13392: Active:  24.7 Stalled:   1.1 Starved:  75.3 Total Active:  2097152 Expected Active:  2097152
 	 2097153  2097152  2097152  2097152 
 Total DRAM:	   0.99 GB/s (  0.99 GB/s R,   0.00 GB/s W)
 Sending shutdown IPC message.
-IPC layer sent 8510512 msgs recvd 8510512 msgs
+IPC layer sent 8487246 msgs recvd 8487246 msgs
 -------------PASS (DONE)------------

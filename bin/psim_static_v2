@@ -2,26 +2,21 @@
 
 app=$1
 
-outDir=$PIR_HOME/out/${app}_dynamic_s1
+outDir=$PIR_HOME/out/${app}_static_v2/
 config=${outDir}/config.psim
-place=${outDir}/final.place
 
 [ -e $config ] && rm $config
 export _JAVA_OPTIONS="-Xss8192k" 
 $PIR_HOME/bin/pir $app \
   --out=$outDir \
-  --debug=false \
-  --dot=false \
+  --debug \
   --mapping=true \
   --load-pir=false \
-  --save-pir=true \
-  --net=dynamic \
+  --save-pir=false \
+  --net=static \
   --psim=true \
-  --routing-algo=proute \
-  --proute-slink=1 \
-  --proute-iter=100 \
   --psim-out=$outDir \
-  --run-psim=false \
+  --run-psim=true \
   --trace=true \
   --ctrl=true \
   --bp=false \
@@ -31,10 +26,8 @@ $PIR_HOME/bin/pir $app \
   --topo=mesh \
   --argin=64 \
   --tokenout=32 \
-  --fifo-depth=20 \
   --vfifo=4 \
-  --vc=8
-
-$PLASTISIM_HOME/plastisim -f $config -p $place
+  --fifo-depth=20 \
+  --vlink=2 \
 
 echo "-------------PASS (DONE)------------"

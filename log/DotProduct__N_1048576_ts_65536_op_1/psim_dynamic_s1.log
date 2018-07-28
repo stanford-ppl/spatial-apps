@@ -4,109 +4,109 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
 [0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
 [0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mRunning DotProduct__N_1048576_ts_65536_op_1 --out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1 --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --net=dynamic --psim=true --routing-algo=proute --proute-slink=1 --psim-out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1 --run-psim=false --trace=true --ctrl=true --bp=false --stat=false --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4 --vc=8[0m
-[pir] args=[--load-pir=false, --run-psim=true, --trace=true, --net=p2p, --stat=true, --psim-timeout=100000000, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --net=dynamic, --psim=true, --routing-algo=proute, --proute-slink=1, --psim-out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=false, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8]
+[0m[[0minfo[0m] [0mRunning DotProduct__N_1048576_ts_65536_op_1 --out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1 --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --net=dynamic --psim=true --routing-algo=proute --proute-slink=1 --proute-iter=100 --psim-out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1 --run-psim=false --trace=true --ctrl=true --bp=false --stat=false --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4 --vc=8[0m
+[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=p2p, --stat=false, --psim-timeout=100000000, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --net=dynamic, --psim=true, --routing-algo=proute, --proute-slink=1, --proute-iter=100, --psim-out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=false, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8]
 [pir] Output directory set to [36m/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1[0m
 [pir] Finishing graph construction for DotProduct__N_1048576_ts_65536_op_1
 [pir] Configuring spade MyDesign ...
-New design elapsed time: 5075.246ms
-[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 71.929073ms
-[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 2.466312ms
-[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 54.952169ms
-[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 66.247365ms
-[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 28.252217ms
-[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 0.718828ms
-[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 11.693664ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 38.601488ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 18.875227ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 81.055198ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 35.96537ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 49.165882ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 22.975459ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 14.687434ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 46.796443ms
-[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 1220.786294ms
-[pir] Running 24-IgraphPartioner ...[pir] Finished 24-IgraphPartioner in 1474.271811ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 39.107532ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 37.180449ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 2.201515ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 23.024854ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 4.950742ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 277.833119ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 10.203122ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 7.114842ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 29.550949ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 101.431355ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 42.472208ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 31.98519ms
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 1181.696568ms
+New design elapsed time: 5385.595ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 69.224937ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 2.427809ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 55.370857ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 71.21209ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 27.966362ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 0.712439ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 12.228696ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 38.719448ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 23.530833ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 84.495527ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 36.725975ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 49.493574ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 20.918521ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 13.284978ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 44.898187ms
+[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 1314.502709ms
+[pir] Running 24-IgraphPartioner ...[pir] Finished 24-IgraphPartioner in 1450.596676ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 39.15887ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 45.537206ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 2.172441ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 22.933295ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 6.078703ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 273.718766ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 7.651185ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 6.618392ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 26.291376ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 88.038574ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 41.291795ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 31.569551ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 1150.049994ms
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/DotProduct__N_1048576_ts_65536_op_1.pir
 [pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/traces
 [[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/trace_classes
 [[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1 /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1
 [[33mtrace[0m] log in /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 2960.113864ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 153.96257ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 164.120726ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 28.080373ms
-[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/DotProduct__N_1048576_ts_65536_op_1.pir
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1431.368303ms
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 5782.698756ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 131.33272ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 151.13315ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 30.043174ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1259.922743ms
 [pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 13346.247229ms
-[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 21.370559ms
-[pir] Running 64-LinkCSVCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/node.csv -l /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/link.csv -o /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/proute.place -r 16 -c 8 -s1 -x1
+[pir] Finished 59-CUPlacer in 14206.123599ms
+[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 3.400675ms
+[pir] Running 64-LinkCSVCodegen ...[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 69.662619ms
+[pir] Running 65-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/node.csv -l /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/link.csv -o /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/final.place -r 16 -c 8 -s1 -x1 -i 100
 [[33mproute[0m] log in /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/proute.log
-[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 145.377264ms
-[pir] Running 65-PlastisimDotCodegen ...[pir] Finished 65-PlastisimDotCodegen to [36mpsim.dot[0m in 139.718649ms
-[pir] Running 66-PlastisimPlacementCodegen ...[pir] Finished 66-PlastisimPlacementCodegen to [36mpir.place[0m in 91.697923ms
+[pir] Finished 65-PlastisimPlacementCodegen to [36mfinal.place[0m in 738.02467ms
+[pir] Running 66-PlastisimDotCodegen ...[pir] Finished 66-PlastisimDotCodegen to [36mpsim.dot[0m in 143.765677ms
 [pir] Running 67-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/
 [pir] To run simulation manually, use following command, or use --run-psim to launch simulation automatically
-[pir] [33m/home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/config.psim -p /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/proute.place -c 100000000[0m
-[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 134.193303ms
-[pir] Saving node prism.Session@63c37f26 to /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/DotProduct__N_1048576_ts_65536_op_1.sess
-[0m[[32msuccess[0m] [0mTotal time: 32 s, completed Jul 23, 2018 10:13:57 AM[0m
+[pir] [33m/home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/config.psim -p /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/final.place -c 100000000[0m
+[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 121.667433ms
+[pir] Saving node prism.Session@4b11d751 to /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1/DotProduct__N_1048576_ts_65536_op_1.sess
+[0m[[32msuccess[0m] [0mTotal time: 36 s, completed Jul 27, 2018 9:41:35 PM[0m
 Error setting saddr = 4
-Error setting daddr = 10
-Error setting daddr = 1
+Error setting daddr = 7
+Error setting daddr = 2
 Error setting daddr = 4
-Error setting class = 0
-Error setting class = 1
-Error setting class = 0
-Error setting saddr = 4
-Error setting daddr = 10
-Error setting class = 1
-Error setting saddr = 4
-Error setting daddr = 1
 Error setting lat = 3
-Error setting saddr = 3
-Error setting daddr = 6
+Error setting lat = 2
+Error setting lat = 1
+Error setting saddr = 4
+Error setting daddr = 7
+Error setting class = 1
+Error setting saddr = 4
+Error setting daddr = 2
+Error setting class = 1
+Error setting saddr = 19
+Error setting daddr = 5
 Error setting lat = 3
 Error setting saddr = 11
-Error setting daddr = 7
-Error setting lat = 4
+Error setting daddr = 8
+Error setting lat = 3
 Error setting saddr = 0
-Error setting daddr = 3
+Error setting daddr = 19
+Error setting lat = 4
+Error setting saddr = 8
+Error setting daddr = 5
 Error setting lat = 3
 Error setting saddr = 7
-Error setting daddr = 6
-Error setting lat = 1
-Error setting saddr = 10
-Error setting daddr = 11
-Error setting lat = 1
-Error setting saddr = 1
-Error setting daddr = 0
-Error setting class = 1
-Error setting saddr = 10
 Error setting daddr = 11
 Error setting class = 1
-Error setting saddr = 1
+Error setting saddr = 2
 Error setting daddr = 0
-Error setting lat = 1
+Error setting lat = 2
+Error setting saddr = 7
+Error setting daddr = 11
+Error setting lat = 4
+Error setting saddr = 2
+Error setting daddr = 0
+Error setting class = 1
 Error setting saddr = 4
 Error setting daddr = 4
 Error setting lat = 1
-Error setting saddr = 6
+Error setting saddr = 5
 Error setting daddr = 4
-Error setting lat = 2
+Error setting lat = 1
 Changing to config directory: /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_dynamic_s1
 Constructing NetworkLink.
 Constructing NetworkLink.
@@ -122,63 +122,52 @@ Constructing NetworkLink.
 Constructing NetworkLink.
 Constructing NetworkLink.
 Added all names to the symbol table.
-Adding static hop for route 758 (355->344, lat 1).
-Adding static hop for route 785 (356->344, lat 3).
-Adding static hop for route 994 (135->356, lat 3).
-Adding static hop for route 950 (73->355, lat 4).
-Adding static hop for route 652 (352->135, lat 1).
-Adding static hop for route 570 (349->73, lat 1).
-Adding static hop for route 813 (344->345, lat 2).
-Adding static hop for route 700 (345->259, lat 1).
-Adding static hop for route 906 (259->352, lat 3).
+Adding static hop for route 936 (73->355, lat 3).
+Adding static hop for route 980 (135->356, lat 4).
+Adding static hop for route 744 (355->344, lat 3).
+Adding static hop for route 771 (356->344, lat 3).
+Adding static hop for route 585 (349->73, lat 4).
+Adding static hop for route 799 (344->345, lat 1).
+Adding static hop for route 609 (352->135, lat 2).
+Adding static hop for route 713 (259->352, lat 2).
+Adding static hop for route 713 (259->345, lat 1).
+Adding static hop for route 713 (259->349, lat 3).
+Adding static hop for route 686 (345->259, lat 1).
 Printing hop routes
-0	623: X, vc1
-1	623: W, vc0
-	727: X, vc0
-2	727: W, vc0
-3	727: W, vc0
-4	727: XEW, vc0
-	860: E, vc0
-5	727: E, vc0
-	860: E, vc0
-6	727: E, vc0
-	860: E, vc0
-7	727: E, vc0
-	860: E, vc0
-8	727: E, vc0
-	860: E, vc0
-9	727: E, vc0
-	860: E, vc0
-10	599: E, vc0
-	727: X, vc0
-	860: X, vc1
-11	599: X, vc1
+0	638: X, vc1
+1	638: W, vc0
+2	638: W, vc0
+	892: X, vc1
+3	892: W, vc0
+4	846: E, vc0
+	892: W, vc0
+5	846: E, vc0
+6	846: E, vc0
+7	556: E, vc0
+	846: X, vc1
+8	556: E, vc0
+9	556: E, vc0
+10	556: E, vc0
+11	556: X, vc1
 Parsed placement file.
 Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 727
-Set exit class for pos 1 to 0 (rt 727)
-1 hops for route 727
-1 hops for route 727
-3 hops for route 727
-Set exit class for pos 2 to 1 (rt 727)
-1 hops for route 727
-1 hops for route 727
-1 hops for route 727
-1 hops for route 727
-1 hops for route 727
-1 hops for route 727
-Set exit class for pos 0 to 0 (rt 727)
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set lat 2 from 0 to 1
+Set lat 1 from 0 to 2
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 860
-1 hops for route 860
-1 hops for route 860
-1 hops for route 860
-1 hops for route 860
-1 hops for route 860
-1 hops for route 860
-Set exit class for pos 0 to 1 (rt 860)
+1 hops for route 846
+1 hops for route 846
+1 hops for route 846
+1 hops for route 846
+Set exit class for pos 0 to 1 (rt 846)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 892
+Set exit class for pos 0 to 1 (rt 892)
+1 hops for route 892
+1 hops for route 892
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 3 from 0 to 0
@@ -192,33 +181,34 @@ Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 3 from 0 to 0
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 623
-Set exit class for pos 0 to 1 (rt 623)
-1 hops for route 623
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 599
-1 hops for route 599
-Set exit class for pos 0 to 1 (rt 599)
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
+1 hops for route 556
+1 hops for route 556
+1 hops for route 556
+1 hops for route 556
+1 hops for route 556
+Set exit class for pos 0 to 1 (rt 556)
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 2 from 0 to 0
-Child process has pid -17032
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 638
+Set exit class for pos 0 to 1 (rt 638)
+1 hops for route 638
+1 hops for route 638
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Child process has pid 4348
 == Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
 == Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
 ===== MemorySystem 0 =====
@@ -244,63 +234,52 @@ Constructing NetworkLink.
 Constructing NetworkLink.
 Constructing NetworkLink.
 Added all names to the symbol table.
-Adding static hop for route 758 (355->344, lat 1).
-Adding static hop for route 785 (356->344, lat 3).
-Adding static hop for route 994 (135->356, lat 3).
-Adding static hop for route 950 (73->355, lat 4).
-Adding static hop for route 652 (352->135, lat 1).
-Adding static hop for route 570 (349->73, lat 1).
-Adding static hop for route 813 (344->345, lat 2).
-Adding static hop for route 700 (345->259, lat 1).
-Adding static hop for route 906 (259->352, lat 3).
+Adding static hop for route 936 (73->355, lat 3).
+Adding static hop for route 980 (135->356, lat 4).
+Adding static hop for route 744 (355->344, lat 3).
+Adding static hop for route 771 (356->344, lat 3).
+Adding static hop for route 585 (349->73, lat 4).
+Adding static hop for route 799 (344->345, lat 1).
+Adding static hop for route 609 (352->135, lat 2).
+Adding static hop for route 713 (259->352, lat 2).
+Adding static hop for route 713 (259->345, lat 1).
+Adding static hop for route 713 (259->349, lat 3).
+Adding static hop for route 686 (345->259, lat 1).
 Printing hop routes
-0	623: X, vc1
-1	623: W, vc0
-	727: X, vc0
-2	727: W, vc0
-3	727: W, vc0
-4	727: XEW, vc0
-	860: E, vc0
-5	727: E, vc0
-	860: E, vc0
-6	727: E, vc0
-	860: E, vc0
-7	727: E, vc0
-	860: E, vc0
-8	727: E, vc0
-	860: E, vc0
-9	727: E, vc0
-	860: E, vc0
-10	599: E, vc0
-	727: X, vc0
-	860: X, vc1
-11	599: X, vc1
+0	638: X, vc1
+1	638: W, vc0
+2	638: W, vc0
+	892: X, vc1
+3	892: W, vc0
+4	846: E, vc0
+	892: W, vc0
+5	846: E, vc0
+6	846: E, vc0
+7	556: E, vc0
+	846: X, vc1
+8	556: E, vc0
+9	556: E, vc0
+10	556: E, vc0
+11	556: X, vc1
 Parsed placement file.
 Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 727
-Set exit class for pos 1 to 0 (rt 727)
-1 hops for route 727
-1 hops for route 727
-3 hops for route 727
-Set exit class for pos 2 to 1 (rt 727)
-1 hops for route 727
-1 hops for route 727
-1 hops for route 727
-1 hops for route 727
-1 hops for route 727
-1 hops for route 727
-Set exit class for pos 0 to 0 (rt 727)
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set lat 2 from 0 to 1
+Set lat 1 from 0 to 2
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 860
-1 hops for route 860
-1 hops for route 860
-1 hops for route 860
-1 hops for route 860
-1 hops for route 860
-1 hops for route 860
-Set exit class for pos 0 to 1 (rt 860)
+1 hops for route 846
+1 hops for route 846
+1 hops for route 846
+1 hops for route 846
+Set exit class for pos 0 to 1 (rt 846)
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 892
+Set exit class for pos 0 to 1 (rt 892)
+1 hops for route 892
+1 hops for route 892
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 3 from 0 to 0
@@ -314,32 +293,33 @@ Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 3 from 0 to 0
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 623
-Set exit class for pos 0 to 1 (rt 623)
-1 hops for route 623
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 599
-1 hops for route 599
-Set exit class for pos 0 to 1 (rt 599)
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
+1 hops for route 556
+1 hops for route 556
+1 hops for route 556
+1 hops for route 556
+1 hops for route 556
+Set exit class for pos 0 to 1 (rt 556)
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 638
+Set exit class for pos 0 to 1 (rt 638)
+1 hops for route 638
+1 hops for route 638
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
 I'm the child process!
 GPGPU-Sim uArch: interconnect node map (shaderID+MemID to icntID)
 GPGPU-Sim uArch: Memory nodes ID start from index: 256
@@ -379,19 +359,19 @@ GPGPU-Sim uArch:  224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 23
 GPGPU-Sim uArch:  240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255
 Parsed definitions of all elements.
 Total of 15 links:
-  0: ArgIn358_ArgIn380_ArgIn676
+  0: ArgIn358_ArgIn380_ArgIn662
     
   1: DramAddress53
     
   2: DramAddress115
     
-  3: RetimingFIFO458
+  3: RetimingFIFO444
     
-  4: RetimingFIFO468
+  4: RetimingFIFO454
     
-  5: RetimingFIFO497
+  5: RetimingFIFO483
     
-  6: RetimingFIFO423
+  6: RetimingFIFO416
     
   7: StreamOut44
     
@@ -410,30 +390,30 @@ Total of 15 links:
   14: Reg166
     
 Total of 12 nodes:
-  0: CE1042
-    [StreamOut45 *4096 /1] [StreamOut44 *4096 /1]  => [RetimingFIFO468] 
-  1: CE1162
-    [RetimingFIFO468 *1 /1]  => [SRAM33] 
-  2: CE1152
-    [SRAM33 *4096 /1]  => [RetimingFIFO423] 
-  3: CE1056
-    [StreamOut107 *4096 /1] [StreamOut106 *4096 /1]  => [RetimingFIFO497] 
-  4: CE1182
-    [RetimingFIFO497 *1 /1]  => [SRAM34] 
-  5: CE1172
-    [SRAM34 *4096 /1]  => [RetimingFIFO458] 
-  6: CE1090
-    [RetimingFIFO423 *1 /1] [RetimingFIFO458 *1 /1]  => [Reg166] 
-  7: CE1070
-     => [ArgIn358_ArgIn380_ArgIn676] [DramAddress53] [DramAddress115] 
-  8: CE1080
+  0: CE1028
+    [StreamOut45 *4096 /1] [StreamOut44 *4096 /1]  => [RetimingFIFO454] 
+  1: CE1148
+    [RetimingFIFO454 *1 /1]  => [SRAM33] 
+  2: CE1138
+    [SRAM33 *4096 /1]  => [RetimingFIFO416] 
+  3: CE1042
+    [StreamOut107 *4096 /1] [StreamOut106 *4096 /1]  => [RetimingFIFO483] 
+  4: CE1168
+    [RetimingFIFO483 *1 /1]  => [SRAM34] 
+  5: CE1158
+    [SRAM34 *4096 /1]  => [RetimingFIFO444] 
+  6: CE1076
+    [RetimingFIFO416 *1 /1] [RetimingFIFO444 *1 /1]  => [Reg166] 
+  7: CE1056
+     => [ArgIn358_ArgIn380_ArgIn662] [DramAddress53] [DramAddress115] 
+  8: CE1066
     [ArgOut12 *1 /1]  => 
-  9: CE1104
-    [ArgIn358_ArgIn380_ArgIn676 *16 /1] [Reg166 *1 /1]  => [ArgOut12] 
-  10: CE1120
-    [ArgIn358_ArgIn380_ArgIn676 *16 /1] [DramAddress53 *16 /1]  => [StreamOut45] [StreamOut44] 
-  11: CE1138
-    [ArgIn358_ArgIn380_ArgIn676 *16 /1] [DramAddress115 *16 /1]  => [StreamOut107] [StreamOut106] 
+  9: CE1090
+    [ArgIn358_ArgIn380_ArgIn662 *16 /1] [Reg166 *1 /1]  => [ArgOut12] 
+  10: CE1106
+    [ArgIn358_ArgIn380_ArgIn662 *16 /1] [DramAddress53 *16 /1]  => [StreamOut45] [StreamOut44] 
+  11: CE1124
+    [ArgIn358_ArgIn380_ArgIn662 *16 /1] [DramAddress115 *16 /1]  => [StreamOut107] [StreamOut106] 
 
 DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
 10000...
@@ -453,34 +433,37 @@ DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
 150000...
 160000...
 170000...
-Simulation complete at cycle: 173026
-CE1042: Active:  37.9 Stalled:   0.0 Starved:   2.6 Total Active:    65536 Expected Active:    65536
+Starting remote loop
+Dumping flits:
+IPC layer sent 173116 msgs recvd 173116 msgs
+Simulation complete at cycle: 173116
+CE1028: Active:  37.9 Stalled:   0.0 Starved:   2.6 Total Active:    65536 Expected Active:    65536
 	   65536    65536 
-	DRAM:  24.24 GB/s ( 24.24 GB/s R,   0.00 GB/s W)
-CE1162: Active:  37.9 Stalled:   0.0 Starved:  62.1 Total Active:    65536 Expected Active:    65536
+	DRAM:  24.23 GB/s ( 24.23 GB/s R,   0.00 GB/s W)
+CE1148: Active:  37.9 Stalled:   0.0 Starved:  62.1 Total Active:    65536 Expected Active:    65536
 	   65536 
-CE1152: Active:  37.9 Stalled:   0.1 Starved:  62.1 Total Active:    65536 Expected Active:    65536
+CE1138: Active:  37.9 Stalled:   0.2 Starved:  62.0 Total Active:    65536 Expected Active:    65536
 	   65536 
-CE1056: Active:  37.9 Stalled:   0.0 Starved:   3.2 Total Active:    65536 Expected Active:    65536
+CE1042: Active:  37.9 Stalled:   0.0 Starved:   2.8 Total Active:    65536 Expected Active:    65536
 	   65536    65536 
-	DRAM:  24.24 GB/s ( 24.24 GB/s R,   0.00 GB/s W)
-CE1182: Active:  37.9 Stalled:   0.0 Starved:  62.1 Total Active:    65536 Expected Active:    65536
+	DRAM:  24.23 GB/s ( 24.23 GB/s R,   0.00 GB/s W)
+CE1168: Active:  37.9 Stalled:   0.0 Starved:  62.1 Total Active:    65536 Expected Active:    65536
 	   65536 
-CE1172: Active:  37.9 Stalled:  10.0 Starved:  52.1 Total Active:    65536 Expected Active:    65536
+CE1158: Active:  37.9 Stalled:   2.0 Starved:  60.1 Total Active:    65536 Expected Active:    65536
 	   65536 
-CE1090: Active:  37.9 Stalled:   0.0 Starved:  62.1 Total Active:    65536 Expected Active:    65536
+CE1076: Active:  37.9 Stalled:   0.0 Starved:  62.1 Total Active:    65536 Expected Active:    65536
 	   65536    65536 
-CE1070: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
+CE1056: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
 	
-CE1080: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
+CE1066: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
 	       1 
-CE1104: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Expected Active:       16
+CE1090: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Expected Active:       16
 	      16       16 
-CE1120: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Expected Active:       16
+CE1106: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Expected Active:       16
 	      16       16 
-CE1138: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Expected Active:       16
+CE1124: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Expected Active:       16
 	      16       16 
-Total DRAM:	  48.48 GB/s ( 48.48 GB/s R,   0.00 GB/s W)
+Total DRAM:	  48.46 GB/s ( 48.46 GB/s R,   0.00 GB/s W)
 Sending shutdown IPC message.
-IPC layer sent 173026 msgs recvd 173026 msgs
+IPC layer sent 173116 msgs recvd 173116 msgs
 -------------PASS (DONE)------------

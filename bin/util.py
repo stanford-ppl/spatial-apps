@@ -18,7 +18,7 @@ APPS = ["lenet_loops"]
 # APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
 # APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
 
-passes=["gen_pir","psim_p2p", "psim_asic", "psim_static", "psim_dynamic", "psim_dynamic_s1",
+passes=["gen_pir","psim_p2p", "psim_asic", "psim_static","psim_static_v2", "psim_dynamic", "psim_dynamic_s1",
 "psim_dynamic_s2","psim_dynamic_s3", "link_count"]
 dependency = {
         "gen_pir":[],
@@ -30,6 +30,7 @@ dependency = {
         "psim_p2p":["gen_pir"],
         "psim_asic":["psim_p2p"],
         "psim_static":["psim_p2p"],
+        "psim_static_v2":["psim_p2p"],
         "psim_dynamic":["psim_p2p"],
         "psim_dynamic_s1":["psim_p2p"],
         "psim_dynamic_s2":["psim_p2p"],
