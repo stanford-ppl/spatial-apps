@@ -19,6 +19,8 @@ from stats import *
 from util import *
 
 def copyApp(app, args, params):
+    if not args or not params:
+        return
     path = '{0}/{1}.scala'.format(APP_DIR, app)
     fullname = getFullName(app, args, params) 
     if not os.path.exists('{}/gen'.format(APP_DIR)):
@@ -58,7 +60,7 @@ def runPass(fullname, passName):
         return
     if running(fullname, passName):
         return
-    if progress(fullname, passName)!="NOTRUN" and not regenerate(passName):
+    if progress(fullname, passName)!="NOTRUN" and not rerun(passName):
         return
     for dep in dependency[passName]:
         if not success(fullname, dep):
@@ -82,8 +84,7 @@ def runPass(fullname, passName):
     proc.wait()
 
 def runJob(app, args, params):
-    if args or params:
-        copyApp(app, args, params)
+    copyApp(app, args, params)
     fullname = getFullName(app, args, params)
     for passName in passes:
         runPass(fullname, passName)
@@ -254,11 +255,11 @@ def success(fullname, passName):
 def running(fullname, passName):
     return progress(fullname, passName)=="RUNNING"
 
-def regenerate(passName):
-    return passName in opts.regen or opts.regen == "ALL"
+def rerun(passName):
+    return passName in opts.rerun.split(",") or opts.rerun == "ALL"
 
 def torun(passName):
-    return passName in opts.torun or opts.torun == "ALL"
+    return passName in opts.torun.split(",") or opts.torun == "ALL"
 
 def git_add(app, args, params):
     fullname = getFullName(app, args, params)

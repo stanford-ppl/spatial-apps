@@ -19,7 +19,7 @@ APPS = ["lenet_loops"]
 # APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
 
 passes=["gen_pir","psim_p2p", "psim_asic", "psim_static","psim_static_v2", "psim_dynamic", "psim_dynamic_s1",
-"psim_dynamic_s2","psim_dynamic_s3", "link_count"]
+"psim_dynamic_s2","psim_dynamic_s3", "psim_dynamic_v1_s6", "link_count"]
 dependency = {
         "gen_pir":[],
         "fit_pir":["gen_pir"],
@@ -35,6 +35,7 @@ dependency = {
         "psim_dynamic_s1":["psim_p2p"],
         "psim_dynamic_s2":["psim_p2p"],
         "psim_dynamic_s3":["psim_p2p"],
+        "psim_dynamic_v1_s6":["psim_p2p"],
         "link_count":["psim_p2p"],
         }
 
@@ -191,7 +192,7 @@ parser.add_argument('--status', dest='status', action='store_true', default=Fals
 parser.add_argument('--dse', dest='dse', action='store_true', default=False) 
 parser.add_argument('--git', dest='git', action='store_true', default=False) 
 parser.add_argument('--app', dest='app', action='store', default='ALL',help='App name')
-parser.add_argument('--rerun', dest='regen', action='store', default='false',
+parser.add_argument('--rerun', dest='rerun', action='store', default='false',
     help='force pass to rerun' )
 parser.add_argument('--torun', dest='torun', action='store', default='ALL',
     help='Pass to run')
