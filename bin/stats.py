@@ -94,6 +94,7 @@ def summarize(app, args, params):
     summary = opts.summary[app]
     fullname = getFullName(app, args, params)
     summary["cycle"] = {}
+    summary["vc"] = {}
     for passName in passes:
         log = logs(fullname, passName)
         if passName=="psim_p2p":
@@ -103,6 +104,17 @@ def summarize(app, args, params):
             summary["loadbw"] = loadbw(log)
             summary["storebw"] = storebw(log)
         summary["cycle"][passName] = cycleOf(log)
+        if "dynamic" in passName:
+            summary["vc"][passName] = numVC(log)
+
+    with open(logs(fullname,"link_count"), 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        counts = []
+        for row in reader:
+            count = row['count']
+            if count is not None:
+                counts.append(count)
+        summary["link_count"] = counts
 
 def futil(used,total):
    return round(float(used) / float(total), 3)
