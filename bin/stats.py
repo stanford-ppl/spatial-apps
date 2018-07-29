@@ -82,6 +82,13 @@ def storebw(log):
       return None
     return float(line[0].split("R,")[1].split("GB")[0].strip()) / peak_bw * 100
 
+def numVC(log):
+    if not os.path.exists(log): return None
+    line = grep(log, ["Used "])
+    if len(line) == 0:
+      return None
+    return int(line[0].split("Used ")[1].split("VCs")[0].strip())
+
 def summarize(app, args, params):
     opts.summary[app] = {}
     summary = opts.summary[app]
