@@ -5,65 +5,66 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
 [0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
 [0m[[0minfo[0m] [0mRunning Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1 --out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --net=dynamic --psim=true --routing-algo=proute --proute-iter=100 --psim-out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic --run-psim=false --trace=true --ctrl=true --bp=false --stat=false --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4 --vc=8[0m
-[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=p2p, --stat=false, --psim-timeout=100000000, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=true, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --net=dynamic, --psim=true, --routing-algo=proute, --proute-iter=100, --psim-out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=false, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8]
+[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=static, --stat=false, --psim-timeout=100000000, --vlink=2, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --net=dynamic, --psim=true, --routing-algo=proute, --proute-iter=100, --psim-out=/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic, --run-psim=false, --trace=true, --ctrl=true, --bp=false, --stat=false, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8]
 [pir] Output directory set to [36m/home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic[0m
 [pir] Finishing graph construction for Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1
 [pir] Configuring spade MyDesign ...
-New design elapsed time: 7738.087ms
-[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 809.607521ms
-[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 6.282832ms
-[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 90.504441ms
-[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 1393.168502ms
-[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 620.790961ms
-[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 2.364312ms
-[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 781.187051ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 120.64223ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 82.950187ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 3048.545679ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 498.461022ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 568.75204ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 1576.853392ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 168.929371ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 322.665511ms
-[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 793.143838ms
-[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer2538 in 396.269525ms[pir] Split CUContainer5789 in 393.153891ms[pir] Split CUContainer5792 in 277.819797ms[pir] Split CUContainer5793 in 279.482297ms[pir] Split CUContainer2547 in 412.084535ms[pir] Split CUContainer2548 in 262.794914ms[pir] Split CUContainer2549 in 269.787762ms[pir] Split CUContainer2550 in 363.102238ms[pir] Split CUContainer2555 in 316.472744ms[pir] Split CUContainer5806 in 470.310071ms[pir] Split CUContainer2557 in 317.82723ms[pir] Split CUContainer5810 in 373.480456ms[pir] Split CUContainer2559 in 261.013849ms[pir] Split CUContainer5814 in 273.247009ms[pir] Split CUContainer2561 in 338.263877ms[pir] Split CUContainer5818 in 265.078567ms[pir] Split CUContainer2563 in 273.526695ms[pir] Split CUContainer2564 in 239.658735ms[pir] Split CUContainer2565 in 261.406095ms[pir] Split CUContainer2566 in 262.10157ms[pir] Split CUContainer2567 in 283.838063ms[pir] Finished 24-IgraphPartioner in 8451.925546ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 6998.312595ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 2463.286993ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 17.140236ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 75.523245ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 206.253065ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 12766.632516ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 490.499874ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 482.972539ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 8666.87041ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 12005.413858ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 889.765914ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 294.945779ms
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 664.698028ms
+New design elapsed time: 7634.610ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 923.625031ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 5.45909ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 128.871936ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 1604.921017ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 662.668208ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 2.375576ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 955.54035ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 111.745803ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 93.619481ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 2627.974326ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 595.32381ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 799.641452ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 1523.03292ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 147.345943ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 369.962075ms
+[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 944.865494ms
+[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer2538 in 346.742044ms[pir] Split CUContainer5789 in 264.350621ms[pir] Split CUContainer5792 in 288.562005ms[pir] Split CUContainer5793 in 315.696209ms[pir] Split CUContainer2547 in 363.119455ms[pir] Split CUContainer2548 in 260.084404ms[pir] Split CUContainer2549 in 438.94458ms[pir] Split CUContainer2550 in 288.880586ms[pir] Split CUContainer2555 in 322.381897ms[pir] Split CUContainer5806 in 289.286766ms[pir] Split CUContainer2557 in 305.953167ms[pir] Split CUContainer5810 in 370.910971ms[pir] Split CUContainer2559 in 356.06867ms[pir] Split CUContainer5814 in 247.158243ms[pir] Split CUContainer2561 in 272.916572ms[pir] Split CUContainer5818 in 291.795829ms[pir] Split CUContainer2563 in 422.225815ms[pir] Split CUContainer2564 in 246.875352ms[pir] Split CUContainer2565 in 254.392269ms[pir] Split CUContainer2566 in 351.06177ms[pir] Split CUContainer2567 in 286.422332ms[pir] Finished 24-IgraphPartioner in 8342.171814ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 6780.78137ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 2474.056021ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 15.926615ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 79.761828ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 271.171906ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 12947.942678ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 596.411578ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 453.672606ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 8912.080504ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 11663.41048ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 921.444045ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 418.776597ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 770.001339ms
 [pir] Saving node PIRDesign() to /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1.pir
 [pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/traces
 [[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/trace_classes
 [[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic
 [[33mtrace[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 13064.470803ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 26886.266807ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 10766.340105ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 559.527735ms
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1759.365433ms
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 13727.5142ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 24590.054273ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 9357.163441ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 652.502353ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1684.401001ms
 [pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 68534.193827ms
-[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 5.097776ms
-[pir] Running 64-LinkCSVCodegen ...[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 10074.245391ms
+[pir] Finished 59-CUPlacer in 72862.009966ms
+[pir] Running 63-TerminalCSVCodegen ...[pir] Finished 63-TerminalCSVCodegen to [36mnode.csv[0m in 4.57993ms
+[pir] Running 64-LinkCSVCodegen ...[pir] Finished 64-LinkCSVCodegen to [36mlink.csv[0m in 9464.910741ms
 [pir] Running 65-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/node.csv -l /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/link.csv -o /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/final.place -r 16 -c 8 -s1 -x0 -i 100
 [[33mproute[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/proute.log
-[pir] Finished 65-PlastisimPlacementCodegen to [36mfinal.place[0m in 10688.79429ms
-[pir] Running 66-PlastisimDotCodegen ...[pir] Finished 66-PlastisimDotCodegen to [36mpsim.dot[0m in 10905.788368ms
+[[32mproute[0m] 	Used 4 VCs.
+[pir] Finished 65-PlastisimPlacementCodegen to [36mfinal.place[0m in 10918.835716ms
+[pir] Running 66-PlastisimDotCodegen ...[pir] Finished 66-PlastisimDotCodegen to [36mpsim.dot[0m in 12032.508101ms
 [pir] Running 67-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/
 [pir] To run simulation manually, use following command, or use --run-psim to launch simulation automatically
 [pir] [33m/home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/config.psim -p /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/final.place -c 100000000[0m
-[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 10164.016462ms
-[pir] Saving node prism.Session@4fbbb981 to /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1.sess
-[0m[[32msuccess[0m] [0mTotal time: 244 s, completed Jul 28, 2018 12:37:48 PM[0m
+[pir] Finished 67-PlastisimConfigCodegen to [36mconfig.psim[0m in 10475.865565ms
+[pir] Saving node prism.Session@200bbc0 to /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1.sess
+[0m[[32msuccess[0m] [0mTotal time: 247 s, completed Jul 28, 2018 6:25:22 PM[0m
 Changing to config directory: /home/yaqiz/pir/out/Kmeans__I_2_N_16384_K_64_D_64_ts_1024_op_1_mp1_4_mp2_1_mp3_1_dynamic
 Constructing NetworkLink.
 Constructing NetworkLink.
@@ -1876,7 +1877,7 @@ Set exit class for pos 0 to 1 (rt 7152)
 1 hops for route 7152
 1 hops for route 7152
 1 hops for route 7152
-Child process has pid 6931
+Child process has pid 2942
 == Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
 == Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
 ===== MemorySystem 0 =====
@@ -3204,579 +3205,3 @@ DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
 7750000...
 7760000...
 7770000...
-7780000...
-7790000...
-7800000...
-7810000...
-7820000...
-7830000...
-7840000...
-7850000...
-7860000...
-7870000...
-7880000...
-7890000...
-7900000...
-7910000...
-7920000...
-7930000...
-7940000...
-7950000...
-7960000...
-7970000...
-7980000...
-7990000...
-8000000...
-8010000...
-8020000...
-8030000...
-8040000...
-8050000...
-8060000...
-8070000...
-8080000...
-8090000...
-8100000...
-8110000...
-8120000...
-8130000...
-8140000...
-8150000...
-8160000...
-8170000...
-8180000...
-8190000...
-8200000...
-8210000...
-8220000...
-8230000...
-8240000...
-8250000...
-8260000...
-8270000...
-8280000...
-8290000...
-8300000...
-8310000...
-8320000...
-8330000...
-8340000...
-8350000...
-8360000...
-8370000...
-8380000...
-8390000...
-8400000...
-8410000...
-8420000...
-8430000...
-8440000...
-8450000...
-8460000...
-8470000...
-8480000...
-Simulation complete at cycle: 8487246
-CE12470: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256      256 
-	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
-CE12484: Active:   1.5 Stalled:  77.0 Starved:  21.4 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-	DRAM:   0.99 GB/s (  0.99 GB/s R,   0.00 GB/s W)
-CE12522: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
-	
-CE12538: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Expected Active:        1
-	       1 
-CE12558: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       64 Expected Active:       64
-	      64 
-CE12572: Active:   0.0 Stalled: 100.0 Starved:   0.0 Total Active:       64 Expected Active:       64
-	      64 
-CE12636: Active:   0.4 Stalled:  78.1 Starved:  21.5 Total Active:    32768 Expected Active:    32768
-	   32768    32768    32768 
-CE12656: Active:   1.5 Stalled:  77.0 Starved:  21.4 Total Active:   131072 Expected Active:   131072
-	  131072   131072   131072 
-CE13358: Active:  24.7 Stalled:  75.3 Starved:   0.0 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152 
-CE13670: Active:   0.0 Stalled: 100.0 Starved:   0.0 Total Active:      512 Expected Active:      512
-	     512      512 
-CE13744: Active:  24.7 Stalled:  73.8 Starved:   1.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152 
-CE13820: Active:  24.7 Stalled:  73.9 Starved:   1.4 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152 
-CE13896: Active:  24.7 Stalled:  73.9 Starved:   1.4 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152 
-CE13972: Active:  24.7 Stalled:  73.8 Starved:   1.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152 
-CE12894: Active:   1.5 Stalled:  66.6 Starved:  34.5 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12882: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12918: Active:   1.5 Stalled:  66.6 Starved:  34.6 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12906: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12942: Active:   1.5 Stalled:  66.6 Starved:  34.6 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12930: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12966: Active:   1.5 Stalled:  66.6 Starved:  34.5 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12954: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12990: Active:   1.5 Stalled:  31.4 Starved:  68.3 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE12978: Active:  24.7 Stalled:  73.4 Starved:   1.9 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13014: Active:   1.5 Stalled:  33.8 Starved:  66.0 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE13002: Active:  24.7 Stalled:  73.5 Starved:   1.8 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13038: Active:   1.5 Stalled:  35.0 Starved:  64.9 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE13026: Active:  24.7 Stalled:  73.5 Starved:   1.8 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13062: Active:   1.5 Stalled:  32.6 Starved:  67.2 Total Active:   131072 Expected Active:   131072
-	  131072   131072 
-CE13050: Active:  24.7 Stalled:  73.4 Starved:   1.9 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12546: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE12606: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      128 Expected Active:      128
-	     128 
-CE12670: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE12680: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE12690: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE12700: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE12766: Active:   6.2 Stalled:  87.9 Starved:   5.9 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13124: Active:   6.2 Stalled:  87.7 Starved:   6.3 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13114: Active:   0.4 Stalled:  93.7 Starved:   5.9 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE13144: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13134: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE13424: Active:   0.4 Stalled:  94.6 Starved:   5.1 Total Active:    32768 Expected Active:    32768
-	   32768    32768 
-CE13436: Active:   0.4 Stalled:  95.4 Starved:   4.3 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE12712: Active:  24.7 Stalled:  65.5 Starved:   9.9 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152 
-CE13284: Active:  24.7 Stalled:  72.5 Starved:   2.9 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13274: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12776: Active:   6.2 Stalled:  88.3 Starved:   5.6 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13164: Active:   6.2 Stalled:  88.0 Starved:   5.9 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13154: Active:   0.4 Stalled:  94.1 Starved:   5.5 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE13184: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13174: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE13448: Active:   0.4 Stalled:  95.0 Starved:   4.7 Total Active:    32768 Expected Active:    32768
-	   32768    32768 
-CE13460: Active:   0.4 Stalled:  95.7 Starved:   3.9 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE12726: Active:  24.7 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152 
-CE13304: Active:  24.7 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13294: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13374: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152 
-CE12786: Active:   6.2 Stalled:  88.4 Starved:   5.4 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13204: Active:   6.2 Stalled:  88.5 Starved:   5.4 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13194: Active:   0.4 Stalled:  94.3 Starved:   5.4 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE13224: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13214: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE13472: Active:   0.4 Stalled:  95.0 Starved:   4.7 Total Active:    32768 Expected Active:    32768
-	   32768    32768 
-CE13484: Active:   0.4 Stalled:  95.7 Starved:   3.9 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE12740: Active:  24.7 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152 
-CE13324: Active:  24.7 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13314: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE12796: Active:   6.2 Stalled:  88.1 Starved:   5.7 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13244: Active:   6.2 Stalled:  87.9 Starved:   6.1 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13234: Active:   0.4 Stalled:  93.9 Starved:   5.7 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE13264: Active:   6.2 Stalled:   0.0 Starved:  93.8 Total Active:   524288 Expected Active:   524288
-	  524288 
-CE13254: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE13496: Active:   0.4 Stalled:  94.6 Starved:   5.1 Total Active:    32768 Expected Active:    32768
-	   32768    32768 
-CE13508: Active:   0.4 Stalled:  95.4 Starved:   4.3 Total Active:    32768 Expected Active:    32768
-	   32768 
-CE12754: Active:  24.7 Stalled:  74.5 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152 
-CE13344: Active:  24.7 Stalled:  74.6 Starved:   0.7 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13334: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13410: Active:  24.7 Stalled:  74.8 Starved:   0.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152 
-CE12872: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:     8192 Expected Active:     8192
-	    8192 
-CE12862: Active:   0.1 Stalled:  99.8 Starved:   0.1 Total Active:     8261 Expected Active:     8192
-	    8192 
-CE13084: Active:  24.7 Stalled:   0.0 Starved:  75.3 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13074: Active:   0.1 Stalled:   0.1 Starved:  99.8 Total Active:     8192 Expected Active:     8192
-	    8192 
-CE12590: Active:   0.1 Stalled:   0.2 Starved:  99.7 Total Active:     8192 Expected Active:     8192
-	    8192     8193     8192     8192 
-CE12820: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:     8192 Expected Active:     8192
-	    8192     8192     8192 
-CE12806: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
-	     512 
-CE12848: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:     8192 Expected Active:     8192
-	    8192     8192     8192 
-CE12834: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      128 Expected Active:      128
-	     128 
-CE12618: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
-	     512      512 
-CE13630: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE13650: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
-	     512      512      512      512 
-CE13616: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256      256 
-CE13714: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE13692: Active:  24.7 Stalled:  72.2 Starved:   3.1 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152  3145728  2097152 
-CE13728: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
-	     512      512 
-CE13790: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE13768: Active:  24.7 Stalled:  72.4 Starved:   2.9 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152  3145728  2097152 
-CE13804: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
-	     512      512 
-CE13866: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE13844: Active:  24.7 Stalled:  72.5 Starved:   2.8 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152  3145728  2097152 
-CE13880: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      512 Expected Active:      512
-	     512      512 
-CE13942: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256 
-CE13920: Active:  24.7 Stalled:  72.3 Starved:   3.0 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152  2097152  3145728  2097152 
-CE13956: Active:   0.0 Stalled:   0.0 SStarting remote loop
-Dumping flits:
-  Flit ID: 80259147 (0x1630000) Packet ID: 80259147 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484624 Injection time: 8484624 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 80259149 (0x2ac1290) Packet ID: 80259149 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484625 Injection time: 8484625 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 80259151 (0x18c7f10) Packet ID: 80259151 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484626 Injection time: 8484626 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 80259153 (0x2aa5ca0) Packet ID: 80259153 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484627 Injection time: 8484627 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 80259155 (0x14b3610) Packet ID: 80259155 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484628 Injection time: 8484628 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 80259157 (0x2b050d0) Packet ID: 80259157 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484629 Injection time: 8484629 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 80259159 (0x2acdb50) Packet ID: 80259159 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484630 Injection time: 8484630 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 80259161 (0x285da00) Packet ID: 80259161 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484631 Injection time: 8484631 Arrival time: -1 Phase: -1
-  VC: 1
-  Flit ID: 80259164 (0x1b4c760) Packet ID: 80259164 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484632 Injection time: 8484632 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259167 (0x1b253e0) Packet ID: 80259167 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484633 Injection time: 8484633 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259170 (0x1a0a770) Packet ID: 80259170 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484634 Injection time: 8484634 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259173 (0x2b5ed20) Packet ID: 80259173 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484635 Injection time: 8484635 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259176 (0x1b0fcb0) Packet ID: 80259176 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484636 Injection time: 8484636 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259179 (0x11a55d0) Packet ID: 80259179 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484637 Injection time: 8484637 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259182 (0x2aaf610) Packet ID: 80259182 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484638 Injection time: 8484638 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259185 (0x2acaf90) Packet ID: 80259185 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484639 Injection time: 8484639 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259188 (0x14b3730) Packet ID: 80259188 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484640 Injection time: 8484640 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259192 (0x1b0e8c0) Packet ID: 80259192 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484641 Injection time: 8484641 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259195 (0x2b07a20) Packet ID: 80259195 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484642 Injection time: 8484642 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259199 (0x2acf680) Packet ID: 80259199 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484643 Injection time: 8484643 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259202 (0x2a9a9c0) Packet ID: 80259202 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484644 Injection time: 8484644 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259206 (0x2af5c30) Packet ID: 80259206 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484645 Injection time: 8484645 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259209 (0x1905de0) Packet ID: 80259209 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484646 Injection time: 8484646 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259213 (0x1b86cd0) Packet ID: 80259213 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484647 Injection time: 8484647 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80259216 (0x2b3be10) Packet ID: 80259216 Type: 2 Head: 1 Tail: 1
-  Source: 68  Dest: 67 Flow: 9265
-  Creation time: 8484648 Injection time: -1 Arrival time: -1 Phase: -1
-  VC: -1
-  Flit ID: 80260422 (0x19e24c0) Packet ID: 80260422 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485447 Injection time: 8485447 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260425 (0x2080160) Packet ID: 80260425 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485448 Injection time: 8485448 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260428 (0x2ae6140) Packet ID: 80260428 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485449 Injection time: 8485449 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260431 (0x10f2d00) Packet ID: 80260431 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485450 Injection time: 8485450 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260434 (0x1c3e180) Packet ID: 80260434 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485451 Injection time: 8485451 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260437 (0x11225b0) Packet ID: 80260437 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485452 Injection time: 8485452 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260440 (0x1631b50) Packet ID: 80260440 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485453 Injection time: 8485453 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260443 (0x123e110) Packet ID: 80260443 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485454 Injection time: 8485454 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260446 (0x2ae1290) Packet ID: 80260446 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485455 Injection time: 8485455 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260449 (0x2b18480) Packet ID: 80260449 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485456 Injection time: 8485456 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260452 (0x1244870) Packet ID: 80260452 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485457 Injection time: 8485457 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260455 (0x2abec90) Packet ID: 80260455 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485458 Injection time: 8485458 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260458 (0x2b5edb0) Packet ID: 80260458 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485459 Injection time: 8485459 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260461 (0x28e63a0) Packet ID: 80260461 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485460 Injection time: 8485460 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260464 (0x1c940c0) Packet ID: 80260464 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485461 Injection time: 8485461 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260467 (0x2b05cc0) Packet ID: 80260467 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485462 Injection time: 8485462 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260470 (0x2a98e90) Packet ID: 80260470 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485463 Injection time: 8485463 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260473 (0x2b16aa0) Packet ID: 80260473 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485464 Injection time: 8485464 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260476 (0x2b0b160) Packet ID: 80260476 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485465 Injection time: 8485465 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260479 (0x2b55bb0) Packet ID: 80260479 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485466 Injection time: 8485466 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260482 (0x11e6d40) Packet ID: 80260482 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485467 Injection time: 8485467 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260485 (0x2a9f8c0) Packet ID: 80260485 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485468 Injection time: 8485468 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260488 (0x1773480) Packet ID: 80260488 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485469 Injection time: 8485469 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260491 (0x121d450) Packet ID: 80260491 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485470 Injection time: 8485470 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260494 (0x2aa47c0) Packet ID: 80260494 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485471 Injection time: 8485471 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260497 (0x2ac3d30) Packet ID: 80260497 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485472 Injection time: 8485472 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260499 (0x2af2d90) Packet ID: 80260499 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485473 Injection time: 8485473 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260502 (0x2a9ef90) Packet ID: 80260502 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485474 Injection time: 8485474 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260505 (0x1af9870) Packet ID: 80260505 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485475 Injection time: 8485475 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260508 (0x2aef100) Packet ID: 80260508 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485476 Injection time: 8485476 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260511 (0x2aa2ab0) Packet ID: 80260511 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485477 Injection time: 8485477 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260514 (0x1afd070) Packet ID: 80260514 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485478 Injection time: 8485478 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260517 (0x2af1370) Packet ID: 80260517 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485479 Injection time: 8485479 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260520 (0x2ae9560) Packet ID: 80260520 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485480 Injection time: 8485480 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260523 (0x1609ed0) Packet ID: 80260523 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485481 Injection time: 8485481 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260526 (0x1879150) Packet ID: 80260526 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485482 Injection time: 8485482 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260529 (0x2abdb40) Packet ID: 80260529 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485483 Injection time: 8485483 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260532 (0x2acfc30) Packet ID: 80260532 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485484 Injection time: 8485484 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260535 (0x2ad6d00) Packet ID: 80260535 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485485 Injection time: 8485485 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260538 (0x12231b0) Packet ID: 80260538 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485486 Injection time: 8485486 Arrival time: -1 Phase: -1
-  VC: 0
-  Flit ID: 80260541 (0x1645ca0) Packet ID: 80260541 Type: 2 Head: 1 Tail: 1
-  Source: 121  Dest: 103 Flow: 6847
-  Creation time: 8485487 Injection time: -1 Arrival time: -1 Phase: -1
-  VC: -1
-IPC layer sent 8487246 msgs recvd 8487246 msgs
-tarved: 100.0 Total Active:      512 Expected Active:      512
-	     512      512 
-CE12500: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Expected Active:      256
-	     256      256      256 
-	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
-CE13520: Active:  24.7 Stalled:  51.7 Starved:  23.7 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152 
-CE13544: Active:  24.7 Stalled:  51.8 Starved:  23.5 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152 
-CE13568: Active:  24.7 Stalled:  52.8 Starved:  22.6 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152 
-CE13592: Active:  24.7 Stalled:  51.8 Starved:  23.6 Total Active:  2097152 Expected Active:  2097152
-	 2097152  2097152 
-CE13532: Active:  24.7 Stalled:  59.4 Starved:  16.0 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13556: Active:  24.7 Stalled:  59.6 Starved:  15.8 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13580: Active:  24.7 Stalled:  62.5 Starved:  12.9 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13604: Active:  24.7 Stalled:  62.3 Starved:  13.1 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13104: Active:  24.7 Stalled:   0.0 Starved:  75.3 Total Active:  2097152 Expected Active:  2097152
-	 2097152 
-CE13094: Active:  24.7 Stalled:  65.6 Starved:  11.1 Total Active:  2097205 Expected Active:  2097152
-	 2097152 
-CE13392: Active:  24.7 Stalled:   1.1 Starved:  75.3 Total Active:  2097152 Expected Active:  2097152
-	 2097153  2097152  2097152  2097152 
-Total DRAM:	   0.99 GB/s (  0.99 GB/s R,   0.00 GB/s W)
-Sending shutdown IPC message.
-IPC layer sent 8487246 msgs recvd 8487246 msgs
--------------PASS (DONE)------------
