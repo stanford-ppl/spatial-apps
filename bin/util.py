@@ -18,26 +18,37 @@ APPS = ["lenet_loops"]
 # APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
 # APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
 
-passes=["gen_pir","psim_p2p", "psim_asic", "psim_static","psim_static_v2", "psim_dynamic", "psim_dynamic_s1",
-"psim_dynamic_s2","psim_dynamic_s3", "psim_dynamic_v1_s6", "link_count"]
-dependency = {
-        "gen_pir":[],
-        "fit_pir":["gen_pir"],
-        "gen_chisel":[],
-        "make_vcs":["gen_chisel"],
-        "map_pir":["gen_pir"],
-        "run_simulation":["make_vcs"],
-        "psim_p2p":["gen_pir"],
-        "psim_asic":["psim_p2p"],
-        "psim_static":["psim_p2p"],
-        "psim_static_v2":["psim_p2p"],
-        "psim_dynamic":["psim_p2p"],
-        "psim_dynamic_s1":["psim_p2p"],
-        "psim_dynamic_s2":["psim_p2p"],
-        "psim_dynamic_s3":["psim_p2p"],
-        "psim_dynamic_v1_s6":["psim_p2p"],
-        "link_count":["psim_p2p"],
-        }
+dependency = OrderedDict()
+dependency["gen_pir"] = []
+dependency["psim_asic"] = ["gen_pir"]
+dependency["psim_p2p"] = ["gen_pir"]
+dependency["link_count"] = ["psim_p2p"]
+dependency["psim_D_v1_s6"] = ["gen_pir"]
+dependency["psim_D_v2_s6"] = ["gen_pir"]
+dependency["psim_v3_s6"] = ["psim_p2p"]
+dependency["psim_v2_s6"] = ["psim_p2p"]
+passes=dependency.keys()
+
+def getCommand(passName, fullapp):
+    if passName=="gen_pir":
+        command = "{}/apps/bin/{} {} {}".format(SPATIAL_HOME, passName, fullapp, opts.pirsrc)
+    elif passName.startswith("psim_"):
+        if "D" in passName:
+            net = "dynamic"
+            vlink = passName.split("_v")[1].split("_")[0]
+            slink = passName.split("_s")[1]
+        elif "v" in passName:
+            net = "static"
+            vlink = passName.split("_v")[1].split("_")[0]
+            slink = passName.split("_s")[1]
+        else:
+            net = passName.split("psim_")[1]
+            vlink = 0
+            slink = 0
+        command = "{}/apps/bin/psim_generic {} {} {} {}".format(SPATIAL_HOME, fullapp, net, vlink, slink)
+    else:
+        command = "{}/apps/bin/{} {}".format(SPATIAL_HOME, passName, fullapp)
+    return command
 
 LOG_DIR='{}/apps/log'.format(SPATIAL_HOME)
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)

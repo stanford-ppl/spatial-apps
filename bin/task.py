@@ -48,13 +48,6 @@ def copyApp(app, args, params):
             print('Param {} not found !!!'.format(param))
             exit()
 
-def getCommand(passName, fullapp):
-    if passName=="gen_pir":
-        command = "{}/apps/bin/{} {} {}".format(SPATIAL_HOME, passName, fullapp, opts.pirsrc)
-    else:
-        command = "{}/apps/bin/{} {}".format(SPATIAL_HOME, passName, fullapp)
-    return command
-
 def runPass(fullname, passName):
     if not torun(passName):
         return
@@ -176,6 +169,8 @@ def show(fullname):
             if vc is not None: msg += " vc={}".format(vc)
         return msg
     for passName in passes:
+        if not torun(passName):
+            continue
         log = logs(fullname, passName)
         prog = progress(fullname, passName)
         msg = passMessage(passName, log)

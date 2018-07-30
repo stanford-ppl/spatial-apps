@@ -104,7 +104,7 @@ def summarize(app, args, params):
             summary["loadbw"] = loadbw(log)
             summary["storebw"] = storebw(log)
         summary["cycle"][passName] = cycleOf(log)
-        if "dynamic" in passName:
+        if "D" in passName:
             summary["vc"][passName] = numVC(log)
 
     with open(logs(fullname,"link_count"), 'r') as csvfile:

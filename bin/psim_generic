@@ -1,33 +1,41 @@
 #!/bin/bash
 
 app=$1
+net=$2
+vlink=$3
+slink=$4
 
-outDir=$PIR_HOME/out/${app}_static_v2/
+outDir=$PIR_HOME/out/${app}_${net}_v${vlink}_s${slink}
 config=${outDir}/config.psim
 
 [ -e $config ] && rm $config
 export _JAVA_OPTIONS="-Xss8192k" 
 $PIR_HOME/bin/pir $app \
   --out=$outDir \
-  --debug \
+  --psim-out=$outDir \
+  --debug=false \
+  --dot=false \
   --mapping=true \
   --load-pir=false \
-  --save-pir=false \
-  --net=static \
+  --save-pir=true \
   --psim=true \
-  --psim-out=$outDir \
-  --run-psim=true \
   --trace=true \
   --ctrl=true \
   --bp=false \
-  --stat=false \
+  --stat=true \
+  --net=$net \
+  --routing-algo=dor \
+  --proute-iter=100 \
+  --run-psim=true \
   --arch=MyDesign \
   --row=16 --col=8 \
   --topo=mesh \
   --argin=64 \
   --tokenout=32 \
-  --vfifo=4 \
   --fifo-depth=20 \
-  --vlink=2 \
+  --vfifo=4 \
+  --vc=8 \
+  --vlink=${vlink} \
+  --slink=${slink}
 
 echo "-------------PASS (DONE)------------"

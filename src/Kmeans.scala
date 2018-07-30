@@ -7,13 +7,13 @@ object Kmeans extends SpatialApp { self => // Regression (Dense) // Args: 3 64
   type X = Int
 
   val I = 2 // param [2]
-  val N = 64 // param [pmuSize / 64 * 16]
   val K = 16 // param [64]
   val D = 32 // param [64] | <K> * p <= pmuSize 
+  val N = 64 // param [pmuSize / <D> * 8]
   val ts = 16 // param [pmuSize / <D>]
   val op = 1 // param [1] | <N> / <ts> % p == 0
-  val mp1 = 2 // param [1,2,4] | <ts> % p == 0
-  val mp2 = 1 // param [1] | <K> % p == 0 and <mp1> * p < 10
+  val mp1 = 2 // param [8] | <ts> % p == 0
+  val mp2 = 1 // param [1] | <K> % p == 0
   val mp3 = 1 // param [1] | <K> % p == 0
   val ip = 16
 
