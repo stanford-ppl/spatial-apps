@@ -30,17 +30,17 @@ from task import *
 def main():
     apps = []
 
-    # apps += ['DotProduct__N_1048576_ts_65536_op_1']
-    # apps += ['TPCHQ6__N_1048576_ts_65536_op_1']
-    # apps += ['OuterProduct__M_4096_N_4096_ts1_64_ts2_1024_op1_1_op2_2_ip2_16_ip1_1']
-    # apps += ['BlackScholes__N_1048576_ts_65536_op_1']
-    # apps += ['SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2']
-    # apps += ['GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1']
-    # apps += ['LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4']
-    # apps += ['GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16']
+    apps += ['DotProduct__N_1048576_ts_65536_op_1']
+    apps += ['TPCHQ6__N_1048576_ts_65536_op_1']
+    apps += ['OuterProduct__M_4096_N_4096_ts1_64_ts2_1024_op1_1_op2_2_ip2_16_ip1_1']
+    apps += ['BlackScholes__N_1048576_ts_65536_op_1']
+    apps += ['SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2']
+    apps += ['GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1']
+    apps += ['LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4']
+    apps += ['GEMM_Blocked__DIM_512_IDIM_256_ts_256_its_128_loop_ii_1_loop_jj_1_loop_kk_1_loop_i_1_loop_k_16']
     apps += ['Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1']
-    # apps += ['lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1']
-    # apps += ['SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16']
+    apps += ['lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1']
+    apps += ['SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16']
 
     opts.parallel=20
     opts.git=True
