@@ -6,13 +6,14 @@ vlink=$3
 slink=$4
 
 outDir=$PIR_HOME/out/${app}_${net}_v${vlink}_s${slink}
+psimOutDir=$PLASTISIM_HOME/configs/finals/${app}_${net}_v${vlink}_s${slink}
 config=${outDir}/config.psim
 
 [ -e $config ] && rm $config
 export _JAVA_OPTIONS="-Xss8192k" 
 $PIR_HOME/bin/pir $app \
   --out=$outDir \
-  --psim-out=$outDir \
+  --psim-out=$psimOutDir \
   --debug=false \
   --dot=false \
   --mapping=true \
@@ -25,7 +26,7 @@ $PIR_HOME/bin/pir $app \
   --stat=true \
   --net=$net \
   --routing-algo=dor \
-  --proute-iter=100 \
+  --proute-iter=1000 \
   --run-psim=true \
   --arch=MyDesign \
   --row=16 --col=8 \
