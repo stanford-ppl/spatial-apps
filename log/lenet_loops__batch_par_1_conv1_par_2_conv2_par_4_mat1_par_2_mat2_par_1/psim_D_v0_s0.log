@@ -56,4 +56,52 @@ New design elapsed time: 9135.309ms
 [pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 68121.537672ms
 [pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 2707.39739ms
 [pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 3596.546209ms
-[pir] Running 59-CUPlacer ...
+[pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
+[pir] Finished 59-CUPlacer in 144649.741437ms
+[pir] Running 60-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
+[pir] 
+[pir] number of cus=149
+[pir] number of ocu = 13
+[pir] - cin (0.00,0.08,1.00) sin (0.00,0.92,1.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.08,1.00) sout (0.00,0.92,1.00) vout (0.00,0.00,0.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] number of pcu = 56
+[pir] - cin (0.00,0.64,1.00) sin (0.00,0.39,3.00) vin (0.00,0.43,3.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.70,1.00) vout (0.00,0.38,2.00)
+[pir] - stages (2.00,3.86,8.00)
+[pir] number of dag = 13
+[pir] - cin (0.00,0.15,1.00) sin (0.00,1.00,2.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.00,0.00) sout (1.00,1.69,2.00) vout (0.00,0.00,0.00)
+[pir] - stages (0.00,3.31,7.00)
+[pir] number of pmu = 42
+[pir] - cin (0.00,0.00,0.00) sin (0.00,1.21,5.00) vin (0.00,1.07,3.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.43,1.00) vout (0.00,0.57,1.00)
+[pir] - stages (0.00,2.90,4.00)
+[pir] number of dfg = 11
+[pir] - cin (0.00,0.00,0.00) sin (2.00,2.00,2.00) vin (0.00,0.09,1.00)
+[pir] - cout (0.00,0.09,1.00) sout (0.00,0.00,0.00) vout (0.00,0.91,1.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] number of scu = 13
+[pir] - cin (0.00,0.54,1.00) sin (0.00,1.00,3.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.00,0.00) sout (1.00,1.00,1.00) vout (0.00,0.00,0.00)
+[pir] - stages (1.00,4.23,6.00)
+[pir] number of afg = 1
+[pir] - cin (1.00,1.00,1.00) sin (0.00,0.00,0.00) vin (0.00,0.00,0.00)
+[pir] - cout (1.00,1.00,1.00) sout (11.00,11.00,11.00) vout (0.00,0.00,0.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] compute CU = 82
+[pir] memory CU = 42
+[pir] mc CU = 11
+[pir] Total = 95
+[pir] PCU = 55 / 64 (85.94%)
+[pir] PMU-comp = 15 / 63 (23.81%)
+[pir] PMU-mem = 42 / 63 (66.67%)
+[pir] AG-ag = 6 / 32 (18.75%)
+[pir] AG-comp = 17 / 32 (53.13%)
+[pir] MC = 11 / 32 (34.38%)
+[pir] Finished 60-CUStatistics to [36mstat.json[0m in 738.398863ms
+[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 1068.017818ms
+[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 1000.671192ms
+[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 989.445455ms
+[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 7.994238ms
+[pir] Running 65-LinkCSVCodegen ...
