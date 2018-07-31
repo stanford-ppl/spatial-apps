@@ -4,55 +4,56 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
 [0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
 [0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mRunning BlackScholes__N_1048576_ts_65536_op_1 --out=/home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4 --psim-out=/home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4 --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --net=dynamic --routing-algo=dor --proute-iter=100 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4 --vc=8 --vlink=2 --slink=4[0m
-[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4, --psim-out=/home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --net=dynamic, --routing-algo=dor, --proute-iter=100, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8, --vlink=2, --slink=4]
+Waiting for lock on /home/yaqiz/.ivy2/.sbt.ivy.lock to be available...
+[0m[[0minfo[0m] [0mRunning BlackScholes__N_1048576_ts_65536_op_1 --out=/home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4 --psim-out=/home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4 --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --net=dynamic --routing-algo=dor --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4 --vc=8 --vlink=2 --slink=4[0m
+[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4, --psim-out=/home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --net=dynamic, --routing-algo=dor, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8, --vlink=2, --slink=4]
 [pir] Output directory set to [36m/home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4[0m
 [pir] Finishing graph construction for BlackScholes__N_1048576_ts_65536_op_1
 [pir] Configuring spade MyDesign ...
-New design elapsed time: 6794.408ms
-[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 475.769297ms
-[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 3.282368ms
-[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 83.512834ms
-[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 2997.983605ms
-[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 584.047638ms
-[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 1.185439ms
-[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 854.663555ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 935.465356ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 430.765661ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 2020.592846ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 2758.814574ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 4069.871856ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 820.265315ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 70.123666ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 710.226881ms
-[pir] Running 23-CUStatistics ...[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4[0m[0m
-[pir] Finished 23-CUStatistics to [36mstat.json[0m in 3217.405339ms
-[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer1671 in 680.208613ms[pir] Split CUContainer2260 in 664.549111ms[pir] Split CUContainer2262 in 486.513937ms[pir] Split CUContainer2264 in 453.537652ms[pir] Split CUContainer2266 in 416.291606ms[pir] Split CUContainer2268 in 438.231903ms[pir] Split CUContainer2271 in 355.781148ms[pir] Split CUContainer2272 in 384.961243ms[pir] Split CUContainer2269 in 403.851223ms[pir] Split CUContainer2267 in 528.612828ms[pir] Split CUContainer2278 in 397.89795ms[pir] Split CUContainer2281 in 472.696933ms[pir] Split CUContainer2282 in 355.157849ms[pir] Split CUContainer2284 in 346.30223ms[pir] Split CUContainer2279 in 500.869601ms[pir] Split CUContainer2288 in 545.502707ms[pir] Split CUContainer2291 in 640.194766ms[pir] Split CUContainer2292 in 622.047821ms[pir] Split CUContainer2295 in 736.678993ms[pir] Split CUContainer2297 in 664.501386ms[pir] Split CUContainer2293 in 241.389361ms[pir] Split CUContainer2265 in 219.40526ms[pir] Split CUContainer2302 in 268.491249ms[pir] Split CUContainer2304 in 208.15934ms[pir] Split CUContainer2306 in 192.575999ms[pir] Split CUContainer2309 in 195.185198ms[pir] Split CUContainer2305 in 218.928511ms[pir] Split CUContainer2303 in 258.148516ms[pir] Split CUContainer2314 in 221.029343ms[pir] Split CUContainer2316 in 200.398494ms[pir] Split CUContainer2263 in 299.051011ms[pir] Split CUContainer2320 in 202.635473ms[pir] Split CUContainer2322 in 211.924611ms[pir] Split CUContainer2324 in 185.421197ms[pir] Split CUContainer2327 in 205.197236ms[pir] Split CUContainer2321 in 212.468836ms[pir] Split CUContainer2330 in 181.814602ms[pir] Split CUContainer2332 in 169.39539ms[pir] Split CUContainer2334 in 185.022936ms[pir] Split CUContainer2336 in 151.967911ms[pir] Split CUContainer2338 in 179.048331ms[pir] Split CUContainer2340 in 148.459754ms[pir] Split CUContainer2339 in 147.786553ms[pir] Split CUContainer2335 in 175.476498ms[pir] Split CUContainer2346 in 171.898461ms[pir] Split CUContainer2348 in 157.999393ms[pir] Split CUContainer2333 in 206.526243ms[pir] Split CUContainer2353 in 206.674236ms[pir] Split CUContainer2331 in 197.464486ms[pir] Split CUContainer2356 in 211.422045ms[pir] Finished 24-IgraphPartioner in 52366.151111ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 3479.969418ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 3606.235162ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 12.028222ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 94.941271ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 172.663831ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 25617.773746ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 208.16565ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 336.021748ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 1161.848635ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 10261.948152ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 773.603798ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 120.93737ms
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 2306.111279ms
+New design elapsed time: 8980.571ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 628.533308ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 5.766171ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 115.191105ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 3787.010839ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 536.907459ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 1.40123ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 994.905129ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 1006.962256ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 498.547422ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 2382.778346ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 2929.88532ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 4510.643601ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 841.252368ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 81.773416ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 751.366787ms
+[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 3191.504929ms
+[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer1671 in 773.148979ms[pir] Split CUContainer2260 in 639.491891ms[pir] Split CUContainer2262 in 593.572733ms[pir] Split CUContainer2264 in 512.658528ms[pir] Split CUContainer2266 in 362.403574ms[pir] Split CUContainer2268 in 328.791002ms[pir] Split CUContainer2271 in 332.530869ms[pir] Split CUContainer2272 in 369.211824ms[pir] Split CUContainer2269 in 346.583592ms[pir] Split CUContainer2267 in 555.86712ms[pir] Split CUContainer2278 in 387.373617ms[pir] Split CUContainer2281 in 431.571448ms[pir] Split CUContainer2282 in 356.681656ms[pir] Split CUContainer2284 in 353.696624ms[pir] Split CUContainer2279 in 505.030547ms[pir] Split CUContainer2288 in 571.245374ms[pir] Split CUContainer2291 in 682.301088ms[pir] Split CUContainer2292 in 782.822406ms[pir] Split CUContainer2295 in 715.134324ms[pir] Split CUContainer2297 in 716.712773ms[pir] Split CUContainer2293 in 263.408425ms[pir] Split CUContainer2265 in 246.304326ms[pir] Split CUContainer2302 in 252.304813ms[pir] Split CUContainer2304 in 225.376996ms[pir] Split CUContainer2306 in 246.932662ms[pir] Split CUContainer2309 in 246.251057ms[pir] Split CUContainer2305 in 276.164675ms[pir] Split CUContainer2303 in 225.597371ms[pir] Split CUContainer2314 in 237.468449ms[pir] Split CUContainer2316 in 245.416116ms[pir] Split CUContainer2263 in 282.693809ms[pir] Split CUContainer2320 in 222.035711ms[pir] Split CUContainer2322 in 230.522384ms[pir] Split CUContainer2324 in 211.241367ms[pir] Split CUContainer2327 in 241.498338ms[pir] Split CUContainer2321 in 314.496816ms[pir] Split CUContainer2330 in 202.298349ms[pir] Split CUContainer2332 in 188.275661ms[pir] Split CUContainer2334 in 168.179076ms[pir] Split CUContainer2336 in 168.753657ms[pir] Split CUContainer2338 in 192.013163ms[pir] Split CUContainer2340 in 196.349707ms[pir] Split CUContainer2339 in 194.952108ms[pir] Split CUContainer2335 in 190.695311ms[pir] Split CUContainer2346 in 166.750437ms[pir] Split CUContainer2348 in 208.349453ms[pir] Split CUContainer2333 in 225.855817ms[pir] Split CUContainer2353 in 196.406652ms[pir] Split CUContainer2331 in 181.730659ms[pir] Split CUContainer2356 in 189.26455ms[pir] Finished 24-IgraphPartioner in 53317.191477ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 3880.205903ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 4107.694689ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 13.0472ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 130.032146ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 211.275687ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 28589.519989ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 221.83593ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 381.392589ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 1231.322182ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 11262.431738ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 896.232541ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 128.869485ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 2505.698344ms
 [pir] Saving node PIRDesign() to /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/BlackScholes__N_1048576_ts_65536_op_1.pir
-[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/traces
-[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/trace_classes
-[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4 /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4
+[pir] Running 50-PlastisimTraceCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4[0m[0m
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4 /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4
 [[33mtrace[0m] log in /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 19559.280586ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 8591.43886ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 7186.159361ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 564.563258ms
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 3042.67903ms
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 11531.22419ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 9295.694414ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 7698.465183ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 618.158593ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 3376.296621ms
 [pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 165788.067236ms
+[pir] Finished 59-CUPlacer in 185190.910586ms
 [pir] Running 60-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
 [pir] 
 [pir] number of cus=73
@@ -90,24 +91,24 @@ New design elapsed time: 6794.408ms
 [pir] AG-ag = 5 / 32 (15.63%)
 [pir] AG-comp = 0 / 32 (0.00%)
 [pir] MC = 7 / 32 (21.88%)
-[pir] Finished 60-CUStatistics to [36mstat.json[0m in 2778.507098ms
-[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 650.131552ms
-[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 593.495977ms
-[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 567.027046ms
-[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 4.54223ms
-[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 6134.727933ms
-[pir] Running 66-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/node.csv -l /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/link.csv -o /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/final.place -r 16 -c 8 -s1 -g /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/proute.dot -x2 -e 4 -i 100 -b /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/init.place
+[pir] Finished 60-CUStatistics to [36mstat.json[0m in 3032.51598ms
+[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 715.790598ms
+[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 740.386941ms
+[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 1007.762353ms
+[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 6.136087ms
+[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 6696.400438ms
+[pir] Running 66-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/node.csv -l /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/link.csv -o /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/final.place -r 16 -c 8 -s1 -g /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/proute.dot -x2 -e 4 -i 1000 -b /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/init.place
 [[33mproute[0m] log in /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/proute.log
-[[32mproute[0m] 	Used 3 VCs.
-[pir] Finished 66-PlastisimPlacementCodegen to [36minit.place[0m in 11295.99196ms
-[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 9640.115279ms
-[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/
-[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/config.psim -p /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/final.place -c 100000000
+[[32mproute[0m] 	Used 1 VCs.
+[pir] Finished 66-PlastisimPlacementCodegen to [36minit.place[0m in 78295.34952ms
+[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 11025.777577ms
+[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/
+[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/config.psim -p /home/yaqiz/plastisim/configs/finals/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/final.place -c 100000000
 [[33mpsim[0m] log in /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/psim.log
-[[32mpsim[0m] Simulation complete at cycle: 712392
-[[32mpsim[0m] Total DRAM:	  41.21 GB/s ( 35.33 GB/s R,   5.89 GB/s W)
-[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 258299.007553ms
-[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 9770.233771ms
-[pir] Saving node prism.Session@2ebc0ea5 to /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/BlackScholes__N_1048576_ts_65536_op_1.sess
-[0m[[32msuccess[0m] [0mTotal time: 637 s, completed Jul 30, 2018 6:07:38 PM[0m
+[[32mpsim[0m] Simulation complete at cycle: 649333
+[[32mpsim[0m] Total DRAM:	  45.22 GB/s ( 38.76 GB/s R,   6.46 GB/s W)
+[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 243155.580972ms
+[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 10793.18567ms
+[pir] Saving node prism.Session@51bf93ab to /home/yaqiz/pir/out/BlackScholes__N_1048576_ts_65536_op_1_dynamic_v2_s4/BlackScholes__N_1048576_ts_65536_op_1.sess
+[0m[[32msuccess[0m] [0mTotal time: 719 s, completed Jul 31, 2018 3:03:56 AM[0m
 -------------PASS (DONE)------------
