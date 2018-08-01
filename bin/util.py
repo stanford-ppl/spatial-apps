@@ -23,10 +23,10 @@ dependency["gen_pir"] = []
 dependency["psim_asic"] = ["gen_pir"]
 dependency["psim_p2p"] = ["gen_pir"]
 dependency["link_count"] = ["psim_p2p"]
-dependency["psim_D_v1_s6"] = ["gen_pir"]
-dependency["psim_D_v2_s6"] = ["gen_pir"]
-dependency["psim_v3_s6"] = ["psim_p2p"]
-dependency["psim_v2_s6"] = ["psim_p2p"]
+# dependency["psim_D_v1_s6"] = ["gen_pir"]
+# dependency["psim_D_v2_s6"] = ["gen_pir"]
+# dependency["psim_v3_s6"] = ["psim_p2p"]
+# dependency["psim_v2_s6"] = ["psim_p2p"]
 dependency["psim_D_v0_s0"] = ["psim_p2p"]
 dependency["psim_D_v1_s4"] = ["psim_p2p"]
 dependency["psim_D_v2_s4"] = ["psim_p2p"]
@@ -210,6 +210,8 @@ parser.add_argument('--git', dest='git', action='store_true', default=False)
 parser.add_argument('--app', dest='app', action='store', default='ALL',help='App name')
 parser.add_argument('--rerun', dest='rerun', action='store', default='false',
     help='force pass to rerun' )
+parser.add_argument('--toclear', dest='toclear', action='store', default='false',
+    help='clear status in pass' )
 parser.add_argument('--torun', dest='torun', action='store', default='ALL',
     help='Pass to run')
 parser.add_argument('--regression', dest='regression', action='store_true', default=False) 

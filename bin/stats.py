@@ -26,7 +26,7 @@ def cycleOf(log):
         return None
     else:
         line = lines[0]
-        cycle = int(line.split("Simulation complete at cycle:")[1].strip())
+        cycle = int(line.split("Simulation complete at cycle:")[1].strip().split("(TIMED OUT)")[0])
         return cycle
 
 def usage(key, log):

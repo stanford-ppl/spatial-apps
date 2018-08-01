@@ -124,7 +124,11 @@ def act(fullname, resp):
         for passName in getPass():
             log = logs(fullname, passName)
             rm(log)
-            # del progress_cache[(fullname, passName)]
+    def clearLog():
+        for passName in passes:
+            if toclear(passName):
+                log = logs(fullname, passName)
+                rm(log)
     def printlog():
         for passName in getPass():
             log = logs(fullname, passName)
@@ -143,6 +147,8 @@ def act(fullname, resp):
         killPass()
     elif resp.startswith("r"):
         removeLog()
+    elif resp.startswith("c"):
+        clearLog()
     elif resp.startswith("s"):
         printlog();
     elif resp.startswith("o"):
@@ -252,6 +258,9 @@ def running(fullname, passName):
 
 def rerun(passName):
     return passName in opts.rerun.split(",") or opts.rerun == "ALL"
+
+def toclear(passName):
+    return passName in opts.toclear.split(",") or opts.toclear == "ALL"
 
 def torun(passName):
     return passName in opts.torun.split(",") or opts.torun == "ALL"
