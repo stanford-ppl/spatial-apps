@@ -42,11 +42,12 @@ bestapps += ['SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16']
 def runbest(summarize):
     opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes if p.startswith("psim")])
 
+    print(opts.parallel)
     if summarize:
         opts.summarize = True
-    else:
-        opts.parallel=20
-        opts.git=True
+    # else:
+        # opts.parallel=20
+        # opts.git=True
 
     for app in bestapps:
         target(app, [], {})

@@ -11,6 +11,7 @@ import math
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 PAPER_HOME = os.environ['HOME'] + "/papers/"
+CONF_PATH = SPATIAL_HOME + '/apps/bin/exp.conf'
 
 APPS = ["lenet_loops"]
 # APPS = ['DotProduct', 'OuterProduct', 'GDA', 'BlackScholes', 'TPCHQ6']
@@ -224,7 +225,21 @@ global opts
 opts.apps = [] if len(args)==0 else APPS if args[0] == "ALL" else args
 
 opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME) if opts.dse else '{}/pir/apps/src'.format(PIR_HOME)
-# opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME)
+
+opts.parallel = 1
+if os.path.exists(CONF_PATH.format(SPATIAL_HOME)):
+    with open(CONF_PATH, 'r') as f:
+        for row in f:
+            if not row.startswith("#"):
+                k,v, = row.split("=")
+                if v.isdigit():
+                    v = int(v)
+                elif v in ["True", "true"]:
+                    v = True
+                elif  v in ['False','false']:
+                    v = False
+                setattr(opts, k, v)
+# opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME):
 if opts.summarize:
     opts.summary = OrderedDict()
     opts.summary['apps'] = OrderedDict()
