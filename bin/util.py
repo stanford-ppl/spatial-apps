@@ -225,3 +225,4 @@ opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME) if opts.dse else '{}/pir/ap
 # opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME)
 if opts.summarize:
     opts.summary = OrderedDict()
+    opts.summary['apps'] = OrderedDict()

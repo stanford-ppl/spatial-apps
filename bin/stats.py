@@ -29,37 +29,20 @@ def cycleOf(log):
         cycle = int(line.split("Simulation complete at cycle:")[1].strip())
         return cycle
 
-def pcuUsage(log):
+def usage(key, log):
     if not os.path.exists(log): return None
-    line = grep(log, ["PCU usage ="])
+    line = grep(log, [key])
     if len(line) == 0:
       return None
     pct = float(line[0].split("(")[1].split("%")[0])
     return pct
 
-def pmuUsage(log):
+def count(key, log):
     if not os.path.exists(log): return None
-    line = grep(log, ["PMU usage ="])
+    line = grep(log, [key])
     if len(line) == 0:
       return None
-    pct = float(line[0].split("(")[1].split("%")[0])
-    return pct
-
-def mcUsage(log):
-    if not os.path.exists(log): return None
-    line = grep(log, ["MC usage ="])
-    if len(line) == 0:
-      return None
-    pct = float(line[0].split("(")[1].split("%")[0])
-    return pct
-
-def totalUsage(log):
-    if not os.path.exists(log): return None
-    line = grep(log, ["Total usage ="])
-    if len(line) == 0:
-      return None
-    pct = float(line[0].split("(")[1].split("%")[0])
-    return pct
+    return int(line[0].split(key)[1])
 
 def drambw(log):
     if not os.path.exists(log): return None
@@ -90,17 +73,19 @@ def numVC(log):
     return int(line[0].split("Used ")[1].split("VCs")[0].strip())
 
 def summarize(app, args, params):
-    opts.summary[app] = {}
-    summary = opts.summary[app]
+    opts.summary['apps'][app] = {}
+    summary = opts.summary['apps'][app]
     fullname = getFullName(app, args, params)
     summary["cycle"] = {}
     summary["vc"] = {}
     for passName in passes:
         log = logs(fullname, passName)
+        if passName=="psim_D_v1_s4":
+            summary["pcu"] = usage("PCU = ", log)
+            summary["pmu-comp"] = usage("PMU-comp = ",log)
+            summary["pmu-mem"] = usage("PMU-mem = ",log)
+            summary["mc"] = usage("MC =", log)
         if passName=="psim_p2p":
-            summary["pcu"] = pcuUsage(log)
-            summary["pmu"] = pmuUsage(log)
-            summary["mc"] = mcUsage(log)
             summary["loadbw"] = loadbw(log)
             summary["storebw"] = storebw(log)
         summary["cycle"][passName] = cycleOf(log)
@@ -115,6 +100,7 @@ def summarize(app, args, params):
             if count is not None:
                 counts.append(count)
         summary["link_count"] = counts
+    return summary
 
 def futil(used,total):
    return round(float(used) / float(total), 3)

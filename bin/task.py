@@ -159,10 +159,10 @@ def show(fullname):
     def passMessage(passName, log):
         msg = ""
         if success(fullname, passName) and passName=="psim_p2p":
-            pcu = pcuUsage(log)
-            pmu = pmuUsage(log)
-            mc = mcUsage(log)
-            msg += "pcu={}% pmu={}% mc={}%".format(pcu, pmu, mc)
+            pcu = count("compute CU =", log)
+            pmu = count("memory CU =", log)
+            mc = count("mc CU =", log)
+            msg += "pcu={} pmu={} mc={}".format(pcu, pmu, mc)
         if success(fullname, passName) and (passName.startswith("psim_")):
             msg += " cycle={} dram={}".format(cycleOf(log), drambw(log))
             vc = numVC(log)
