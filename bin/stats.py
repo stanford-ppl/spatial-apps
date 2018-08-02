@@ -95,11 +95,19 @@ def summarize(app, args, params):
     with open(logs(fullname,"link_count"), 'r') as csvfile:
         reader = csv.DictReader(csvfile)
         counts = []
+        multicasts = []
         for row in reader:
             count = row['count']
             if count is not None:
+                multicast = 0
                 counts.append(count)
+                for header in row:
+                    if 'dst' in header and row[header] != '':
+                        multicast += 1
+                multicasts.append(multicast)
+
         summary["link_count"] = counts
+        summary["multicast"] = multicasts
     return summary
 
 def futil(used,total):

@@ -232,6 +232,7 @@ if os.path.exists(CONF_PATH.format(SPATIAL_HOME)):
         for row in f:
             if not row.startswith("#"):
                 k,v, = row.split("=")
+                v = v.strip()
                 if v.isdigit():
                     v = int(v)
                 elif v in ["True", "true"]:
