@@ -4,55 +4,55 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
 [0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
 [0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mRunning LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4 --out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4 --psim-out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4 --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --net=static --routing-algo=dor --proute-iter=100 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=20 --vfifo=4 --vc=8 --vlink=3 --slink=4[0m
-[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4, --psim-out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --net=static, --routing-algo=dor, --proute-iter=100, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=20, --vfifo=4, --vc=8, --vlink=3, --slink=4]
+[0m[[0minfo[0m] [0mRunning LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4 --out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4 --psim-out=/home/yaqiz/plastisim/configs/finals/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4 --debug=false --verbose=true --dot=false --mapping=true --load-pir=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --net=static --routing-algo=dor --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=4 --vfifo=4 --vc=8 --vlink=3 --slink=4[0m
+[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4, --psim-out=/home/yaqiz/plastisim/configs/finals/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4, --debug=false, --verbose=true, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --net=static, --routing-algo=dor, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=4, --vfifo=4, --vc=8, --vlink=3, --slink=4]
 [pir] Output directory set to [36m/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4[0m
 [pir] Finishing graph construction for LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4
 [pir] Configuring spade MyDesign ...
-New design elapsed time: 11805.039ms
-[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 318.238466ms
-[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 3.941117ms
-[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 79.497762ms
-[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 655.875147ms
-[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 211.501719ms
-[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 1.294236ms
-[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 494.402898ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 64.567714ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 61.049117ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 1144.291302ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 301.881767ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 257.61538ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 425.346878ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 72.138178ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 182.776875ms
-[pir] Running 23-CUStatistics ...[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4[0m[0m
-[pir] Finished 23-CUStatistics to [36mstat.json[0m in 167.066845ms
-[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer1609 in 210.670817ms[pir] Split CUContainer3593 in 193.064055ms[pir] Split CUContainer3596 in 160.066676ms[pir] Split CUContainer3597 in 168.352623ms[pir] Finished 24-IgraphPartioner in 1750.647081ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 3018.601186ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 949.84957ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 7.796013ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 65.588642ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 82.656334ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 7056.769408ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 277.809799ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 227.094862ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 2132.19315ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 5300.41474ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 627.782663ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 165.337095ms
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 171.99905ms
+New design elapsed time: 10766.782ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 474.967527ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 3.573248ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 60.869107ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 633.738499ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 266.967445ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 1.751443ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 435.062911ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 57.509792ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 51.663154ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 1154.58314ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 268.430316ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 266.23686ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 488.42183ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 73.863835ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 173.38043ms
+[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 177.506625ms
+[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer1609 in 178.187725ms[pir] Split CUContainer3593 in 161.465011ms[pir] Split CUContainer3596 in 151.766185ms[pir] Split CUContainer3597 in 165.372842ms[pir] Finished 24-IgraphPartioner in 1782.467869ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 2790.978529ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 893.516564ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 7.276399ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 55.77915ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 66.559643ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 7225.706182ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 213.933608ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 271.339961ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 2089.908087ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 4522.789182ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 375.512019ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 150.977448ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 145.841993ms
 [pir] Saving node PIRDesign() to /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4.pir
-[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/traces
-[[33mcommand[0m] mkdir -p /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/trace_classes
-[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4 /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4
+[pir] Running 50-PlastisimTraceCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/finals/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4[0m[0m
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4 /home/yaqiz/plastisim/configs/finals/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4
 [[33mtrace[0m] log in /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 17493.454346ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 7780.175031ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 4677.070142ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 319.690459ms
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1140.461561ms
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 6581.408191ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 6983.920767ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 3761.293331ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 271.061468ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1073.017586ms
 [pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 251648.06941ms
+[pir] Finished 59-CUPlacer in 226536.817809ms
 [pir] Running 60-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
 [pir] 
 [pir] number of cus=52
@@ -84,27 +84,904 @@ New design elapsed time: 11805.039ms
 [pir] memory CU = 23
 [pir] mc CU = 4
 [pir] Total = 24
-[pir] PCU = 19 / 64 (29.69%)
-[pir] PMU-comp = 1 / 64 (1.56%)
+[pir] PCU = 21 / 64 (32.81%)
+[pir] PMU-comp = 0 / 64 (0.00%)
 [pir] PMU-mem = 23 / 64 (35.94%)
 [pir] AG-ag = 2 / 34 (5.88%)
 [pir] AG-comp = 1 / 34 (2.94%)
 [pir] MC = 4 / 34 (11.76%)
-[pir] Finished 60-CUStatistics to [36mstat.json[0m in 341.250876ms
-[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 953.485256ms
-[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 711.134838ms
-[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 629.366029ms
-[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 4.382909ms
-[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 3527.271712ms
-[pir] Running 66-PlastisimPlacementCodegen ...[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 3702.633766ms
-[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 4072.181235ms
-[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/
-[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/config.psim -p /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/final.place -c 100000000
+[pir] Finished 60-CUStatistics to [36mstat.json[0m in 349.873378ms
+[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 673.706828ms
+[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 731.194825ms
+[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 621.464974ms
+[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 5.458037ms
+[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 3822.524263ms
+[pir] Running 66-PlastisimPlacementCodegen ...[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 3675.642441ms
+[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 3543.999452ms
+[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/
+[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/config.psim -p /home/yaqiz/plastisim/configs/finals/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/final.place -c 100000000 -l B
 [[33mpsim[0m] log in /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/psim.log
-[[32mpsim[0m] Simulation complete at cycle: 345047
-[[32mpsim[0m] Total DRAM:	  49.01 GB/s ( 49.00 GB/s R,   0.00 GB/s W)
-[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 36735.373256ms
-[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 4750.406626ms
-[pir] Saving node prism.Session@6b87c026 to /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4.sess
-[0m[[32msuccess[0m] [0mTotal time: 382 s, completed Jul 30, 2018 5:59:45 PM[0m
+Changing to config directory: /home/yaqiz/plastisim/configs/finals/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Added all names to the symbol table.
+Adding static hop for route 3934 (1591->55, lat 5).
+Adding static hop for route 3963 (1591->55, lat 6).
+Adding static hop for route 3987 (1610->213, lat 6).
+Adding static hop for route 4016 (1610->213, lat 7).
+Adding static hop for route 4040 (1613->293, lat 1).
+Adding static hop for route 4069 (1613->293, lat 1).
+Adding static hop for route 6938 (293->1644, lat 10).
+Adding static hop for route 4187 (1480->1364, lat 16).
+Adding static hop for route 4268 (1364->1591, lat 16).
+Adding static hop for route 4396 (1364->1596, lat 18).
+Adding static hop for route 4574 (1364->1610, lat 17).
+Adding static hop for route 4291 (1364->1610, lat 19).
+Adding static hop for route 4237 (1364->1610, lat 19).
+Adding static hop for route 8020 (1364->1611, lat 7).
+Adding static hop for route 4237 (1364->1611, lat 9).
+Adding static hop for route 4291 (1364->1611, lat 9).
+Adding static hop for route 4644 (1364->1613, lat 17).
+Adding static hop for route 4291 (1364->1613, lat 17).
+Adding static hop for route 4237 (1364->1613, lat 17).
+Adding static hop for route 8020 (1364->3595, lat 15).
+Adding static hop for route 4237 (1364->3595, lat 18).
+Adding static hop for route 4291 (1364->3595, lat 17).
+Adding static hop for route 6256 (1611->1636, lat 7).
+Adding static hop for route 6232 (213->1636, lat 4).
+Adding static hop for route 6256 (1611->1637, lat 5).
+Adding static hop for route 6232 (213->1637, lat 6).
+Adding static hop for route 6256 (1611->1638, lat 3).
+Adding static hop for route 6232 (213->1638, lat 8).
+Adding static hop for route 6256 (1611->1639, lat 6).
+Adding static hop for route 6232 (213->1639, lat 12).
+Adding static hop for route 6256 (1611->1640, lat 6).
+Adding static hop for route 6232 (213->1640, lat 6).
+Adding static hop for route 6256 (1611->1641, lat 2).
+Adding static hop for route 6232 (213->1641, lat 10).
+Adding static hop for route 6256 (1611->1642, lat 2).
+Adding static hop for route 6232 (213->1642, lat 10).
+Adding static hop for route 6256 (1611->1643, lat 4).
+Adding static hop for route 6232 (213->1643, lat 12).
+Adding static hop for route 4213 (1359->1480, lat 4).
+Adding static hop for route 6116 (1602->1635, lat 3).
+Adding static hop for route 6999 (3599->1645, lat 3).
+Adding static hop for route 4474 (1645->1602, lat 4).
+Adding static hop for route 4499 (1635->1602, lat 3).
+Adding static hop for route 4291 (1364->1602, lat 17).
+Adding static hop for route 4237 (1364->1602, lat 17).
+Adding static hop for route 6116 (1602->1634, lat 2).
+Adding static hop for route 4291 (1364->1634, lat 18).
+Adding static hop for route 4237 (1364->1634, lat 18).
+Adding static hop for route 6999 (3599->1646, lat 4).
+Adding static hop for route 7088 (1624->1647, lat 3).
+Adding static hop for route 7134 (1625->1648, lat 3).
+Adding static hop for route 7274 (1647->3598, lat 3).
+Adding static hop for route 7249 (1648->3598, lat 6).
+Adding static hop for route 7180 (1626->1649, lat 3).
+Adding static hop for route 7226 (1627->1650, lat 2).
+Adding static hop for route 7416 (1649->3600, lat 5).
+Adding static hop for route 7393 (1650->3600, lat 12).
+Adding static hop for route 7321 (3595->3599, lat 4).
+Adding static hop for route 7370 (3598->3599, lat 2).
+Adding static hop for route 7346 (3600->3599, lat 2).
+Adding static hop for route 7297 (1646->3599, lat 4).
+Adding static hop for route 4093 (1596->1359, lat 1).
+Adding static hop for route 4122 (1596->1359, lat 1).
+Adding static hop for route 4146 (1628->1359, lat 3).
+Adding static hop for route 4345 (1629->1595, lat 2).
+Adding static hop for route 4372 (1634->1595, lat 6).
+Adding static hop for route 5380 (55->1628, lat 2).
+Adding static hop for route 5403 (1595->1628, lat 5).
+Adding static hop for route 4237 (1364->1628, lat 16).
+Adding static hop for route 5380 (55->1629, lat 3).
+Adding static hop for route 5403 (1595->1629, lat 3).
+Adding static hop for route 4237 (1364->1629, lat 14).
+Adding static hop for route 5380 (55->1630, lat 5).
+Adding static hop for route 5403 (1595->1630, lat 2).
+Adding static hop for route 4291 (1364->1630, lat 12).
+Adding static hop for route 4237 (1364->1630, lat 12).
+Adding static hop for route 5380 (55->1631, lat 7).
+Adding static hop for route 5403 (1595->1631, lat 4).
+Adding static hop for route 4291 (1364->1631, lat 10).
+Adding static hop for route 4237 (1364->1631, lat 10).
+Adding static hop for route 5380 (55->1632, lat 9).
+Adding static hop for route 5403 (1595->1632, lat 6).
+Adding static hop for route 4291 (1364->1632, lat 8).
+Adding static hop for route 4237 (1364->1632, lat 8).
+Adding static hop for route 5380 (55->1633, lat 11).
+Adding static hop for route 5403 (1595->1633, lat 8).
+Adding static hop for route 4291 (1364->1633, lat 6).
+Adding static hop for route 4237 (1364->1633, lat 6).
+Adding static hop for route 4668 (1640->1616, lat 4).
+Adding static hop for route 4695 (1630->1616, lat 2).
+Adding static hop for route 4720 (1641->1617, lat 3).
+Adding static hop for route 4747 (1631->1617, lat 2).
+Adding static hop for route 4772 (1642->1618, lat 4).
+Adding static hop for route 4799 (1632->1618, lat 2).
+Adding static hop for route 4824 (1643->1619, lat 2).
+Adding static hop for route 4851 (1633->1619, lat 2).
+Adding static hop for route 4906 (1644->1620, lat 3).
+Adding static hop for route 4879 (1616->1620, lat 2).
+Adding static hop for route 4906 (1644->1621, lat 2).
+Adding static hop for route 4934 (1617->1621, lat 2).
+Adding static hop for route 4906 (1644->1622, lat 4).
+Adding static hop for route 4983 (1618->1622, lat 2).
+Adding static hop for route 4906 (1644->1623, lat 10).
+Adding static hop for route 5032 (1619->1623, lat 3).
+Adding static hop for route 5108 (1636->1624, lat 2).
+Adding static hop for route 5077 (1620->1624, lat 2).
+Adding static hop for route 5163 (1637->1625, lat 2).
+Adding static hop for route 5132 (1621->1625, lat 2).
+Adding static hop for route 5218 (1638->1626, lat 2).
+Adding static hop for route 5187 (1622->1626, lat 2).
+Adding static hop for route 5273 (1639->1627, lat 2).
+Adding static hop for route 5242 (1623->1627, lat 2).
+Printing hop routes
+Parsed placement file.
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Set lat 6 from 0 to 1
+Set lat 8 from 0 to 2
+Set lat 12 from 0 to 3
+Set lat 6 from 0 to 4
+Set lat 10 from 0 to 5
+Set lat 10 from 0 to 6
+Set lat 12 from 0 to 7
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 7 from 0 to 0
+Set lat 5 from 0 to 1
+Set lat 3 from 0 to 2
+Set lat 6 from 0 to 3
+Set lat 6 from 0 to 4
+Set lat 2 from 0 to 5
+Set lat 2 from 0 to 6
+Set lat 4 from 0 to 7
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 17 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 12 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 10 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set lat 2 from 0 to 1
+Set lat 4 from 0 to 2
+Set lat 10 from 0 to 3
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 7 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 7 from 0 to 0
+Set lat 15 from 0 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 17 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 4 from 0 to 1
+Set lat 6 from 0 to 2
+Set lat 8 from 0 to 3
+Set lat 5 from 0 to 4
+Set lat 3 from 0 to 5
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 3 from 0 to 1
+Set lat 5 from 0 to 2
+Set lat 7 from 0 to 3
+Set lat 9 from 0 to 4
+Set lat 11 from 0 to 5
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 19 from 0 to 0
+Set lat 17 from 0 to 1
+Set lat 9 from 0 to 2
+Set lat 17 from 0 to 3
+Set lat 18 from 0 to 4
+Set lat 12 from 0 to 5
+Set lat 10 from 0 to 6
+Set lat 8 from 0 to 7
+Set lat 6 from 0 to 8
+Set lat 17 from 0 to 9
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set lat 4 from 0 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 3 from 0 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 18 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 16 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 19 from 0 to 0
+Set lat 17 from 0 to 1
+Set lat 9 from 0 to 2
+Set lat 17 from 0 to 3
+Set lat 18 from 0 to 4
+Set lat 12 from 0 to 5
+Set lat 10 from 0 to 6
+Set lat 8 from 0 to 7
+Set lat 6 from 0 to 8
+Set lat 16 from 0 to 9
+Set lat 14 from 0 to 10
+Set lat 18 from 0 to 11
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 16 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Parsed definitions of all elements.
+Total of 97 links:
+  0: RetimingFIFO2635_RetimingFIFO2659_RetimingFIFO2682_RetimingFIFO2705_RetimingFIFO2728_RetimingFIFO2751_RetimingFIFO2774_RetimingFIFO2797
+    
+  1: RetimingFIFO2643_RetimingFIFO2667_RetimingFIFO2690_RetimingFIFO2713_RetimingFIFO2736_RetimingFIFO2759_RetimingFIFO2782_RetimingFIFO2805
+    
+  2: SRAM132
+    
+  3: DramAddress270
+    
+  4: RetimingFIFO2570
+    
+  5: RetimingFIFO2387
+    
+  6: RetimingFIFO2359
+    
+  7: RetimingFIFO2144
+    
+  8: RetimingFIFO3163
+    
+  9: RetimingFIFO3082
+    
+  10: RetimingFIFO3001
+    
+  11: RetimingFIFO2920
+    
+  12: RetimingFIFO2116
+    
+  13: RetimingFIFO3619
+    
+  14: RetimingFIFO2486
+    
+  15: RetimingFIFO3384
+    
+  16: RetimingFIFO2458
+    
+  17: RetimingFIFO3302
+    
+  18: RetimingFIFO3610
+    
+  19: RetimingFIFO2542
+    
+  20: RetimingFIFO3548
+    
+  21: RetimingFIFO2514
+    
+  22: RetimingFIFO2820
+    
+  23: RetimingFIFO3292
+    
+  24: RetimingFIFO3374
+    
+  25: RetimingFIFO3456
+    
+  26: RetimingFIFO3538
+    
+  27: RetimingFIFO2892
+    
+  28: RetimingFIFO2973
+    
+  29: RetimingFIFO3054
+    
+  30: RetimingFIFO3135
+    
+  31: RetimingFIFO3601
+    
+  32: RetimingFIFO3466
+    
+  33: StreamOut157
+    
+  34: StreamOut1301
+    
+  35: StreamOut24
+    
+  36: StreamOut261
+    
+  37: RetimingFIFO3191_RetimingFIFO3207_RetimingFIFO3223_RetimingFIFO3239
+    
+  38: SRAM329
+    
+  39: SRAM106
+    
+  40: SRAM328
+    
+  41: SRAM105
+    
+  42: SRAM22
+    
+  43: SRAM21
+    
+  44: SRAM20
+    
+  45: SRAM19
+    
+  46: SRAM18
+    
+  47: SRAM17
+    
+  48: SRAM835
+    
+  49: SRAM834
+    
+  50: SRAM837
+    
+  51: SRAM836
+    
+  52: StreamOut158
+    
+  53: StreamOut1302
+    
+  54: StreamOut25
+    
+  55: StreamOut262
+    
+  56: TokenIn7995_TokenIn8008
+    
+  57: DramAddress183
+    
+  58: RetimingFIFO2154_RetimingFIFO2212_RetimingFIFO2226_RetimingFIFO2255_RetimingFIFO2284_RetimingFIFO2183
+    
+  59: RetimingFIFO1924_RetimingFIFO1982_RetimingFIFO2011_RetimingFIFO2040_RetimingFIFO2069_RetimingFIFO1953
+    
+  60: ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134
+    
+  61: SRAM124
+    
+  62: SRAM125
+    
+  63: SRAM126
+    
+  64: SRAM127
+    
+  65: SRAM128
+    
+  66: SRAM129
+    
+  67: SRAM130
+    
+  68: SRAM131
+    
+  69: RetimingFIFO2580_RetimingFIFO2609
+    
+  70: RetimingFIFO2397_RetimingFIFO2426
+    
+  71: DramAddress1313
+    
+  72: DramAddress35
+    
+  73: StreamIn1304
+    
+  74: ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115
+    
+  75: TokenOut1487
+    
+  76: TokenIn5354
+    
+  77: TokenIn5367
+    
+  78: TokenIn5459
+    
+  79: TokenIn5472
+    
+  80: TokenIn5609
+    
+  81: TokenIn5596
+    
+  82: TokenIn5746
+    
+  83: TokenIn5733
+    
+  84: TokenIn5883
+    
+  85: TokenIn5870
+    
+  86: TokenIn6020
+    
+  87: TokenIn6007
+    
+  88: StreamOut1303
+    
+  89: Reg661
+    
+  90: Reg357
+    
+  91: Reg660
+    
+  92: Reg355
+    
+  93: Reg663
+    
+  94: Reg361
+    
+  95: Reg359
+    
+  96: Reg662
+    
+Total of 82 nodes:
+  0: CE8268
+    [StreamOut25 *8 /1] [StreamOut24 *8 /1]  => [RetimingFIFO1924_RetimingFIFO1982_RetimingFIFO2011_RetimingFIFO2040_RetimingFIFO2069_RetimingFIFO1953] 
+  1: CE8282
+    [StreamOut158 *8 /1] [StreamOut157 *8 /1]  => [RetimingFIFO2635_RetimingFIFO2659_RetimingFIFO2682_RetimingFIFO2705_RetimingFIFO2728_RetimingFIFO2751_RetimingFIFO2774_RetimingFIFO2797] 
+  2: CE8296
+    [StreamOut262 *32 /1] [StreamOut261 *32 /1]  => [RetimingFIFO2820] 
+  3: CE9232
+    [RetimingFIFO2820 *1 /1]  => [SRAM132] 
+  4: CE9222
+    [SRAM132 *128 /1]  => [RetimingFIFO3191_RetimingFIFO3207_RetimingFIFO3223_RetimingFIFO3239] 
+  5: CE8336
+     => [DramAddress270] [TokenIn7995_TokenIn8008] [DramAddress183] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134] [DramAddress35] [DramAddress1313] [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115] 
+  6: CE8354
+    [TokenOut1487 *1 /1]  => 
+  7: CE8374
+    [DramAddress35 *1 /1]  => [StreamOut25] [StreamOut24] 
+  8: CE8402
+    [DramAddress1313 *1 /1]  => [StreamOut1302] [StreamOut1301] 
+  9: CE8442
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *32768 /1] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134 *32768 /1] [DramAddress183 *32768 /1]  => [StreamOut158] [StreamOut157] 
+  10: CE8462
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *262144 /1] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134 *262144 /1] [TokenIn7995_TokenIn8008 *262144 /1]  => [RetimingFIFO2643_RetimingFIFO2667_RetimingFIFO2690_RetimingFIFO2713_RetimingFIFO2736_RetimingFIFO2759_RetimingFIFO2782_RetimingFIFO2805] 
+  11: CE8482
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *64 /1] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134 *64 /1] [DramAddress270 *64 /1]  => [StreamOut262] [StreamOut261] 
+  12: CE9366
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *65536 /1] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134 *65536 /1] [TokenIn7995_TokenIn8008 *65536 /1]  => [RetimingFIFO3601] 
+  13: CE9042
+    [RetimingFIFO2635_RetimingFIFO2659_RetimingFIFO2682_RetimingFIFO2705_RetimingFIFO2728_RetimingFIFO2751_RetimingFIFO2774_RetimingFIFO2797 *1 /1] [RetimingFIFO2643_RetimingFIFO2667_RetimingFIFO2690_RetimingFIFO2713_RetimingFIFO2736_RetimingFIFO2759_RetimingFIFO2782_RetimingFIFO2805 *1 /1]  => [SRAM124] 
+  14: CE9030
+    [SRAM124 *1024 /1]  => [RetimingFIFO3292] 
+  15: CE9066
+    [RetimingFIFO2635_RetimingFIFO2659_RetimingFIFO2682_RetimingFIFO2705_RetimingFIFO2728_RetimingFIFO2751_RetimingFIFO2774_RetimingFIFO2797 *1 /1] [RetimingFIFO2643_RetimingFIFO2667_RetimingFIFO2690_RetimingFIFO2713_RetimingFIFO2736_RetimingFIFO2759_RetimingFIFO2782_RetimingFIFO2805 *1 /1]  => [SRAM125] 
+  16: CE9054
+    [SRAM125 *1024 /1]  => [RetimingFIFO3374] 
+  17: CE9090
+    [RetimingFIFO2635_RetimingFIFO2659_RetimingFIFO2682_RetimingFIFO2705_RetimingFIFO2728_RetimingFIFO2751_RetimingFIFO2774_RetimingFIFO2797 *1 /1] [RetimingFIFO2643_RetimingFIFO2667_RetimingFIFO2690_RetimingFIFO2713_RetimingFIFO2736_RetimingFIFO2759_RetimingFIFO2782_RetimingFIFO2805 *1 /1]  => [SRAM126] 
+  18: CE9078
+    [SRAM126 *1024 /1]  => [RetimingFIFO3456] 
+  19: CE9114
+    [RetimingFIFO2635_RetimingFIFO2659_RetimingFIFO2682_RetimingFIFO2705_RetimingFIFO2728_RetimingFIFO2751_RetimingFIFO2774_RetimingFIFO2797 *1 /1] [RetimingFIFO2643_RetimingFIFO2667_RetimingFIFO2690_RetimingFIFO2713_RetimingFIFO2736_RetimingFIFO2759_RetimingFIFO2782_RetimingFIFO2805 *1 /1]  => [SRAM127] 
+  20: CE9102
+    [SRAM127 *1024 /1]  => [RetimingFIFO3538] 
+  21: CE9138
+    [RetimingFIFO2635_RetimingFIFO2659_RetimingFIFO2682_RetimingFIFO2705_RetimingFIFO2728_RetimingFIFO2751_RetimingFIFO2774_RetimingFIFO2797 *1 /1] [RetimingFIFO2643_RetimingFIFO2667_RetimingFIFO2690_RetimingFIFO2713_RetimingFIFO2736_RetimingFIFO2759_RetimingFIFO2782_RetimingFIFO2805 *1 /1]  => [SRAM128] 
+  22: CE9126
+    [SRAM128 *1024 /1]  => [RetimingFIFO2892] 
+  23: CE9162
+    [RetimingFIFO2635_RetimingFIFO2659_RetimingFIFO2682_RetimingFIFO2705_RetimingFIFO2728_RetimingFIFO2751_RetimingFIFO2774_RetimingFIFO2797 *1 /1] [RetimingFIFO2643_RetimingFIFO2667_RetimingFIFO2690_RetimingFIFO2713_RetimingFIFO2736_RetimingFIFO2759_RetimingFIFO2782_RetimingFIFO2805 *1 /1]  => [SRAM129] 
+  24: CE9150
+    [SRAM129 *1024 /1]  => [RetimingFIFO2973] 
+  25: CE9186
+    [RetimingFIFO2635_RetimingFIFO2659_RetimingFIFO2682_RetimingFIFO2705_RetimingFIFO2728_RetimingFIFO2751_RetimingFIFO2774_RetimingFIFO2797 *1 /1] [RetimingFIFO2643_RetimingFIFO2667_RetimingFIFO2690_RetimingFIFO2713_RetimingFIFO2736_RetimingFIFO2759_RetimingFIFO2782_RetimingFIFO2805 *1 /1]  => [SRAM130] 
+  26: CE9174
+    [SRAM130 *1024 /1]  => [RetimingFIFO3054] 
+  27: CE9210
+    [RetimingFIFO2635_RetimingFIFO2659_RetimingFIFO2682_RetimingFIFO2705_RetimingFIFO2728_RetimingFIFO2751_RetimingFIFO2774_RetimingFIFO2797 *1 /1] [RetimingFIFO2643_RetimingFIFO2667_RetimingFIFO2690_RetimingFIFO2713_RetimingFIFO2736_RetimingFIFO2759_RetimingFIFO2782_RetimingFIFO2805 *1 /1]  => [SRAM131] 
+  28: CE9198
+    [SRAM131 *1024 /1]  => [RetimingFIFO3135] 
+  29: CE8362
+    [StreamIn1304 *1 /1]  => [TokenOut1487] 
+  30: CE9020
+    [RetimingFIFO2397_RetimingFIFO2426 *1 /1]  => [SRAM106] 
+  31: CE9010
+    [SRAM106 *8 /1]  => [RetimingFIFO2387] 
+  32: CE9252
+    [RetimingFIFO2580_RetimingFIFO2609 *1 /1]  => [SRAM328] 
+  33: CE9242
+    [SRAM328 *8 /1]  => [RetimingFIFO2359] 
+  34: CE8420
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *512 /1] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134 *512 /1] [RetimingFIFO2359 *1 /1] [RetimingFIFO2387 *1 /1]  => [RetimingFIFO2397_RetimingFIFO2426] 
+  35: CE8996
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *512 /1] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134 *512 /1] [RetimingFIFO2397_RetimingFIFO2426 *1 /1]  => [SRAM105] 
+  36: CE8982
+    [SRAM105 *8 /1]  => [RetimingFIFO2144] 
+  37: CE9272
+    [RetimingFIFO2580_RetimingFIFO2609 *1 /1]  => [SRAM329] 
+  38: CE9262
+    [SRAM329 *8 /1]  => [RetimingFIFO2570] 
+  39: CE9292
+    [RetimingFIFO3302 *1 /1]  => [SRAM834] 
+  40: CE9282
+    [SRAM834 *8 /1]  => [RetimingFIFO2458] 
+  41: CE9312
+    [RetimingFIFO3384 *1 /1]  => [SRAM835] 
+  42: CE9302
+    [SRAM835 *8 /1]  => [RetimingFIFO2486] 
+  43: CE9382
+    [RetimingFIFO2486 *1 /1] [RetimingFIFO2458 *1 /1]  => [RetimingFIFO3619] 
+  44: CE9332
+    [RetimingFIFO3466 *1 /1]  => [SRAM836] 
+  45: CE9322
+    [SRAM836 *8 /1]  => [RetimingFIFO2514] 
+  46: CE9352
+    [RetimingFIFO3548 *1 /1]  => [SRAM837] 
+  47: CE9342
+    [SRAM837 *8 /1]  => [RetimingFIFO2542] 
+  48: CE9418
+    [RetimingFIFO2542 *1 /1] [RetimingFIFO2514 *1 /1]  => [RetimingFIFO3610] 
+  49: CE9400
+    [RetimingFIFO2570 *1 /1] [RetimingFIFO3601 *1 /1] [RetimingFIFO3610 *1 /1] [RetimingFIFO3619 *1 /1]  => [RetimingFIFO2580_RetimingFIFO2609] 
+  50: CE8312
+    [StreamOut1302 *8 /1] [StreamOut1303 *1 /1] [StreamOut1301 *8 /1]  => [StreamIn1304] 
+  51: CE8388
+    [RetimingFIFO2116 *1 /1] [RetimingFIFO2144 *1 /1]  => [RetimingFIFO2154_RetimingFIFO2212_RetimingFIFO2226_RetimingFIFO2255_RetimingFIFO2284_RetimingFIFO2183] 
+  52: CE8682
+    [RetimingFIFO1924_RetimingFIFO1982_RetimingFIFO2011_RetimingFIFO2040_RetimingFIFO2069_RetimingFIFO1953 *1 /1]  => [TokenIn5354] 
+  53: CE8700
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *32 /1] [TokenIn5354 *32 /1] [RetimingFIFO2154_RetimingFIFO2212_RetimingFIFO2226_RetimingFIFO2255_RetimingFIFO2284_RetimingFIFO2183 *1 /1]  => [TokenIn5367] [SRAM17] 
+  54: CE8668
+    [TokenIn5367 *8 /1] [SRAM17 *8 /1]  => [StreamOut1303] 
+  55: CE8732
+    [RetimingFIFO1924_RetimingFIFO1982_RetimingFIFO2011_RetimingFIFO2040_RetimingFIFO2069_RetimingFIFO1953 *1 /1]  => [TokenIn5459] 
+  56: CE8750
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *32 /1] [TokenIn5459 *32 /1] [RetimingFIFO2154_RetimingFIFO2212_RetimingFIFO2226_RetimingFIFO2255_RetimingFIFO2284_RetimingFIFO2183 *1 /1]  => [TokenIn5472] [SRAM18] 
+  57: CE8718
+    [TokenIn5472 *8 /1] [SRAM18 *8 /1]  => [RetimingFIFO2116] 
+  58: CE8794
+    [RetimingFIFO1924_RetimingFIFO1982_RetimingFIFO2011_RetimingFIFO2040_RetimingFIFO2069_RetimingFIFO1953 *1 /1]  => [TokenIn5596] [SRAM19] 
+  59: CE8774
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *65536 /1] [TokenIn5596 *65536 /1] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134 *65536 /1] [SRAM19 *16384 /1]  => [TokenIn5609] [RetimingFIFO2920] 
+  60: CE8808
+    [TokenIn5609 *8 /1] [RetimingFIFO2154_RetimingFIFO2212_RetimingFIFO2226_RetimingFIFO2255_RetimingFIFO2284_RetimingFIFO2183 *1 /1]  => [SRAM19] 
+  61: CE8848
+    [RetimingFIFO1924_RetimingFIFO1982_RetimingFIFO2011_RetimingFIFO2040_RetimingFIFO2069_RetimingFIFO1953 *1 /1]  => [TokenIn5733] [SRAM20] 
+  62: CE8828
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *65536 /1] [TokenIn5733 *65536 /1] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134 *65536 /1] [SRAM20 *16384 /1]  => [TokenIn5746] [RetimingFIFO3001] 
+  63: CE8862
+    [TokenIn5746 *8 /1] [RetimingFIFO2154_RetimingFIFO2212_RetimingFIFO2226_RetimingFIFO2255_RetimingFIFO2284_RetimingFIFO2183 *1 /1]  => [SRAM20] 
+  64: CE8902
+    [RetimingFIFO1924_RetimingFIFO1982_RetimingFIFO2011_RetimingFIFO2040_RetimingFIFO2069_RetimingFIFO1953 *1 /1]  => [TokenIn5870] [SRAM21] 
+  65: CE8882
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *65536 /1] [TokenIn5870 *65536 /1] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134 *65536 /1] [SRAM21 *16384 /1]  => [TokenIn5883] [RetimingFIFO3082] 
+  66: CE8916
+    [TokenIn5883 *8 /1] [RetimingFIFO2154_RetimingFIFO2212_RetimingFIFO2226_RetimingFIFO2255_RetimingFIFO2284_RetimingFIFO2183 *1 /1]  => [SRAM21] 
+  67: CE8956
+    [RetimingFIFO1924_RetimingFIFO1982_RetimingFIFO2011_RetimingFIFO2040_RetimingFIFO2069_RetimingFIFO1953 *1 /1]  => [TokenIn6007] [SRAM22] 
+  68: CE8936
+    [ArgIn4435_ArgIn4539_ArgIn4613_ArgIn5310_ArgIn7558_ArgIn7610_ArgIn7671_ArgIn7732_ArgIn7793_ArgIn7854_ArgIn8040_ArgIn8115 *65536 /1] [TokenIn6007 *65536 /1] [ArgIn1894_ArgIn1826_ArgIn1860_ArgIn5548_ArgIn5685_ArgIn5822_ArgIn5959_ArgIn6072_ArgIn8059_ArgIn8134 *65536 /1] [SRAM22 *16384 /1]  => [TokenIn6020] [RetimingFIFO3163] 
+  69: CE8970
+    [TokenIn6020 *8 /1] [RetimingFIFO2154_RetimingFIFO2212_RetimingFIFO2226_RetimingFIFO2255_RetimingFIFO2284_RetimingFIFO2183 *1 /1]  => [SRAM22] 
+  70: CE8500
+    [RetimingFIFO2892 *1 /1] [RetimingFIFO2920 *1 /1]  => [Reg355] 
+  71: CE8514
+    [RetimingFIFO2973 *1 /1] [RetimingFIFO3001 *1 /1]  => [Reg357] 
+  72: CE8528
+    [RetimingFIFO3054 *1 /1] [RetimingFIFO3082 *1 /1]  => [Reg359] 
+  73: CE8542
+    [RetimingFIFO3135 *1 /1] [RetimingFIFO3163 *1 /1]  => [Reg361] 
+  74: CE8556
+    [Reg355 *1 /1] [RetimingFIFO3191_RetimingFIFO3207_RetimingFIFO3223_RetimingFIFO3239 *1 /1]  => [Reg660] 
+  75: CE8570
+    [Reg357 *1 /1] [RetimingFIFO3191_RetimingFIFO3207_RetimingFIFO3223_RetimingFIFO3239 *1 /1]  => [Reg661] 
+  76: CE8584
+    [Reg359 *1 /1] [RetimingFIFO3191_RetimingFIFO3207_RetimingFIFO3223_RetimingFIFO3239 *1 /1]  => [Reg662] 
+  77: CE8598
+    [Reg361 *1 /1] [RetimingFIFO3191_RetimingFIFO3207_RetimingFIFO3223_RetimingFIFO3239 *1 /1]  => [Reg663] 
+  78: CE8612
+    [Reg660 *8 /1] [RetimingFIFO3292 *1 /1]  => [RetimingFIFO3302] 
+  79: CE8626
+    [Reg661 *8 /1] [RetimingFIFO3374 *1 /1]  => [RetimingFIFO3384] 
+  80: CE8640
+    [Reg662 *8 /1] [RetimingFIFO3456 *1 /1]  => [RetimingFIFO3466] 
+  81: CE8654
+    [Reg663 *8 /1] [RetimingFIFO3538 *1 /1]  => [RetimingFIFO3548] 
+
+10000...
+20000...
+30000...
+40000...
+50000...
+60000...
+70000...
+80000...
+90000...
+100000...
+110000...
+120000...
+130000...
+140000...
+150000...
+160000...
+170000...
+180000...
+190000...
+200000...
+210000...
+220000...
+230000...
+240000...
+250000...
+260000...
+270000...
+280000...
+290000...
+300000...
+310000...
+320000...
+330000...
+340000...
+Simulation complete at cycle: 344599
+[[32mpsim[0m] Simulation complete at cycle: 344599
+CE8268: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 344578
+[0m[[31merror[0m] [0m(Thread-26) java.lang.NumberFormatException: For input string: "8 Total Output:        8"[0m
+java.lang.NumberFormatException: For input string: "8 Total Output:        8"
+	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)
+	at java.lang.Long.parseLong(Long.java:589)
+	at java.lang.Long.parseLong(Long.java:631)
+	at scala.collection.immutable.StringLike.toLong(StringLike.scala:306)
+	at scala.collection.immutable.StringLike.toLong$(StringLike.scala:306)
+	at scala.collection.immutable.StringOps.toLong(StringOps.scala:29)
+	at pir.codegen.PlastisimConfigCodegen.$anonfun$processOutput$1(PlastisimConfigCodegen.scala:55)
+	at pir.codegen.PlastisimConfigCodegen.$anonfun$processOutput$1$adapted(PlastisimConfigCodegen.scala:54)
+	at scala.Option.foreach(Option.scala:257)
+	at pir.codegen.PlastisimConfigCodegen.processOutput(PlastisimConfigCodegen.scala:54)
+	at pir.codegen.PlastisimConfigCodegen.$anonfun$runPsim$5(PlastisimConfigCodegen.scala:82)
+	at pir.codegen.PlastisimConfigCodegen.$anonfun$runPsim$5$adapted(PlastisimConfigCodegen.scala:82)
+	at prism.util.Misc.$anonfun$shell$7(Misc.scala:88)
+	at prism.util.Misc.$anonfun$shell$7$adapted(Misc.scala:88)
+	at scala.Option.foreach(Option.scala:257)
+	at prism.util.Misc.$anonfun$shell$5(Misc.scala:88)
+	at prism.util.Misc.$anonfun$shell$5$adapted(Misc.scala:88)
+	at scala.sys.process.ProcessLogger$$anon$1.out(ProcessLogger.scala:97)
+	at scala.sys.process.BasicIO$.$anonfun$processOutFully$1(BasicIO.scala:136)
+	at scala.sys.process.BasicIO$.$anonfun$processOutFully$1$adapted(BasicIO.scala:136)
+	at scala.sys.process.BasicIO$.readFully$1(BasicIO.scala:184)
+	at scala.sys.process.BasicIO$.$anonfun$processFully$1$adapted(BasicIO.scala:188)
+	at scala.sys.process.ProcessBuilderImpl$Simple.$anonfun$run$3(ProcessBuilderImpl.scala:76)
+	at scala.sys.process.ProcessImpl$Spawn$$anon$1.run(ProcessImpl.scala:23)
+[0m[[31mtrace[0m] [0mStack trace suppressed: run [34mlast apps/compile:runMain[0m for the full output.[0m
+[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 23952.60286ms
+[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 4356.173161ms
+[pir] Saving node prism.Session@7347a49f to /home/yaqiz/pir/out/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4_static_v3_s4/LogReg__iters_4_D_128_N_8192_ts_512_op_1_mp_4.sess
+[0m[[32msuccess[0m] [0mTotal time: 329 s, completed Aug 1, 2018 6:19:11 PM[0m
 -------------PASS (DONE)------------

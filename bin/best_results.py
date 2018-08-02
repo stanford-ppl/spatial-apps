@@ -40,7 +40,8 @@ bestapps += ['lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_p
 bestapps += ['SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16']
 
 def runbest(summarize):
-    opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes if p.startswith("psim")])
+    opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes if
+        p.startswith("psim") and 'D' in p])
 
     if summarize:
         opts.summarize = True
