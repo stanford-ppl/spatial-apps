@@ -27,7 +27,7 @@ from task import *
 
 bestapps = []
 
-# bestapps += ['DotProduct__N_1048576_ts_65536_op_1']
+bestapps += ['DotProduct__N_1048576_ts_65536_op_1']
 bestapps += ['TPCHQ6__N_1048576_ts_65536_op_1']
 bestapps += ['OuterProduct__M_4096_N_4096_ts1_64_ts2_1024_op1_1_op2_2_ip2_16_ip1_1']
 bestapps += ['BlackScholes__N_1048576_ts_65536_op_1']
@@ -40,9 +40,9 @@ bestapps += ['lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_p
 bestapps += ['SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16']
 
 def runbest(summarize):
-    opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes if p.startswith("psim")])
+    opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes if
+        p.startswith("psim") and 'D' in p])
 
-    print(opts.parallel)
     if summarize:
         opts.summarize = True
     # else:

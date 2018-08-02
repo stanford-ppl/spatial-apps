@@ -24,15 +24,11 @@ dependency["gen_pir"] = []
 dependency["psim_asic"] = ["gen_pir"]
 dependency["psim_p2p"] = ["gen_pir"]
 dependency["link_count"] = ["psim_p2p"]
-# dependency["psim_D_v1_s6"] = ["gen_pir"]
-# dependency["psim_D_v2_s6"] = ["gen_pir"]
-# dependency["psim_v3_s6"] = ["psim_p2p"]
-# dependency["psim_v2_s6"] = ["psim_p2p"]
-dependency["psim_D_v0_s0"] = ["psim_p2p"]
-dependency["psim_D_v1_s4"] = ["psim_p2p"]
-dependency["psim_D_v2_s4"] = ["psim_p2p"]
 dependency["psim_v3_s4"] = ["psim_p2p"]
 dependency["psim_v2_s4"] = ["psim_p2p"]
+dependency["psim_D_v1_s4"] = ["psim_p2p"]
+dependency["psim_D_v2_s4"] = ["psim_p2p"]
+dependency["psim_D_v0_s0"] = ["psim_p2p"]
 passes=dependency.keys()
 
 def getCommand(passName, fullapp):
