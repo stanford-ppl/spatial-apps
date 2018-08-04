@@ -1,12 +1,11 @@
 #!/bin/bash
 
 app=$1
-net=$2
-vlink=$3
-slink=$4
+outName=$2
+opts="${@:3}"
 
-outDir=$PIR_HOME/out/${app}_${net}_v${vlink}_s${slink}
-psimOutDir=$PLASTISIM_HOME/configs/finals/${app}_${net}_v${vlink}_s${slink}
+outDir=$PIR_HOME/out/${app}_$outName
+psimOutDir=$PLASTISIM_HOME/configs/finals/${app}_$outName
 config=${outDir}/config.psim
 
 [ -e $config ] && rm $config
@@ -17,15 +16,12 @@ $PIR_HOME/bin/pir $app \
   --debug=false \
   --verbose=true \
   --dot=false \
-  --mapping=true \
-  --load-pir=true \
   --save-pir=true \
   --psim=true \
   --trace=true \
   --ctrl=true \
   --bp=false \
   --stat=true \
-  --net=$net \
   --routing-algo=proute \
   --proute-iter=1000 \
   --run-psim=true \
@@ -34,10 +30,14 @@ $PIR_HOME/bin/pir $app \
   --topo=mesh \
   --argin=64 \
   --tokenout=32 \
-  --fifo-depth=4 \
-  --vfifo=4 \
-  --vc=8 \
-  --vlink=${vlink} \
-  --slink=${slink}
+  --pcu-stage=4 \
+  --vc=4 \
+  $opts
+  #--net=$net \
+  #--vlink=${vlink} \
+  #--slink=${slink}
+  #--fifo-depth=4 \
+  #--vfifo=4 \
+  #--proute-algo
 
 echo "-------------PASS (DONE)------------"

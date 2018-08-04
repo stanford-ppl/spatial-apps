@@ -12,54 +12,28 @@ SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
 PAPER_HOME = os.environ['HOME'] + "/papers/"
 CONF_PATH = SPATIAL_HOME + '/apps/bin/exp.conf'
-
-APPS = ["lenet_loops"]
-# APPS = ['DotProduct', 'OuterProduct', 'GDA', 'BlackScholes', 'TPCHQ6']
-# APPS = ['DotProduct', 'OuterProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'GEMM_Blocked']
-# APPS += ['LogReg', 'SGD_minibatch', 'SimpleP4']
-# APPS += ['Kmeans', 'PageRank', 'SPMV_CRS', 'BFS']
-
-dependency = OrderedDict()
-dependency["gen_pir"] = []
-dependency["psim_asic"] = ["gen_pir"]
-dependency["psim_p2p"] = ["gen_pir"]
-dependency["link_count"] = ["psim_p2p"]
-dependency["psim_v3_s4"] = ["psim_p2p"]
-dependency["psim_v2_s4"] = ["psim_p2p"]
-dependency["psim_D_v1_s4"] = ["psim_p2p"]
-dependency["psim_D_v2_s4"] = ["psim_p2p"]
-dependency["psim_D_v0_s0"] = ["psim_p2p"]
-passes=dependency.keys()
-
-def getCommand(passName, fullapp):
-    if passName=="gen_pir":
-        command = "{}/apps/bin/{} {} {}".format(SPATIAL_HOME, passName, fullapp, opts.pirsrc)
-    elif passName.startswith("psim_"):
-        if "D" in passName:
-            net = "dynamic"
-            vlink = passName.split("_v")[1].split("_")[0]
-            slink = passName.split("_s")[1]
-        elif "v" in passName:
-            net = "static"
-            vlink = passName.split("_v")[1].split("_")[0]
-            slink = passName.split("_s")[1]
-        else:
-            net = passName.split("psim_")[1]
-            vlink = 0
-            slink = 0
-        command = "{}/apps/bin/psim_generic {} {} {} {}".format(SPATIAL_HOME, fullapp, net, vlink, slink)
-    else:
-        command = "{}/apps/bin/{} {}".format(SPATIAL_HOME, passName, fullapp)
-    return command
-
 LOG_DIR='{}/apps/log'.format(SPATIAL_HOME)
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
 JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
-SUMMARY_PATH="{}/apps/summary.pickle".format(SPATIAL_HOME)
-SUMMARY_CSV_PATH="{}/apps/summary.csv".format(SPATIAL_HOME)
-BEST_SUMMARY_CSV_PATH="{}/apps/best.csv".format(SPATIAL_HOME)
 
-cycle_cache = {}
+dependency = OrderedDict()
+commands = OrderedDict()
+
+def passes():
+    return dependency.keys()
+
+def addPass(passName, deps, command):
+    dependency[passName] = deps
+    commands[passName] = command
+
+def gen_pir():
+    addPass("gen_pir", [], lambda fullapp: "{}/apps/bin/{} {}".format(SPATIAL_HOME, fullapp, opts.pirsrc))
+
+def psim_generic(name, deps, opts):
+    addPass(name, deps, lambda fullapp: "{}/apps/bin/psim_generic {} {} {}".format(SPATIAL_HOME, fullapp, name, opts))
+
+def link_count():
+    addPass("link_count", ["psim_p2p"], lambda fullapp: "{}/apps/bin/link_count {}".format(SPATIAL_HOME, fullapp))
 
 class bcolors:
     HEADER    = '\033[95m'
@@ -218,7 +192,7 @@ parser.add_argument('--summarize', dest='summarize', action='store_true', defaul
 global opts
 (opts, args) = parser.parse_known_args()
 
-opts.apps = [] if len(args)==0 else APPS if args[0] == "ALL" else args
+opts.apps = args
 
 opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME) if opts.dse else '{}/pir/apps/src'.format(PIR_HOME)
 
@@ -236,7 +210,3 @@ if os.path.exists(CONF_PATH.format(SPATIAL_HOME)):
                 elif  v in ['False','false']:
                     v = False
                 setattr(opts, k, v)
-# opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME):
-if opts.summarize:
-    opts.summary = OrderedDict()
-    opts.summary['apps'] = OrderedDict()
