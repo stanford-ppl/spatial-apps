@@ -16,9 +16,6 @@ import numpy as np
 
 from util import *
 
-def sargs(args):
-    return '_'.join([str(a) for a in args])
-
 def cycleOf(log):
     if not os.path.exists(log): return None
     lines = grep(log, ["Simulation complete at cycle"])
@@ -41,8 +38,8 @@ def count(key, log):
     if not os.path.exists(log): return None
     line = grep(log, [key])
     if len(line) == 0:
-      return None
-    return int(line[0].split(key)[1])
+      return 0
+    return int(line[0].split(key)[1].split(",")[0])
 
 def drambw(log):
     if not os.path.exists(log): return None
@@ -71,44 +68,6 @@ def numVC(log):
     if len(line) == 0:
       return None
     return int(line[0].split("Used ")[1].split("VCs")[0].strip())
-
-def summarize(app, args, params):
-    opts.summary['apps'][app] = {}
-    summary = opts.summary['apps'][app]
-    fullname = getFullName(app, args, params)
-    summary["cycle"] = {}
-    summary["vc"] = {}
-    for passName in passes:
-        log = logs(fullname, passName)
-        if passName=="psim_D_v1_s4":
-            summary["pcu"] = usage("PCU = ", log)
-            summary["pmu-comp"] = usage("PMU-comp = ",log)
-            summary["pmu-mem"] = usage("PMU-mem = ",log)
-            summary["mc"] = usage("MC =", log)
-        if passName=="psim_p2p":
-            summary["loadbw"] = loadbw(log)
-            summary["storebw"] = storebw(log)
-        summary["cycle"][passName] = cycleOf(log)
-        if "D" in passName:
-            summary["vc"][passName] = numVC(log)
-
-    with open(logs(fullname,"link_count"), 'r') as csvfile:
-        reader = csv.DictReader(csvfile)
-        counts = []
-        multicasts = []
-        for row in reader:
-            count = row['count']
-            if count is not None:
-                multicast = 0
-                counts.append(count)
-                for header in row:
-                    if 'dst' in header and row[header] != '':
-                        multicast += 1
-                multicasts.append(multicast)
-
-        summary["link_count"] = counts
-        summary["multicast"] = multicasts
-    return summary
 
 def futil(used,total):
    return round(float(used) / float(total), 3)

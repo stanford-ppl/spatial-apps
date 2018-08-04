@@ -39,18 +39,24 @@ bestapps += ['Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1']
 bestapps += ['lenet_loops__batch_par_1_conv1_par_2_conv2_par_4_mat1_par_2_mat2_par_1']
 bestapps += ['SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16']
 
-def runbest(summarize):
-    opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes if
-        p.startswith("psim") and 'D' in p])
+gen_pir()
+psim_generic("psim_p2p_ideal" , ["gen_pir"]  , "--net=p2p --vlink=0 --slink=0 --fifo-depth=20 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512")
+psim_generic("psim_p2p"       , ["psim_p2p_ideal"]  , "--net=p2p --vlink=0 --slink=0 --fifo-depth=4  --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512" )
+psim_generic("psim_v3_s4"     , ["psim_p2p_ideal"] , "--net=static --vlink=3 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512" )
+psim_generic("psim_v2_s4"     , ["psim_p2p_ideal"] , "--net=static --vlink=2 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512" )
+psim_generic("psim_v2_s4_cd"  , ["psim_p2p_ideal"] , "--net=static --vlink=2 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=cd --flit-width=512" )
+psim_generic("psim_D_v1_s4"   , ["psim_p2p_ideal"] , "--net=dynamic --vlink=1 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512" )
+psim_generic("psim_D_v1_s4_f32"   , ["psim_p2p_ideal"] , "--net=dynamic --vlink=1 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=32" )
+psim_generic("psim_D_v1_s4_val"   , ["psim_p2p_ideal"] , "--net=dynamic --vlink=1 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_min_directed_valient --link-prop=db --flit-width=512" )
+psim_generic("psim_D_v2_s4"   , ["psim_p2p_ideal"] , "--net=dynamic --vlink=2 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512" )
+psim_generic("psim_D_v0_s0"   , ["psim_p2p_ideal"] , "--net=dynamic --vlink=0 --slink=0 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512" )
+psim_generic("psim_D_v0_s4"   , ["psim_p2p_ideal"] , "--net=dynamic --vlink=0 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512" )
+link_count()
 
-    if summarize:
-        opts.summarize = True
+def runbest():
+    opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes() if
+        p.startswith("psim")])
 
     for app in bestapps:
         target(app, [], {})
-    if opts.summarize:
-        path = '{}/plasticine_network/data/summary.pickle'.format(PAPER_HOME)
-        pickle.dump(opts.summary, openfile(path, 'wb'))   
     #################################################################################################################
-
-

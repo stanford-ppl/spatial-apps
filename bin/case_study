@@ -27,29 +27,21 @@ from util import *
 from stat import *
 from task import *
 
-apps = []
+bestapps = []
 
-apps += ['DotProduct']
-# apps += ['TPCHQ6']
-# apps += ['OuterProduct']
-# apps += ['BlackScholes']
-# apps += ['GDA']
-# apps += ['LogReg']
-# apps += ['GEMM_Blocked']
-# apps += ['Kmeans']
-# apps += ['lenet_loops']
-# apps += ['SPMV_ELL']
+bestapps += ['BlackScholes__N_1048576_ts_65536_op_1']
 
 gen_pir()
-psim_generic("psim_p2p_ideal" , ["gen_pir"]  , "--net=p2p --vlink=0 --slink=0 --fifo-depth=20 --vfifo=4 --proute-algo=dor --slink-prop=db")
+psim_generic("psim_D_v1_s4_fifo8"   , ["psim_p2p"] , "--net=dynamic --vlink=1 --slink=4 --fifo-depth=3 --vfifo=8 --proute-algo=route_dor_YX --link-prop=db" )
 
-def main():
+def run():
+    opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes() if
+        p.startswith("psim") and 'D' in p])
 
-    opts.parallel=20
-    for app in apps:
+    for app in bestapps:
         target(app, [], {})
     #################################################################################################################
 
-if __name__ == "__main__":
-    main()
 
+if __name__ == "__main__":
+    run()

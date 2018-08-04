@@ -69,7 +69,7 @@ def runPass(fullname, passName):
     rm(log)
     mkdir(dirname(log))
 
-    command = getCommand(passName, fullname)
+    command = commands[passName](fullname)
 
     logFile = open(log, 'w')
     proc = subprocess.Popen(command.split(" "), stdout=logFile, stderr=logFile)
@@ -79,7 +79,7 @@ def runPass(fullname, passName):
 def runJob(app, args, params):
     copyApp(app, args, params)
     fullname = getFullName(app, args, params)
-    for passName in passes:
+    for passName in passes():
         runPass(fullname, passName)
 
 def launchJob(app, args, params):
@@ -110,14 +110,14 @@ def kill(fullname, passName):
 def act(fullname, resp):
     def getPass():
         ps = []
-        for passName in passes:
+        for passName in passes():
             if passName in resp:
                 ps.append(passName)
         if len(ps) == 0:
-            for passName in reversed(passes):
+            for passName in reversed(passes()):
                 if running(fullname, passName): ps.append(passName); break
         if len(ps) == 0:
-            for passName in reversed(passes):
+            for passName in reversed(passes()):
                 if failed(fullname, passName): ps.append(passName); break
         return ps
     def removeLog():
@@ -125,7 +125,7 @@ def act(fullname, resp):
             log = logs(fullname, passName)
             rm(log)
     def clearLog():
-        for passName in passes:
+        for passName in passes():
             if toclear(passName):
                 log = logs(fullname, passName)
                 rm(log)
@@ -174,7 +174,7 @@ def show(fullname):
             vc = numVC(log)
             if vc is not None: msg += " vc={}".format(vc)
         return msg
-    for passName in passes:
+    for passName in passes():
         if not torun(passName):
             continue
         log = logs(fullname, passName)
@@ -267,7 +267,7 @@ def torun(passName):
 
 def git_add(app, args, params):
     fullname = getFullName(app, args, params)
-    for passName in passes:
+    for passName in passes():
         log = logs(fullname, passName)
         spatial_app = "{}/apps/src/gen/{}.scala".format(SPATIAL_HOME,fullname)
         # pir_app = "{}/pir/apps/gen/{}.scala".format(PIR_HOME,fullname)
