@@ -4,55 +4,80 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
 [0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
 [0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mRunning DotProduct__N_1048576_ts_65536_op_1 --out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4 --psim-out=/home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4 --debug=false --dot=false --mapping=true --load-pir=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --net=static --routing-algo=dor --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=4 --vfifo=4 --vc=8 --vlink=3 --slink=4[0m
-[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4, --psim-out=/home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4, --debug=false, --dot=false, --mapping=true, --load-pir=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --net=static, --routing-algo=dor, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=4, --vfifo=4, --vc=8, --vlink=3, --slink=4]
-[pir] Output directory set to [36m/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4[0m
+[0m[[0minfo[0m] [0mRunning DotProduct__N_1048576_ts_65536_op_1 --out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4 --psim-out=/home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4 --debug=false --verbose=true --dot=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --routing-algo=proute --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --pcu-stage=4 --vc=4 --net=static --vlink=3 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512[0m
+[pir] args=[--load-pir=true, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4, --psim-out=/home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4, --debug=false, --verbose=true, --dot=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --routing-algo=proute, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --pcu-stage=4, --vc=4, --net=static, --vlink=3, --slink=4, --fifo-depth=4, --vfifo=4, --proute-algo=route_dor_YX, --link-prop=db, --flit-width=512]
+[pir] Output directory set to [36m/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4[0m
+[pir] Loading from /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/DotProduct__N_1048576_ts_65536_op_1.pir[[33mwarn[0m] Restore session failed: java.io.FileNotFoundException: /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/DotProduct__N_1048576_ts_65536_op_1.pir (No such file or directory). Creating a new session ...
 [pir] Finishing graph construction for DotProduct__N_1048576_ts_65536_op_1
 [pir] Configuring spade MyDesign ...
-New design elapsed time: 8547.158ms
-[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 61.629772ms
-[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 2.155786ms
-[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 52.327643ms
-[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 66.67553ms
-[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 27.78751ms
-[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 0.763968ms
-[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 11.454043ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 34.131567ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 17.759461ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 72.718207ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 31.625544ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 49.070744ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 23.739137ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 15.806098ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 48.141761ms
-[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 82.459047ms
-[pir] Running 24-IgraphPartioner ...[pir] Finished 24-IgraphPartioner in 1291.494619ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 39.707577ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 38.882155ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 2.387247ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 23.370548ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 5.387223ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 288.699174ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 8.561987ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 7.777819ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 29.682331ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 98.260692ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 44.865744ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 33.582852ms
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 56.095272ms
-[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4/DotProduct__N_1048576_ts_65536_op_1.pir
-[pir] Running 50-PlastisimTraceCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4[0m[0m
-[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4/traces
-[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4/trace_classes
-[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4 /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4
-[[33mtrace[0m] log in /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 5596.342653ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 144.932996ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 161.77495ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 27.178455ms
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1036.701955ms
+New design elapsed time: 9726.519ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 149.141568ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 4.614719ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 119.002662ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 84.423076ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 35.284883ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 1.193404ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 14.341489ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 44.033831ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 21.850055ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 92.699024ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 41.597812ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 48.3267ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 22.169267ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 14.986691ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 61.322031ms
+[pir] Running 23-CUStatistics ...[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4[0m[0m
+[pir] Finished 23-CUStatistics to [36mstat.json[0m in 91.710181ms
+[pir] Running 24-IgraphPartioner ...[pir] Finished 24-IgraphPartioner in 1309.552449ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 41.613891ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 38.905141ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 2.955442ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 25.821124ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 5.792067ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 283.688674ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 8.000083ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 6.700977ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 27.992775ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 97.188833ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 45.28651ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 32.599671ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 52.558489ms
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/DotProduct__N_1048576_ts_65536_op_1.pir
+[pir] Running 50-PlastisimTraceCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4[0m[0m
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4 /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4
+[[33mtrace[0m] log in /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/trace.log
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mSet current project to dotproduct__n_1048576_ts_65536_op_1_psim_v3_s4 (in build file:/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/)[0m
+[0m[[0minfo[0m] [0mUpdating {file:/home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/}dotproduct__n_1048576_ts_65536_op_1_psim_v3_s4...[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#jline;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.fusesource.jansi#jansi;1.4 ...[0m
+[0m[[0minfo[0m] [0mDone updating.[0m
+[0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/target/scala-2.10/classes...[0m
+[0m[[33mwarn[0m] [0mthere were 2 feature warning(s); re-run with -feature for details[0m
+[0m[[33mwarn[0m] [0mone warning found[0m
+[0m[[0minfo[0m] [0mRunning tracer /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/traces[0m
+[0m[[32msuccess[0m] [0mTotal time: 9 s, completed Aug 3, 2018 8:32:59 PM[0m
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 16163.331669ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 187.031598ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 200.277498ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 38.2755ms
+[pir] Running 54-ControllerDotCodegen ...[pir] Finished 54-ControllerDotCodegen to [36mcontroller.dot[0m in 58.304168ms
+[pir] Running 55-PIRIRDotCodegen ...[pir] Finished 55-PIRIRDotCodegen to [36mtop.dot[0m in 203.961957ms
+[pir] Running 56-SimpleIRDotCodegen ...[pir] Finished 56-SimpleIRDotCodegen to [36msimple.dot[0m in 28.181569ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1337.80697ms
 [pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 139185.061714ms
+[pir] Finished 59-CUPlacer in 179415.336354ms
 [pir] Running 60-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
 [pir] 
 [pir] number of cus=9
@@ -90,21 +115,287 @@ New design elapsed time: 8547.158ms
 [pir] AG-ag = 1 / 34 (2.94%)
 [pir] AG-comp = 0 / 34 (0.00%)
 [pir] MC = 2 / 34 (5.88%)
-[pir] Finished 60-CUStatistics to [36mstat.json[0m in 974.083416ms
-[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 745.945221ms
-[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 757.749609ms
-[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 771.985174ms
-[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 4.581861ms
-[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 76.275786ms
-[pir] Running 66-PlastisimPlacementCodegen ...[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 98.694484ms
-[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 132.114483ms
-[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4/
-[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4/config.psim -p /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4/final.place -c 100000000 -l B
-[[33mpsim[0m] log in /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4/psim.log
+[pir] Finished 60-CUStatistics to [36mstat.json[0m in 1100.510407ms
+[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 973.625101ms
+[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 995.800386ms
+[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 701.425813ms
+[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 4.316993ms
+[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 84.24729ms
+[pir] Running 66-PlastisimPlacementCodegen ...[[32mpir[0m] StatHopsScal: 278,StatHopsVec: 655360
+[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 139.175603ms
+[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 129.75032ms
+[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/
+[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/config.psim -p /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/final.place -c 100000000 -l B -w 512
+[[33mpsim[0m] log in /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/psim.log
+Error setting saddr = 0
+Error setting daddr = 0
+Error setting daddr = 0
+Error setting daddr = 0
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+Error setting lat = 18
+Error setting lat = 15
+Error setting lat = 13
+Error setting saddr = 0
+Error setting daddr = 0
+Error setting class = 0
+Error setting lat = 18
+Changing to config directory: /home/yaqiz/plastisim/configs/finals/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4
+Error setting saddr = 0
+Error setting daddr = 0
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 15
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 2
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Constructing NetworkLink.
+Error setting lat = 3
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Added all names to the symbol table.
+Error setting lat = 3
+Adding static hop for route 556 (349->73, lat 1).
+Error setting saddr = 0
+Adding static hop for route 585 (349->73, lat 1).
+Error setting daddr = 0
+Adding static hop for route 936 (73->355, lat 3).
+Error setting class = 0
+Adding static hop for route 609 (352->135, lat 3).
+Error setting lat = 2
+Adding static hop for route 638 (352->135, lat 4).
+Error setting saddr = 0
+Adding static hop for route 980 (135->356, lat 3).
+Error setting daddr = 0
+Adding static hop for route 744 (355->344, lat 2).
+Error setting class = 0
+Adding static hop for route 771 (356->344, lat 2).
+Error setting lat = 1
+Adding static hop for route 686 (345->259, lat 12).
+Error setting saddr = 0
+Adding static hop for route 799 (344->345, lat 6).
+Error setting daddr = 0
+Adding static hop for route 713 (259->345, lat 13).
+Error setting class = 0
+Adding static hop for route 846 (259->349, lat 18).
+Error setting lat = 3
+Adding static hop for route 713 (259->349, lat 18).
+Error setting saddr = 0
+Adding static hop for route 892 (259->352, lat 15).
+Error setting daddr = 0
+Adding static hop for route 713 (259->352, lat 15).
+Error setting class = 0
+Printing hop routes
+Error setting lat = 1
+Parsed placement file.
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 4
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 18 from 0 to 0
+Error setting class = 0
+Set lat 15 from 0 to 1
+Error setting lat = 12
+Set lat 13 from 0 to 2
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 6
+Set lat 18 from 0 to 0
+== Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
+Set ejection VC at addr 0 to 0
+== Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
+Link specified in placement file.
+===== MemorySystem 0 =====
+Changing link to static with placed latencies.
+CH. 0 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set lat 15 from 0 to 0
+===== MemorySystem 1 =====
+Set ejection VC at addr 0 to 0
+CH. 1 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Link specified in placement file.
+===== MemorySystem 2 =====
+Changing link to static with placed latencies.
+CH. 2 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set lat 2 from 0 to 0
+===== MemorySystem 3 =====
+Set ejection VC at addr 0 to 0
+CH. 3 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Link specified in placement file.
+DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 12 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Parsed definitions of all elements.
+Total of 15 links:
+  0: ArgIn358_ArgIn380_ArgIn662
+    
+  1: DramAddress53
+    
+  2: DramAddress115
+    
+  3: RetimingFIFO444
+    
+  4: RetimingFIFO454
+    
+  5: RetimingFIFO483
+    
+  6: RetimingFIFO416
+    
+  7: StreamOut44
+    
+  8: StreamOut106
+    
+  9: StreamOut45
+    
+  10: StreamOut107
+    
+  11: SRAM34
+    
+  12: SRAM33
+    
+  13: ArgOut12
+    
+  14: Reg166
+    
+Total of 12 nodes:
+  0: CE1028
+    [StreamOut45 *4096 /1] [StreamOut44 *4096 /1]  => [RetimingFIFO454] 
+  1: CE1148
+    [RetimingFIFO454 *1 /1]  => [SRAM33] 
+  2: CE1138
+    [SRAM33 *4096 /1]  => [RetimingFIFO416] 
+  3: CE1042
+    [StreamOut107 *4096 /1] [StreamOut106 *4096 /1]  => [RetimingFIFO483] 
+  4: CE1168
+    [RetimingFIFO483 *1 /1]  => [SRAM34] 
+  5: CE1158
+    [SRAM34 *4096 /1]  => [RetimingFIFO444] 
+  6: CE1076
+    [RetimingFIFO416 *1 /1] [RetimingFIFO444 *1 /1]  => [Reg166] 
+  7: CE1056
+     => [ArgIn358_ArgIn380_ArgIn662] [DramAddress53] [DramAddress115] 
+  8: CE1066
+    [ArgOut12 *1 /1]  => 
+  9: CE1090
+    [ArgIn358_ArgIn380_ArgIn662 *16 /1] [Reg166 *1 /1]  => [ArgOut12] 
+  10: CE1106
+    [ArgIn358_ArgIn380_ArgIn662 *16 /1] [DramAddress53 *16 /1]  => [StreamOut45] [StreamOut44] 
+  11: CE1124
+    [ArgIn358_ArgIn380_ArgIn662 *16 /1] [DramAddress115 *16 /1]  => [StreamOut107] [StreamOut106] 
+
+10000...
+20000...
+30000...
+40000...
+50000...
+60000...
+70000...
+80000...
+90000...
+100000...
+110000...
+120000...
+130000...
+140000...
+150000...
+160000...
+170000...
+Simulation complete at cycle: 173049
 [[32mpsim[0m] Simulation complete at cycle: 173049
+CE1028: Active:  37.9 Stalled:   0.0 Starved:   2.6 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 4445 
+	   65536    65536 
+	DRAM:  24.24 GB/s ( 24.24 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE1148: Active:  37.9 Stalled:   0.0 Starved:  62.1 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 4127 
+	   65536 
+CE1138: Active:  37.9 Stalled:   1.1 Starved:  61.0 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 26 
+	   65536 
+CE1042: Active:  37.9 Stalled:   0.0 Starved:   3.0 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 5196 
+	   65536    65536 
+	DRAM:  24.24 GB/s ( 24.24 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE1168: Active:  37.9 Stalled:   0.0 Starved:  62.1 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 4482 
+	   65536 
+CE1158: Active:  37.9 Stalled:   4.3 Starved:  57.9 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 31 
+	   65536 
+CE1076: Active:  37.9 Stalled:   0.0 Starved:  62.1 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 19 
+	   65536    65536 
+CE1056: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 173048 
+	
+CE1066: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 1 
+	       1 
+CE1090: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Total Output:       16 Expected Active:       16 Last Activity: 10 
+	      16       16 
+CE1106: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Total Output:       16 Expected Active:       16 Last Activity: 173029 
+	      16       16 
+CE1124: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Total Output:       16 Expected Active:       16 Last Activity: 173029 
+	      16       16 
+Total DRAM:	  48.48 GB/s ( 48.48 GB/s R,   0.00 GB/s W)
 [[32mpsim[0m] Total DRAM:	  48.48 GB/s ( 48.48 GB/s R,   0.00 GB/s W)
-[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 2971.421352ms
-[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 105.173513ms
-[pir] Saving node prism.Session@53b348b to /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_static_v3_s4/DotProduct__N_1048576_ts_65536_op_1.sess
-[0m[[32msuccess[0m] [0mTotal time: 167 s, completed Aug 1, 2018 12:59:51 AM[0m
+Pending Read: 0	 Pending Write: 0	
+[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 3910.50384ms
+[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 174.662935ms
+[pir] Saving node prism.Session@2bea463d to /home/yaqiz/pir/out/DotProduct__N_1048576_ts_65536_op_1_psim_v3_s4/DotProduct__N_1048576_ts_65536_op_1.sess
+[0m[[32msuccess[0m] [0mTotal time: 223 s, completed Aug 3, 2018 8:36:10 PM[0m
 -------------PASS (DONE)------------

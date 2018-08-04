@@ -1,0 +1,1472 @@
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
+[0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mRunning SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2 --out=/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal --psim-out=/home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal --debug=false --verbose=true --dot=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --routing-algo=proute --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --pcu-stage=4 --vc=4 --net=p2p --vlink=0 --slink=0 --fifo-depth=20 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512[0m
+[pir] args=[--load-pir=true, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal, --psim-out=/home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal, --debug=false, --verbose=true, --dot=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --routing-algo=proute, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --pcu-stage=4, --vc=4, --net=p2p, --vlink=0, --slink=0, --fifo-depth=20, --vfifo=4, --proute-algo=route_dor_YX, --link-prop=db, --flit-width=512]
+[pir] Output directory set to [36m/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal[0m
+[pir] Loading from /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.pir[[33mwarn[0m] Restore session failed: java.io.FileNotFoundException: /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.pir (No such file or directory). Creating a new session ...
+[pir] Finishing graph construction for SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2
+[pir] Configuring spade MyDesign ...
+New design elapsed time: 3407.473ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 281.778762ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 5.391938ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 83.291024ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 328.679451ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 97.889917ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 1.481875ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 230.013293ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 58.003645ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 77.123456ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 453.581016ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 163.949781ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 197.054092ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 188.388994ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 59.912382ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 203.491427ms
+[pir] Running 23-CUStatistics ...[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal[0m[0m
+[pir] Finished 23-CUStatistics to [36mstat.json[0m in 202.179049ms
+[pir] Running 24-IgraphPartioner ...[pir] Finished 24-IgraphPartioner in 893.438573ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 618.420192ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 448.867343ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 5.583908ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 49.32626ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 23.905378ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 1675.462034ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 85.280264ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 54.208059ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 753.636298ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 1291.856614ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 235.890637ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 154.705655ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 157.036689ms
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.pir
+[pir] Running 50-PlastisimTraceCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal[0m[0m
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal
+[[33mtrace[0m] log in /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/trace.log
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mSet current project to spmv_ell__l_64_n_16384_ts_1024_op_1_mp_2_psim_p2p_ideal (in build file:/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/)[0m
+[0m[[0minfo[0m] [0mUpdating {file:/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/}spmv_ell__l_64_n_16384_ts_1024_op_1_mp_2_psim_p2p_ideal...[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#jline;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.fusesource.jansi#jansi;1.4 ...[0m
+[0m[[0minfo[0m] [0mDone updating.[0m
+[0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/target/scala-2.10/classes...[0m
+[0m[[33mwarn[0m] [0mthere were 2 feature warning(s); re-run with -feature for details[0m
+[0m[[33mwarn[0m] [0mone warning found[0m
+[0m[[0minfo[0m] [0mRunning tracer /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/traces[0m
+[0m[[32msuccess[0m] [0mTotal time: 38 s, completed Aug 3, 2018 8:32:20 PM[0m
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 42431.558349ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 1056.390098ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 878.473882ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 106.606238ms
+[pir] Running 54-ControllerDotCodegen ...[pir] Finished 54-ControllerDotCodegen to [36mcontroller.dot[0m in 460.610292ms
+[pir] Running 55-PIRIRDotCodegen ...[pir] Finished 55-PIRIRDotCodegen to [36mtop.dot[0m in 892.406502ms
+[pir] Running 56-SimpleIRDotCodegen ...[pir] Finished 56-SimpleIRDotCodegen to [36msimple.dot[0m in 180.463162ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 655.191059ms
+[pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
+[pir] Finished 59-CUPlacer in 120.240057ms
+[pir] Running 60-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
+[pir] 
+[pir] number of cus=29
+[pir] number of ocu = 5
+[pir] - cin (0.00,0.60,1.00) sin (0.00,0.40,1.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.20,1.00) sout (0.00,1.20,2.00) vout (0.00,0.00,0.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] number of pcu = 6
+[pir] - cin (0.00,0.33,1.00) sin (0.00,0.67,2.00) vin (0.00,1.00,2.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.33,1.00) vout (0.00,0.67,1.00)
+[pir] - stages (2.00,4.00,6.00)
+[pir] number of dag = 3
+[pir] - cin (0.00,0.00,0.00) sin (1.00,1.00,1.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.00,0.00) sout (2.00,2.00,2.00) vout (0.00,0.00,0.00)
+[pir] - stages (2.00,4.00,5.00)
+[pir] number of pmu = 9
+[pir] - cin (0.00,0.00,0.00) sin (0.00,0.89,2.00) vin (0.00,1.11,2.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.00,0.00) vout (1.00,1.00,1.00)
+[pir] - stages (0.00,0.89,2.00)
+[pir] number of dfg = 5
+[pir] - cin (0.00,0.00,0.00) sin (0.00,1.20,2.00) vin (0.00,0.60,1.00)
+[pir] - cout (0.00,0.20,1.00) sout (0.00,0.40,1.00) vout (0.00,0.40,1.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] number of afg = 1
+[pir] - cin (1.00,1.00,1.00) sin (0.00,0.00,0.00) vin (0.00,0.00,0.00)
+[pir] - cout (1.00,1.00,1.00) sout (5.00,5.00,5.00) vout (0.00,0.00,0.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] compute CU = 11
+[pir] memory CU = 9
+[pir] mc CU = 5
+[pir] Total = 14
+[pir] PCU = 2 / 63 (3.17%)
+[pir] PMU-comp = 9 / 64 (14.06%)
+[pir] PMU-mem = 9 / 64 (14.06%)
+[pir] AG-ag = 2 / 32 (6.25%)
+[pir] AG-comp = 0 / 32 (0.00%)
+[pir] MC = 5 / 32 (15.63%)
+[pir] Finished 60-CUStatistics to [36mstat.json[0m in 138.604676ms
+[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 68.294764ms
+[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 64.557241ms
+[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 77.392504ms
+[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 5.757276ms
+[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 679.884409ms
+[pir] Running 66-PlastisimPlacementCodegen ...[[32mpir[0m] 
+[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 675.464799ms
+[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 780.72375ms
+[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/
+[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/config.psim -p /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/final.place -c 100000000 -l B -w 512
+[[33mpsim[0m] log in /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/psim.log
+Error setting saddr = 0
+Changing to config directory: /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal
+Error setting daddr = 0
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 1
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 1
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 1
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 1
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 1
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 1
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 1
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 1
+Constructing NetworkLink.
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 1
+Constructing NetworkLink.
+Error setting saddr = 0
+Constructing NetworkLink.
+Error setting daddr = 0
+Constructing NetworkLink.
+Error setting class = 0
+Constructing NetworkLink.
+Error setting lat = 1
+Constructing NetworkLink.
+Error setting saddr = 0
+Added all names to the symbol table.
+Error setting daddr = 0
+Adding static hop for route 2047 (1016->110, lat 1).
+Error setting class = 0
+Adding static hop for route 2076 (1016->110, lat 1).
+Error setting lat = 1
+Adding static hop for route 2100 (1019->213, lat 1).
+Error setting saddr = 0
+Adding static hop for route 2129 (1019->213, lat 1).
+Error setting daddr = 0
+Adding static hop for route 2153 (1041->456, lat 1).
+Error setting class = 0
+Adding static hop for route 2180 (1044->571, lat 1).
+Error setting lat = 1
+Adding static hop for route 2317 (960->844, lat 1).
+Error setting saddr = 0
+Adding static hop for route 2367 (844->1016, lat 1).
+Error setting daddr = 0
+Adding static hop for route 3663 (844->1017, lat 1).
+Error setting class = 0
+Adding static hop for route 2399 (844->1019, lat 1).
+Error setting lat = 1
+Adding static hop for route 3663 (844->1020, lat 1).
+Error setting saddr = 0
+Adding static hop for route 2430 (844->1027, lat 1).
+Error setting daddr = 0
+Adding static hop for route 3663 (844->1033, lat 1).
+Error setting class = 0
+Adding static hop for route 3663 (844->1034, lat 1).
+Error setting lat = 1
+Adding static hop for route 2986 (1017->1047, lat 1).
+Error setting saddr = 0
+Adding static hop for route 2962 (110->1047, lat 1).
+Error setting daddr = 0
+Adding static hop for route 2986 (1017->1048, lat 1).
+Error setting class = 0
+Adding static hop for route 2962 (110->1048, lat 1).
+Error setting lat = 1
+Adding static hop for route 3180 (1020->1049, lat 1).
+Error setting saddr = 0
+Adding static hop for route 3156 (213->1049, lat 1).
+Error setting daddr = 0
+Adding static hop for route 3180 (1020->1050, lat 1).
+Error setting class = 0
+Adding static hop for route 3156 (213->1050, lat 1).
+Error setting lat = 1
+Adding static hop for route 3383 (456->1052, lat 1).
+Error setting saddr = 0
+Adding static hop for route 2734 (1033->1052, lat 1).
+Error setting daddr = 0
+Adding static hop for route 3446 (571->1053, lat 1).
+Error setting class = 0
+Adding static hop for route 2877 (1034->1053, lat 1).
+Error setting lat = 1
+Adding static hop for route 2458 (1049->1037, lat 1).
+Error setting saddr = 0
+Adding static hop for route 2485 (1052->1037, lat 1).
+Error setting daddr = 0
+Adding static hop for route 2510 (1050->1038, lat 1).
+Error setting class = 0
+Adding static hop for route 2537 (1053->1038, lat 1).
+Error setting lat = 1
+Adding static hop for route 3509 (1047->1054, lat 1).
+Error setting saddr = 0
+Adding static hop for route 2685 (1033->1054, lat 1).
+Error setting daddr = 0
+Adding static hop for route 3572 (1048->1055, lat 1).
+Error setting class = 0
+Adding static hop for route 2828 (1034->1055, lat 1).
+Error setting lat = 1
+Adding static hop for route 2565 (1037->1039, lat 1).
+Error setting saddr = 0
+Adding static hop for route 2595 (1038->1040, lat 1).
+Error setting daddr = 0
+Adding static hop for route 2621 (844->1041, lat 1).
+Error setting class = 0
+Adding static hop for route 2710 (1054->1041, lat 1).
+Error setting lat = 1
+Adding static hop for route 2685 (1033->1041, lat 1).
+Error setting saddr = 0
+Adding static hop for route 2764 (844->1044, lat 1).
+Error setting daddr = 0
+Adding static hop for route 2853 (1055->1044, lat 1).
+Error setting class = 0
+Adding static hop for route 2828 (1034->1044, lat 1).
+Error setting lat = 1
+Adding static hop for route 3316 (1039->1051, lat 1).
+Error setting saddr = 0
+Adding static hop for route 3339 (1040->1051, lat 1).
+Error setting daddr = 0
+Adding static hop for route 2207 (1027->839, lat 1).
+Error setting class = 0
+Adding static hop for route 2236 (1027->839, lat 1).
+Error setting lat = 1
+Adding static hop for route 2260 (1051->839, lat 1).
+Error setting saddr = 0
+Adding static hop for route 2343 (839->960, lat 1).
+Error setting daddr = 0
+Printing hop routes
+Error setting class = 0
+Parsed placement file.
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 1
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 1
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Error setting daddr = 0
+Error setting class = 0
+Error setting class = 0
+Error setting lat = 1
+Set ejection VC at addr 0 to 0
+Error setting lat = 1
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting lat = 1
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 1
+Error setting lat = 1
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 1
+Set ejection VC at addr 0 to 0
+Error setting lat = 1
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting lat = 1
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 1
+Link specified in placement file.
+Error setting lat = 1
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 1
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 1
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Error setting lat = 1
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 1
+Set ejection VC at addr 0 to 0
+== Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
+Link specified in placement file.
+== Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
+Changing link to static with placed latencies.
+===== MemorySystem 0 =====
+Set lat 1 from 0 to 0
+CH. 0 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set ejection VC at addr 0 to 0
+===== MemorySystem 1 =====
+Link specified in placement file.
+CH. 1 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Changing link to static with placed latencies.
+===== MemorySystem 2 =====
+Set lat 1 from 0 to 0
+CH. 2 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set ejection VC at addr 0 to 0
+===== MemorySystem 3 =====
+Link specified in placement file.
+CH. 3 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Changing link to static with placed latencies.
+DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Set ejection VC at addr 0 to 0
+Set ejection VC at addr 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set lat 1 from 0 to 2
+Set lat 1 from 0 to 3
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Parsed definitions of all elements.
+Total of 48 links:
+  0: SRAM35
+    
+  1: RetimingFIFO1737
+    
+  2: RetimingFIFO1698
+    
+  3: RetimingFIFO1860
+    
+  4: RetimingFIFO1435
+    
+  5: RetimingFIFO1517
+    
+  6: RetimingFIFO1589
+    
+  7: RetimingFIFO1670
+    
+  8: RetimingFIFO1779
+    
+  9: RetimingFIFO1789
+    
+  10: RetimingFIFO1617
+    
+  11: RetimingFIFO1708
+    
+  12: RetimingFIFO1850
+    
+  13: StreamOut163
+    
+  14: StreamOut59
+    
+  15: StreamOut779
+    
+  16: SRAM270
+    
+  17: SRAM271
+    
+  18: SRAM269
+    
+  19: SRAM272
+    
+  20: DramAddress415
+    
+  21: DramAddress530
+    
+  22: DramAddress789
+    
+  23: StreamOut164
+    
+  24: StreamOut60
+    
+  25: StreamOut780
+    
+  26: DramAddress85
+    
+  27: DramAddress189
+    
+  28: StreamOut389
+    
+  29: StreamOut504
+    
+  30: Reg351_Reg1755
+    
+  31: Reg353_Reg1826
+    
+  32: RetimingFIFO1315_RetimingFIFO1339
+    
+  33: RetimingFIFO1307_RetimingFIFO1331
+    
+  34: RetimingFIFO1256_RetimingFIFO1280
+    
+  35: RetimingFIFO1248_RetimingFIFO1272
+    
+  36: StreamIn782
+    
+  37: TokenOut967
+    
+  38: SRAM33
+    
+  39: SRAM32
+    
+  40: SRAM31
+    
+  41: SRAM34
+    
+  42: TokenIn3614_TokenIn3627_TokenIn3639_TokenIn3651
+    
+  43: StreamOut781
+    
+  44: Reg620
+    
+  45: Reg1798
+    
+  46: Reg1869
+    
+  47: Reg618
+    
+Total of 39 nodes:
+  0: CE3861
+    [StreamOut60 *4 /1] [StreamOut59 *4 /1]  => [RetimingFIFO1248_RetimingFIFO1272] 
+  1: CE3875
+    [StreamOut164 *4 /1] [StreamOut163 *4 /1]  => [RetimingFIFO1307_RetimingFIFO1331] 
+  2: CE3887
+    [StreamOut389 *1 /1]  => [RetimingFIFO1789] 
+  3: CE3897
+    [StreamOut504 *1 /1]  => [RetimingFIFO1860] 
+  4: CE3933
+     => [DramAddress789] [DramAddress415] [DramAddress530] [DramAddress85] [DramAddress189] [TokenIn3614_TokenIn3627_TokenIn3639_TokenIn3651] 
+  5: CE3949
+    [TokenOut967 *1 /1]  => 
+  6: CE3969
+    [DramAddress85 *16384 /1]  => [StreamOut60] [StreamOut59] 
+  7: CE3981
+    [TokenIn3614_TokenIn3627_TokenIn3639_TokenIn3651 *65536 /1]  => [RetimingFIFO1256_RetimingFIFO1280] 
+  8: CE3993
+    [DramAddress189 *16384 /1]  => [StreamOut164] [StreamOut163] 
+  9: CE4005
+    [TokenIn3614_TokenIn3627_TokenIn3639_TokenIn3651 *65536 /1]  => [RetimingFIFO1315_RetimingFIFO1339] 
+  10: CE4017
+    [DramAddress789 *16 /1]  => [StreamOut780] [StreamOut779] 
+  11: CE4031
+    [TokenIn3614_TokenIn3627_TokenIn3639_TokenIn3651 *8192 /1]  => [Reg351_Reg1755] [Reg1798] 
+  12: CE4045
+    [TokenIn3614_TokenIn3627_TokenIn3639_TokenIn3651 *8192 /1]  => [Reg353_Reg1826] [Reg1869] 
+  13: CE4153
+    [RetimingFIFO1248_RetimingFIFO1272 *1 /1] [RetimingFIFO1256_RetimingFIFO1280 *1 /1]  => [SRAM31] 
+  14: CE4141
+    [SRAM31 *2048 /1]  => [RetimingFIFO1435] 
+  15: CE4177
+    [RetimingFIFO1248_RetimingFIFO1272 *1 /1] [RetimingFIFO1256_RetimingFIFO1280 *1 /1]  => [SRAM32] 
+  16: CE4165
+    [SRAM32 *2048 /1]  => [RetimingFIFO1517] 
+  17: CE4201
+    [RetimingFIFO1307_RetimingFIFO1331 *1 /1] [RetimingFIFO1315_RetimingFIFO1339 *1 /1]  => [SRAM33] 
+  18: CE4189
+    [SRAM33 *2048 /1]  => [RetimingFIFO1589] 
+  19: CE4225
+    [RetimingFIFO1307_RetimingFIFO1331 *1 /1] [RetimingFIFO1315_RetimingFIFO1339 *1 /1]  => [SRAM34] 
+  20: CE4213
+    [SRAM34 *2048 /1]  => [RetimingFIFO1670] 
+  21: CE4273
+    [Reg1798 *4 /1] [RetimingFIFO1789 *1 /1]  => [SRAM269] 
+  22: CE4261
+    [SRAM269 *4 /1]  => [RetimingFIFO1617] 
+  23: CE4297
+    [Reg1869 *4 /1] [RetimingFIFO1860 *1 /1]  => [SRAM270] 
+  24: CE4285
+    [SRAM270 *4 /1]  => [RetimingFIFO1698] 
+  25: CE4059
+    [RetimingFIFO1589 *1 /1] [RetimingFIFO1617 *1 /1]  => [Reg618] 
+  26: CE4073
+    [RetimingFIFO1670 *1 /1] [RetimingFIFO1698 *1 /1]  => [Reg620] 
+  27: CE4323
+    [RetimingFIFO1435 *1 /1]  => [SRAM271] 
+  28: CE4311
+    [SRAM271 *4 /1] [Reg351_Reg1755 *4 /1]  => [RetimingFIFO1779] 
+  29: CE4347
+    [RetimingFIFO1517 *1 /1]  => [SRAM272] 
+  30: CE4335
+    [SRAM272 *4 /1] [Reg353_Reg1826 *4 /1]  => [RetimingFIFO1850] 
+  31: CE4085
+    [Reg618 *1 /1]  => [RetimingFIFO1708] 
+  32: CE4095
+    [Reg620 *1 /1]  => [RetimingFIFO1737] 
+  33: CE4109
+    [DramAddress415 *32768 /1] [Reg351_Reg1755 *4 /1] [RetimingFIFO1779 *1 /1]  => [StreamOut389] 
+  34: CE4127
+    [DramAddress530 *32768 /1] [Reg353_Reg1826 *4 /1] [RetimingFIFO1850 *1 /1]  => [StreamOut504] 
+  35: CE4249
+    [RetimingFIFO1708 *1 /1] [RetimingFIFO1737 *1 /1]  => [SRAM35] 
+  36: CE4237
+    [SRAM35 *64 /1]  => [StreamOut781] 
+  37: CE3911
+    [StreamOut780 *64 /1] [StreamOut781 *1 /1] [StreamOut779 *64 /1]  => [StreamIn782] 
+  38: CE3957
+    [StreamIn782 *1 /1]  => [TokenOut967] 
+
+10000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+20000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+30000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+40000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+50000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+60000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+70000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+80000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+90000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+100000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+110000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+120000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+130000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+140000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+150000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+160000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+170000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+180000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+190000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+200000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+210000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+220000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+230000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+240000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+250000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+260000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+Simulation complete at cycle: 262656
+[[32mpsim[0m] Simulation complete at cycle: 262656
+CE3861: Active:  25.0 Stalled:   0.0 Starved:   3.1 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 8097 
+	   65536    65536 
+	DRAM:  15.97 GB/s ( 15.97 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE3875: Active:  25.0 Stalled:   0.0 Starved:   3.4 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 8796 
+	   65536    65536 
+	DRAM:  15.97 GB/s ( 15.97 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE3887: Active:  12.5 Stalled:   0.1 Starved:  87.5 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 764 
+	   32768 
+	DRAM:   5.30 GB/s (  5.30 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE3897: Active:  12.5 Stalled:   0.1 Starved:  87.5 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 268 
+	   32768 
+	DRAM:   5.26 GB/s (  5.26 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE3933: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 262655 
+	
+CE3949: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 1 
+	       1 
+CE3969: Active:   6.2 Stalled:  90.6 Starved:   3.1 Total Active:    16384 Total Output:    16384 Expected Active:    16384 Last Activity: 8257 
+	   16384 
+CE3981: Active:  25.0 Stalled:  72.1 Starved:   2.9 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 7690 
+	   65536 
+CE3993: Active:   6.2 Stalled:  90.2 Starved:   3.6 Total Active:    16384 Total Output:    16384 Expected Active:    16384 Last Activity: 9361 
+	   16384 
+CE4005: Active:  25.0 Stalled:  72.0 Starved:   3.1 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 8112 
+	   65536 
+CE4017: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Total Output:       16 Expected Active:       16 Last Activity: 262637 
+	      16 
+CE4031: Active:   3.1 Stalled:  96.6 Starved:   0.3 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 798 
+	    8192 
+CE4045: Active:   3.1 Stalled:  96.8 Starved:   0.1 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 381 
+	    8192 
+CE4153: Active:  25.0 Stalled:   0.0 Starved:  75.0 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 7664 
+	   65536    65536 
+CE4141: Active:  12.5 Stalled:  83.0 Starved:   4.5 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 830 
+	   32768 
+CE4177: Active:  25.0 Stalled:   0.0 Starved:  75.0 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 7664 
+	   65536    65536 
+CE4165: Active:  12.5 Stalled:  83.3 Starved:   4.2 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 413 
+	   32768 
+CE4201: Active:  25.0 Stalled:   0.0 Starved:  75.0 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 7846 
+	   65536    65536 
+CE4189: Active:  12.5 Stalled:  83.2 Starved:   4.3 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 535 
+	   32768 
+CE4225: Active:  25.0 Stalled:   0.0 Starved:  75.0 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 7846 
+	   65536    65536 
+CE4213: Active:  12.5 Stalled:  83.4 Starved:   4.2 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 176 
+	   32768 
+CE4273: Active:  12.5 Stalled:   0.9 Starved:  86.9 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 524 
+	   32768    32768 
+CE4261: Active:  12.5 Stalled:   3.4 Starved:  84.7 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 515 
+	   32768 
+CE4297: Active:  12.5 Stalled:   0.4 Starved:  87.2 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 165 
+	   32768    32768 
+CE4285: Active:  12.5 Stalled:   2.0 Starved:  86.0 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 156 
+	   32768 
+CE4059: Active:  12.5 Stalled:   6.1 Starved:  82.2 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 493 
+	   32768    32768 
+CE4073: Active:  12.5 Stalled:   5.0 Starved:  83.1 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 150 
+	   32768    32768 
+CE4323: Active:  12.5 Stalled:  83.1 Starved:   4.4 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 804 
+	   32768 
+CE4311: Active:  12.5 Stalled:   0.0 Starved:  87.5 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 777 
+	   32768    32768 
+CE4347: Active:  12.5 Stalled:  83.4 Starved:   4.2 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 387 
+	   32768 
+CE4335: Active:  12.5 Stalled:   0.0 Starved:  87.5 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 281 
+	   32768    32768 
+CE4085: Active:   3.1 Stalled:  28.3 Starved:  71.4 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 352 
+	    8192 
+CE4095: Active:   3.1 Stalled:  26.6 Starved:  73.4 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 142 
+	    8192 
+CE4109: Active:  12.5 Stalled:   0.0 Starved:  87.5 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 771 
+	   32768    32768    32768 
+CE4127: Active:  12.5 Stalled:   0.0 Starved:  87.5 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 275 
+	   32768    32768    32768 
+CE4249: Active:   3.1 Stalled:   0.0 Starved:  96.9 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 136 
+	    8192     8192 
+CE4237: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:     1024 Total Output:     1024 Expected Active:     1024 Last Activity: 67 
+	    1024 
+CE3911: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:     1024 Total Output:     1024 Expected Active:     1024 Last Activity: 61 
+	    1024     1024     1024 
+	DRAM:   0.25 GB/s (  0.00 GB/s R,   0.25 GB/s W)
+	ROB remaining: 0
+CE3957: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:     1024 Total Output:     1024 Expected Active:     1024 Last Activity: 8 
+	    1024 
+Total DRAM:	  48.16 GB/s ( 47.91 GB/s R,   0.25 GB/s W)
+[[32mpsim[0m] Total DRAM:	  48.16 GB/s ( 47.91 GB/s R,   0.25 GB/s W)
+Pending Read: 0	 Pending Write: 0	
+[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 8074.072322ms
+[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 709.299422ms
+[pir] Saving node prism.Session@5ed13e11 to /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_p2p_ideal/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.sess
+[0m[[32msuccess[0m] [0mTotal time: 77 s, completed Aug 3, 2018 8:32:37 PM[0m
+-------------PASS (DONE)------------

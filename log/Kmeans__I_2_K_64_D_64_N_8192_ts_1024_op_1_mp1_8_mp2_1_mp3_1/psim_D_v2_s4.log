@@ -4,57 +4,80 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
 [0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
 [0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mRunning Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1 --out=/home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4 --psim-out=/home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4 --debug=false --verbose=true --dot=false --mapping=true --load-pir=true --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --net=dynamic --routing-algo=proute --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=4 --vfifo=4 --vc=8 --vlink=2 --slink=4[0m
-[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4, --psim-out=/home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4, --debug=false, --verbose=true, --dot=false, --mapping=true, --load-pir=true, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --net=dynamic, --routing-algo=proute, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=4, --vfifo=4, --vc=8, --vlink=2, --slink=4]
-[pir] Output directory set to [36m/home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4[0m
-[pir] Loading from /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1.pir[pir] Loading PIRDesign() from /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1.pir
-[pir] Configuring spade MyDesign ...
-[pir] Loading from /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1.sess[[33mwarn[0m] Restore session failed: java.io.InvalidClassException: pir.codegen.PlastisimPlacementCodegen; local class incompatible: stream classdesc serialVersionUID = -8889915444669227093, local class serialVersionUID = -6211842762413206399. Creating a new session ...
+[0m[[0minfo[0m] [0mRunning Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1 --out=/home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4 --psim-out=/home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4 --debug=false --verbose=true --dot=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --routing-algo=proute --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --pcu-stage=4 --vc=4 --net=dynamic --vlink=2 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512[0m
+[pir] args=[--load-pir=true, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4, --psim-out=/home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4, --debug=false, --verbose=true, --dot=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --routing-algo=proute, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --pcu-stage=4, --vc=4, --net=dynamic, --vlink=2, --slink=4, --fifo-depth=4, --vfifo=4, --proute-algo=route_dor_YX, --link-prop=db, --flit-width=512]
+[pir] Output directory set to [36m/home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4[0m
+[pir] Loading from /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1.pir[[33mwarn[0m] Restore session failed: java.io.FileNotFoundException: /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1.pir (No such file or directory). Creating a new session ...
 [pir] Finishing graph construction for Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1
 [pir] Configuring spade MyDesign ...
-New design elapsed time: 7358.578ms
-[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 5756.384818ms
-[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 7.653712ms
-[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 111.407494ms
-[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 5961.829422ms
-[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 2479.264485ms
-[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 4.942628ms
-[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 4313.30633ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 213.870969ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 154.070689ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 11149.019339ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 2022.651605ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 1370.18961ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 4995.605092ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 620.34644ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 1135.172602ms
-[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 524.388659ms
-[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer4320 in 1032.468442ms[pir] Split CUContainer10015 in 772.82457ms[pir] Split CUContainer10018 in 887.118964ms[pir] Split CUContainer10019 in 680.594348ms[pir] Split CUContainer10021 in 698.087894ms[pir] Split CUContainer4337 in 940.308124ms[pir] Split CUContainer4338 in 741.881342ms[pir] Split CUContainer4339 in 761.442888ms[pir] Split CUContainer4340 in 779.751184ms[pir] Split CUContainer4341 in 703.868238ms[pir] Split CUContainer4342 in 639.136731ms[pir] Split CUContainer4343 in 840.599815ms[pir] Split CUContainer4344 in 769.672927ms[pir] Split CUContainer4353 in 903.239949ms[pir] Split CUContainer10042 in 791.776942ms[pir] Split CUContainer4355 in 872.568382ms[pir] Split CUContainer10046 in 977.544351ms[pir] Split CUContainer4357 in 779.124754ms[pir] Split CUContainer10050 in 986.343156ms[pir] Split CUContainer4359 in 589.817044ms[pir] Split CUContainer10054 in 808.617231ms[pir] Split CUContainer4361 in 795.882026ms[pir] Split CUContainer10058 in 717.912946ms[pir] Split CUContainer4363 in 888.337536ms[pir] Split CUContainer10062 in 601.695001ms[pir] Split CUContainer4365 in 612.435637ms[pir] Split CUContainer10066 in 708.210652ms[pir] Split CUContainer4367 in 618.898746ms[pir] Split CUContainer10070 in 688.204919ms[pir] Split CUContainer4369 in 631.261162ms[pir] Split CUContainer4370 in 732.787074ms[pir] Split CUContainer4371 in 817.964269ms[pir] Split CUContainer4372 in 596.13148ms[pir] Split CUContainer4373 in 556.749063ms[pir] Split CUContainer4374 in 688.902411ms[pir] Split CUContainer4375 in 781.321047ms[pir] Split CUContainer4376 in 771.392709ms[pir] Split CUContainer4377 in 799.528384ms[pir] Finished 24-IgraphPartioner in 32373.228753ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 33046.284283ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 9812.486577ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 59.219441ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 131.768862ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 985.715686ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 65657.167033ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 1636.234058ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 1808.703074ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 40063.37385ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 35747.150824ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 2596.976348ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 891.467111ms
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 837.771609ms
-[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1.pir
-[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/traces
-[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/trace_classes
-[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4 /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4
-[[33mtrace[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 35565.93442ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 94917.908441ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 58149.067864ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 1756.164009ms
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 2828.676224ms
+New design elapsed time: 6329.413ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 3480.664311ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 7.485329ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 95.557263ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 4869.325125ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 2023.880776ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 3.147778ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 3987.090343ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 160.537157ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 129.474663ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 9683.530981ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 1386.994498ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 1143.596988ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 4234.993961ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 480.075032ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 1025.951344ms
+[pir] Running 23-CUStatistics ...[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4[0m[0m
+[pir] Finished 23-CUStatistics to [36mstat.json[0m in 404.572315ms
+[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer4320 in 681.290381ms[pir] Split CUContainer10015 in 592.825006ms[pir] Split CUContainer10018 in 708.447898ms[pir] Split CUContainer10019 in 599.257579ms[pir] Split CUContainer10021 in 685.386447ms[pir] Split CUContainer4337 in 611.719307ms[pir] Split CUContainer4338 in 607.031584ms[pir] Split CUContainer4339 in 676.219687ms[pir] Split CUContainer4340 in 625.018252ms[pir] Split CUContainer4341 in 618.609378ms[pir] Split CUContainer4342 in 683.778067ms[pir] Split CUContainer4343 in 619.535945ms[pir] Split CUContainer4344 in 619.827625ms[pir] Split CUContainer4353 in 630.503205ms[pir] Split CUContainer10042 in 668.262386ms[pir] Split CUContainer4355 in 619.84472ms[pir] Split CUContainer10046 in 620.617854ms[pir] Split CUContainer4357 in 746.397082ms[pir] Split CUContainer10050 in 605.128055ms[pir] Split CUContainer4359 in 623.779656ms[pir] Split CUContainer10054 in 602.062172ms[pir] Split CUContainer4361 in 641.311216ms[pir] Split CUContainer10058 in 595.744021ms[pir] Split CUContainer4363 in 606.922324ms[pir] Split CUContainer10062 in 652.973567ms[pir] Split CUContainer4365 in 715.556655ms[pir] Split CUContainer10066 in 583.72768ms[pir] Split CUContainer4367 in 542.951831ms[pir] Split CUContainer10070 in 588.462903ms[pir] Split CUContainer4369 in 646.295139ms[pir] Split CUContainer4370 in 575.053558ms[pir] Split CUContainer4371 in 566.18428ms[pir] Split CUContainer4372 in 569.636474ms[pir] Split CUContainer4373 in 622.421296ms[pir] Split CUContainer4374 in 539.601014ms[pir] Split CUContainer4375 in 538.728976ms[pir] Split CUContainer4376 in 522.406439ms[pir] Split CUContainer4377 in 516.399391ms[pir] Finished 24-IgraphPartioner in 26114.903804ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 30430.85429ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 8317.349122ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 44.175082ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 113.87329ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 557.053291ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 58123.645987ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 1291.24972ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 1275.569364ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 34464.531508ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 33166.053192ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 2094.1782ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 527.035977ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 454.344414ms
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1.pir
+[pir] Running 50-PlastisimTraceCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4[0m[0m
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4 /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4
+[[33mtrace[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/trace.log
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mSet current project to kmeans__i_2_k_64_d_64_n_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_d_v2_s4 (in build file:/home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/)[0m
+[0m[[0minfo[0m] [0mUpdating {file:/home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/}kmeans__i_2_k_64_d_64_n_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_d_v2_s4...[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#jline;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.fusesource.jansi#jansi;1.4 ...[0m
+[0m[[0minfo[0m] [0mDone updating.[0m
+[0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/target/scala-2.10/classes...[0m
+[0m[[33mwarn[0m] [0mthere were 2 feature warning(s); re-run with -feature for details[0m
+[0m[[33mwarn[0m] [0mone warning found[0m
+[0m[[0minfo[0m] [0mRunning tracer /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/traces[0m
+[0m[[32msuccess[0m] [0mTotal time: 9 s, completed Aug 3, 2018 10:19:12 PM[0m
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 37568.684147ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 93141.733029ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 34428.850532ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 1616.65415ms
+[pir] Running 54-ControllerDotCodegen ...[pir] Finished 54-ControllerDotCodegen to [36mcontroller.dot[0m in 12771.718506ms
+[pir] Running 55-PIRIRDotCodegen ...[pir] Finished 55-PIRIRDotCodegen to [36mtop.dot[0m in 42708.881226ms
+[pir] Running 56-SimpleIRDotCodegen ...[pir] Finished 56-SimpleIRDotCodegen to [36msimple.dot[0m in 3047.996572ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 2945.667842ms
 [pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 115568.958022ms
+[pir] Finished 59-CUPlacer in 126114.863156ms
 [pir] Running 60-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
 [pir] 
 [pir] number of cus=136
@@ -96,81 +119,33 @@ New design elapsed time: 7358.578ms
 [pir] AG-ag = 2 / 32 (6.25%)
 [pir] AG-comp = 6 / 32 (18.75%)
 [pir] MC = 3 / 32 (9.38%)
-[pir] Finished 60-CUStatistics to [36mstat.json[0m in 608.898984ms
-[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 954.49938ms
-[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 861.257906ms
-[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 874.468278ms
-[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 6.066314ms
-[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 52919.409373ms
-[pir] Running 66-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/node.csv -l /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/link.csv -o /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/final.place -r 16 -c 8 -s1 -g /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/proute.dot -x2 -e 4 -i100 -p100 -t1 -d100 -a route_min_directed_valient -s0
-[[33mproute[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/proute.log
-Start scoring thread: 0
-Start scoring thread: 0
-100 scores: min 1810.29 	2.00/2.00/18/0.90/3 	max 51014.27 mean 16169.80
-Start scoring thread: 0
-100 scores: min 1213.24 	1.02/1.00/18/0.79/3 	max 17823.63 mean 2868.11
-Start scoring thread: 0
-100 scores: min 212.70 	1.02/1.00/18/0.55/2 	max 26818.48 mean 2386.45
-Start scoring thread: 0
-100 scores: min 209.73 	1.00/1.00/18/0.54/2 	max 17322.45 mean 1700.97
-Start scoring thread: 0
-100 scores: min 209.44 	1.00/1.00/18/0.44/2 	max 37313.91 mean 2234.80
-Start scoring thread: 0
-100 scores: min 209.44 	1.00/1.00/18/0.44/2 	max 27514.18 mean 2297.82
-Start scoring thread: 0
-100 scores: min 209.44 	1.00/1.00/18/0.44/2 	max 38514.83 mean 1569.05
-Start scoring thread: 0
-100 scores: min 209.44 	1.00/1.00/18/0.44/2 	max 28215.22 mean 2536.66
-Start scoring thread: 0
-100 scores: min 209.44 	1.00/1.00/18/0.44/2 	max 27024.02 mean 2360.59
-Start scoring thread: 0
-100 scores: min 209.44 	1.00/1.00/18/0.44/2 	max 50313.49 mean 2108.42
-Start scoring thread: 0
-100 scores: min 209.35 	1.00/1.00/18/0.35/2 	max 27524.02 mean 2031.55
-Start scoring thread: 0
-100 scores: min 209.35 	1.00/1.00/18/0.35/2 	max 16816.86 mean 1460.10
-Start scoring thread: 0
-100 scores: min 209.35 	1.00/1.00/18/0.35/2 	max 27014.09 mean 2237.21
-Start scoring thread: 0
-100 scores: min 209.35 	1.00/1.00/18/0.35/2 	max 17324.64 mean 1917.46
-Start scoring thread: 0
-100 scores: min 209.34 	1.00/1.00/18/0.34/2 	max 26319.99 mean 2138.47
-Start scoring thread: 0
-100 scores: min 209.34 	1.00/1.00/18/0.34/2 	max 28226.58 mean 2156.65
-Start scoring thread: 0
-100 scores: min 209.34 	1.00/1.00/18/0.34/2 	max 18513.46 mean 1404.01
-Start scoring thread: 0
-100 scores: min 209.34 	1.00/1.00/18/0.34/2 	max 37814.10 mean 1955.46
-Start scoring thread: 0
-100 scores: min 209.29 	1.00/1.00/18/0.29/2 	max 26828.77 mean 1756.62
-Start scoring thread: 0
-100 scores: min 209.19 	1.00/1.00/18/0.19/2 	max 51512.97 mean 2028.53
-Start scoring thread: 0
-100 scores: min 209.19 	1.00/1.00/18/0.19/2 	max 26823.99 mean 2061.82
-Start scoring thread: 0
-100 scores: min 209.19 	1.00/1.00/18/0.19/2 	max 27013.19 mean 1992.48
-Start scoring thread: 0
-100 scores: min 209.19 	1.00/1.00/18/0.19/2 	max 37313.63 mean 2207.62
-Start scoring thread: 0
-100 scores: min 209.13 	1.00/1.00/18/0.13/2 	max 26830.60 mean 1809.66
-Start scoring thread: 0
-100 scores: min 209.13 	1.00/1.00/18/0.13/2 	max 37314.89 mean 2341.85
-Start scoring thread: 0
-100 scores: min 209.13 	1.00/1.00/18/0.13/2 	max 37821.72 mean 1816.75
-Start scoring thread: 0
-100 scores: min 209.06 	1.00/1.00/18/0.06/2 	max 27514.13 mean 1373.46
-Start scoring thread: 0
-100 scores: min 9.06 	0.02/0.02/18/0.01/2 	max 18513.89 mean 1318.36
-Best score is 9.06
-Used 2 VCs for endpoint coloring.
-	Used 2 VCs.
-[[32mproute[0m] 	Used 2 VCs.
-[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 88632.41322ms
-[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 52504.280954ms
-[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/
-[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/config.psim -p /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/final.place -c 100000000 -l B
-[[33mpsim[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/psim.log
-Changing to config directory: /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4
+[pir] Finished 60-CUStatistics to [36mstat.json[0m in 759.857311ms
+[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 1020.824331ms
+[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 960.80179ms
+[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 936.514592ms
+[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 6.754709ms
+[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 36124.366251ms
+[pir] Running 66-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/node.csv -l /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/link.csv -o /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/final.place -r 16 -c 8 -g /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/proute.dot -v /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/summary.csv -x2 -e 4 -a route_dor_YX  -i100 -p100 -t1 -d100 -s0
+[[33mproute[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/proute.log
+100 scores: min 1263.88 	2.00/1.00/26/0.88/2 	max 70760.10 mean 13739.55
+100 scores: min 10.82 	0.03/0.02/21/0.01/2 	max 14538.58 mean 3024.47
+100 scores: min 8.63 	0.02/0.02/17/0.01/1 	max 15265.64 mean 2563.20
+100 scores: min 8.13 	0.02/0.02/16/0.00/1 	max 5261.85 mean 2010.12
+All static routes:
+	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13012:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	13036:16:65536	14614:2:524288	14614:2:524288	16976:1:524288	12342:1:524288	18225:1:524288	18621:1:524288	18819:1:524288	15761:1:524288	15784:1:524288	12270:1:524288	15830:1:524288	11982:1:524288	17075:1:524288	15713:1:524288	15736:1:524288	16783:1:524288	12414:1:524288	11910:1:524288	16020:1:524288	15529:1:524288	12126:1:524288	17049:1:524288	19017:1:524288	17002:1:524288	16856:1:524288	15575:1:524288	17221:1:524288	15437:1:524288	16903:1:524288	17025:1:524288	16710:1:524288	15974:1:524288	12054:1:524288	17244:1:524288	15483:1:524288	17631:1:524288	15926:1:524288	15391:1:524288	15854:1:524288	15879:1:524288	15807:1:524288	18027:1:524288	15997:1:524288	16929:1:524288	18423:1:524288	12198:1:524288	16879:1:524288	16733:1:524288	15621:1:524288	16757:1:524288	17148:1:524288	17171:1:524288	16806:1:524288	15667:1:524288	17829:1:524288	16952:1:524288	17195:1:524288	16830:1:524288	16684:1:524288	17122:1:524288	17098:1:524288	15950:1:524288	15903:1:524288	14961:2:131072	14961:2:131072	15305:2:131072	15305:2:131072	15219:2:131072	15219:2:131072	14703:2:131072	14703:2:131072	14875:2:131072	14875:2:131072	15133:2:131072	15133:2:131072	15047:2:131072	15047:2:131072	14789:2:131072	14789:2:131072	12756:1:131072	12713:1:131072	12541:1:131072	12455:1:131072	12498:1:131072	12670:1:131072	12627:1:131072	12584:1:131072	11035:1:16384	11064:1:16384	12831:3:4096	12831:3:4096	12831:3:4096	16123:1:8192	16443:1:8192	11755:1:8192	16180:1:8192	11782:1:8192	16523:1:8192	11836:1:8192	16260:1:8192	11674:1:8192	16283:1:8192	11647:1:8192	16340:1:8192	16363:1:8192	11728:1:8192	16420:1:8192	16500:1:8192	11701:1:8192	16603:1:8192	11809:1:8192	16043:1:8192	16580:1:8192	16203:1:8192	16100:1:8192	17409:9:512	17409:9:512	17409:9:512	17409:9:512	17409:9:512	17409:9:512	17409:9:512	17409:9:512	17409:9:512	11466:1:4096	11441:1:4096	17386:9:256	17386:9:256	17386:9:256	17386:9:256	17386:9:256	17386:9:256	17386:9:256	17386:9:256	17386:9:256	16472:1:2048	16552:1:2048	16632:1:2048	16072:1:2048	12311:1:2048	11951:1:2048	12167:1:2048	16152:1:2048	16232:1:2048	12383:1:2048	12023:1:2048	16312:1:2048	11879:1:2048	12239:1:2048	12095:1:2048	16392:1:2048	11548:1:512	17433:1:512	11141:1:256	11224:1:256	11491:1:128	11517:1:128	11011:1:64	11088:1:64	11117:1:64	10982:1:64	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11248:24:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	11306:22:1	20032:11:1	20032:11:1	20032:11:1	20032:11:1	20032:11:1	20032:11:1	20032:11:1	20032:11:1	20032:11:1	20032:11:1	20032:11:1	11198:1:1	11623:1:1	11279:1:1	11359:1:1
+All dynamic routes:
+	16660:1:8192
+Best score is 8.13
+Used 1 VCs for endpoint coloring.
+	Used 1 VCs.
+[[32mproute[0m] 	Used 1 VCs.
+[[32mproute[0m] DynHopsVec:114688, DynHopsScal:0, StatHopsVec:178636384, StatHopsScal:13611038
+[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 43966.05132ms
+[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 42034.393192ms
+[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/
+[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/config.psim -p /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/final.place -c 100000000 -l B -w 512
+[[33mpsim[0m] log in /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/psim.log
+Changing to config directory: /home/yaqiz/plastisim/configs/finals/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4
 Constructing NetworkLink.
 Constructing NetworkLink.
 Constructing NetworkLink.
@@ -316,1102 +291,2344 @@ Constructing NetworkLink.
 Constructing NetworkLink.
 Constructing NetworkLink.
 Added all names to the symbol table.
-Adding static hop for route 13036 (4314->4386, lat 7).
-Adding static hop for route 13036 (4314->4385, lat 9).
-Adding static hop for route 13036 (4314->4393, lat 5).
-Adding static hop for route 13036 (4314->4392, lat 7).
-Adding static hop for route 13036 (4314->4391, lat 9).
-Adding static hop for route 13036 (4314->4390, lat 3).
+Adding static hop for route 13012 (256->4389, lat 11).
+Adding static hop for route 13012 (256->4396, lat 3).
+Adding static hop for route 13012 (256->4395, lat 7).
+Adding static hop for route 13012 (256->4394, lat 9).
+Adding static hop for route 13012 (256->4381, lat 5).
+Adding static hop for route 13012 (256->4382, lat 11).
+Adding static hop for route 13012 (256->4383, lat 13).
+Adding static hop for route 13012 (256->4384, lat 9).
+Adding static hop for route 13012 (256->4385, lat 9).
+Adding static hop for route 13012 (256->4386, lat 13).
+Adding static hop for route 13012 (256->4387, lat 9).
+Adding static hop for route 13012 (256->4388, lat 5).
+Adding static hop for route 13012 (256->4390, lat 11).
+Adding static hop for route 13012 (256->4391, lat 5).
+Adding static hop for route 13012 (256->4392, lat 7).
+Adding static hop for route 13012 (256->4393, lat 15).
 Adding static hop for route 13036 (4314->4389, lat 7).
-Adding static hop for route 13036 (4314->4387, lat 9).
-Adding static hop for route 13036 (4314->4384, lat 11).
-Adding static hop for route 13036 (4314->4383, lat 9).
-Adding static hop for route 13036 (4314->4394, lat 3).
-Adding static hop for route 13036 (4314->4395, lat 1).
-Adding static hop for route 13036 (4314->4381, lat 5).
-Adding static hop for route 13036 (4314->4396, lat 5).
-Adding static hop for route 13036 (4314->4388, lat 11).
-Adding static hop for route 13036 (4314->4382, lat 3).
-Adding static hop for route 13012 (256->4386, lat 12).
-Adding static hop for route 13012 (256->4395, lat 8).
-Adding static hop for route 13012 (256->4394, lat 6).
-Adding static hop for route 13012 (256->4383, lat 10).
-Adding static hop for route 13012 (256->4384, lat 12).
-Adding static hop for route 13012 (256->4387, lat 2).
-Adding static hop for route 13012 (256->4389, lat 8).
-Adding static hop for route 13012 (256->4391, lat 14).
-Adding static hop for route 13012 (256->4392, lat 4).
-Adding static hop for route 13012 (256->4393, lat 4).
-Adding static hop for route 13012 (256->4390, lat 8).
-Adding static hop for route 13012 (256->4385, lat 14).
-Adding static hop for route 13012 (256->4381, lat 10).
-Adding static hop for route 13012 (256->4396, lat 4).
-Adding static hop for route 13012 (256->4388, lat 16).
-Adding static hop for route 13012 (256->4382, lat 12).
-Adding static hop for route 14614 (10022->4398, lat 3).
-Adding static hop for route 14614 (10022->4397, lat 3).
-Adding static hop for route 15305 (4368->4414, lat 3).
-Adding static hop for route 15305 (4368->4413, lat 5).
-Adding static hop for route 15219 (4366->4412, lat 5).
-Adding static hop for route 15219 (4366->4411, lat 3).
-Adding static hop for route 15133 (4364->4410, lat 7).
-Adding static hop for route 15133 (4364->4409, lat 7).
-Adding static hop for route 15047 (4362->4408, lat 4).
-Adding static hop for route 15047 (4362->4407, lat 6).
-Adding static hop for route 14961 (4360->4405, lat 10).
-Adding static hop for route 14961 (4360->4406, lat 2).
-Adding static hop for route 14875 (4358->4403, lat 3).
-Adding static hop for route 14875 (4358->4404, lat 1).
-Adding static hop for route 14789 (4356->4402, lat 4).
-Adding static hop for route 14789 (4356->4401, lat 4).
-Adding static hop for route 14703 (4354->4400, lat 7).
-Adding static hop for route 14703 (4354->4399, lat 5).
-Adding static hop for route 19017 (10090->10089, lat 1).
-Adding static hop for route 18819 (10088->10087, lat 1).
-Adding static hop for route 18621 (10086->10085, lat 7).
-Adding static hop for route 18423 (10084->10083, lat 7).
-Adding static hop for route 18225 (10082->10081, lat 1).
-Adding static hop for route 18027 (10080->10079, lat 5).
-Adding static hop for route 17829 (10078->10077, lat 7).
-Adding static hop for route 17631 (10076->10075, lat 3).
-Adding static hop for route 17244 (10071->10072, lat 2).
-Adding static hop for route 17221 (4396->10071, lat 4).
-Adding static hop for route 17195 (10089->10071, lat 2).
-Adding static hop for route 17171 (10067->10068, lat 10).
-Adding static hop for route 17148 (4395->10067, lat 1).
-Adding static hop for route 17122 (10087->10067, lat 9).
-Adding static hop for route 17098 (10063->10064, lat 5).
-Adding static hop for route 17075 (4394->10063, lat 3).
-Adding static hop for route 17049 (10085->10063, lat 9).
-Adding static hop for route 17025 (10059->10060, lat 2).
-Adding static hop for route 17002 (4393->10059, lat 1).
-Adding static hop for route 16976 (10083->10059, lat 7).
-Adding static hop for route 16952 (10055->10056, lat 4).
-Adding static hop for route 16929 (4392->10055, lat 1).
-Adding static hop for route 16903 (10081->10055, lat 1).
-Adding static hop for route 16879 (10051->10052, lat 10).
-Adding static hop for route 16856 (4391->10051, lat 5).
-Adding static hop for route 16830 (10079->10051, lat 5).
-Adding static hop for route 16806 (10047->10048, lat 15).
-Adding static hop for route 16783 (4390->10047, lat 11).
-Adding static hop for route 16757 (10077->10047, lat 5).
-Adding static hop for route 16733 (10043->10044, lat 1).
-Adding static hop for route 16710 (4389->10043, lat 5).
-Adding static hop for route 16684 (10075->10043, lat 7).
-Adding static hop for route 16020 (4422->10024, lat 3).
-Adding static hop for route 15997 (4421->10024, lat 1).
-Adding static hop for route 15974 (10020->10023, lat 2).
-Adding static hop for route 15950 (10024->10023, lat 4).
-Adding static hop for route 15926 (4419->10023, lat 5).
-Adding static hop for route 15903 (4420->10023, lat 7).
-Adding static hop for route 15879 (10023->10022, lat 6).
-Adding static hop for route 15854 (10017->10022, lat 4).
-Adding static hop for route 15830 (4398->10022, lat 3).
-Adding static hop for route 15807 (4418->10020, lat 1).
-Adding static hop for route 15784 (4417->10020, lat 1).
+Adding static hop for route 13036 (4314->4396, lat 1).
+Adding static hop for route 13036 (4314->4395, lat 3).
+Adding static hop for route 13036 (4314->4394, lat 5).
+Adding static hop for route 13036 (4314->4381, lat 3).
+Adding static hop for route 13036 (4314->4382, lat 9).
+Adding static hop for route 13036 (4314->4383, lat 11).
+Adding static hop for route 13036 (4314->4384, lat 5).
+Adding static hop for route 13036 (4314->4385, lat 5).
+Adding static hop for route 13036 (4314->4386, lat 11).
+Adding static hop for route 13036 (4314->4387, lat 5).
+Adding static hop for route 13036 (4314->4388, lat 3).
+Adding static hop for route 13036 (4314->4390, lat 7).
+Adding static hop for route 13036 (4314->4391, lat 1).
+Adding static hop for route 13036 (4314->4392, lat 5).
+Adding static hop for route 13036 (4314->4393, lat 11).
+Adding static hop for route 14614 (10022->4397, lat 1).
+Adding static hop for route 14614 (10022->4398, lat 1).
+Adding static hop for route 16976 (10083->10059, lat 1).
+Adding static hop for route 12342 (4387->4351, lat 7).
+Adding static hop for route 18225 (10082->10081, lat 9).
+Adding static hop for route 18621 (10086->10085, lat 3).
+Adding static hop for route 18819 (10088->10087, lat 7).
 Adding static hop for route 15761 (4416->10020, lat 7).
-Adding static hop for route 15736 (4415->10020, lat 7).
-Adding static hop for route 15713 (4352->4422, lat 5).
-Adding static hop for route 15667 (4351->4421, lat 3).
-Adding static hop for route 15621 (4350->4420, lat 3).
-Adding static hop for route 15575 (4349->4419, lat 1).
-Adding static hop for route 15529 (4348->4418, lat 7).
-Adding static hop for route 15483 (4347->4417, lat 7).
-Adding static hop for route 15437 (4346->4416, lat 2).
-Adding static hop for route 15391 (4345->4415, lat 1).
-Adding static hop for route 12414 (4388->4352, lat 3).
-Adding static hop for route 12342 (4387->4351, lat 1).
+Error setting saddr = 4
+Adding static hop for route 15784 (4417->10020, lat 7).
 Adding static hop for route 12270 (4386->4350, lat 1).
-Adding static hop for route 12198 (4385->4349, lat 17).
-Adding static hop for route 12126 (4384->4348, lat 1).
-Adding static hop for route 12054 (4383->4347, lat 3).
-Adding static hop for route 11982 (4382->4346, lat 2).
-Adding static hop for route 11910 (4381->4345, lat 11).
-Adding static hop for route 12756 (10072->4368, lat 5).
-Adding static hop for route 12713 (10068->4366, lat 2).
-Adding static hop for route 12670 (10064->4364, lat 1).
-Adding static hop for route 12627 (10060->4362, lat 9).
-Adding static hop for route 12584 (10056->4360, lat 1).
-Adding static hop for route 12541 (10052->4358, lat 16).
-Adding static hop for route 12498 (10048->4356, lat 14).
+Adding static hop for route 15830 (4398->10022, lat 1).
+Adding static hop for route 11982 (4382->4346, lat 12).
+Error setting daddr = 0
+Adding static hop for route 17075 (4394->10063, lat 3).
+Error setting class = 0
+Adding static hop for route 15713 (4352->4422, lat 7).
+Error setting lat = 4
+Error setting saddr = 20
+Adding static hop for route 15736 (4415->10020, lat 1).
+Error setting daddr = 4
+Adding static hop for route 16783 (4390->10047, lat 9).
+Error setting class = 0
+Adding static hop for route 12414 (4388->4352, lat 5).
+Error setting lat = 1
+Adding static hop for route 11910 (4381->4345, lat 1).
+Error setting saddr = 5
+Adding static hop for route 16020 (4422->10024, lat 1).
+Error setting daddr = 57
+Adding static hop for route 15529 (4348->4418, lat 1).
+Error setting class = 0
+Error setting lat = 7
+Error setting saddr = 1
+Error setting daddr = 2
+Error setting class = 0
+Adding static hop for route 12126 (4384->4348, lat 3).
+Error setting lat = 1
+Adding static hop for route 17049 (10085->10063, lat 5).
+Error setting saddr = 3
+Adding static hop for route 19017 (10090->10089, lat 7).
+Error setting daddr = 4
+Adding static hop for route 17002 (4393->10059, lat 3).
+Error setting class = 1
+Adding static hop for route 16856 (4391->10051, lat 9).
+Error setting lat = 1
+Error setting saddr = 197
+Adding static hop for route 15575 (4349->4419, lat 3).
+Error setting daddr = 244
+Adding static hop for route 17221 (4396->10071, lat 8).
+Error setting class = 0
+Adding static hop for route 15437 (4346->4416, lat 6).
+Error setting lat = 4
+Adding static hop for route 16903 (10081->10055, lat 1).
+Error setting saddr = 24
+Adding static hop for route 17025 (10059->10060, lat 6).
+Error setting daddr = 197
+Adding static hop for route 16710 (4389->10043, lat 5).
+Error setting class = 1
+Adding static hop for route 15974 (10020->10023, lat 4).
+Error setting lat = 14
+Adding static hop for route 12054 (4383->4347, lat 15).
+Error setting saddr = 147
+Error setting daddr = 119
+Adding static hop for route 17244 (10071->10072, lat 4).
+Error setting class = 0
+Adding static hop for route 15483 (4347->4417, lat 1).
+Error setting lat = 6
+Adding static hop for route 17631 (10076->10075, lat 5).
+Error setting saddr = 103
+Adding static hop for route 15926 (4419->10023, lat 5).
+Error setting daddr = 147
+Adding static hop for route 15391 (4345->4415, lat 11).
+Error setting class = 1
+Adding static hop for route 15854 (10017->10022, lat 4).
+Error setting lat = 7
+Adding static hop for route 15879 (10023->10022, lat 8).
+Error setting saddr = 166
+Adding static hop for route 15807 (4418->10020, lat 3).
+Error setting daddr = 150
+Adding static hop for route 18027 (10080->10079, lat 5).
+Error setting class = 0
+Adding static hop for route 15997 (4421->10024, lat 3).
+Error setting lat = 1
+Adding static hop for route 16929 (4392->10055, lat 15).
+Error setting saddr = 86
+Adding static hop for route 18423 (10084->10083, lat 3).
+Error setting daddr = 166
+Adding static hop for route 12198 (4385->4349, lat 3).
+Error setting class = 1
+Adding static hop for route 16879 (10051->10052, lat 12).
+Error setting lat = 5
+Adding static hop for route 16733 (10043->10044, lat 9).
+Error setting saddr = 34
+Error setting daddr = 40
+Error setting class = 0
+Adding static hop for route 15621 (4350->4420, lat 1).
+Error setting lat = 6
+Adding static hop for route 16757 (10077->10047, lat 1).
+Error setting saddr = 35
+Adding static hop for route 17148 (4395->10067, lat 7).
+Error setting daddr = 34
+Adding static hop for route 17171 (10067->10068, lat 6).
+Error setting class = 0
+Adding static hop for route 16806 (10047->10048, lat 1).
+Error setting lat = 1
+Adding static hop for route 15667 (4351->4421, lat 3).
+Error setting saddr = 104
+Adding static hop for route 17829 (10078->10077, lat 3).
+Error setting daddr = 81
+Adding static hop for route 16952 (10055->10056, lat 8).
+Error setting class = 0
+Adding static hop for route 17195 (10089->10071, lat 14).
+Error setting lat = 8
+Adding static hop for route 16830 (10079->10051, lat 9).
+Error setting saddr = 88
+Error setting daddr = 104
+Adding static hop for route 16684 (10075->10043, lat 1).
+Error setting class = 0
+Adding static hop for route 17122 (10087->10067, lat 7).
+Error setting lat = 1
+Adding static hop for route 17098 (10063->10064, lat 1).
+Error setting saddr = 136
+Adding static hop for route 15950 (10024->10023, lat 4).
+Error setting daddr = 209
+Adding static hop for route 15903 (4420->10023, lat 13).
+Error setting class = 0
+Adding static hop for route 14961 (4360->4405, lat 8).
+Error setting lat = 12
+Adding static hop for route 14961 (4360->4406, lat 10).
+Error setting saddr = 52
+Adding static hop for route 15305 (4368->4414, lat 1).
+Error setting daddr = 136
+Adding static hop for route 15305 (4368->4413, lat 5).
+Error setting class = 1
+Error setting lat = 9
+Error setting saddr = 70
+Error setting daddr = 54
+Error setting class = 0
+Error setting lat = 1
+Error setting saddr = 69
+Error setting daddr = 70
+Error setting class = 1
+Error setting lat = 1
+Error setting saddr = 87
+Adding static hop for route 15219 (4366->4411, lat 10).
+Error setting daddr = 18
+Adding static hop for route 15219 (4366->4412, lat 16).
+Error setting class = 0
+Adding static hop for route 14703 (4354->4400, lat 7).
+Error setting lat = 9
+Adding static hop for route 14703 (4354->4399, lat 5).
+Error setting saddr = 71
+Adding static hop for route 14875 (4358->4404, lat 1).
+Error setting daddr = 87
+Adding static hop for route 14875 (4358->4403, lat 5).
+Error setting class = 1
+Error setting lat = 1
+Adding static hop for route 15133 (4364->4410, lat 2).
+Error setting saddr = 39
+Adding static hop for route 15133 (4364->4409, lat 6).
+Error setting daddr = 55
+Adding static hop for route 15047 (4362->4407, lat 3).
+Error setting class = 0
+Adding static hop for route 15047 (4362->4408, lat 3).
+Error setting lat = 1
+Adding static hop for route 14789 (4356->4402, lat 10).
+Error setting saddr = 184
+Error setting daddr = 232
+Error setting class = 0
+Error setting lat = 5
+Error setting saddr = 247
+Error setting daddr = 215
+Error setting class = 0
+Error setting lat = 4
+Adding static hop for route 14789 (4356->4401, lat 2).
+Error setting saddr = 199
+Adding static hop for route 12756 (10072->4368, lat 1).
+Error setting daddr = 247
+Adding static hop for route 12713 (10068->4366, lat 7).
+Error setting class = 0
+Adding static hop for route 12541 (10052->4358, lat 2).
+Error setting lat = 3
 Adding static hop for route 12455 (10044->4354, lat 3).
-Adding static hop for route 12831 (4310->4379, lat 3).
+Error setting saddr = 212
+Adding static hop for route 12498 (10048->4356, lat 4).
+Error setting daddr = 226
+Adding static hop for route 12670 (10064->4364, lat 8).
+Error setting class = 0
+Adding static hop for route 12627 (10060->4362, lat 6).
+Error setting lat = 3
+Adding static hop for route 12584 (10056->4360, lat 5).
+Error setting saddr = 200
+Error setting daddr = 23
+Adding static hop for route 11035 (4313->256, lat 8).
+Error setting class = 0
+Adding static hop for route 11064 (4313->256, lat 8).
+Error setting lat = 14
 Adding static hop for route 12831 (4310->4380, lat 1).
-Adding static hop for route 12831 (4310->4378, lat 7).
-Adding static hop for route 11064 (4313->256, lat 13).
-Adding static hop for route 11035 (4313->256, lat 13).
-Adding static hop for route 16580 (10037->10038, lat 2).
-Adding static hop for route 16523 (4411->10037, lat 1).
-Adding static hop for route 16500 (10035->10036, lat 6).
-Adding static hop for route 16443 (4409->10035, lat 7).
-Adding static hop for route 16420 (10033->10034, lat 6).
-Adding static hop for route 16363 (4407->10033, lat 3).
-Adding static hop for route 16340 (10031->10032, lat 2).
-Adding static hop for route 16283 (4405->10031, lat 3).
-Adding static hop for route 16260 (10029->10030, lat 2).
-Adding static hop for route 16203 (4403->10029, lat 1).
-Adding static hop for route 16180 (10027->10028, lat 4).
+Error setting saddr = 216
+Adding static hop for route 12831 (4310->4379, lat 1).
+Error setting daddr = 200
+Adding static hop for route 12831 (4310->4378, lat 5).
+Error setting class = 0
 Adding static hop for route 16123 (4401->10027, lat 1).
-Adding static hop for route 16100 (10025->10026, lat 2).
-Adding static hop for route 16043 (4399->10025, lat 1).
-Adding static hop for route 11836 (4414->4336, lat 1).
-Adding static hop for route 11809 (4412->4335, lat 3).
-Adding static hop for route 11782 (4410->4334, lat 1).
-Adding static hop for route 11755 (4408->4333, lat 1).
+Error setting lat = 1
+Adding static hop for route 16443 (4409->10035, lat 15).
+Error setting saddr = 114
+Adding static hop for route 11755 (4408->4333, lat 3).
+Error setting daddr = 117
+Adding static hop for route 16180 (10027->10028, lat 2).
+Error setting class = 0
+Adding static hop for route 11782 (4410->4334, lat 15).
+Error setting lat = 5
+Adding static hop for route 16523 (4411->10037, lat 5).
+Error setting saddr = 100
+Adding static hop for route 11836 (4414->4336, lat 9).
+Error setting daddr = 162
+Adding static hop for route 16260 (10029->10030, lat 14).
+Error setting class = 0
+Adding static hop for route 11674 (4402->4330, lat 9).
+Error setting lat = 6
+Adding static hop for route 16283 (4405->10031, lat 3).
+Error setting saddr = 97
+Adding static hop for route 11647 (4400->4329, lat 5).
+Error setting daddr = 100
+Adding static hop for route 16340 (10031->10032, lat 4).
+Error setting class = 0
+Adding static hop for route 16363 (4407->10033, lat 9).
+Error setting lat = 3
 Adding static hop for route 11728 (4406->4332, lat 5).
+Error setting saddr = 182
+Adding static hop for route 16420 (10033->10034, lat 4).
+Error setting daddr = 181
+Adding static hop for route 16500 (10035->10036, lat 4).
+Error setting class = 0
 Adding static hop for route 11701 (4404->4331, lat 3).
-Adding static hop for route 11674 (4402->4330, lat 5).
+Error setting lat = 1
+Adding static hop for route 16603 (4413->10039, lat 1).
+Error setting saddr = 196
+Adding static hop for route 11809 (4412->4335, lat 1).
+Error setting daddr = 149
+Adding static hop for route 16043 (4399->10025, lat 3).
+Error setting class = 0
+Adding static hop for route 16580 (10037->10038, lat 14).
+Error setting lat = 14
+Adding static hop for route 16203 (4403->10029, lat 1).
+Error setting saddr = 116
+Adding static hop for route 16100 (10025->10026, lat 6).
+Error setting daddr = 196
+Adding static hop for route 17409 (4312->10089, lat 3).
+Error setting class = 0
+Error setting lat = 5
+Error setting saddr = 152
+Error setting daddr = 183
+Adding static hop for route 17409 (4312->10087, lat 5).
+Error setting class = 0
+Adding static hop for route 17409 (4312->10085, lat 3).
+Error setting lat = 3
+Error setting saddr = 198
+Adding static hop for route 17409 (4312->10083, lat 9).
+Error setting daddr = 179
+Adding static hop for route 17409 (4312->10079, lat 7).
+Error setting class = 0
+Adding static hop for route 17409 (4312->10077, lat 5).
+Error setting lat = 4
+Adding static hop for route 17409 (4312->10075, lat 1).
+Error setting saddr = 118
+Adding static hop for route 17409 (4312->10073, lat 9).
+Error setting daddr = 198
+Adding static hop for route 17409 (4312->10081, lat 7).
+Error setting class = 0
 Adding static hop for route 11466 (4380->4310, lat 1).
+Error setting lat = 9
 Adding static hop for route 11441 (4397->4310, lat 1).
-Adding static hop for route 16632 (4336->10039, lat 2).
-Adding static hop for route 16552 (4335->10037, lat 4).
+Error setting saddr = 164
+Adding static hop for route 17386 (82->10089, lat 11).
+Error setting daddr = 132
+Adding static hop for route 17386 (82->10087, lat 11).
+Error setting class = 0
+Adding static hop for route 17386 (82->10085, lat 13).
+Error setting class = 0
+Adding static hop for route 17386 (82->10083, lat 3).
+Error setting saddr = 227
+Adding static hop for route 17386 (82->10079, lat 5).
+Error setting daddr = 168
+Adding static hop for route 17386 (82->10077, lat 7).
+Error setting class = 0
+Adding static hop for route 17386 (82->10075, lat 9).
+Error setting lat = 9
+Adding static hop for route 17386 (82->10073, lat 7).
+Error setting saddr = 180
+Adding static hop for route 17386 (82->10081, lat 15).
+Error setting daddr = 164
 Adding static hop for route 16472 (4334->10035, lat 2).
-Adding static hop for route 16392 (4333->10033, lat 4).
-Adding static hop for route 16312 (4332->10031, lat 6).
-Adding static hop for route 16232 (4331->10029, lat 4).
-Adding static hop for route 16152 (4330->10027, lat 2).
-Adding static hop for route 16072 (4329->10025, lat 6).
-Adding static hop for route 12383 (10040->4352, lat 2).
+Error setting class = 0
+Adding static hop for route 16552 (4335->10037, lat 2).
+Error setting lat = 1
+Adding static hop for route 16632 (4336->10039, lat 4).
+Error setting saddr = 230
+Adding static hop for route 16072 (4329->10025, lat 2).
+Error setting daddr = 228
 Adding static hop for route 12311 (10038->4351, lat 4).
-Adding static hop for route 12239 (10036->4350, lat 8).
-Adding static hop for route 12167 (10034->4349, lat 2).
-Adding static hop for route 12095 (10032->4348, lat 2).
-Adding static hop for route 12023 (10030->4347, lat 4).
-Adding static hop for route 11951 (10028->4346, lat 7).
+Error setting class = 0
+Adding static hop for route 11951 (10028->4346, lat 3).
+Error setting lat = 4
+Adding static hop for route 12167 (10034->4349, lat 6).
+Error setting saddr = 56
+Adding static hop for route 16152 (4330->10027, lat 2).
+Error setting daddr = 245
+Adding static hop for route 16232 (4331->10029, lat 8).
+Error setting class = 0
+Adding static hop for route 12383 (10040->4352, lat 4).
+Error setting lat = 15
+Adding static hop for route 12023 (10030->4347, lat 2).
+Error setting saddr = 22
+Adding static hop for route 16312 (4332->10031, lat 2).
+Error setting daddr = 230
 Adding static hop for route 11879 (10026->4345, lat 2).
-Adding static hop for route 11248 (3767->10077, lat 13).
-Adding static hop for route 11248 (3767->4379, lat 15).
-Adding static hop for route 11248 (3767->10086, lat 18).
-Adding static hop for route 11248 (3767->10076, lat 4).
-Adding static hop for route 11248 (3767->10080, lat 4).
-Adding static hop for route 11248 (3767->10079, lat 9).
-Adding static hop for route 11248 (3767->10090, lat 4).
-Adding static hop for route 11248 (3767->10088, lat 18).
-Adding static hop for route 11248 (3767->10084, lat 14).
-Adding static hop for route 11248 (3767->10082, lat 10).
-Adding static hop for route 11248 (3767->10078, lat 12).
-Adding static hop for route 11248 (3767->10017, lat 16).
-Adding static hop for route 11248 (3767->4310, lat 14).
-Adding static hop for route 11248 (3767->10081, lat 11).
-Adding static hop for route 11248 (3767->10085, lat 17).
-Adding static hop for route 11248 (3767->10087, lat 17).
-Adding static hop for route 11248 (3767->10089, lat 5).
-Adding static hop for route 11248 (3767->10075, lat 3).
-Adding static hop for route 11248 (3767->10074, lat 4).
-Adding static hop for route 11248 (3767->4314, lat 8).
-Adding static hop for route 11248 (3767->4313, lat 6).
-Adding static hop for route 11248 (3767->4378, lat 15).
-Adding static hop for route 11248 (3767->10073, lat 5).
-Adding static hop for route 11248 (3767->10083, lat 9).
+Error setting class = 0
+Adding static hop for route 12239 (10036->4350, lat 2).
+Error setting lat = 15
+Adding static hop for route 12095 (10032->4348, lat 6).
+Error setting saddr = 98
+Adding static hop for route 16392 (4333->10033, lat 2).
+Error setting daddr = 113
+Adding static hop for route 11548 (4378->4312, lat 1).
+Error setting class = 0
 Adding static hop for route 17433 (10074->10073, lat 1).
-Adding static hop for route 11548 (4378->4312, lat 5).
-Adding static hop for route 11306 (3767->10077, lat 13).
-Adding static hop for route 11306 (3767->4379, lat 15).
-Adding static hop for route 11306 (3767->10086, lat 18).
-Adding static hop for route 11306 (3767->10076, lat 4).
-Adding static hop for route 11306 (3767->10080, lat 4).
-Adding static hop for route 11306 (3767->10079, lat 9).
-Adding static hop for route 11306 (3767->10090, lat 4).
-Adding static hop for route 11306 (3767->10088, lat 18).
-Adding static hop for route 11306 (3767->10084, lat 14).
-Adding static hop for route 11306 (3767->10082, lat 10).
-Adding static hop for route 11306 (3767->10078, lat 12).
-Adding static hop for route 11306 (3767->10017, lat 16).
-Adding static hop for route 11306 (3767->4310, lat 14).
-Adding static hop for route 11306 (3767->10081, lat 11).
-Adding static hop for route 11306 (3767->10085, lat 17).
-Adding static hop for route 11306 (3767->10087, lat 17).
-Adding static hop for route 11306 (3767->10089, lat 5).
-Adding static hop for route 11306 (3767->10075, lat 3).
-Adding static hop for route 11306 (3767->4314, lat 8).
-Adding static hop for route 11306 (3767->4313, lat 6).
-Adding static hop for route 11306 (3767->4378, lat 15).
-Adding static hop for route 11306 (3767->10083, lat 9).
-Adding static hop for route 11224 (3762->3859, lat 10).
-Adding static hop for route 11141 (10073->3762, lat 8).
-Adding static hop for route 11517 (4311->4312, lat 10).
-Adding static hop for route 11491 (4379->4311, lat 17).
-Adding static hop for route 20032 (3767->10086, lat 18).
-Adding static hop for route 20032 (3767->10076, lat 4).
-Adding static hop for route 20032 (3767->10080, lat 4).
-Adding static hop for route 20032 (3767->10090, lat 4).
-Adding static hop for route 20032 (3767->10088, lat 18).
-Adding static hop for route 20032 (3767->10084, lat 14).
-Adding static hop for route 20032 (3767->10082, lat 10).
-Adding static hop for route 20032 (3767->10078, lat 12).
-Adding static hop for route 20032 (3767->10017, lat 16).
-Adding static hop for route 20032 (3767->10074, lat 4).
-Adding static hop for route 20032 (3767->4314, lat 8).
-Adding static hop for route 11117 (4303->3762, lat 1).
+Error setting lat = 2
+Adding static hop for route 11141 (10073->3762, lat 6).
+Error setting saddr = 210
+Adding static hop for route 11224 (3762->3859, lat 2).
+Error setting daddr = 130
+Adding static hop for route 11491 (4379->4311, lat 7).
+Error setting class = 0
+Adding static hop for route 11517 (4311->4312, lat 2).
+Error setting lat = 9
+Adding static hop for route 11011 (4298->82, lat 1).
+Error setting saddr = 82
 Adding static hop for route 11088 (4303->3762, lat 1).
-Adding static hop for route 11011 (4298->82, lat 5).
-Adding static hop for route 10982 (4298->82, lat 5).
-Adding static hop for route 11623 (3767->4313, lat 6).
-Adding static hop for route 11359 (3767->4303, lat 5).
-Adding static hop for route 11279 (3767->4298, lat 5).
+Error setting daddr = 98
+Adding static hop for route 11117 (4303->3762, lat 1).
+Error setting class = 0
+Adding static hop for route 10982 (4298->82, lat 1).
+Error setting lat = 1
+Adding static hop for route 11248 (3767->10081, lat 9).
+Error setting saddr = 115
+Adding static hop for route 11248 (3767->10090, lat 4).
+Error setting daddr = 2
+Adding static hop for route 11248 (3767->10088, lat 2).
+Error setting class = 2
+Adding static hop for route 11248 (3767->10086, lat 4).
+Error setting lat = 8
+Adding static hop for route 11248 (3767->10084, lat 4).
+Error setting saddr = 51
+Adding static hop for route 11248 (3767->10082, lat 2).
+Error setting daddr = 115
+Adding static hop for route 11248 (3767->10080, lat 2).
+Error setting class = 2
+Adding static hop for route 11248 (3767->10078, lat 6).
+Error setting lat = 4
+Adding static hop for route 11248 (3767->10076, lat 6).
+Error setting saddr = 195
+Adding static hop for route 11248 (3767->10074, lat 4).
+Adding static hop for route 11248 (3767->10017, lat 2).
+Error setting daddr = 194
+Adding static hop for route 11248 (3767->4314, lat 14).
+Error setting class = 0
+Adding static hop for route 11248 (3767->4310, lat 1).
+Error setting lat = 1
+Adding static hop for route 11248 (3767->4313, lat 6).
+Error setting saddr = 246
+Adding static hop for route 11248 (3767->10073, lat 3).
+Error setting daddr = 99
+Adding static hop for route 11248 (3767->4378, lat 5).
+Error setting class = 0
+Adding static hop for route 11248 (3767->4379, lat 1).
+Error setting lat = 12
+Adding static hop for route 11248 (3767->10075, lat 7).
+Error setting saddr = 231
+Adding static hop for route 11248 (3767->10077, lat 5).
+Error setting daddr = 8
+Adding static hop for route 11248 (3767->10079, lat 3).
+Error setting class = 0
+Adding static hop for route 11248 (3767->10083, lat 3).
+Error setting lat = 15
+Adding static hop for route 11248 (3767->10085, lat 7).
+Error setting saddr = 131
+Adding static hop for route 11248 (3767->10087, lat 9).
+Error setting daddr = 134
+Adding static hop for route 11248 (3767->10089, lat 5).
+Error setting class = 0
+Adding static hop for route 11306 (3767->10081, lat 9).
+Error setting lat = 3
+Adding static hop for route 11306 (3767->10090, lat 4).
+Error setting saddr = 148
+Adding static hop for route 11306 (3767->10088, lat 2).
+Error setting daddr = 151
+Adding static hop for route 11306 (3767->10086, lat 4).
+Error setting class = 0
+Error setting lat = 3
+Adding static hop for route 11306 (3767->10084, lat 4).
+Error setting saddr = 229
+Adding static hop for route 11306 (3767->10082, lat 2).
+Error setting daddr = 213
+Adding static hop for route 11306 (3767->10080, lat 2).
+Error setting class = 0
+Adding static hop for route 11306 (3767->10078, lat 6).
+Error setting lat = 1
+Adding static hop for route 11306 (3767->10076, lat 6).
+Error setting saddr = 146
+Adding static hop for route 11306 (3767->10017, lat 2).
+Error setting daddr = 102
+Adding static hop for route 11306 (3767->4310, lat 1).
+Error setting class = 0
+Adding static hop for route 11306 (3767->4313, lat 6).
+Error setting lat = 7
+Adding static hop for route 11306 (3767->4378, lat 5).
+Error setting saddr = 225
+Adding static hop for route 11306 (3767->4379, lat 1).
+Error setting daddr = 145
+Adding static hop for route 11306 (3767->10075, lat 7).
+Error setting class = 0
+Adding static hop for route 11306 (3767->10077, lat 5).
+Error setting lat = 5
+Adding static hop for route 11306 (3767->10079, lat 3).
+Error setting saddr = 167
+Adding static hop for route 11306 (3767->10083, lat 3).
+Error setting daddr = 87
+Adding static hop for route 11306 (3767->10085, lat 7).
+Error setting class = 0
+Adding static hop for route 11306 (3767->10087, lat 9).
+Error setting lat = 5
+Adding static hop for route 11306 (3767->10089, lat 5).
+Error setting saddr = 129
+Adding static hop for route 11306 (3767->4314, lat 14).
+Error setting daddr = 70
+Adding static hop for route 20032 (3767->4314, lat 14).
+Error setting class = 0
+Adding static hop for route 20032 (3767->10090, lat 4).
+Error setting lat = 9
+Adding static hop for route 20032 (3767->10088, lat 2).
+Error setting saddr = 178
+Adding static hop for route 20032 (3767->10086, lat 4).
+Error setting daddr = 136
+Adding static hop for route 20032 (3767->10084, lat 4).
+Error setting class = 0
+Adding static hop for route 20032 (3767->10082, lat 2).
+Error setting lat = 9
+Adding static hop for route 20032 (3767->10080, lat 2).
+Error setting saddr = 242
+Adding static hop for route 20032 (3767->10078, lat 6).
+Error setting daddr = 104
+Adding static hop for route 20032 (3767->10076, lat 6).
+Error setting class = 1
+Adding static hop for route 20032 (3767->10074, lat 4).
+Error setting lat = 15
+Adding static hop for route 20032 (3767->10017, lat 2).
+Error setting saddr = 65
 Adding static hop for route 11198 (3859->3767, lat 7).
+Error setting daddr = 34
+Adding static hop for route 11623 (3767->4313, lat 6).
+Error setting class = 1
+Error setting lat = 3
+Error setting saddr = 165
+Error setting daddr = 166
+Adding static hop for route 11279 (3767->4298, lat 5).
+Error setting class = 0
+Adding static hop for route 11359 (3767->4303, lat 4).
+Error setting lat = 3
 Printing hop routes
-2	11647: X, vc0
-3	11647: W, vc0
-5	16603: S, vc0
-19	11647: N, vc0
-21	16603: S, vc0
-22	17386: X, vc2
+Error setting saddr = 163
+0	11359: X, vc0
+Error setting daddr = 147
+1	14614: X, vc0
+Error setting class = 0
+2	15830: X, vc0
+Error setting lat = 7
+	15854: X, vc1
+Error setting saddr = 193
+	15879: X, vc2
+3	14614: X, vc0
+Error setting daddr = 197
+4	11198: X, vc4
+Error setting class = 0
+	11248: X, vc2
+Error setting lat = 8
+	11306: X, vc3
+Error setting saddr = 21
+	11441: X, vc1
+Error setting daddr = 2
+	11466: X, vc0
+Error setting class = 1
+5	11248: X, vc1
+Error setting lat = 4
+Error setting saddr = 38
+Error setting daddr = 37
+Error setting class = 2
+Error setting lat = 1
+Error setting saddr = 83
+	11306: X, vc2
+Error setting daddr = 71
+Error setting class = 0
+Error setting lat = 5
+	12831: X, vc0
+Error setting saddr = 66
+6	11248: X, vc0
+Error setting daddr = 69
+	11306: X, vc1
+Error setting class = 0
+	20032: X, vc2
+Error setting lat = 3
+7	15483: X, vc0
+Error setting saddr = 6
+8	12023: X, vc1
+Error setting daddr = 52
+	12054: X, vc0
+16	11088: X, vc1
+Error setting class = 0
+	11117: X, vc2
+Error setting lat = 5
+	11141: X, vc0
+Error setting saddr = 19
+	11279: X, vc3
+Error setting daddr = 88
+17	11248: X, vc0
+Error setting class = 0
+	11306: X, vc1
+Error setting lat = 9
+	20032: X, vc2
+Error setting saddr = 68
+18	16733: X, vc0
+Error setting daddr = 35
+19	11248: X, vc0
+Error setting class = 0
+	11306: X, vc1
+Error setting lat = 3
+	20032: X, vc2
+Error setting saddr = 53
+20	12831: X, vc0
+Error setting daddr = 86
+21	11248: X, vc0
+Error setting class = 0
+	11306: X, vc1
+Error setting lat = 3
+	20032: X, vc2
+Error setting saddr = 36
+22	15133: X, vc0
+Error setting daddr = 103
+23	16260: X, vc0
+Error setting class = 0
+24	11248: X, vc3
+Error setting lat = 7
+	11306: X, vc4
+Error setting saddr = 17
+	17386: X, vc2
+Error setting daddr = 24
 	17409: X, vc1
-35	11647: N, vc0
-37	16603: S, vc0
-38	17386: N, vc0
-	17409: N, vc1
-50	17386: X, vc2
+Error setting class = 0
+	19017: X, vc0
+Error setting lat = 7
+32	10982: X, vc2
+Error setting saddr = 194
+	11011: X, vc1
+Error setting daddr = 101
+	12455: X, vc0
+Error setting class = 0
+33	15437: X, vc0
+Error setting lat = 11
+34	16976: X, vc0
+Error setting saddr = 101
+	17002: X, vc1
+Error setting daddr = 85
+35	11248: X, vc3
+Error setting class = 2
+	11306: X, vc4
+Error setting lat = 1
+	17386: X, vc2
+Error setting saddr = 99
 	17409: X, vc1
-51	11647: N, vc0
-53	16603: S, vc0
-54	17386: N, vc0
-	17409: N, vc1
-66	17386: N, vc0
-	17409: N, vc1
-67	11647: N, vc0
-69	16603: S, vc0
+Error setting daddr = 33
+	18423: X, vc0
+Error setting class = 0
+36	11248: X, vc0
+Error setting lat = 6
+	11306: X, vc1
+Error setting saddr = 33
+	20032: X, vc2
+Error setting daddr = 85
+37	11248: X, vc3
+Error setting class = 0
 	17386: X, vc1
+Error setting lat = 7
 	17409: X, vc0
-70	17386: N, vc0
-	17409: N, vc1
-81	17386: S, vc0
-82	17386: NSW, vc0
-	17409: N, vc1
-83	11647: N, vc0
-	17386: W, vc0
-84	17386: W, vc0
-85	16603: S, vc0
-	17386: NW, vc0
-	17409: N, vc1
-86	17386: SNW, vc0
-	17409: N, vc1
-87	17386: SW, vc0
-88	17386: XW, vc0
+Error setting saddr = 8
+	17433: X, vc2
+Error setting daddr = 7
+38	11248: X, vc0
+Error setting class = 0
+	20032: X, vc1
+Error setting lat = 1
+39	11248: X, vc1
+Error setting saddr = 7
+	11306: X, vc2
+Error setting daddr = 85
+	12831: X, vc0
+Error setting class = 1
+40	17025: X, vc0
+Error setting lat = 7
+41	12713: X, vc0
+Error setting saddr = 134
+48	11224: X, vc0
+Error setting daddr = 133
+49	11248: X, vc0
+Error setting class = 0
+	11306: X, vc1
+Error setting lat = 1
+	11623: X, vc2
+Error setting saddr = 133
+50	15713: X, vc0
+Error setting daddr = 85
+51	15997: X, vc1
+Error setting class = 3
+	16020: X, vc0
+Error setting lat = 3
+52	11248: X, vc3
+Error setting saddr = 85
+	11306: X, vc4
+Error setting daddr = 115
+	17386: X, vc2
+Error setting class = 0
 	17409: X, vc1
-89	17386: W, vc0
-97	17386: S, vc0
-98	17386: S, vc0
-	17409: N, vc0
-99	11647: N, vc0
-101	16603: S, vc0
-	17409: N, vc0
-102	17386: S, vc0
-	17409: N, vc0
-103	17386: X, vc2
+Error setting lat = 4
+	18027: X, vc0
+Error setting saddr = 151
+53	11248: X, vc0
+Error setting daddr = 120
+	11306: X, vc1
+Error setting class = 0
+	20032: X, vc2
+Error setting lat = 3
+54	16806: X, vc0
+Error setting saddr = 120
+55	11517: X, vc1
+Error setting daddr = 115
+	11548: X, vc0
+Error setting class = 1
+56	15133: X, vc0
+Error setting lat = 5
+57	11491: X, vc0
+Error setting saddr = 213
+65	13012: X, vc0
+Error setting daddr = 214
+	13036: X, vc1
+Error setting class = 0
+66	11248: X, vc0
+Error setting lat = 1
+	11306: X, vc1
+Error setting saddr = 214
+	20032: X, vc2
+Error setting daddr = 115
+67	12498: X, vc0
+Error setting class = 3
+68	11248: X, vc0
+Error setting lat = 13
+	11306: X, vc1
+Error setting saddr = 102
+	20032: X, vc2
+Error setting daddr = 84
+69	11248: X, vc3
+Error setting class = 0
+	11306: X, vc4
+Error setting lat = 3
+	17386: X, vc2
+Error setting saddr = 84
 	17409: X, vc1
-104	17409: N, vc0
-113	17386: S, vc0
-114	17386: S, vc0
-	17409: N, vc0
-115	11647: N, vc0
-116	16603: S, vc0
-117	16603: W, vc0
-	17409: N, vc0
-118	17386: S, vc0
-	17409: N, vc0
-119	17409: N, vc0
-120	17409: N, vc0
-129	17386: S, vc0
-130	17386: S, vc0
-	17409: N, vc0
-131	11647: N, vc0
-132	16603: X, vc0
+Error setting daddr = 51
+	17829: X, vc0
+Error setting class = 1
+70	16757: X, vc1
+Error setting lat = 3
+	16783: X, vc0
+Error setting saddr = 145
+71	11248: X, vc3
+Error setting daddr = 50
+	11306: X, vc4
+Error setting class = 0
+	17386: X, vc2
+Error setting lat = 7
+	17409: X, vc1
+Error setting saddr = 50
+	17631: X, vc0
+Error setting daddr = 51
+73	12670: X, vc0
+Error setting class = 0
+81	16952: X, vc0
+Error setting lat = 1
+82	14789: X, vc0
+Error setting saddr = 49
+83	11248: X, vc0
+Error setting daddr = 160
+	11306: X, vc1
+Error setting class = 0
+	20032: X, vc2
+Error setting lat = 8
+84	15667: X, vc0
+Error setting saddr = 0
+85	15736: X, vc2
+Error setting daddr = 16
+	15761: X, vc0
+Error setting class = 1
+	15784: X, vc1
+Error setting lat = 1
+	15807: X, vc3
+Error setting saddr = 16
+86	11248: X, vc3
+Error setting daddr = 32
+	11306: X, vc4
+Error setting class = 2
+	17386: X, vc2
+Error setting lat = 1
+	17409: X, vc1
+Error setting saddr = 49
+	18621: X, vc0
+Error setting daddr = 160
+87	16684: X, vc1
+Error setting class = 1
+	16710: X, vc0
+Error setting lat = 8
+88	11248: X, vc3
+Error setting saddr = 0
+	11306: X, vc4
+Error setting daddr = 16
+	17386: X, vc2
+Error setting class = 2
+	17409: X, vc1
+Error setting lat = 1
+	18225: X, vc0
+Error setting saddr = 16
+97	14703: X, vc0
+Error setting daddr = 32
+98	16123: X, vc0
+Error setting class = 1
+	16152: X, vc1
+Error setting lat = 1
+99	11951: X, vc1
+Error setting saddr = 4
+	11982: X, vc0
+Error setting daddr = 21
+100	16043: X, vc0
+Error setting daddr = 38
+	16072: X, vc1
+Error setting daddr = 83
+101	15391: X, vc0
+Error setting daddr = 66
+102	12311: X, vc1
+Error setting daddr = 6
+	12342: X, vc0
+Error setting daddr = 19
+103	11248: X, vc3
+Error setting daddr = 68
+	11306: X, vc4
+Error setting daddr = 53
+	17386: X, vc2
+Error setting daddr = 36
+	17409: X, vc1
+Error setting daddr = 17
+	18819: X, vc0
+Error setting daddr = 177
+104	16903: X, vc0
+Error setting class = 2
+	16929: X, vc1
+Error setting class = 1
+112	16660: E, vc0
+Error setting class = 2
+113	16180: X, vc0
+Error setting class = 2
+Error setting class = 2
+Error setting class = 2
+Error setting class = 2
+	16660: E, vc0
+Error setting class = 2
+114	14703: X, vc0
+Error setting class = 2
 	16660: S, vc0
-133	17409: N, vc0
-134	17386: S, vc0
-	17409: N, vc0
-135	17409: N, vc0
-136	17409: N, vc0
-145	17386: S, vc0
-	17409: S, vc1
-146	17386: X, vc2
-	17409: XNW, vc0
-147	11647: N, vc0
-	17409: W, vc0
-148	16660: S, vc0
-	17409: W, vc0
-149	17409: NEW, vc0
-150	17386: S, vc0
-	17409: SEN, vc0
-151	17409: EN, vc0
-152	17409: N, vc0
-161	17386: XS, vc0
-	17409: XS, vc1
-163	11647: N, vc0
-164	11647: W, vc0
+Error setting class = 2
+115	15903: X, vc3
+Error setting class = 2
+	15926: X, vc1
+Error setting lat = 2
+	15950: X, vc2
+Error setting lat = 4
+	15974: X, vc0
+Error setting lat = 6
+116	15219: X, vc0
+Error setting lat = 6
+117	11647: X, vc0
+Error setting lat = 2
+118	15047: X, vc0
+Error setting lat = 2
+119	17171: X, vc0
+Error setting lat = 4
+120	15575: X, vc0
+Error setting lat = 4
+121	12627: X, vc0
+Error setting lat = 2
+128	16660: N, vc0
+Error setting lat = 4
+129	13012: X, vc0
+Error setting lat = 14
+	13036: X, vc1
+Error setting saddr = 4
+130	11674: X, vc0
+Error setting daddr = 39
+	16660: E, vc0
+Error setting daddr = 5
+131	13012: X, vc0
+Error setting daddr = 20
+	13036: X, vc1
+Error setting class = 0
+	16660: E, vc0
+Error setting class = 0
+132	16660: X, vc0
+Error setting class = 0
+133	15529: X, vc0
+Error setting lat = 5
+134	12095: X, vc1
+Error setting lat = 1
+	12126: X, vc0
+Error setting lat = 1
+136	16830: X, vc1
+Error setting saddr = 177
+	16856: X, vc0
+Error setting daddr = 195
+144	16660: N, vc0
+Error setting daddr = 246
+145	12383: X, vc1
+Error setting daddr = 231
+	12414: X, vc0
+Error setting daddr = 131
+146	13012: X, vc0
+Error setting daddr = 148
+	13036: X, vc1
+Error setting daddr = 229
+147	17122: X, vc1
+Error setting daddr = 146
+	17148: X, vc0
+Error setting daddr = 225
+148	13012: X, vc0
+Error setting daddr = 167
+	13036: X, vc1
+Error setting daddr = 129
+149	16580: X, vc0
+Error setting daddr = 178
+150	17098: X, vc0
+Error setting daddr = 242
+151	12167: X, vc1
+Error setting daddr = 65
+	12198: X, vc0
+Error setting daddr = 165
+152	15047: X, vc0
+Error setting daddr = 163
+160	11035: X, vc0
+Error setting daddr = 193
+	11064: X, vc1
+Error setting class = 1
+	16660: N, vc0
+Error setting class = 1
+161	12584: X, vc0
+162	16100: X, vc0
+163	13012: X, vc0
+Error setting class = 1
+	13036: X, vc1
+Error setting class = 1
+164	16603: X, vc0
+Error setting class = 1
+	16632: X, vc1
+Error setting class = 1
 	16660: S, vc0
-165	11647: W, vc0
-166	11647: W, vc0
-	17386: S, vc0
-	17409: S, vc1
-167	11647: W, vc0
-177	17386: S, vc0
-	17409: S, vc1
-180	16660: S, vc0
-182	17386: S, vc0
-	17409: S, vc1
-193	17386: S, vc0
-	17409: S, vc1
-196	16660: S, vc0
-198	17386: S, vc0
-	17409: S, vc1
-209	17386: S, vc0
-	17409: S, vc1
-212	16660: S, vc0
-214	17386: S, vc0
-	17409: S, vc1
-225	17386: X, vc2
-	17409: X, vc1
-228	16660: X, vc0
-230	17386: S, vc0
-	17409: S, vc1
-246	17386: X, vc2
-	17409: X, vc1
+Error setting class = 1
+165	13012: X, vc0
+Error setting class = 1
+	13036: X, vc1
+Error setting class = 1
+166	17049: X, vc1
+Error setting class = 1
+Error setting class = 1
+Error setting class = 1
+Error setting class = 1
+Error setting class = 1
+	17075: X, vc0
+Error setting class = 1
+167	13012: X, vc0
+Error setting class = 1
+	13036: X, vc1
+Error setting lat = 3
+168	11836: X, vc0
+Error setting lat = 9
+176	16660: N, vc0
+Error setting lat = 11
+177	11248: X, vc0
+Error setting lat = 5
+	11306: X, vc1
+Error setting lat = 5
+	16660: W, vc0
+Error setting lat = 11
+	20032: X, vc2
+Error setting lat = 5
+178	13012: X, vc0
+Error setting lat = 3
+	13036: X, vc1
+Error setting lat = 7
+	16660: W, vc0
+Error setting lat = 7
+179	16420: X, vc0
+Error setting lat = 1
+	16660: W, vc0
+Error setting lat = 5
+180	15305: X, vc0
+Error setting lat = 11
+	16660: W, vc0
+Error setting lat = 5
+181	11809: X, vc0
+Error setting lat = 3
+182	15219: X, vc0
+Error setting lat = 1
+183	11755: X, vc0
+Error setting saddr = 160
+184	14961: X, vc0
+Error setting daddr = 195
+193	13012: X, vc0
+Error setting daddr = 246
+	13036: X, vc1
+Error setting daddr = 231
+194	11879: X, vc1
+Error setting daddr = 131
+	11910: X, vc0
+Error setting daddr = 148
+195	13012: X, vc0
+Error setting daddr = 229
+	13036: X, vc1
+Error setting daddr = 146
+196	16523: X, vc0
+Error setting daddr = 225
+	16552: X, vc1
+Error setting daddr = 167
+197	17195: X, vc1
+Error setting daddr = 129
+	17221: X, vc0
+Error setting daddr = 178
+198	16363: X, vc0
+Error setting daddr = 242
+	16392: X, vc1
+Error setting daddr = 65
+199	14961: X, vc0
+Error setting daddr = 165
+200	16203: X, vc0
+Error setting daddr = 163
+	16232: X, vc1
+Error setting daddr = 193
+209	16879: X, vc0
+Error setting class = 0
+210	14789: X, vc0
+Error setting class = 0
+211	12541: X, vc0
+Error setting class = 0
+212	14875: X, vc0
+Error setting class = 0
+213	12239: X, vc1
+Error setting class = 0
+	12270: X, vc0
+Error setting class = 0
+214	15621: X, vc0
+Error setting class = 0
+215	16340: X, vc0
+Error setting class = 0
+216	14875: X, vc0
+Error setting class = 0
+225	13012: X, vc0
+Error setting class = 0
+	13036: X, vc1
+Error setting class = 0
+226	11701: X, vc0
+Error setting class = 0
+227	15305: X, vc0
+Error setting class = 0
+228	16500: X, vc0
+Error setting class = 0
+229	13012: X, vc0
+Error setting class = 0
+	13036: X, vc1
+Error setting class = 0
+230	16443: X, vc0
+Error setting lat = 5
+	16472: X, vc1
+Error setting lat = 11
+231	13012: X, vc0
+Error setting lat = 13
+	13036: X, vc1
+Error setting lat = 9
+232	11728: X, vc0
+Error setting lat = 9
+Error setting lat = 13
+Error setting lat = 9
+Error setting lat = 5
+Error setting lat = 11
+242	13012: X, vc0
+Error setting lat = 11
+	13036: X, vc1
+Error setting lat = 5
+243	12756: X, vc0
+Error setting lat = 7
+244	17244: X, vc0
+Error setting lat = 15
+245	11782: X, vc0
+Error setting lat = 9
+246	13012: X, vc0
+Error setting lat = 7
+	13036: X, vc1
+Error setting lat = 3
+247	16283: X, vc0
+Error setting saddr = 55
+	16312: X, vc1
+Error setting daddr = 71
 Parsed placement file.
+Set ejection VC at addr 0 to 0
+Error setting daddr = 69
 Link specified in placement file.
+Error setting daddr = 52
 Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 17 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 10 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 9 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 9 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting daddr = 88
 Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting daddr = 35
 Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 10 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 15 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting daddr = 86
 Set lat 1 from 0 to 0
+Error setting daddr = 103
+Set lat 1 from 0 to 0
+Error setting daddr = 24
+Set lat 1 from 0 to 0
+Error setting daddr = 37
+Set lat 1 from 0 to 0
+Error setting class = 1
+Set lat 1 from 0 to 0
+Error setting class = 1
+Set lat 1 from 0 to 0
+Error setting class = 1
+Set lat 1 from 0 to 0
+Error setting class = 1
+Set lat 1 from 0 to 0
+Error setting class = 1
+Set lat 1 from 0 to 0
+Error setting class = 1
+Set lat 1 from 0 to 0
+Error setting class = 1
+Set lat 1 from 0 to 0
+Error setting class = 1
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting lat = 5
+Set lat 1 from 0 to 0
+Error setting lat = 7
+Set ejection VC at addr 4 to 0
+Error setting lat = 7
 Link specified in placement file.
+Error setting lat = 9
 Changing link to static with placed latencies.
+Error setting lat = 3
+Set lat 1 from 0 to 0
+Error setting lat = 5
+Set ejection VC at addr 57 to 0
+Error setting lat = 3
+Link specified in placement file.
+Error setting lat = 9
+Changing link to static with placed latencies.
+Error setting saddr = 32
 Set lat 7 from 0 to 0
+Error setting daddr = 37
+Set ejection VC at addr 2 to 0
+Error setting daddr = 71
 Link specified in placement file.
+Error setting daddr = 69
 Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting daddr = 52
 Set lat 1 from 0 to 0
+Error setting daddr = 88
+Set ejection VC at addr 4 to 1
+Error setting daddr = 35
 Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 11647
-Set exit class for pos 0 to 0 (rt 11647)
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-1 hops for route 11647
-Link specified in placement file.
+Error setting daddr = 86
 Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting daddr = 103
 Set lat 1 from 0 to 0
+Error setting daddr = 24
+Set ejection VC at addr 244 to 0
+Error setting class = 1
 Link specified in placement file.
+Error setting class = 2
 Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
+Error setting class = 2
+Set lat 4 from 0 to 0
+Error setting class = 2
+Set ejection VC at addr 197 to 1
+Error setting class = 2
 Link specified in placement file.
+Error setting class = 2
 Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
+Error setting class = 2
+Set lat 14 from 0 to 0
+Error setting class = 2
+Set ejection VC at addr 119 to 0
+Error setting class = 2
 Link specified in placement file.
+Error setting lat = 7
 Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting lat = 9
 Set lat 6 from 0 to 0
+Error setting lat = 7
+Set ejection VC at addr 147 to 1
+Error setting lat = 5
+Link specified in placement file.
+Error setting lat = 15
+Changing link to static with placed latencies.
+Error setting lat = 3
+Set lat 7 from 0 to 0
+Error setting lat = 13
+Set ejection VC at addr 150 to 0
+Error setting lat = 11
+Link specified in placement file.
+Error setting lat = 11
+Changing link to static with placed latencies.
+Error setting saddr = 2
+Set lat 1 from 0 to 0
+Error setting daddr = 3
+Set ejection VC at addr 166 to 1
+Error setting daddr = 1
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 5 from 0 to 0
+Error setting lat = 1
+Set ejection VC at addr 40 to 0
+Error setting lat = 1
+Link specified in placement file.
+Error setting saddr = 161
+Changing link to static with placed latencies.
+Error setting daddr = 199
+Set lat 6 from 0 to 0
+Error setting daddr = 184
+Set ejection VC at addr 34 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 8
+Set lat 1 from 0 to 0
+Error setting lat = 10
+Set ejection VC at addr 81 to 0
+Error setting saddr = 211
+Link specified in placement file.
+Error setting daddr = 216
+Changing link to static with placed latencies.
+Error setting daddr = 212
+Set lat 8 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 104 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 5
+Changing link to static with placed latencies.
+Error setting lat = 1
+Set lat 1 from 0 to 0
+Error setting saddr = 32
+Set ejection VC at addr 209 to 0
+Error setting daddr = 97
+Link specified in placement file.
+Error setting daddr = 114
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 12 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 136 to 1
+Error setting lat = 5
+Link specified in placement file.
+Error setting lat = 7
+Changing link to static with placed latencies.
+Error setting saddr = 41
+Set lat 9 from 0 to 0
+Error setting daddr = 116
+Set ejection VC at addr 54 to 0
+Error setting daddr = 182
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 10
+Set ejection VC at addr 70 to 1
+Error setting lat = 16
+Link specified in placement file.
+Error setting saddr = 121
+Changing link to static with placed latencies.
+Error setting daddr = 118
+Set lat 1 from 0 to 0
+Error setting daddr = 152
+Set ejection VC at addr 18 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 3
+Set lat 9 from 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 87 to 1
+Error setting saddr = 243
+Link specified in placement file.
+Error setting daddr = 180
+Changing link to static with placed latencies.
+Error setting daddr = 227
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 55 to 0
+Error setting class = 0
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
+Set lat 1 from 0 to 0
+Set ejection VC at addr 232 to 0
+Error setting lat = 5
 Link specified in placement file.
+Error setting lat = 1
+Changing link to static with placed latencies.
+Error setting saddr = 73
+Set lat 5 from 0 to 0
+Error setting daddr = 22
+Set ejection VC at addr 215 to 0
+Error setting daddr = 56
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 4 from 0 to 0
+Error setting lat = 6
+Set ejection VC at addr 247 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 67
+Changing link to static with placed latencies.
+Error setting daddr = 82
+Set lat 3 from 0 to 0
+Error setting daddr = 210
+Set ejection VC at addr 226 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 2
+Set lat 3 from 0 to 0
+Error setting lat = 10
+Set ejection VC at addr 23 to 0
+Error setting saddr = 16
+Link specified in placement file.
+Error setting daddr = 48
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 14 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 200 to 0
+Error setting saddr = 4
+Link specified in placement file.
+Error setting daddr = 21
+Changing link to static with placed latencies.
+Error setting daddr = 38
+Set lat 1 from 0 to 0
+Error setting daddr = 49
+Set ejection VC at addr 117 to 0
+Error setting daddr = 71
+Link specified in placement file.
+Error setting daddr = 69
+Changing link to static with placed latencies.
+Error setting daddr = 52
+Set lat 5 from 0 to 0
+Error setting daddr = 88
+Set ejection VC at addr 162 to 0
+Error setting daddr = 35
+Link specified in placement file.
+Error setting daddr = 86
+Changing link to static with placed latencies.
+Error setting daddr = 103
+Set lat 6 from 0 to 0
+Error setting daddr = 24
+Set ejection VC at addr 100 to 0
+Error setting daddr = 83
+Link specified in placement file.
+Error setting daddr = 66
+Changing link to static with placed latencies.
+Error setting daddr = 6
+Set lat 3 from 0 to 0
+Error setting daddr = 19
+Set ejection VC at addr 181 to 0
+Error setting daddr = 68
+Link specified in placement file.
+Error setting daddr = 53
+Changing link to static with placed latencies.
+Error setting daddr = 36
+Set lat 1 from 0 to 0
+Error setting daddr = 17
+Set ejection VC at addr 149 to 0
+Error setting daddr = 39
+Link specified in placement file.
+Error setting daddr = 5
+Changing link to static with placed latencies.
+Error setting daddr = 4
+Set lat 14 from 0 to 0
+Error setting daddr = 177
+Set ejection VC at addr 196 to 0
+Error setting daddr = 37
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 5 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 183 to 0
+Error setting class = 3
+Link specified in placement file.
+Error setting class = 3
+Changing link to static with placed latencies.
+Error setting class = 3
+Set lat 3 from 0 to 0
+Error setting class = 3
+Set ejection VC at addr 179 to 0
+Error setting class = 3
+Link specified in placement file.
+Error setting class = 3
+Changing link to static with placed latencies.
+Error setting class = 3
+Set lat 4 from 0 to 0
+Error setting class = 3
+Set ejection VC at addr 198 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 9 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 132 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
 Updating dynamic link exit VCs.
+Error setting class = 0
 1 hops for route 16660
+Error setting class = 0
 1 hops for route 16660
+Error setting class = 1
 1 hops for route 16660
+Error setting class = 1
 1 hops for route 16660
+Error setting class = 2
 1 hops for route 16660
+Error setting class = 0
 1 hops for route 16660
+Error setting class = 3
 1 hops for route 16660
+Error setting lat = 2
 Set exit class for pos 0 to 0 (rt 16660)
+Error setting lat = 4
+1 hops for route 16660
+Error setting lat = 6
+1 hops for route 16660
+Error setting lat = 7
+1 hops for route 16660
+Error setting lat = 5
+1 hops for route 16660
+Error setting lat = 3
+1 hops for route 16660
+Error setting lat = 9
+1 hops for route 16660
+Error setting lat = 3
+1 hops for route 16660
+Error setting lat = 7
+1 hops for route 16660
+Error setting lat = 9
+Set ejection VC at addr 168 to 0
+Error setting lat = 5
 Link specified in placement file.
+Error setting lat = 6
 Changing link to static with placed latencies.
+Error setting lat = 6
+Set lat 9 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 164 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting lat = 4
+Changing link to static with placed latencies.
+Error setting lat = 4
 Set lat 1 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 228 to 0
+Error setting lat = 4
+Error setting lat = 5
 Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 16603
-1 hops for route 16603
-1 hops for route 16603
-1 hops for route 16603
-1 hops for route 16603
-1 hops for route 16603
-1 hops for route 16603
-1 hops for route 16603
-1 hops for route 16603
-1 hops for route 16603
-Set exit class for pos 0 to 0 (rt 16603)
-Link specified in placement file.
+Error setting lat = 1
 Changing link to static with placed latencies.
-Set lat 6 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting lat = 1
 Set lat 4 from 0 to 0
+Error setting lat = 14
+Set ejection VC at addr 245 to 0
+Error setting lat = 3
+Link specified in placement file.
+Error setting saddr = 48
+Changing link to static with placed latencies.
+Error setting daddr = 4
+Set lat 15 from 0 to 0
+Error setting class = 4
+Set ejection VC at addr 230 to 0
+Error setting lat = 7
+Link specified in placement file.
+Error setting saddr = 4
+Changing link to static with placed latencies.
+Error setting daddr = 16
+Set lat 15 from 0 to 0
+Error setting class = 3
+Set ejection VC at addr 113 to 0
+Error setting lat = 5
+Link specified in placement file.
+Error setting saddr = 4
+Changing link to static with placed latencies.
+Error setting daddr = 49
+Set lat 2 from 0 to 0
+Error setting class = 2
+Set ejection VC at addr 130 to 0
+Error setting lat = 6
+Link specified in placement file.
+Error setting saddr = 37
+Changing link to static with placed latencies.
+Error setting daddr = 16
+Set lat 9 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 98 to 0
+Error setting lat = 6
+Link specified in placement file.
+Error setting saddr = 4
+Changing link to static with placed latencies.
+Error setting daddr = 21
+Set lat 1 from 0 to 0
+Error setting daddr = 49
+Set ejection VC at addr 2 to 2
+Error setting daddr = 71
+Link specified in placement file.
+Error setting daddr = 69
+Changing link to static with placed latencies.
+Error setting daddr = 52
+Set lat 8 from 0 to 0
+Error setting daddr = 88
+Set ejection VC at addr 115 to 2
+Error setting daddr = 35
+Link specified in placement file.
+Error setting daddr = 86
+Changing link to static with placed latencies.
+Error setting daddr = 103
+Set lat 4 from 0 to 0
+Error setting daddr = 24
+Set ejection VC at addr 194 to 0
+Error setting daddr = 83
+Link specified in placement file.
+Error setting daddr = 66
+Changing link to static with placed latencies.
+Error setting daddr = 6
+Set lat 1 from 0 to 0
+Error setting daddr = 19
+Set ejection VC at addr 99 to 0
+Error setting daddr = 68
+Link specified in placement file.
+Error setting daddr = 53
+Changing link to static with placed latencies.
+Error setting daddr = 36
+Set lat 12 from 0 to 0
+Error setting daddr = 17
+Set ejection VC at addr 8 to 0
+Error setting daddr = 39
+Link specified in placement file.
+Error setting daddr = 5
+Changing link to static with placed latencies.
+Error setting daddr = 4
+Set lat 15 from 0 to 0
+Error setting daddr = 177
+Set ejection VC at addr 134 to 0
+Error setting class = 1
+Link specified in placement file.
+Error setting class = 1
+Changing link to static with placed latencies.
+Error setting class = 4
+Set lat 3 from 0 to 0
+Error setting class = 4
+Set ejection VC at addr 151 to 0
+Error setting class = 4
+Link specified in placement file.
+Error setting class = 4
+Changing link to static with placed latencies.
+Error setting class = 4
+Set lat 3 from 0 to 0
+Error setting class = 4
+Set ejection VC at addr 213 to 0
+Error setting class = 4
+Link specified in placement file.
+Error setting class = 4
+Changing link to static with placed latencies.
+Error setting class = 1
+Set lat 1 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 102 to 0
+Error setting class = 1
+Link specified in placement file.
+Error setting class = 1
+Changing link to static with placed latencies.
+Error setting class = 1
+Set lat 7 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 145 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 5 from 0 to 0
+Set ejection VC at addr 87 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
+Error setting class = 1
+Set lat 5 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 70 to 0
+Error setting class = 2
 Link specified in placement file.
+Error setting class = 2
 Changing link to static with placed latencies.
-Set lat 6 from 0 to 0
+Error setting class = 3
+Set lat 9 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 136 to 0
+Error setting lat = 2
 Link specified in placement file.
+Error setting lat = 6
 Changing link to static with placed latencies.
+Error setting lat = 7
+Set lat 9 from 0 to 0
+Error setting lat = 5
+Set ejection VC at addr 104 to 1
+Error setting lat = 3
+Link specified in placement file.
+Error setting lat = 9
+Changing link to static with placed latencies.
+Error setting lat = 3
+Set lat 15 from 0 to 0
+Error setting lat = 7
+Set ejection VC at addr 34 to 1
+Error setting lat = 9
+Link specified in placement file.
+Error setting lat = 5
+Changing link to static with placed latencies.
+Error setting lat = 6
+Set lat 3 from 0 to 0
+Error setting lat = 6
+Set ejection VC at addr 166 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting lat = 2
+Changing link to static with placed latencies.
+Error setting lat = 4
+Set lat 3 from 0 to 0
+Error setting lat = 4
+Set ejection VC at addr 147 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting lat = 4
+Changing link to static with placed latencies.
+Error setting lat = 5
+Set lat 7 from 0 to 0
+Error setting lat = 1
+Set ejection VC at addr 197 to 0
+Error setting lat = 1
+Link specified in placement file.
+Error setting lat = 14
+Changing link to static with placed latencies.
+Error setting saddr = 57
+Set lat 8 from 0 to 0
+Error setting daddr = 55
+Set ejection VC at addr 2 to 1
+Error setting class = 1
+Link specified in placement file.
+Error setting lat = 2
+Changing link to static with placed latencies.
+Error setting saddr = 81
 Set lat 4 from 0 to 0
+Error setting daddr = 161
+Set ejection VC at addr 37 to 2
+Error setting class = 0
 Link specified in placement file.
+Error setting lat = 5
 Changing link to static with placed latencies.
+Error setting saddr = 215
+Set lat 1 from 0 to 0
+Error setting daddr = 134
+Error setting class = 1
+Set ejection VC at addr 71 to 0
+Error setting lat = 6
+Link specified in placement file.
+Error setting saddr = 23
+Changing link to static with placed latencies.
+Error setting daddr = 8
+Set lat 5 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 69 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 209
+Changing link to static with placed latencies.
+Error setting daddr = 211
+Set lat 3 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 52 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 162
+Changing link to static with placed latencies.
+Error setting daddr = 194
+Set lat 5 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 88 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 18
+Changing link to static with placed latencies.
+Error setting daddr = 32
+Set lat 9 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 35 to 0
+Error setting lat = 3
+Link specified in placement file.
+Error setting saddr = 149
+Changing link to static with placed latencies.
+Error setting daddr = 102
+Set lat 3 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 86 to 0
+Error setting lat = 4
+Link specified in placement file.
+Error setting saddr = 119
+Changing link to static with placed latencies.
+Error setting daddr = 41
+Set lat 3 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 103 to 0
+Error setting lat = 7
+Link specified in placement file.
+Error setting saddr = 179
+Changing link to static with placed latencies.
+Error setting daddr = 151
+Set lat 7 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 24 to 0
+Error setting lat = 6
+Link specified in placement file.
+Error setting saddr = 40
+Changing link to static with placed latencies.
+Error setting daddr = 121
+Set lat 7 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 101 to 0
+Error setting lat = 6
+Link specified in placement file.
+Error setting saddr = 232
+Changing link to static with placed latencies.
+Error setting daddr = 247
 Set lat 11 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 85 to 2
+Error setting lat = 2
 Link specified in placement file.
+Error setting saddr = 226
 Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting daddr = 200
 Set lat 1 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 33 to 0
+Error setting lat = 8
 Link specified in placement file.
+Error setting saddr = 117
 Changing link to static with placed latencies.
-Set lat 17 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 11 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 13 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 13 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 16 from 0 to 0
-Set lat 4 from 0 to 1
-Set lat 4 from 0 to 2
-Set lat 12 from 0 to 3
-Set lat 4 from 0 to 4
-Set lat 10 from 0 to 5
-Set lat 14 from 0 to 6
-Set lat 18 from 0 to 7
-Set lat 18 from 0 to 8
-Set lat 4 from 0 to 9
-Set lat 8 from 0 to 10
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Set lat 3 from 0 to 1
-Set lat 1 from 0 to 2
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Set lat 3 from 0 to 1
-Set lat 9 from 0 to 2
-Set lat 11 from 0 to 3
-Set lat 9 from 0 to 4
-Set lat 7 from 0 to 5
-Set lat 9 from 0 to 6
-Set lat 11 from 0 to 7
-Set lat 7 from 0 to 8
-Set lat 3 from 0 to 9
-Set lat 9 from 0 to 10
-Set lat 7 from 0 to 11
-Set lat 5 from 0 to 12
-Set lat 3 from 0 to 13
-Set lat 1 from 0 to 14
-Set lat 5 from 0 to 15
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 10 from 0 to 0
-Set lat 12 from 0 to 1
-Set lat 10 from 0 to 2
-Set lat 12 from 0 to 3
-Set lat 14 from 0 to 4
-Set lat 12 from 0 to 5
-Set lat 2 from 0 to 6
-Set lat 16 from 0 to 7
-Set lat 8 from 0 to 8
-Set lat 8 from 0 to 9
-Set lat 14 from 0 to 10
-Set lat 4 from 0 to 11
-Set lat 4 from 0 to 12
-Set lat 6 from 0 to 13
-Set lat 8 from 0 to 14
-Set lat 4 from 0 to 15
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 17409
-Set exit class for pos 0 to 1 (rt 17409)
-1 hops for route 17409
-1 hops for route 17409
-Set exit class for pos 7 to 1 (rt 17409)
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-Set exit class for pos 8 to 0 (rt 17409)
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-Set exit class for pos 4 to 1 (rt 17409)
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-Set exit class for pos 2 to 1 (rt 17409)
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-3 hops for route 17409
-Set exit class for pos 3 to 1 (rt 17409)
-1 hops for route 17409
-1 hops for route 17409
-3 hops for route 17409
-3 hops for route 17409
-2 hops for route 17409
-1 hops for route 17409
-2 hops for route 17409
-Set exit class for pos 1 to 1 (rt 17409)
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-1 hops for route 17409
-Set exit class for pos 5 to 1 (rt 17409)
-1 hops for route 17409
-1 hops for route 17409
-Set exit class for pos 6 to 1 (rt 17409)
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 17386
-Set exit class for pos 1 to 2 (rt 17386)
-1 hops for route 17386
-1 hops for route 17386
-Set exit class for pos 8 to 2 (rt 17386)
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-Set exit class for pos 0 to 1 (rt 17386)
-1 hops for route 17386
-1 hops for route 17386
-3 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-2 hops for route 17386
-3 hops for route 17386
-2 hops for route 17386
-2 hops for route 17386
-Set exit class for pos 5 to 2 (rt 17386)
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-Set exit class for pos 3 to 2 (rt 17386)
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-Set exit class for pos 4 to 2 (rt 17386)
-1 hops for route 17386
-2 hops for route 17386
-Set exit class for pos 2 to 2 (rt 17386)
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-1 hops for route 17386
-Set exit class for pos 6 to 2 (rt 17386)
-1 hops for route 17386
-1 hops for route 17386
-Set exit class for pos 7 to 2 (rt 17386)
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Set lat 3 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 10 from 0 to 0
-Set lat 2 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Set lat 1 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Set lat 7 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 3 from 0 to 0
-Set lat 5 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting daddr = 100
 Set lat 6 from 0 to 0
-Set lat 4 from 0 to 1
+Error setting class = 1
+Set ejection VC at addr 85 to 0
+Error setting lat = 2
 Link specified in placement file.
+Error setting saddr = 181
 Changing link to static with placed latencies.
-Set lat 5 from 0 to 0
-Set lat 3 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting daddr = 196
 Set lat 7 from 0 to 0
-Set lat 7 from 0 to 1
+Error setting class = 1
+Set ejection VC at addr 7 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 183
+Changing link to static with placed latencies.
+Error setting daddr = 198
+Set lat 1 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 85 to 1
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 132
+Changing link to static with placed latencies.
+Error setting daddr = 145
+Set lat 7 from 0 to 0
+Set ejection VC at addr 133 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
+Error setting class = 1
+Set lat 1 from 0 to 0
+Error setting lat = 4
+Set ejection VC at addr 85 to 3
+Error setting saddr = 168
+Link specified in placement file.
+Error setting daddr = 164
+Changing link to static with placed latencies.
+Error setting class = 1
+Set lat 3 from 0 to 0
+Error setting lat = 4
+Set ejection VC at addr 115 to 0
+Error setting saddr = 244
+Link specified in placement file.
+Error setting daddr = 243
+Changing link to static with placed latencies.
+Error setting class = 0
 Set lat 4 from 0 to 0
-Set lat 4 from 0 to 1
+Error setting lat = 1
+Set ejection VC at addr 120 to 0
+Error setting saddr = 228
+Link specified in placement file.
+Error setting daddr = 213
+Changing link to static with placed latencies.
+Error setting class = 1
+Set lat 3 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 115 to 1
+Error setting saddr = 245
+Link specified in placement file.
+Error setting daddr = 230
+Changing link to static with placed latencies.
+Error setting class = 1
+Set lat 5 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 214 to 0
+Error setting saddr = 150
+Link specified in placement file.
+Error setting daddr = 73
+Changing link to static with placed latencies.
+Error setting class = 0
 Set lat 1 from 0 to 0
+Error setting lat = 8
+Set ejection VC at addr 115 to 3
+Error setting saddr = 113
+Link specified in placement file.
+Error setting daddr = 99
+Changing link to static with placed latencies.
+Error setting class = 1
+Set lat 13 from 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 84 to 0
+Error setting saddr = 130
+Link specified in placement file.
+Error setting daddr = 98
+Changing link to static with placed latencies.
+Error setting class = 1
+Set lat 3 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 51 to 1
+Error setting saddr = 54
+Link specified in placement file.
+Error setting daddr = 67
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 3 from 0 to 0
+Error setting lat = 4
+Set ejection VC at addr 50 to 0
+== Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
+Link specified in placement file.
+== Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
+Changing link to static with placed latencies.
+===== MemorySystem 0 =====
+Set lat 7 from 0 to 0
+CH. 0 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set ejection VC at addr 51 to 0
+===== MemorySystem 1 =====
+Link specified in placement file.
+CH. 1 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Changing link to static with placed latencies.
+===== MemorySystem 2 =====
 Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 1 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
+CH. 2 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set ejection VC at addr 160 to 0
+===== MemorySystem 3 =====
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 10 from 0 to 0
+Set lat 8 from 0 to 0
+Set ejection VC at addr 16 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 16 from 0 to 0
+CH. 3 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set lat 1 from 0 to 0
+Set ejection VC at addr 32 to 2
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set ejection VC at addr 160 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 8 from 0 to 0
+Set ejection VC at addr 16 to 2
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 32 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 21 to 2
+Set ejection VC at addr 38 to 1
+Set ejection VC at addr 83 to 2
+Set ejection VC at addr 66 to 2
+Set ejection VC at addr 6 to 2
+Set ejection VC at addr 19 to 2
+Set ejection VC at addr 68 to 2
+Set ejection VC at addr 53 to 2
+Set ejection VC at addr 36 to 2
+Set ejection VC at addr 17 to 2
+Set ejection VC at addr 177 to 2
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
 Set lat 4 from 0 to 1
 Set lat 6 from 0 to 2
-Set lat 3 from 0 to 3
-Set lat 13 from 0 to 4
-Set lat 9 from 0 to 5
-Set lat 11 from 0 to 6
-Set lat 9 from 0 to 7
-Set lat 17 from 0 to 8
-Set lat 17 from 0 to 9
-Set lat 5 from 0 to 10
-Set lat 4 from 0 to 11
-Set lat 12 from 0 to 12
-Set lat 4 from 0 to 13
-Set lat 10 from 0 to 14
-Set lat 14 from 0 to 15
-Set lat 18 from 0 to 16
-Set lat 18 from 0 to 17
-Set lat 4 from 0 to 18
-Set lat 15 from 0 to 19
-Set lat 15 from 0 to 20
-Set lat 14 from 0 to 21
-Set lat 8 from 0 to 22
-Set lat 5 from 0 to 23
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
+Set lat 6 from 0 to 3
+Set lat 2 from 0 to 4
+Set lat 2 from 0 to 5
+Set lat 4 from 0 to 6
+Set lat 4 from 0 to 7
+Set lat 2 from 0 to 8
+Set lat 4 from 0 to 9
+Set lat 14 from 0 to 10
+Set ejection VC at addr 39 to 0
+Set ejection VC at addr 5 to 0
+Set ejection VC at addr 20 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 6 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 8 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 16 from 0 to 0
-Set lat 6 from 0 to 1
-Set lat 3 from 0 to 2
-Set lat 13 from 0 to 3
-Set lat 9 from 0 to 4
-Set lat 11 from 0 to 5
-Set lat 9 from 0 to 6
-Set lat 17 from 0 to 7
-Set lat 17 from 0 to 8
-Set lat 5 from 0 to 9
-Set lat 4 from 0 to 10
-Set lat 12 from 0 to 11
-Set lat 4 from 0 to 12
-Set lat 10 from 0 to 13
-Set lat 14 from 0 to 14
-Set lat 18 from 0 to 15
-Set lat 18 from 0 to 16
-Set lat 4 from 0 to 17
-Set lat 15 from 0 to 18
-Set lat 15 from 0 to 19
-Set lat 14 from 0 to 20
-Set lat 8 from 0 to 21
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 10 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 16 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
+Set lat 1 from 0 to 1
+Set lat 1 from 0 to 2
+Set ejection VC at addr 195 to 1
+Set ejection VC at addr 246 to 1
+Set ejection VC at addr 231 to 1
+Set ejection VC at addr 131 to 1
+Set ejection VC at addr 148 to 1
+Set ejection VC at addr 229 to 1
+Set ejection VC at addr 146 to 1
+Set ejection VC at addr 225 to 1
+Set ejection VC at addr 167 to 1
+Set ejection VC at addr 129 to 1
+Set ejection VC at addr 178 to 1
+Set ejection VC at addr 242 to 1
+Set ejection VC at addr 65 to 1
+Set ejection VC at addr 165 to 1
+Set ejection VC at addr 163 to 1
+Set ejection VC at addr 193 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 3 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 9 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 6 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 6 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
+Set lat 9 from 0 to 1
+Set lat 11 from 0 to 2
+Set lat 5 from 0 to 3
+Set lat 5 from 0 to 4
+Set lat 11 from 0 to 5
+Set lat 5 from 0 to 6
+Set lat 3 from 0 to 7
+Set lat 7 from 0 to 8
+Set lat 7 from 0 to 9
+Set lat 1 from 0 to 10
+Set lat 5 from 0 to 11
+Set lat 11 from 0 to 12
+Set lat 5 from 0 to 13
+Set lat 3 from 0 to 14
+Set lat 1 from 0 to 15
+Set ejection VC at addr 195 to 0
+Set ejection VC at addr 246 to 0
+Set ejection VC at addr 231 to 0
+Set ejection VC at addr 131 to 0
+Set ejection VC at addr 148 to 0
+Set ejection VC at addr 229 to 0
+Set ejection VC at addr 146 to 0
+Set ejection VC at addr 225 to 0
+Set ejection VC at addr 167 to 0
+Set ejection VC at addr 129 to 0
+Set ejection VC at addr 178 to 0
+Set ejection VC at addr 242 to 0
+Set ejection VC at addr 65 to 0
+Set ejection VC at addr 165 to 0
+Set ejection VC at addr 163 to 0
+Set ejection VC at addr 193 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 8 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
+Set lat 11 from 0 to 1
+Set lat 13 from 0 to 2
+Set lat 9 from 0 to 3
+Set lat 9 from 0 to 4
+Set lat 13 from 0 to 5
+Set lat 9 from 0 to 6
+Set lat 5 from 0 to 7
+Set lat 11 from 0 to 8
+Set lat 11 from 0 to 9
+Set lat 5 from 0 to 10
+Set lat 7 from 0 to 11
+Set lat 15 from 0 to 12
+Set lat 9 from 0 to 13
+Set lat 7 from 0 to 14
+Set lat 3 from 0 to 15
+Set ejection VC at addr 71 to 1
+Set ejection VC at addr 69 to 1
+Set ejection VC at addr 52 to 1
+Set ejection VC at addr 88 to 1
+Set ejection VC at addr 35 to 1
+Set ejection VC at addr 86 to 1
+Set ejection VC at addr 103 to 1
+Set ejection VC at addr 24 to 1
+Set ejection VC at addr 37 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 1 from 0 to 0
+Set lat 5 from 0 to 1
+Set lat 7 from 0 to 2
+Set lat 7 from 0 to 3
+Set lat 9 from 0 to 4
+Set lat 3 from 0 to 5
+Set lat 5 from 0 to 6
+Set lat 3 from 0 to 7
+Set lat 9 from 0 to 8
+Set ejection VC at addr 37 to 1
+Set ejection VC at addr 71 to 2
+Set ejection VC at addr 69 to 2
+Set ejection VC at addr 52 to 2
+Set ejection VC at addr 88 to 2
+Set ejection VC at addr 35 to 2
+Set ejection VC at addr 86 to 2
+Set ejection VC at addr 103 to 2
+Set ejection VC at addr 24 to 2
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 7 from 0 to 0
+Set lat 9 from 0 to 1
+Set lat 7 from 0 to 2
+Set lat 5 from 0 to 3
+Set lat 15 from 0 to 4
+Set lat 3 from 0 to 5
+Set lat 13 from 0 to 6
+Set lat 11 from 0 to 7
+Set lat 11 from 0 to 8
+Set ejection VC at addr 3 to 0
+Set ejection VC at addr 1 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 199 to 0
+Set ejection VC at addr 184 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 8 from 0 to 0
+Set lat 10 from 0 to 1
+Set ejection VC at addr 216 to 0
+Set ejection VC at addr 212 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 97 to 0
+Set ejection VC at addr 114 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Set lat 7 from 0 to 1
+Set ejection VC at addr 116 to 0
+Set ejection VC at addr 182 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 10 from 0 to 0
+Set lat 16 from 0 to 1
+Set ejection VC at addr 118 to 0
+Set ejection VC at addr 152 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set lat 3 from 0 to 1
+Set ejection VC at addr 180 to 0
+Set ejection VC at addr 227 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 22 to 0
+Set ejection VC at addr 56 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Set lat 2 from 0 to 1
+Set ejection VC at addr 82 to 0
+Set ejection VC at addr 210 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 2 from 0 to 0
+Set lat 10 from 0 to 1
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 1 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set ejection VC at addr 48 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 14 from 0 to 0
-Child process has pid 9124
+Set lat 2 from 0 to 0
+Set ejection VC at addr 21 to 0
+Set ejection VC at addr 38 to 0
+Set ejection VC at addr 49 to 0
+Set ejection VC at addr 71 to 3
+Set ejection VC at addr 69 to 3
+Set ejection VC at addr 52 to 3
+Set ejection VC at addr 88 to 3
+Set ejection VC at addr 35 to 3
+Set ejection VC at addr 86 to 3
+Set ejection VC at addr 103 to 3
+Set ejection VC at addr 24 to 3
+Set ejection VC at addr 83 to 0
+Set ejection VC at addr 66 to 0
+Set ejection VC at addr 6 to 0
+Set ejection VC at addr 19 to 0
+Set ejection VC at addr 68 to 0
+Set ejection VC at addr 53 to 0
+Set ejection VC at addr 36 to 0
+Set ejection VC at addr 17 to 0
+Set ejection VC at addr 39 to 1
+Set ejection VC at addr 5 to 1
+Set ejection VC at addr 4 to 2
+Set ejection VC at addr 177 to 0
+Set ejection VC at addr 37 to 3
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 4 from 0 to 1
+Set lat 6 from 0 to 2
+Set lat 7 from 0 to 3
+Set lat 5 from 0 to 4
+Set lat 3 from 0 to 5
+Set lat 9 from 0 to 6
+Set lat 3 from 0 to 7
+Set lat 7 from 0 to 8
+Set lat 9 from 0 to 9
+Set lat 5 from 0 to 10
+Set lat 6 from 0 to 11
+Set lat 6 from 0 to 12
+Set lat 2 from 0 to 13
+Set lat 2 from 0 to 14
+Set lat 4 from 0 to 15
+Set lat 4 from 0 to 16
+Set lat 2 from 0 to 17
+Set lat 4 from 0 to 18
+Set lat 5 from 0 to 19
+Set lat 1 from 0 to 20
+Set lat 1 from 0 to 21
+Set lat 14 from 0 to 22
+Set lat 3 from 0 to 23
+Set ejection VC at addr 4 to 4
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 7 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set ejection VC at addr 16 to 3
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Set ejection VC at addr 49 to 2
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Set ejection VC at addr 16 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Set ejection VC at addr 21 to 1
+Set ejection VC at addr 49 to 1
+Set ejection VC at addr 71 to 4
+Set ejection VC at addr 69 to 4
+Set ejection VC at addr 52 to 4
+Set ejection VC at addr 88 to 4
+Set ejection VC at addr 35 to 4
+Set ejection VC at addr 86 to 4
+Set ejection VC at addr 103 to 4
+Set ejection VC at addr 24 to 4
+Set ejection VC at addr 83 to 1
+Set ejection VC at addr 66 to 1
+Set ejection VC at addr 6 to 1
+Set ejection VC at addr 19 to 1
+Set ejection VC at addr 68 to 1
+Set ejection VC at addr 53 to 1
+Set ejection VC at addr 36 to 1
+Set ejection VC at addr 17 to 1
+Set ejection VC at addr 39 to 2
+Set ejection VC at addr 5 to 2
+Set ejection VC at addr 4 to 3
+Set ejection VC at addr 177 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 6 from 0 to 1
+Set lat 7 from 0 to 2
+Set lat 5 from 0 to 3
+Set lat 3 from 0 to 4
+Set lat 9 from 0 to 5
+Set lat 3 from 0 to 6
+Set lat 7 from 0 to 7
+Set lat 9 from 0 to 8
+Set lat 5 from 0 to 9
+Set lat 6 from 0 to 10
+Set lat 6 from 0 to 11
+Set lat 2 from 0 to 12
+Set lat 2 from 0 to 13
+Set lat 4 from 0 to 14
+Set lat 4 from 0 to 15
+Set lat 2 from 0 to 16
+Set lat 4 from 0 to 17
+Set lat 5 from 0 to 18
+Set lat 1 from 0 to 19
+Set lat 1 from 0 to 20
+Set lat 14 from 0 to 21
+Set ejection VC at addr 55 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 161 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Set ejection VC at addr 134 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Set ejection VC at addr 8 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 211 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 194 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 32 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set ejection VC at addr 102 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Set ejection VC at addr 41 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 7 from 0 to 0
+Set ejection VC at addr 151 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Set ejection VC at addr 121 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Set ejection VC at addr 247 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 200 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 8 from 0 to 0
+Set ejection VC at addr 100 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 196 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 198 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 145 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Set ejection VC at addr 164 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Set ejection VC at addr 243 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 213 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 230 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 73 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 8 from 0 to 0
+Set ejection VC at addr 99 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set ejection VC at addr 98 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 67 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Child process has pid -31679
 Parsed definitions of all elements.
 Total of 216 links:
   0: DramAddress3710
@@ -2202,13 +3419,39 @@ Total of 200 nodes:
   176: CE23894
     [TokenIn18767 *256 /1] [RetimingFIFO5889_RetimingFIFO5997_RetimingFIFO6105_RetimingFIFO6213_RetimingFIFO6321_RetimingFIFO5943_RetimingFIFO6051_RetimingFIFO6159_RetimingFIFO6267 *1 /1]  => [SRAM22] 
   177: CE23956
-    [RetimingFIFO5019_Retimt lat 7 from 0 to 0
+    [RetimingFIFO5019_Retim1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Set ejection VC at addr 243 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 213 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 2 from 0 to 0
+Set ejection VC at addr 230 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 14 from 0 to 0
+Set lat 2 from 0 to 0
+DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
+Set ejection VC at addr 73 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 8 from 0 to 0
+Set ejection VC at addr 99 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set ejection VC at addr 98 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 67 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
 I'm the child process!
 GPGPU-Sim uArch: interconnect node map (shaderID+MemID to icntID)
 GPGPU-Sim uArch: Memory nodes ID start from index: 256
@@ -2349,38 +3592,421 @@ ingFIFO5127_RetimingFIFO5235_RetimingFIFO5343_RetimingFIFO5451_RetimingFIFO5073_
 550000...
 560000...
 570000...
-Simulation complete at cycle: 578321
-[[32mpsim[0m] Simulation complete at cycle: 578321
-CE21394: Active:   0.0 Stalled:   0.2 Starved:  99.9 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 577500
-[0m[[31merror[0m] [0m(Thread-131) java.lang.NumberFormatException: For input string: "256 Total Output:      256"[0m
-java.lang.NumberFormatException: For input string: "256 Total Output:      256"
-	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)
-	at java.lang.Long.parseLong(Long.java:589)
-	at java.lang.Long.parseLong(Long.java:631)
-	at scala.collection.immutable.StringLike.toLong(StringLike.scala:306)
-	at scala.collection.immutable.StringLike.toLong$(StringLike.scala:306)
-	at scala.collection.immutable.StringOps.toLong(StringOps.scala:29)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$processOutput$1(PlastisimConfigCodegen.scala:55)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$processOutput$1$adapted(PlastisimConfigCodegen.scala:54)
-	at scala.Option.foreach(Option.scala:257)
-	at pir.codegen.PlastisimConfigCodegen.processOutput(PlastisimConfigCodegen.scala:54)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$runPsim$5(PlastisimConfigCodegen.scala:82)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$runPsim$5$adapted(PlastisimConfigCodegen.scala:82)
-	at prism.util.Misc.$anonfun$shell$7(Misc.scala:88)
-	at prism.util.Misc.$anonfun$shell$7$adapted(Misc.scala:88)
-	at scala.Option.foreach(Option.scala:257)
-	at prism.util.Misc.$anonfun$shell$5(Misc.scala:88)
-	at prism.util.Misc.$anonfun$shell$5$adapted(Misc.scala:88)
-	at scala.sys.process.ProcessLogger$$anon$1.out(ProcessLogger.scala:97)
-	at scala.sys.process.BasicIO$.$anonfun$processOutFully$1(BasicIO.scala:136)
-	at scala.sys.process.BasicIO$.$anonfun$processOutFully$1$adapted(BasicIO.scala:136)
-	at scala.sys.process.BasicIO$.readFully$1(BasicIO.scala:184)
-	at scala.sys.process.BasicIO$.$anonfun$processFully$1$adapted(BasicIO.scala:188)
-	at scala.sys.process.ProcessBuilderImpl$Simple.$anonfun$run$3(ProcessBuilderImpl.scala:76)
-	at scala.sys.process.ProcessImpl$Spawn$$anon$1.run(ProcessImpl.scala:23)
-[0m[[31mtrace[0m] [0mStack trace suppressed: run [34mlast apps/compile:runMain[0m for the full output.[0m
-[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 220198.706468ms
-[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 52068.805084ms
-[pir] Saving node prism.Session@3349ee67 to /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_dynamic_v2_s4/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1.sess
-[0m[[32msuccess[0m] [0mTotal time: 1074 s, completed Aug 1, 2018 8:07:50 PM[0m
+Simulation complete at cycle: 573631
+[[32mpsim[0m] Simulation complete at cycle: 573631
+CE21394: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 573360 
+	     256      256 
+	DRAM:   0.03 GB/s (  0.03 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE21408: Active:  11.4 Stalled:  43.0 Starved:  42.8 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 245265 
+	   65536    65536 
+	DRAM:   7.31 GB/s (  7.31 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE21446: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 573630 
+	
+CE21462: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 1 
+	       1 
+CE21482: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       64 Total Output:       64 Expected Active:       64 Last Activity: 573471 
+	      64 
+CE21496: Active:   0.0 Stalled: 100.0 Starved:   0.0 Total Active:       64 Total Output:       64 Expected Active:       64 Last Activity: 237 
+	      64 
+CE21560: Active:   2.9 Stalled:  54.4 Starved:  42.8 Total Active:    16384 Total Output:    16384 Expected Active:    16384 Last Activity: 245457 
+	   16384    16384    16384 
+CE21580: Active:  11.4 Stalled:  45.9 Starved:  42.7 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244958 
+	   65536    65536    65536 
+CE22850: Active:  91.4 Stalled:   8.4 Starved:   0.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 983 
+	  524288   524288   524288 
+CE23380: Active:   0.1 Stalled:  99.8 Starved:   0.1 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 407 
+	     512      512 
+CE23454: Active:  91.4 Stalled:   6.8 Starved:   1.8 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 10342 
+	  524288   524288   524288 
+CE23530: Active:  91.4 Stalled:   6.9 Starved:   1.8 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 10041 
+	  524288   524288   524288 
+CE23606: Active:  91.4 Stalled:   6.7 Starved:   1.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11162 
+	  524288   524288   524288 
+CE23682: Active:  91.4 Stalled:   6.5 Starved:   2.1 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 12300 
+	  524288   524288   524288 
+CE23758: Active:  91.4 Stalled:   6.3 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 13079 
+	  524288   524288   524288 
+CE23834: Active:  91.4 Stalled:   6.6 Starved:   2.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11734 
+	  524288   524288   524288 
+CE23910: Active:  91.4 Stalled:   6.4 Starved:   2.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 12900 
+	  524288   524288   524288 
+CE23986: Active:  91.4 Stalled:   6.2 Starved:   2.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 13885 
+	  524288   524288   524288 
+CE21954: Active:  11.4 Stalled:  48.3 Starved:  45.6 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE21942: Active:  91.4 Stalled:   7.2 Starved:   1.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2725 
+	  524288 
+CE21978: Active:  11.4 Stalled:  48.3 Starved:  45.6 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE21966: Active:  91.4 Stalled:   7.2 Starved:   1.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2737 
+	  524288 
+CE22002: Active:  11.4 Stalled:  48.3 Starved:  45.6 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE21990: Active:  91.4 Stalled:   7.2 Starved:   1.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2736 
+	  524288 
+CE22026: Active:  11.4 Stalled:  48.3 Starved:  45.6 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22014: Active:  91.4 Stalled:   7.2 Starved:   1.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2720 
+	  524288 
+CE22050: Active:  11.4 Stalled:  48.3 Starved:  45.5 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22038: Active:  91.4 Stalled:   7.2 Starved:   1.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2709 
+	  524288 
+CE22074: Active:  11.4 Stalled:  48.3 Starved:  45.5 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22062: Active:  91.4 Stalled:   7.2 Starved:   1.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2711 
+	  524288 
+CE22098: Active:  11.4 Stalled:  48.3 Starved:  45.6 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22086: Active:  91.4 Stalled:   7.2 Starved:   1.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2727 
+	  524288 
+CE22122: Active:  11.4 Stalled:  48.3 Starved:  45.6 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22110: Active:  91.4 Stalled:   7.2 Starved:   1.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2726 
+	  524288 
+CE22146: Active:  11.4 Stalled:  38.6 Starved:  54.6 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22134: Active:  91.4 Stalled:   5.8 Starved:   2.8 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 10330 
+	  524288 
+CE22170: Active:  11.4 Stalled:  38.8 Starved:  54.3 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22158: Active:  91.4 Stalled:   5.9 Starved:   2.7 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 10035 
+	  524288 
+CE22194: Active:  11.4 Stalled:  37.9 Starved:  55.3 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22182: Active:  91.4 Stalled:   5.7 Starved:   2.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11145 
+	  524288 
+CE22218: Active:  11.4 Stalled:  36.9 Starved:  56.2 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22206: Active:  91.4 Stalled:   5.5 Starved:   3.1 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 12294 
+	  524288 
+CE22242: Active:  11.4 Stalled:  36.4 Starved:  56.7 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22230: Active:  91.4 Stalled:   5.4 Starved:   3.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 13067 
+	  524288 
+CE22266: Active:  11.4 Stalled:  37.4 Starved:  55.8 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22254: Active:  91.4 Stalled:   5.6 Starved:   3.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11717 
+	  524288 
+CE22290: Active:  11.4 Stalled:  36.6 Starved:  56.6 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22278: Active:  91.4 Stalled:   5.4 Starved:   3.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 12861 
+	  524288 
+CE22314: Active:  11.4 Stalled:  35.9 Starved:  57.3 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 244942 
+	   65536    65536 
+CE22302: Active:  91.4 Stalled:   5.2 Starved:   3.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 13860 
+	  524288 
+CE21470: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 12 
+	     256 
+CE21530: Active:   0.0 Stalled:   0.1 Starved:  99.9 Total Active:      128 Total Output:      128 Expected Active:      128 Last Activity: 474 
+	     128 
+CE21594: Active:   1.4 Stalled:  55.9 Starved:  76.4 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 10153 
+	    8192 
+CE21604: Active:   1.4 Stalled:  17.8 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 9974 
+	    8192 
+CE21614: Active:   1.4 Stalled:   0.0 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 11069 
+	    8192 
+CE21624: Active:   1.4 Stalled:  47.0 Starved:  74.0 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 12075 
+	    8192 
+CE21634: Active:   1.4 Stalled:  48.1 Starved:  52.4 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 12342 
+	    8192 
+CE21644: Active:   1.4 Stalled:  58.5 Starved:  42.0 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 10143 
+	    8192 
+CE21654: Active:   1.4 Stalled:  46.6 Starved:  70.5 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 12622 
+	    8192 
+CE21664: Active:   1.4 Stalled:   0.0 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 13797 
+	    8192 
+CE21786: Active:  22.8 Stalled:  12.8 Starved:  65.0 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 10287 
+	  131072 
+CE22376: Active:  22.8 Stalled:  24.4 Starved:  53.4 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 10276 
+	  131072 
+CE22366: Active:   1.4 Stalled:  65.1 Starved:  34.8 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 8499 
+	    8192 
+CE22396: Active:  22.8 Stalled:   0.0 Starved:  77.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 10276 
+	  131072 
+CE22386: Active:   1.4 Stalled:   0.0 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 10267 
+	    8192 
+CE22942: Active:   1.4 Stalled:  71.5 Starved:  29.0 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 7398 
+	    8192     8192 
+CE22954: Active:   1.4 Stalled:  79.2 Starved:  21.3 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 5748 
+	    8192 
+CE21676: Active:  91.4 Stalled:   6.6 Starved:   2.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2715 
+	  524288   524288 
+CE22696: Active:  91.4 Stalled:   6.7 Starved:   1.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2692 
+	  524288 
+CE22686: Active:  91.4 Stalled:   7.1 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 1013 
+	  524288 
+CE21796: Active:  22.8 Stalled:  14.6 Starved:  63.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 9997 
+	  131072 
+CE22416: Active:  22.8 Stalled:  22.0 Starved:  55.8 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 9990 
+	  131072 
+CE22406: Active:   1.4 Stalled:  66.4 Starved:  33.5 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 8227 
+	    8192 
+CE22436: Active:  22.8 Stalled:   0.0 Starved:  77.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 9990 
+	  131072 
+CE22426: Active:   1.4 Stalled:   0.0 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 9981 
+	    8192 
+CE22966: Active:   1.4 Stalled:  71.5 Starved:  29.0 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 7401 
+	    8192     8192 
+CE22978: Active:   1.4 Stalled:  76.6 Starved:  23.9 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 6299 
+	    8192 
+CE21690: Active:  91.4 Stalled:   6.6 Starved:   2.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2715 
+	  524288   524288 
+CE22716: Active:  91.4 Stalled:   6.7 Starved:   1.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2699 
+	  524288 
+CE22706: Active:  91.4 Stalled:   7.1 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 1020 
+	  524288 
+CE21806: Active:  22.8 Stalled:  10.2 Starved:  67.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 11093 
+	  131072 
+CE22456: Active:  22.8 Stalled:  21.0 Starved:  56.7 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 11084 
+	  131072 
+CE22446: Active:   1.4 Stalled:  61.2 Starved:  38.7 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 9316 
+	    8192 
+CE22476: Active:  22.8 Stalled:   0.0 Starved:  77.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 11085 
+	  131072 
+CE22466: Active:   1.4 Stalled:   0.0 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 11076 
+	    8192 
+CE22990: Active:   1.4 Stalled:  66.3 Starved:  34.2 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 8490 
+	    8192     8192 
+CE23002: Active:   1.4 Stalled:  79.3 Starved:  21.2 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 5744 
+	    8192 
+CE21704: Active:  91.4 Stalled:   6.6 Starved:   2.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2711 
+	  524288   524288 
+CE22736: Active:  91.4 Stalled:   6.7 Starved:   2.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2699 
+	  524288 
+CE22726: Active:  91.4 Stalled:   7.1 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 1020 
+	  524288 
+CE21816: Active:  22.8 Stalled:  13.1 Starved:  64.6 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 12240 
+	  131072 
+CE22496: Active:  22.8 Stalled:  26.5 Starved:  51.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 12233 
+	  131072 
+CE22486: Active:   1.4 Stalled:  56.0 Starved:  43.9 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 10421 
+	    8192 
+CE22516: Active:  22.8 Stalled:   0.0 Starved:  77.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 12233 
+	  131072 
+CE22506: Active:   1.4 Stalled:   0.0 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 12224 
+	    8192 
+CE23014: Active:   1.4 Stalled:  62.3 Starved:  38.1 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 9320 
+	    8192     8192 
+CE23026: Active:   1.4 Stalled:  68.8 Starved:  31.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 7944 
+	    8192 
+CE21718: Active:  91.4 Stalled:   6.7 Starved:   2.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2707 
+	  524288   524288 
+CE22756: Active:  91.4 Stalled:   6.7 Starved:   1.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2695 
+	  524288 
+CE22746: Active:  91.4 Stalled:   7.1 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 1016 
+	  524288 
+CE22870: Active:  91.4 Stalled:   7.1 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 1003 
+	  524288   524288   524288   524288 
+CE21826: Active:  22.8 Stalled:  13.2 Starved:  64.5 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 13027 
+	  131072 
+CE22536: Active:  22.8 Stalled:  19.9 Starved:  57.8 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 13016 
+	  131072 
+CE22526: Active:   1.4 Stalled:  52.1 Starved:  47.8 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 11232 
+	    8192 
+CE22556: Active:  22.8 Stalled:   0.0 Starved:  77.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 13016 
+	  131072 
+CE22546: Active:   1.4 Stalled:   0.0 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 13007 
+	    8192 
+CE23038: Active:   1.4 Stalled:  62.4 Starved:  38.1 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 9309 
+	    8192     8192 
+CE23050: Active:   1.4 Stalled:  68.9 Starved:  31.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 7933 
+	    8192 
+CE21732: Active:  91.4 Stalled:   6.7 Starved:   1.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2696 
+	  524288   524288 
+CE22776: Active:  91.4 Stalled:   6.7 Starved:   1.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2681 
+	  524288 
+CE22766: Active:  91.4 Stalled:   7.2 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 1002 
+	  524288 
+CE21836: Active:  22.8 Stalled:  17.7 Starved:  60.0 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 11685 
+	  131072 
+CE22576: Active:  22.8 Stalled:  29.3 Starved:  48.5 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 11674 
+	  131072 
+CE22566: Active:   1.4 Stalled:  58.6 Starved:  41.2 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 9855 
+	    8192 
+CE22596: Active:  22.8 Stalled:   0.0 Starved:  77.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 11674 
+	  131072 
+CE22586: Active:   1.4 Stalled:   0.0 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 11665 
+	    8192 
+CE23062: Active:   1.4 Stalled:  72.8 Starved:  27.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 7110 
+	    8192     8192 
+CE23074: Active:   1.4 Stalled:  79.3 Starved:  21.2 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 5734 
+	    8192 
+CE21746: Active:  91.4 Stalled:   6.7 Starved:   1.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2701 
+	  524288   524288 
+CE22796: Active:  91.4 Stalled:   6.7 Starved:   1.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2689 
+	  524288 
+CE22786: Active:  91.4 Stalled:   7.1 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 1010 
+	  524288 
+CE21846: Active:  22.8 Stalled:  14.6 Starved:  63.0 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 12817 
+	  131072 
+CE22616: Active:  22.8 Stalled:  29.6 Starved:  48.1 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 12806 
+	  131072 
+CE22606: Active:   1.4 Stalled:  53.3 Starved:  46.5 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 10966 
+	    8192 
+CE22636: Active:  22.8 Stalled:   0.0 Starved:  77.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 12806 
+	  131072 
+CE22626: Active:   1.4 Stalled:   0.0 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 12797 
+	    8192 
+CE23086: Active:   1.4 Stalled:  61.0 Starved:  39.4 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 9591 
+	    8192     8192 
+CE23098: Active:   1.4 Stalled:  74.0 Starved:  26.5 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 6845 
+	    8192 
+CE21760: Active:  91.4 Stalled:   6.6 Starved:   2.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2710 
+	  524288   524288 
+CE22816: Active:  91.4 Stalled:   6.7 Starved:   2.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2695 
+	  524288 
+CE22806: Active:  91.4 Stalled:   7.1 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 1016 
+	  524288 
+CE21856: Active:  22.8 Stalled:   6.6 Starved:  70.6 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 13821 
+	  131072 
+CE22656: Active:  22.8 Stalled:  14.8 Starved:  62.8 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 13812 
+	  131072 
+CE22646: Active:   1.4 Stalled:  48.2 Starved:  51.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 12051 
+	    8192 
+CE22676: Active:  22.8 Stalled:   0.0 Starved:  77.2 Total Active:   131072 Total Output:   131072 Expected Active:   131072 Last Activity: 13813 
+	  131072 
+CE22666: Active:   1.4 Stalled:   0.0 Starved:  98.6 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 13804 
+	    8192 
+CE23110: Active:   1.4 Stalled:  53.3 Starved:  47.2 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 11225 
+	    8192     8192 
+CE23122: Active:   1.4 Stalled:  73.7 Starved:  26.7 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 6846 
+	    8192 
+CE21774: Active:  91.4 Stalled:   6.6 Starved:   2.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2711 
+	  524288   524288 
+CE22836: Active:  91.4 Stalled:   6.6 Starved:   2.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 2692 
+	  524288 
+CE22826: Active:  91.4 Stalled:   7.1 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 1013 
+	  524288 
+CE22928: Active:  91.4 Stalled:   7.1 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 1003 
+	  524288   524288 
+CE22910: Active:  91.4 Stalled:   7.1 Starved:   1.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 987 
+	  524288   524288   524288   524288 
+CE21932: Active:   0.7 Stalled:   0.0 Starved:  99.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 682 
+	    4096 
+CE21922: Active:   0.7 Stalled:  99.2 Starved:   0.1 Total Active:     4108 Total Output:     4104 Expected Active:     4096 Last Activity: 665 STALL
+	    4096 
+CE22336: Active:  91.4 Stalled:   0.0 Starved:   8.6 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 958 
+	  524288 
+CE22326: Active:   0.7 Stalled:   0.0 Starved:  99.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 697 
+	    4096 
+CE21514: Active:   0.7 Stalled:   0.0 Starved:  99.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 691 
+	    4096     4096     4097     4096 
+CE21880: Active:   0.7 Stalled:   0.0 Starved:  99.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 682 
+	    4096     4096     4096 
+CE21866: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 414 
+	     512 
+CE21908: Active:   0.7 Stalled:   0.0 Starved:  99.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 683 
+	    4096     4096     4096 
+CE21894: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      128 Total Output:      128 Expected Active:      128 Last Activity: 563 
+	     128 
+CE21542: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 404 
+	     512      512 
+CE23340: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 572958 
+	     256 
+CE23360: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 395 
+	     512      512      512      512 
+CE23326: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 134 
+	     256      256 
+CE23424: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 572958 
+	     256 
+CE23402: Active:  91.4 Stalled:   5.0 Starved:   3.7 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 10325 
+	  524288   786432   524288   524288   524288 
+CE23438: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 396 
+	     512      512 
+CE23500: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 572958 
+	     256 
+CE23478: Active:  91.4 Stalled:   5.1 Starved:   3.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 10026 
+	  524288   786432   524288   524288   524288 
+CE23514: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 395 
+	     512      512 
+CE23576: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 572958 
+	     256 
+CE23554: Active:  91.4 Stalled:   4.7 Starved:   3.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11145 
+	  524288   786432   524288   524288   524288 
+CE23590: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 395 
+	     512      512 
+CE23652: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 572958 
+	     256 
+CE23630: Active:  91.4 Stalled:   4.3 Starved:   4.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 12279 
+	  524288   786432   524288   524288   524288 
+CE23666: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 395 
+	     512      512 
+CE23728: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 572958 
+	     256 
+CE23706: Active:  91.4 Stalled:   4.0 Starved:   4.6 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 13064 
+	  524288   786432   524288   524288   524288 
+CE23742: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 395 
+	     512      512 
+CE23804: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 572958 
+	     256 
+CE23782: Active:  91.4 Stalled:   4.5 Starved:   4.1 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11719 
+	  524288   786432   524288   524288   524288 
+CE23818: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 395 
+	     512      512 
+CE23880: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 572958 
+	     256 
+CE23858: Active:  91.4 Stalled:   4.1 Starved:   4.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 12861 
+	  524288   786432   524288   524288   524288 
+CE23894: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 395 
+	     512      512 
+CE23956: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 572958 
+	     256 
+CE23934: Active:  91.4 Stalled:   3.7 Starved:   4.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 13866 
+	  524288   786432   524288   524288   524288 
+CE23970: Active:   0.1 Stalled:   0.0 Starved:  99.9 Total Active:      512 Total Output:      512 Expected Active:      512 Last Activity: 395 
+	     512      512 
+CE21424: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 127 
+	     256      256      256 
+	DRAM:   0.03 GB/s (  0.00 GB/s R,   0.03 GB/s W)
+	ROB remaining: 0
+CE23134: Active:  91.4 Stalled:   4.1 Starved:   4.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 10315 
+	  524288   524288 
+CE23158: Active:  91.4 Stalled:   4.2 Starved:   4.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 10016 
+	  524288   524288 
+CE23182: Active:  91.4 Stalled:   3.8 Starved:   4.8 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11126 
+	  524288   524288 
+CE23206: Active:  91.4 Stalled:   3.4 Starved:   5.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 12269 
+	  524288   524288 
+CE23230: Active:  91.4 Stalled:   3.2 Starved:   5.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 13054 
+	  524288   524288 
+CE23254: Active:  91.4 Stalled:   3.6 Starved:   5.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11704 
+	  524288   524288 
+CE23278: Active:  91.4 Stalled:   3.2 Starved:   5.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 12844 
+	  524288   524288 
+CE23302: Active:  91.4 Stalled:   2.9 Starved:   5.7 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 13842 
+	  524288   524288 
+CE23146: Active:  91.4 Stalled:   4.1 Starved:   4.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 10294 
+	  524288 
+CE23170: Active:  91.4 Stalled:   4.2 Starved:   4.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 10004 
+	  524288 
+CE23194: Active:  91.4 Stalled:   3.8 Starved:   4.8 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11102 
+	  524288 
+CE23218: Active:  91.4 Stalled:   3.4 Starved:   5.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 12249 
+	  524288 
+CE23242: Active:  91.4 Stalled:   3.2 Starved:   5.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 13036 
+	  524288 
+CE23266: Active:  91.4 Stalled:   3.6 Starved:   5.0 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11692 
+	  524288 
+CE23290: Active:  91.4 Stalled:   3.2 Starved:   5.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 12826 
+	  524288 
+CE23314: Active:  91.4 Stalled:   2.9 Starved:   5.7 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 13828 
+	  524288 
+CE22356: Active:  91.4 Stalled:   0.0 Starved:   8.6 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 958 
+	  524288 
+CE22346: Active:  91.4 Stalled:   1.5 Starved:   7.1 Total Active:   524300 Total Output:   524296 Expected Active:   524288 Last Activity: 941 STALL
+	  524288 
+CE22890: Active:  91.4 Stalled:   0.0 Starved:   8.6 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 967 
+	  524289   524288   524288 
+Total DRAM:	   7.37 GB/s (  7.34 GB/s R,   0.03 GB/s W)
+[[32mpsim[0m] Total DRAM:	   7.37 GB/s (  7.34 GB/s R,   0.03 GB/s W)
+Pending Read: 0	 Pending Write: 0	
+Sending shutdown IPC message.
+IPC layer sent 573631 msgs recvd 573631 msgs
+[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 205510.633115ms
+[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 37774.580635ms
+[pir] Saving node prism.Session@25a1968d to /home/yaqiz/pir/out/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1_psim_D_v2_s4/Kmeans__I_2_K_64_D_64_N_8192_ts_1024_op_1_mp1_8_mp2_1_mp3_1.sess
+[0m[[32msuccess[0m] [0mTotal time: 966 s, completed Aug 3, 2018 10:30:39 PM[0m
 -------------PASS (DONE)------------

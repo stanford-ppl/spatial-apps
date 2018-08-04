@@ -4,24 +4,80 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
 [0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
 [0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mRunning SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16 --out=/home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0 --psim-out=/home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0 --debug=false --verbose=true --dot=false --mapping=true --load-pir=true --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --net=dynamic --routing-algo=proute --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=4 --vfifo=4 --vc=8 --vlink=0 --slink=0[0m
-[pir] args=[--load-pir=true, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0, --psim-out=/home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0, --debug=false, --verbose=true, --dot=false, --mapping=true, --load-pir=true, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --net=dynamic, --routing-algo=proute, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=4, --vfifo=4, --vc=8, --vlink=0, --slink=0]
-[pir] Output directory set to [36m/home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0[0m
-[pir] Loading from /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16.pir[pir] Loading PIRDesign() from /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16.pir
+[0m[[0minfo[0m] [0mRunning SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16 --out=/home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0 --psim-out=/home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0 --debug=false --verbose=true --dot=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --routing-algo=proute --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --pcu-stage=4 --vc=4 --net=dynamic --vlink=0 --slink=0 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512[0m
+[pir] args=[--load-pir=true, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0, --psim-out=/home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0, --debug=false, --verbose=true, --dot=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --routing-algo=proute, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --pcu-stage=4, --vc=4, --net=dynamic, --vlink=0, --slink=0, --fifo-depth=4, --vfifo=4, --proute-algo=route_dor_YX, --link-prop=db, --flit-width=512]
+[pir] Output directory set to [36m/home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0[0m
+[pir] Loading from /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16.pir[[33mwarn[0m] Restore session failed: java.io.FileNotFoundException: /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16.pir (No such file or directory). Creating a new session ...
+[pir] Finishing graph construction for SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16
 [pir] Configuring spade MyDesign ...
-[pir] Loading from /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16.sess[pir] Loading prism.Session@16524c28 from /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16.sess
-[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16.pir
-[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/traces
-[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/trace_classes
-[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0 /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0
-[[33mtrace[0m] log in /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 37164.487799ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 79814.66222ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 42912.45859ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 1879.216432ms
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 5140.689082ms
+New design elapsed time: 5434.753ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 1079.604137ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 4.49626ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 72.758152ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 1994.85643ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 1147.123809ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 1.763495ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 1746.436611ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 176.775571ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 79.041673ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 5314.560955ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 941.341782ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 720.479388ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 2234.732988ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 269.25418ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 429.69051ms
+[pir] Running 23-CUStatistics ...[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0[0m[0m
+[pir] Finished 23-CUStatistics to [36mstat.json[0m in 303.451575ms
+[pir] Running 24-IgraphPartioner ...[pir] Split CUContainer3237 in 379.183222ms[pir] Split CUContainer8191 in 297.693002ms[pir] Split CUContainer8192 in 344.658638ms[pir] Split CUContainer8195 in 375.997948ms[pir] Split CUContainer8193 in 300.56714ms[pir] Split CUContainer3305 in 310.451565ms[pir] Split CUContainer8201 in 288.548086ms[pir] Finished 24-IgraphPartioner in 4399.443432ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 14863.314997ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 4418.378879ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 37.770737ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 132.881885ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 511.668284ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 43879.152375ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 1035.382481ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 1044.037293ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 11309.026473ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 22752.649845ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 1801.99751ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 444.230204ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 354.324458ms
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16.pir
+[pir] Running 50-PlastisimTraceCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0[0m[0m
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0 /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0
+[[33mtrace[0m] log in /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/trace.log
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mSet current project to sgd_minibatch__d_64_n_16384_e_2_ts_1024_mp1_8_mp2_16_psim_d_v0_s0 (in build file:/home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/)[0m
+[0m[[0minfo[0m] [0mUpdating {file:/home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/}sgd_minibatch__d_64_n_16384_e_2_ts_1024_mp1_8_mp2_16_psim_d_v0_s0...[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#jline;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.fusesource.jansi#jansi;1.4 ...[0m
+[0m[[0minfo[0m] [0mDone updating.[0m
+[0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/target/scala-2.10/classes...[0m
+[0m[[33mwarn[0m] [0mthere were 2 feature warning(s); re-run with -feature for details[0m
+[0m[[33mwarn[0m] [0mone warning found[0m
+[0m[[0minfo[0m] [0mRunning tracer /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/traces[0m
+[0m[[32msuccess[0m] [0mTotal time: 9 s, completed Aug 3, 2018 10:07:19 PM[0m
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 28897.454968ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 51205.253987ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 32116.957341ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 1347.929385ms
+[pir] Running 54-ControllerDotCodegen ...[pir] Finished 54-ControllerDotCodegen to [36mcontroller.dot[0m in 8398.511379ms
+[pir] Running 55-PIRIRDotCodegen ...[pir] Finished 55-PIRIRDotCodegen to [36mtop.dot[0m in 33893.457732ms
+[pir] Running 56-SimpleIRDotCodegen ...[pir] Finished 56-SimpleIRDotCodegen to [36msimple.dot[0m in 2471.050183ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 2349.176542ms
 [pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 104280.37316ms
+[pir] Finished 59-CUPlacer in 101172.699447ms
 [pir] Running 60-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
 [pir] 
 [pir] number of cus=100
@@ -59,225 +115,129 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [pir] AG-ag = 2 / 32 (6.25%)
 [pir] AG-comp = 8 / 32 (25.00%)
 [pir] MC = 3 / 32 (9.38%)
-[pir] Finished 60-CUStatistics to [36mstat.json[0m in 2165.029936ms
-[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 1258.706581ms
-[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 1120.163984ms
-[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 1276.399644ms
-[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 6.282844ms
-[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 55017.15296ms
-[pir] Running 66-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/node.csv -l /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/link.csv -o /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/final.place -r 16 -c 8 -s1 -g /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/proute.dot -x0 -e 0 -i100 -p100 -t1 -d100 -a route_min_directed_valient -s0
-[[33mproute[0m] log in /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/proute.log
-Start scoring thread: 0
-Start scoring thread: 0
-100 scores: min 67569.69 	3.09/24.00/19/3.06/5 	max 180215.70 mean 100599.80
-Start scoring thread: 0
-100 scores: min 67062.73 	2.12/24.00/17/2.66/5 	max 108315.92 mean 70572.27
-Start scoring thread: 0
-100 scores: min 62062.70 	2.12/24.00/17/2.63/4 	max 123315.96 mean 68540.13
-Start scoring thread: 0
-100 scores: min 62062.66 	2.12/24.00/17/2.60/4 	max 180215.16 mean 68542.98
-Start scoring thread: 0
-100 scores: min 62061.64 	2.12/24.00/15/2.58/4 	max 123215.78 mean 66091.93
-Start scoring thread: 0
-100 scores: min 62061.64 	2.12/24.00/15/2.58/4 	max 108215.55 mean 66389.44
-Start scoring thread: 0
-100 scores: min 62061.58 	2.12/24.00/15/2.52/4 	max 140214.27 mean 68296.95
-Start scoring thread: 0
-100 scores: min 62061.58 	2.12/24.00/15/2.52/4 	max 108216.07 mean 66695.10
-Start scoring thread: 0
-100 scores: min 62061.57 	2.12/24.00/15/2.51/4 	max 139632.56 mean 67887.67
-Start scoring thread: 0
-100 scores: min 62036.99 	2.06/24.00/17/3.10/4 	max 122534.10 mean 66933.08
-Start scoring thread: 0
-100 scores: min 62035.94 	2.06/24.00/15/3.05/4 	max 95263.04 mean 65505.56
-Start scoring thread: 0
-100 scores: min 62035.94 	2.06/24.00/15/3.05/4 	max 159265.08 mean 66127.99
-Start scoring thread: 0
-100 scores: min 62035.85 	2.06/24.00/15/2.96/4 	max 139649.48 mean 66083.45
-Start scoring thread: 0
-100 scores: min 62035.62 	2.06/24.00/15/2.73/4 	max 123216.03 mean 68129.55
-Start scoring thread: 0
-100 scores: min 62035.55 	2.06/24.00/15/2.67/4 	max 122554.09 mean 67433.12
-Start scoring thread: 0
-100 scores: min 62035.40 	2.06/24.00/15/2.51/4 	max 139553.08 mean 68094.51
-Start scoring thread: 0
-100 scores: min 62035.40 	2.06/24.00/15/2.51/4 	max 203266.91 mean 68131.66
-Start scoring thread: 0
-100 scores: min 62035.40 	2.06/24.00/15/2.51/4 	max 109115.66 mean 67429.65
-Start scoring thread: 0
-100 scores: min 62035.38 	2.06/24.00/15/2.49/4 	max 123265.30 mean 67846.88
-Start scoring thread: 0
-100 scores: min 62035.38 	2.06/24.00/15/2.49/4 	max 95214.57 mean 65988.60
-Start scoring thread: 0
-100 scores: min 62035.38 	2.06/24.00/15/2.49/4 	max 108216.21 mean 66911.67
-Start scoring thread: 0
-100 scores: min 62035.38 	2.06/24.00/15/2.49/4 	max 108264.81 mean 66839.73
-Start scoring thread: 0
-100 scores: min 62035.38 	2.06/24.00/15/2.49/4 	max 123214.20 mean 67140.90
-Start scoring thread: 0
-100 scores: min 62035.38 	2.06/24.00/15/2.49/4 	max 122590.87 mean 67046.47
-Start scoring thread: 0
-100 scores: min 62035.36 	2.06/24.00/15/2.46/4 	max 123211.98 mean 67273.93
-Start scoring thread: 0
-100 scores: min 62035.36 	2.06/24.00/15/2.46/4 	max 180265.33 mean 71430.77
-Start scoring thread: 0
-100 scores: min 62035.36 	2.06/24.00/15/2.46/4 	max 107631.85 mean 69673.05
-Start scoring thread: 0
-100 scores: min 62035.35 	2.06/24.00/15/2.46/4 	max 123265.26 mean 71120.37
-Start scoring thread: 0
-100 scores: min 62035.35 	2.06/24.00/15/2.46/4 	max 108212.28 mean 70950.36
-Start scoring thread: 0
-100 scores: min 62035.35 	2.06/24.00/15/2.46/4 	max 227671.41 mean 72792.33
-Start scoring thread: 0
-100 scores: min 62035.35 	2.06/24.00/15/2.46/4 	max 95215.62 mean 68128.94
-Start scoring thread: 0
-100 scores: min 62035.35 	2.06/24.00/15/2.46/4 	max 158592.25 mean 68226.73
-Start scoring thread: 0
-100 scores: min 62035.31 	2.06/24.00/15/2.42/4 	max 95214.36 mean 66913.49
-Start scoring thread: 0
-100 scores: min 62035.27 	2.06/24.00/15/2.38/4 	max 180215.19 mean 69951.26
-Start scoring thread: 0
-100 scores: min 62035.27 	2.06/24.00/15/2.38/4 	max 123214.47 mean 70532.78
-Start scoring thread: 0
-100 scores: min 62035.26 	2.06/24.00/15/2.37/4 	max 108264.76 mean 70852.66
-Start scoring thread: 0
-100 scores: min 62035.26 	2.06/24.00/15/2.37/4 	max 96112.28 mean 69012.28
-Start scoring thread: 0
-100 scores: min 62035.26 	2.06/24.00/15/2.37/4 	max 107553.08 mean 70854.28
-Start scoring thread: 0
-100 scores: min 62035.26 	2.06/24.00/15/2.37/4 	max 123215.72 mean 67849.55
-Start scoring thread: 0
-100 scores: min 62035.26 	2.06/24.00/15/2.37/4 	max 94511.96 mean 66188.49
-Start scoring thread: 0
-100 scores: min 62035.26 	2.06/24.00/15/2.37/4 	max 180214.81 mean 67103.15
-Start scoring thread: 0
-100 scores: min 62035.26 	2.06/24.00/15/2.37/4 	max 179588.56 mean 67800.98
-Start scoring thread: 0
-100 scores: min 62035.25 	2.06/24.00/15/2.35/4 	max 122632.20 mean 68453.46
-Start scoring thread: 0
-100 scores: min 62035.23 	2.06/24.00/15/2.34/4 	max 160114.58 mean 69915.94
-Start scoring thread: 0
-100 scores: min 62035.23 	2.06/24.00/15/2.34/4 	max 160179.97 mean 71462.79
-Start scoring thread: 0
-100 scores: min 62035.23 	2.06/24.00/15/2.34/4 	max 108265.90 mean 68669.49
-Start scoring thread: 0
-100 scores: min 62035.23 	2.06/24.00/15/2.34/4 	max 139593.08 mean 68823.23
-Start scoring thread: 0
-100 scores: min 62035.23 	2.06/24.00/15/2.34/4 	max 158590.61 mean 69225.28
-Start scoring thread: 0
-100 scores: min 62035.22 	2.06/24.00/15/2.33/4 	max 107551.73 mean 67754.13
-Start scoring thread: 0
-100 scores: min 62035.22 	2.06/24.00/15/2.33/4 	max 108265.43 mean 69433.06
-Start scoring thread: 0
-100 scores: min 62035.22 	2.06/24.00/15/2.33/4 	max 140215.97 mean 68539.55
-Start scoring thread: 0
-100 scores: min 62035.22 	2.06/24.00/15/2.33/4 	max 107549.34 mean 67611.45
-Start scoring thread: 0
-100 scores: min 62035.20 	2.06/24.00/15/2.31/4 	max 158552.75 mean 68981.12
-Start scoring thread: 0
-100 scores: min 62035.20 	2.06/24.00/15/2.31/4 	max 140239.44 mean 69220.63
-Start scoring thread: 0
-100 scores: min 62035.20 	2.06/24.00/15/2.31/4 	max 160178.22 mean 68399.59
-Start scoring thread: 0
-100 scores: min 62035.20 	2.06/24.00/15/2.31/4 	max 95421.40 mean 65868.09
-Start scoring thread: 0
-100 scores: min 62035.20 	2.06/24.00/15/2.31/4 	max 203216.39 mean 69387.95
-Start scoring thread: 0
-100 scores: min 62035.20 	2.06/24.00/15/2.31/4 	max 142291.73 mean 67272.22
-Start scoring thread: 0
-100 scores: min 62035.20 	2.06/24.00/15/2.30/4 	max 158591.39 mean 67201.81
-Start scoring thread: 0
-100 scores: min 62035.18 	2.06/24.00/15/2.29/4 	max 123215.27 mean 66080.34
-Start scoring thread: 0
-100 scores: min 62035.18 	2.06/24.00/15/2.29/4 	max 109115.69 mean 68666.16
-Start scoring thread: 0
-100 scores: min 62035.18 	2.06/24.00/15/2.29/4 	max 159216.62 mean 68226.78
-Start scoring thread: 0
-100 scores: min 62035.18 	2.06/24.00/15/2.29/4 	max 158630.69 mean 67675.34
-Start scoring thread: 0
-100 scores: min 62035.18 	2.06/24.00/15/2.29/4 	max 180214.94 mean 70038.87
-Start scoring thread: 0
-100 scores: min 62035.18 	2.06/24.00/15/2.29/4 	max 122709.38 mean 67513.41
-Start scoring thread: 0
-100 scores: min 62035.18 	2.06/24.00/15/2.29/4 	max 123215.91 mean 68372.55
-Start scoring thread: 0
-100 scores: min 62035.17 	2.06/24.00/15/2.28/4 	max 139592.41 mean 66970.00
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 122671.41 mean 67816.07
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 123318.12 mean 65820.98
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 140266.84 mean 64826.86
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 123265.13 mean 65476.55
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 107534.27 mean 64507.50
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 108215.94 mean 65904.62
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 95264.91 mean 65625.48
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 107668.79 mean 64248.70
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 108318.12 mean 64609.23
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 159215.69 mean 67843.01
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 96114.77 mean 64770.02
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 84213.52 mean 64155.13
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 109115.49 mean 65625.02
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 123266.30 mean 66352.95
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 107591.43 mean 65934.12
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 139552.12 mean 66861.45
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 109115.55 mean 64061.94
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 84215.66 mean 64427.96
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 108265.04 mean 64118.11
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 84214.32 mean 64243.55
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 122672.19 mean 66091.58
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 109116.03 mean 64764.84
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 140266.91 mean 67770.34
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 159215.86 mean 67392.22
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 95215.82 mean 64524.11
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 123215.30 mean 66725.34
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 123265.79 mean 68565.91
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 123317.28 mean 67559.07
-Start scoring thread: 0
-100 scores: min 62035.16 	2.06/24.00/15/2.27/4 	max 109241.19 mean 66298.04
-Start scoring thread: 0
-100 scores: min 62035.14 	2.06/24.00/15/2.25/4 	max 122713.17 mean 65116.12
-Start scoring thread: 0
-100 scores: min 62035.14 	2.06/24.00/15/2.25/4 	max 94593.31 mean 65697.15
-Start scoring thread: 0
-100 scores: min 62035.14 	2.06/24.00/15/2.25/4 	max 123265.65 mean 66330.80
-Start scoring thread: 0
-100 scores: min 62035.14 	2.06/24.00/15/2.25/4 	max 124114.03 mean 66290.17
-Best score is 62035.14
-Used 4 VCs for endpoint coloring.
-	Used 4 VCs.
-[[32mproute[0m] 	Used 4 VCs.
-[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 225385.835747ms
-[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 49094.87193ms
-[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/
-[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/config.psim -p /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/final.place -c 100000000 -l B
-[[33mpsim[0m] log in /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/psim.log
-Changing to config directory: /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0
+[pir] Finished 60-CUStatistics to [36mstat.json[0m in 810.714393ms
+[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 909.865946ms
+[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 965.790683ms
+[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 875.311291ms
+[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 5.873999ms
+[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 29985.84474ms
+[pir] Running 66-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/node.csv -l /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/link.csv -o /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/final.place -r 16 -c 8 -g /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/proute.dot -v /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/summary.csv -x0 -e 0 -a route_dor_YX  -i100 -p100 -t1 -d100 -s0
+[[33mproute[0m] log in /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/proute.log
+100 scores: min 156136.92 	4.06/24.00/16/2.95/6 	max 217142.77 mean 171860.80
+100 scores: min 156010.84 	4.00/24.00/16/2.84/6 	max 195075.19 mean 165037.05
+100 scores: min 154261.66 	3.00/24.00/15/4.15/6 	max 195075.34 mean 165915.25
+100 scores: min 153141.83 	2.12/24.00/18/3.92/6 	max 186764.41 mean 157933.20
+100 scores: min 153076.59 	2.06/24.00/18/4.12/6 	max 183239.47 mean 158822.86
+100 scores: min 149576.59 	2.06/24.00/18/4.11/5 	max 178264.25 mean 160142.12
+100 scores: min 149513.09 	2.00/24.00/18/4.09/5 	max 174481.28 mean 161523.64
+100 scores: min 149513.09 	2.00/24.00/18/4.09/5 	max 185642.36 mean 161844.91
+100 scores: min 149513.09 	2.00/24.00/18/4.09/5 	max 206763.44 mean 162501.30
+100 scores: min 149513.09 	2.00/24.00/18/4.09/5 	max 186764.28 mean 162090.94
+100 scores: min 149513.09 	2.00/24.00/18/4.09/5 	max 170764.91 mean 161812.25
+100 scores: min 149513.06 	2.00/24.00/18/4.06/5 	max 168264.36 mean 162689.88
+100 scores: min 149513.06 	2.00/24.00/18/4.06/5 	max 166731.23 mean 161322.36
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 178263.47 mean 161486.44
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 178264.14 mean 160746.56
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 177143.48 mean 160144.55
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 174372.47 mean 162956.73
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 172512.08 mean 161577.31
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 174372.52 mean 160882.39
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 174372.47 mean 160915.08
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 186765.22 mean 161485.34
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 178265.19 mean 161738.59
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 174372.89 mean 162018.77
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 196263.78 mean 161858.53
+100 scores: min 149513.06 	2.00/24.00/18/4.07/5 	max 174263.77 mean 162165.62
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 170762.70 mean 162874.75
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 185644.70 mean 159998.98
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 170762.67 mean 159731.55
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 180761.88 mean 159818.73
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 178267.92 mean 160262.91
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 170764.67 mean 159831.06
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 180765.44 mean 160806.12
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 178264.72 mean 160305.45
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 177209.77 mean 160201.73
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 178264.97 mean 159623.62
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 169512.05 mean 160345.36
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 177512.38 mean 160327.34
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 185578.78 mean 159853.70
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 178264.64 mean 160675.25
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 177012.72 mean 159704.20
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 178262.70 mean 160177.42
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 178015.12 mean 158928.83
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 178265.53 mean 159263.77
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 186764.72 mean 158949.59
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 178263.22 mean 159590.66
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 169512.94 mean 159248.88
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 185512.16 mean 159318.52
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 170764.45 mean 159644.16
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 183235.77 mean 160723.66
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 196265.28 mean 160820.11
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 178012.77 mean 159889.62
+100 scores: min 149513.05 	2.00/24.00/18/4.05/5 	max 174372.39 mean 158076.66
+100 scores: min 149513.03 	2.00/24.00/18/4.03/5 	max 171204.53 mean 159126.33
+100 scores: min 149513.00 	2.00/24.00/18/4.00/5 	max 177078.41 mean 161976.67
+100 scores: min 149512.98 	2.00/24.00/18/3.99/5 	max 169511.67 mean 161926.12
+100 scores: min 149512.98 	2.00/24.00/18/3.99/5 	max 180985.86 mean 162938.95
+100 scores: min 149512.98 	2.00/24.00/18/3.99/5 	max 186765.06 mean 162434.66
+100 scores: min 149512.98 	2.00/24.00/18/3.99/5 	max 186765.12 mean 161451.09
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 169577.45 mean 161538.41
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 174372.44 mean 161349.69
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 186764.64 mean 162005.30
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 186765.23 mean 162354.66
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 185512.09 mean 162807.52
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 169577.84 mean 161662.95
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 178264.09 mean 161707.69
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 205579.20 mean 162854.06
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 185513.20 mean 161509.59
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 170764.58 mean 163029.66
+100 scores: min 149512.92 	2.00/24.00/18/3.92/5 	max 185575.84 mean 162523.44
+100 scores: min 149512.91 	2.00/24.00/18/3.90/5 	max 178265.30 mean 162116.06
+100 scores: min 149512.91 	2.00/24.00/18/3.90/5 	max 169513.02 mean 162462.17
+100 scores: min 149512.91 	2.00/24.00/18/3.90/5 	max 169641.64 mean 162899.80
+100 scores: min 149512.91 	2.00/24.00/18/3.90/5 	max 178264.48 mean 161478.14
+100 scores: min 149512.91 	2.00/24.00/18/3.90/5 	max 196266.72 mean 161497.55
+100 scores: min 149512.91 	2.00/24.00/18/3.90/5 	max 178262.98 mean 163050.23
+100 scores: min 149512.86 	2.00/24.00/18/3.86/5 	max 181095.27 mean 160622.06
+100 scores: min 149512.81 	2.00/24.00/18/3.81/5 	max 185577.92 mean 162871.81
+100 scores: min 149512.81 	2.00/24.00/18/3.81/5 	max 175081.33 mean 162720.66
+100 scores: min 149512.81 	2.00/24.00/18/3.81/5 	max 174372.23 mean 162457.20
+100 scores: min 149512.81 	2.00/24.00/18/3.81/5 	max 178262.94 mean 161728.56
+100 scores: min 149512.81 	2.00/24.00/18/3.81/5 	max 188512.91 mean 162357.05
+100 scores: min 149512.81 	2.00/24.00/18/3.81/5 	max 178263.02 mean 162635.52
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 169642.09 mean 161730.86
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 169512.25 mean 161135.31
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 170763.67 mean 161361.83
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 178264.17 mean 162019.88
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 178265.27 mean 161724.38
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 174372.44 mean 162516.77
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 178262.81 mean 162470.27
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 178264.78 mean 162147.62
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 195012.91 mean 161947.77
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 185609.91 mean 162593.03
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 186765.20 mean 162772.62
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 178263.28 mean 161730.50
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 196987.02 mean 162447.23
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 195143.62 mean 161213.81
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 206762.44 mean 162272.34
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 185577.91 mean 162169.66
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 169511.59 mean 161808.48
+100 scores: min 149512.80 	2.00/24.00/18/3.80/5 	max 174372.20 mean 161343.42
+All static routes:
+	8815:1:32	8786:1:32	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9067:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	9036:29:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	10063:16:1	18706:11:1	18706:11:1	18706:11:1	18706:11:1	18706:11:1	18706:11:1	18706:11:1	18706:11:1	18706:11:1	18706:11:1	18706:11:1	9226:1:1	8892:1:1	9156:1:1	9090:1:1	8921:1:1
+All dynamic routes:
+	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13378:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	13354:24:131072	12317:10:131072	12317:10:131072	12317:10:131072	12317:10:131072	12317:10:131072	12317:10:131072	12317:10:131072	12317:10:131072	12317:10:131072	12317:10:131072	16421:1:131072	16256:1:131072	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	10179:16:8192	16467:1:131072	16582:1:131072	16325:1:131072	16559:1:131072	16536:1:131072	16279:1:131072	16398:1:131072	16231:1:131072	16444:1:131072	16630:1:131072	16606:1:131072	16653:1:131072	16490:1:131072	16699:1:131072	16349:1:131072	16374:1:131072	16513:1:131072	16676:1:131072	16302:1:131072	9696:8:4096	9696:8:4096	9696:8:4096	9696:8:4096	9696:8:4096	9696:8:4096	9696:8:4096	9696:8:4096	8839:1:32768	8868:1:32768	9277:1:16384	9485:1:16384	9510:1:16384	9433:1:16384	9406:1:16384	9354:1:16384	9250:1:16384	9537:1:16384	9562:1:16384	9329:1:16384	9589:1:16384	9381:1:16384	9302:1:16384	9458:1:16384	9614:1:16384	9641:1:16384	15656:1:8192	15702:1:8192	16116:1:8192	15610:1:8192	16208:1:8192	10550:1:8192	10680:1:8192	11200:1:8192	15932:1:8192	16024:1:8192	16070:1:8192	16162:1:8192	15840:1:8192	12110:1:8192	10940:1:8192	15978:1:8192	10810:1:8192	10420:1:8192	11980:1:8192	15518:1:8192	11850:1:8192	10290:1:8192	10154:1:8192	11460:1:8192	11330:1:8192	15748:1:8192	11070:1:8192	15886:1:8192	11720:1:8192	15794:1:8192	11590:1:8192	15564:1:8192	16901:1:4096	9822:1:4096	9871:1:4096	16947:1:4096	10018:1:4096	9724:1:4096	16760:1:4096	9969:1:4096	16784:1:4096	9773:1:4096	16807:1:4096	16924:1:4096	9669:1:4096	16970:1:4096	16830:1:4096	16854:1:4096	9920:1:4096	16878:1:4096	12174:1:2048	9012:1:4	8945:1:4	8986:1:1
+Best score is 149512.80
+Used 5 VCs for endpoint coloring.
+	Used 5 VCs.
+[[32mproute[0m] 	Used 5 VCs.
+[[32mproute[0m] DynHopsVec:16330772, DynHopsScal:26210308, StatHopsVec:0, StatHopsScal:291
+[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 211238.073443ms
+[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 31565.339973ms
+[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/
+[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/config.psim -p /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/final.place -c 100000000 -l B -w 512
+[[33mpsim[0m] log in /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0/psim.log
+Changing to config directory: /home/yaqiz/plastisim/configs/finals/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_psim_D_v0_s0
 Constructing NetworkLink.
 Constructing NetworkLink.
 Constructing NetworkLink.
@@ -388,870 +348,2199 @@ Constructing NetworkLink.
 Constructing NetworkLink.
 Constructing NetworkLink.
 Added all names to the symbol table.
-Adding static hop for route 16699 (3306->8199, lat 1).
-Adding static hop for route 16676 (3309->8199, lat 1).
-Adding static hop for route 16653 (3308->8199, lat 1).
-Adding static hop for route 16630 (3307->8199, lat 1).
-Adding static hop for route 16582 (3313->8198, lat 1).
-Adding static hop for route 16559 (3310->8198, lat 1).
-Adding static hop for route 16513 (3312->8198, lat 1).
-Adding static hop for route 16467 (3319->8197, lat 1).
-Adding static hop for route 16421 (3321->8197, lat 1).
-Adding static hop for route 16279 (3315->8194, lat 1).
-Adding static hop for route 16256 (3316->8194, lat 1).
-Adding static hop for route 9641 (3280->3245, lat 1).
-Adding static hop for route 9614 (3304->3245, lat 1).
-Adding static hop for route 9589 (3279->3244, lat 1).
-Adding static hop for route 9562 (3303->3244, lat 1).
-Adding static hop for route 9458 (3301->3242, lat 1).
-Adding static hop for route 9433 (3276->3241, lat 1).
-Adding static hop for route 9406 (3300->3241, lat 1).
-Adding static hop for route 9354 (3299->3240, lat 1).
-Adding static hop for route 9329 (3274->3239, lat 1).
-Adding static hop for route 9250 (3297->3238, lat 1).
-Adding static hop for route 16024 (3265->3317, lat 1).
-Adding static hop for route 15840 (3261->3313, lat 1).
-Adding static hop for route 15794 (3260->3312, lat 1).
-Adding static hop for route 15518 (3254->3306, lat 1).
-Adding static hop for route 11980 (3295->3268, lat 1).
-Adding static hop for route 11070 (3288->3261, lat 1).
-Adding static hop for route 10940 (3287->3260, lat 1).
-Adding static hop for route 10810 (3286->3259, lat 1).
-Adding static hop for route 16760 (8202->8200, lat 1).
-Adding static hop for route 9067 (2770->3278, lat 1).
-Adding static hop for route 9067 (2770->3267, lat 12).
-Adding static hop for route 9067 (2770->3280, lat 11).
-Adding static hop for route 9067 (2770->3264, lat 6).
-Adding static hop for route 9067 (2770->3275, lat 13).
-Adding static hop for route 9067 (2770->3228, lat 9).
-Adding static hop for route 9067 (2770->3273, lat 13).
-Adding static hop for route 9067 (2770->3260, lat 10).
-Adding static hop for route 9067 (2770->3268, lat 14).
-Adding static hop for route 9067 (2770->3261, lat 10).
-Adding static hop for route 9067 (2770->3279, lat 13).
-Adding static hop for route 9067 (2770->3263, lat 12).
-Adding static hop for route 9067 (2770->3254, lat 8).
-Adding static hop for route 9067 (2770->3266, lat 7).
-Adding static hop for route 9067 (2770->3271, lat 11).
-Adding static hop for route 9067 (2770->3272, lat 9).
-Adding static hop for route 9067 (2770->3276, lat 15).
-Adding static hop for route 9067 (2770->3277, lat 15).
-Adding static hop for route 9067 (2770->3265, lat 4).
-Adding static hop for route 9067 (2770->3231, lat 12).
-Adding static hop for route 9067 (2770->3232, lat 8).
-Adding static hop for route 9067 (2770->3269, lat 4).
-Adding static hop for route 9067 (2770->3259, lat 4).
-Adding static hop for route 9067 (2770->3274, lat 13).
-Adding static hop for route 9067 (2770->3258, lat 8).
-Adding static hop for route 9067 (2770->3255, lat 6).
-Adding static hop for route 9067 (2770->3256, lat 2).
-Adding static hop for route 9067 (2770->3257, lat 2).
-Adding static hop for route 9067 (2770->3262, lat 1).
-Adding static hop for route 9036 (2770->3278, lat 1).
-Adding static hop for route 9036 (2770->3267, lat 12).
-Adding static hop for route 9036 (2770->3280, lat 11).
-Adding static hop for route 9036 (2770->3264, lat 6).
-Adding static hop for route 9036 (2770->3275, lat 13).
-Adding static hop for route 9036 (2770->3228, lat 9).
-Adding static hop for route 9036 (2770->3273, lat 13).
-Adding static hop for route 9036 (2770->3260, lat 10).
-Adding static hop for route 9036 (2770->3268, lat 14).
-Adding static hop for route 9036 (2770->3261, lat 10).
-Adding static hop for route 9036 (2770->3279, lat 13).
-Adding static hop for route 9036 (2770->3263, lat 12).
-Adding static hop for route 9036 (2770->3254, lat 8).
-Adding static hop for route 9036 (2770->3266, lat 7).
-Adding static hop for route 9036 (2770->3271, lat 11).
-Adding static hop for route 9036 (2770->3272, lat 9).
-Adding static hop for route 9036 (2770->3276, lat 15).
-Adding static hop for route 9036 (2770->3277, lat 15).
-Adding static hop for route 9036 (2770->3265, lat 4).
-Adding static hop for route 9036 (2770->3231, lat 12).
-Adding static hop for route 9036 (2770->3232, lat 8).
-Adding static hop for route 9036 (2770->3269, lat 4).
-Adding static hop for route 9036 (2770->3259, lat 4).
-Adding static hop for route 9036 (2770->3274, lat 13).
-Adding static hop for route 9036 (2770->3258, lat 8).
-Adding static hop for route 9036 (2770->3255, lat 6).
-Adding static hop for route 9036 (2770->3256, lat 2).
-Adding static hop for route 9036 (2770->3257, lat 2).
-Adding static hop for route 9036 (2770->3262, lat 1).
-Adding static hop for route 10063 (2770->3267, lat 12).
-Adding static hop for route 10063 (2770->3264, lat 6).
-Adding static hop for route 10063 (2770->3260, lat 10).
-Adding static hop for route 10063 (2770->3268, lat 14).
-Adding static hop for route 10063 (2770->3261, lat 10).
-Adding static hop for route 10063 (2770->3254, lat 8).
-Adding static hop for route 10063 (2770->3263, lat 12).
-Adding static hop for route 10063 (2770->3266, lat 7).
-Adding static hop for route 10063 (2770->3265, lat 4).
-Adding static hop for route 10063 (2770->3269, lat 4).
-Adding static hop for route 10063 (2770->3259, lat 4).
-Adding static hop for route 10063 (2770->3258, lat 8).
-Adding static hop for route 10063 (2770->3255, lat 6).
-Adding static hop for route 10063 (2770->3256, lat 2).
-Adding static hop for route 10063 (2770->3257, lat 2).
-Adding static hop for route 10063 (2770->3262, lat 1).
-Adding static hop for route 18706 (2770->3278, lat 1).
-Adding static hop for route 18706 (2770->3280, lat 11).
-Adding static hop for route 18706 (2770->3275, lat 13).
-Adding static hop for route 18706 (2770->3273, lat 13).
-Adding static hop for route 18706 (2770->3279, lat 13).
-Adding static hop for route 18706 (2770->3277, lat 15).
-Adding static hop for route 18706 (2770->3276, lat 15).
-Adding static hop for route 18706 (2770->3272, lat 9).
-Adding static hop for route 18706 (2770->3271, lat 11).
-Adding static hop for route 18706 (2770->3232, lat 8).
-Adding static hop for route 18706 (2770->3274, lat 13).
 Adding static hop for route 8815 (3228->177, lat 1).
 Adding static hop for route 8786 (3228->177, lat 1).
-Adding static hop for route 9226 (2770->3231, lat 12).
-Adding static hop for route 9156 (2770->3228, lat 9).
-Adding static hop for route 9090 (2770->3224, lat 10).
-Adding static hop for route 8921 (3224->2765, lat 1).
+Adding static hop for route 9067 (2770->3277, lat 5).
+Adding static hop for route 9067 (2770->3280, lat 3).
+Adding static hop for route 9067 (2770->3266, lat 1).
+Adding static hop for route 9067 (2770->3263, lat 6).
+Adding static hop for route 9067 (2770->3232, lat 6).
+Adding static hop for route 9067 (2770->3278, lat 9).
+Adding static hop for route 9067 (2770->3264, lat 4).
+Adding static hop for route 9067 (2770->3262, lat 8).
+Adding static hop for route 9067 (2770->3261, lat 10).
+Adding static hop for route 9067 (2770->3260, lat 2).
+Adding static hop for route 9067 (2770->3259, lat 12).
+Adding static hop for route 9067 (2770->3258, lat 2).
+Adding static hop for route 9067 (2770->3257, lat 18).
+Adding static hop for route 9067 (2770->3256, lat 1).
+Adding static hop for route 9067 (2770->3255, lat 16).
+Adding static hop for route 9067 (2770->3254, lat 4).
+Adding static hop for route 9067 (2770->3228, lat 5).
+Adding static hop for route 9067 (2770->3265, lat 14).
+Adding static hop for route 9067 (2770->3268, lat 6).
+Adding static hop for route 9067 (2770->3269, lat 6).
+Adding static hop for route 9067 (2770->3272, lat 9).
+Adding static hop for route 9067 (2770->3273, lat 13).
+Adding static hop for route 9067 (2770->3274, lat 15).
+Adding static hop for route 9067 (2770->3275, lat 11).
+Adding static hop for route 9067 (2770->3279, lat 11).
+Adding static hop for route 9067 (2770->3267, lat 4).
+Adding static hop for route 9067 (2770->3271, lat 3).
+Adding static hop for route 9067 (2770->3231, lat 4).
+Adding static hop for route 9067 (2770->3276, lat 11).
+Adding static hop for route 9036 (2770->3277, lat 5).
+Adding static hop for route 9036 (2770->3280, lat 3).
+Adding static hop for route 9036 (2770->3266, lat 1).
+Adding static hop for route 9036 (2770->3263, lat 6).
+Adding static hop for route 9036 (2770->3232, lat 6).
+Adding static hop for route 9036 (2770->3278, lat 9).
+Adding static hop for route 9036 (2770->3264, lat 4).
+Adding static hop for route 9036 (2770->3262, lat 8).
+Adding static hop for route 9036 (2770->3261, lat 10).
+Adding static hop for route 9036 (2770->3260, lat 2).
+Adding static hop for route 9036 (2770->3259, lat 12).
+Adding static hop for route 9036 (2770->3258, lat 2).
+Adding static hop for route 9036 (2770->3257, lat 18).
+Adding static hop for route 9036 (2770->3256, lat 1).
+Adding static hop for route 9036 (2770->3255, lat 16).
+Adding static hop for route 9036 (2770->3254, lat 4).
+Adding static hop for route 9036 (2770->3228, lat 5).
+Adding static hop for route 9036 (2770->3265, lat 14).
+Adding static hop for route 9036 (2770->3268, lat 6).
+Adding static hop for route 9036 (2770->3269, lat 6).
+Adding static hop for route 9036 (2770->3272, lat 9).
+Adding static hop for route 9036 (2770->3273, lat 13).
+Adding static hop for route 9036 (2770->3274, lat 15).
+Adding static hop for route 9036 (2770->3275, lat 11).
+Adding static hop for route 9036 (2770->3279, lat 11).
+Adding static hop for route 9036 (2770->3267, lat 4).
+Adding static hop for route 9036 (2770->3271, lat 3).
+Adding static hop for route 9036 (2770->3231, lat 4).
+Adding static hop for route 9036 (2770->3276, lat 11).
+Adding static hop for route 10063 (2770->3266, lat 1).
+Adding static hop for route 10063 (2770->3263, lat 6).
+Adding static hop for route 10063 (2770->3269, lat 6).
+Adding static hop for route 10063 (2770->3268, lat 6).
+Adding static hop for route 10063 (2770->3254, lat 4).
+Adding static hop for route 10063 (2770->3255, lat 16).
+Adding static hop for route 10063 (2770->3257, lat 18).
+Adding static hop for route 10063 (2770->3258, lat 2).
+Adding static hop for route 10063 (2770->3259, lat 12).
+Adding static hop for route 10063 (2770->3260, lat 2).
+Adding static hop for route 10063 (2770->3262, lat 8).
+Adding static hop for route 10063 (2770->3265, lat 14).
+Adding static hop for route 10063 (2770->3256, lat 1).
+Adding static hop for route 10063 (2770->3264, lat 4).
+Adding static hop for route 10063 (2770->3267, lat 4).
+Adding static hop for route 10063 (2770->3261, lat 10).
+Adding static hop for route 18706 (2770->3277, lat 5).
+Adding static hop for route 18706 (2770->3280, lat 3).
+Adding static hop for route 18706 (2770->3278, lat 9).
+Adding static hop for route 18706 (2770->3275, lat 11).
+Adding static hop for route 18706 (2770->3274, lat 15).
+Adding static hop for route 18706 (2770->3273, lat 13).
+Adding static hop for route 18706 (2770->3232, lat 6).
+Adding static hop for route 18706 (2770->3272, lat 9).
+Adding static hop for route 18706 (2770->3279, lat 11).
+Adding static hop for route 18706 (2770->3271, lat 3).
+Adding static hop for route 18706 (2770->3276, lat 11).
+Adding static hop for route 9226 (2770->3231, lat 4).
 Adding static hop for route 8892 (3224->2765, lat 1).
+Adding static hop for route 9156 (2770->3228, lat 5).
+Adding static hop for route 9090 (2770->3224, lat 6).
+Adding static hop for route 8921 (3224->2765, lat 1).
 Printing hop routes
 0	8986: E, vc0
+	12174: S, vc0
 1	8986: E, vc0
-	15610: S, vc0
+	12174: W, vc0
+	15840: X, vc0
+	16582: S, vc0
 2	8986: E, vc0
+	10420: E, vc1
+	12174: W, vc0
+3	8986: E, vc0
+	10420: E, vc1
+	12174: W, vc0
+	15702: E, vc2
+	16070: X, vc0
+	16490: S, vc0
+4	8986: X, vc5
+	9036: X, vc3
+	9067: X, vc2
+	10063: X, vc4
 	10179: X, vc0
 	10420: X, vc1
-	15610: W, vc0
-3	8986: E, vc0
-4	8986: X, vc5
-	10179: X, vc0
-	11200: X, vc1
-	15886: S, vc0
-5	11200: W, vc0
-16	8986: N, vc0
-17	15610: S, vc0
-18	10179: N, vc0
-	10420: N, vc1
-19	15886: S, vc0
-20	9537: S, vc0
-	10179: N, vc0
-	12317: X, vc0
-	15886: W, vc0
-21	11200: N, vc0
-22	11200: W, vc0
-	13354: X, vc1
-	13378: X, vc0
-32	8986: N, vc0
-	9012: X, vc0
-	9696: S, vc0
-33	9696: W, vc0
-	15610: S, vc0
-34	9696: W, vc0
-	10179: N, vc0
-	10420: N, vc1
-	15656: S, vc0
-35	9696: W, vc0
-	15656: W, vc1
-	15886: X, vc0
-	16302: S, vc0
-36	9537: S, vc0
-	9696: W, vc0
-	10179: XN, vc0
-	10550: X, vc1
-	12317: N, vc1
-	15656: W, vc1
-37	9696: W, vc0
-38	9696: WS, vc0
-	13354: N, vc0
-	13378: N, vc1
-39	9696: WES, vc0
-	12174: X, vc0
-40	9696: E, vc0
-41	9696: S, vc0
-48	9012: N, vc0
-	9696: S, vc0
-49	15610: S, vc0
-50	10179: N, vc0
-	10420: N, vc1
-	15656: X, vc0
-	16208: S, vc0
-51	10179: X, vc0
-	12110: X, vc1
-	16208: W, vc0
-	16302: S, vc0
-52	9537: S, vc0
-	10179: N, vc0
-	10550: N, vc1
-	12317: N, vc2
-53	10179: X, vc0
-	15748: E, vc0
-54	9696: S, vc0
-	13354: XN, vc0
-	13378: XN, vc1
-	15748: E, vc0
-55	9696: X, vc0
-	9969: X, vc1
-	12174: N, vc0
-	15748: E, vc0
-	16784: S, vc0
-56	12174: W, vc0
-	15748: X, vc0
-	16536: S, vc0
-57	9696: XS, vc0
-	9871: X, vc1
 	12174: W, vc0
-	16970: S, vc1
-64	9012: N, vc0
-	9696: S, vc0
-65	15610: X, vc0
-66	10179: N, vc0
-	10420: N, vc1
-	16208: S, vc0
-	16606: E, vc0
-67	10179: N, vc0
-	11590: E, vc0
-	12110: N, vc1
-	15564: X, vc0
-	16302: S, vc0
-	16606: E, vc1
-68	9537: S, vc0
-	10179: XN, vc0
-	10550: N, vc1
-	11590: X, vc1
-	12317: N, vc2
-	16606: E, vc0
-69	10179: N, vc0
-	16231: S, vc0
-	16606: E, vc0
-	16807: S, vc1
-70	9669: X, vc1
-	9696: X, vc0
-	13354: N, vc0
-	13378: N, vc1
-	16606: E, vc0
-	16807: W, vc0
-	16854: S, vc0
-71	9669: W, vc0
-	9969: N, vc0
-	15702: X, vc0
-	16606: S, vc0
-	16784: S, vc1
-	16854: W, vc1
-72	16536: S, vc0
-	16854: W, vc0
-	16878: X, vc4
-	16901: X, vc3
-	16924: X, vc2
-	16947: X, vc1
-	16970: X, vc0
-73	9696: S, vc0
-	9871: N, vc0
-	12174: N, vc1
-	16901: W, vc0
-	16970: W, vc1
-80	9012: N, vc0
-	9696: X, vc0
-	9724: X, vc1
-	16830: E, vc0
-81	10179: S, vc0
-	16830: E, vc0
-82	10179: WSN, vc0
-	10420: N, vc1
-	11460: E, vc0
-	16208: S, vc1
-	16349: S, vc2
-	16830: E, vc1
-83	10179: XNSW, vc0
-	11460: X, vc1
-	11590: N, vc1
-	12110: N, vc2
-	15564: N, vc3
-	15978: E, vc0
-	16302: S, vc1
-	16349: W, vc1
-	16830: E, vc1
-84	9537: S, vc0
-	10179: SNEW, vc0
-	10550: N, vc1
-	12317: N, vc2
-	15978: S, vc2
-	16349: W, vc1
-	16830: E, vc1
-85	10179: SEN, vc0
-	16231: S, vc1
-	16349: W, vc0
-	16784: X, vc3
-	16807: X, vc2
-	16830: X, vc1
-	16854: X, vc0
-86	10179: E, vc0
-	13354: XN, vc0
-	13378: XN, vc1
-	16349: W, vc0
-	16784: W, vc1
-	16854: W, vc2
-87	9669: N, vc0
-	9969: N, vc1
-	10179: SE, vc0
-	15702: N, vc2
-	16349: W, vc0
-	16536: X, vc3
-	16606: X, vc0
-	16784: W, vc1
-88	10179: S, vc0
-	16536: W, vc0
-	16878: N, vc0
-	16924: N, vc1
-	16947: N, vc2
-89	9696: XS, vc0
-	9822: X, vc1
-	9871: N, vc0
-	16901: N, vc1
-	16947: W, vc0
-96	8945: X, vc0
-	9012: N, vc0
-	9724: N, vc1
-97	10179: S, vc0
-	12317: X, vc0
-	16325: S, vc1
-98	10154: X, vc1
-	10179: X, vc0
-	10420: N, vc0
-	11460: N, vc1
-	16208: S, vc0
-	16349: S, vc1
-99	10179: S, vc0
-	11590: N, vc0
-	12110: N, vc1
-	13354: X, vc1
-	13378: X, vc0
-	15564: N, vc2
-	16302: S, vc1
-100	9537: S, vc0
-	10179: X, vc0
-	10290: X, vc1
-	10550: N, vc0
-	11720: E, vc0
-	12110: W, vc0
-	12317: N, vc1
-	15564: W, vc1
-	15978: S, vc1
-	16070: S, vc2
-101	9381: E, vc0
-	10179: XS, vc0
-	10290: W, vc0
-	11720: X, vc1
+	15610: S, vc0
+	15702: E, vc0
 	16070: W, vc1
-	16231: S, vc1
-102	9381: X, vc0
-	9773: E, vc0
-	13354: N, vc0
-	13378: N, vc1
-103	9669: N, vc0
-	9773: E, vc0
-	9969: N, vc1
-	10179: S, vc0
-	15702: N, vc2
-104	9773: E, vc0
-	10179: X, vc0
-	16878: N, vc0
-	16924: N, vc1
-105	9696: XS, vc0
-	9773: X, vc1
-	9822: N, vc0
-	9871: N, vc1
-	16901: N, vc2
-	16924: W, vc0
-112	8945: N, vc0
-	9724: N, vc1
-	16325: S, vc0
-	16398: S, vc1
-113	10179: S, vc0
-	12317: N, vc0
-	16325: W, vc0
-	16398: W, vc1
-114	10154: N, vc0
-	10420: N, vc1
-	11460: N, vc2
-	15932: X, vc0
-	16208: S, vc0
-	16349: S, vc1
-	16398: W, vc0
-115	10179: S, vc0
-	13354: N, vc0
-	13378: N, vc1
-	16231: X, vc3
-	16302: X, vc0
-	16398: W, vc0
-116	9537: S, vc0
-	10550: N, vc0
-	11720: N, vc1
-	12110: N, vc2
-	12317: N, vc3
-	15978: X, vc0
-	16070: S, vc1
-	16231: W, vc0
-117	9381: N, vc0
-	10179: X, vc0
-	10290: N, vc1
-	10680: X, vc1
-	15702: E, vc0
-	16231: W, vc0
-118	13354: XN, vc0
-	13378: XN, vc1
-	15702: E, vc0
-119	9669: N, vc0
-	9969: N, vc1
-	10179: X, vc0
-	15702: N, vc2
-120	13354: X, vc1
+5	9510: S, vc0
+	12174: W, vc0
+	13354: X, vc1
 	13378: X, vc0
-	16878: N, vc0
-121	9696: XS, vc0
-	9822: N, vc0
-	9871: N, vc1
-	9920: X, vc1
-	16878: W, vc0
-	16901: N, vc2
-128	8945: N, vc0
-	9724: N, vc1
-	12317: E, vc0
-	16325: X, vc3
-	16349: X, vc2
-	16374: X, vc1
-	16398: X, vc0
-129	8945: W, vc0
-	10179: S, vc0
-	12317: XSNE, vc0
-	16349: W, vc1
-130	10154: N, vc0
-	10420: N, vc1
-	11460: N, vc2
-	12317: E, vc0
-	13378: S, vc0
-	15932: N, vc3
-	16208: S, vc1
-	16349: W, vc0
-131	10154: W, vc0
-	10179: S, vc0
-	12317: SE, vc0
-	13354: XN, vc0
-	13378: XNSW, vc1
-132	9537: S, vc0
-	10550: N, vc0
-	11720: N, vc1
-	12110: N, vc2
-	12317: EN, vc3
-	13378: SWE, vc1
-	16070: S, vc2
-133	9381: N, vc0
-	10290: N, vc1
-	10680: N, vc2
-	12317: ES, vc0
+	15702: E, vc0
+6	11590: S, vc0
+	11720: S, vc1
+	12174: W, vc0
+	13354: EW, vc1
+	15702: E, vc1
+7	11590: W, vc0
+	11720: W, vc1
+	12174: W, vc2
 	13354: X, vc1
-	13378: XSE, vc1
-134	10018: E, vc0
-	10680: W, vc0
-	12317: E, vc1
-	13354: N, vc0
-	13378: NES, vc0
-135	9669: N, vc0
-	9969: N, vc1
-	10018: E, vc0
-	10680: W, vc0
-	12317: XE, vc1
-	13378: ES, vc0
-136	10018: E, vc0
-	12317: S, vc0
-	13354: N, vc0
-	13378: NS, vc1
-137	9696: X, vc0
-	9822: N, vc0
-	9871: N, vc1
-	9920: N, vc2
-	10018: X, vc1
-	16878: N, vc3
-144	9724: N, vc0
-	16374: N, vc1
-145	10179: X, vc0
-	11330: X, vc1
-	12317: S, vc0
-	15932: E, vc0
-146	10420: N, vc0
-	11460: N, vc1
-	13354: X, vc1
-	13378: XS, vc0
-	15932: N, vc2
-	16208: S, vc1
-147	10179: S, vc0
-	12317: S, vc1
-	13354: N, vc0
-	13378: S, vc2
-148	9537: E, vc0
-	10550: N, vc0
-	11720: N, vc1
-	12110: N, vc2
-	13354: X, vc1
-	13378: XS, vc0
-	16070: S, vc1
-149	9381: N, vc0
-	9537: E, vc0
-	10290: N, vc1
-	12110: W, vc0
-	12317: S, vc0
-	13354: N, vc2
-	13378: S, vc1
-150	9537: E, vc0
-	12110: W, vc0
-	13354: XN, vc0
-	13378: XS, vc0
-151	9510: X, vc1
-	9537: X, vc0
-	9669: N, vc0
-	9920: E, vc0
-	9969: N, vc1
-	10680: N, vc2
-	13378: S, vc0
-152	9920: E, vc0
-	12317: X, vc0
-	13354: N, vc0
-	13378: S, vc0
-153	9822: N, vc0
-	9871: N, vc1
-	9920: N, vc2
-160	9724: N, vc0
-	16374: N, vc1
-161	9724: W, vc0
-	11330: N, vc0
-	12317: XS, vc0
-162	9302: X, vc1
-	9724: W, vc0
+	13378: X, vc0
+	15702: E, vc0
+8	8839: S, vc0
+	8868: E, vc0
+	9036: X, vc1
+	9067: X, vc0
+	9226: X, vc2
+	11720: W, vc0
+	12174: W, vc1
+	15702: S, vc1
+9	8786: X, vc1
+	8815: X, vc0
+	8868: S, vc0
+	9036: X, vc3
+	9067: X, vc2
+	9156: X, vc4
+	12174: W, vc0
+16	8945: S, vc0
+	8986: N, vc0
+	9012: X, vc0
+	9920: S, vc1
+	10420: E, vc0
+	12174: S, vc2
+17	8945: W, vc0
+	9920: W, vc1
+	10420: E, vc0
+	15840: N, vc0
+	16582: S, vc0
+18	8945: W, vc0
+	9036: X, vc2
+	9067: X, vc1
+	9641: S, vc0
+	9920: W, vc1
 	10420: N, vc0
-	13354: NS, vc0
-	13378: S, vc1
-	16208: S, vc2
-163	10179: S, vc0
-	10420: W, vc0
-	12317: S, vc1
-	13354: XNW, vc1
-	13378: X, vc0
-164	10550: N, vc0
-	13354: NSW, vc0
-	13378: S, vc1
-	16070: S, vc2
-165	9381: N, vc0
-	10290: N, vc1
-	12317: S, vc0
-	13354: XNW, vc0
-	13378: X, vc0
-166	8839: E, vc0
-	8868: E, vc1
-	13354: NWS, vc0
-	13378: S, vc1
-167	8839: E, vc0
-	8868: E, vc1
-	9510: N, vc0
-	9669: N, vc1
-	9969: N, vc2
-	10680: N, vc3
-	13354: XSW, vc0
-	13378: XS, vc1
-168	8839: E, vc0
-	8868: E, vc1
-	9969: W, vc0
-	13354: NSW, vc1
-	13378: S, vc1
-169	8839: X, vc1
-	8868: X, vc0
-	9822: N, vc0
-	9871: N, vc1
-	13354: W, vc0
-176	16374: N, vc0
-177	9822: E, vc0
-	11330: N, vc0
-	12317: S, vc0
-	16116: S, vc1
-178	9302: N, vc0
-	9822: E, vc0
-	11330: W, vc0
-	13354: XS, vc0
-	13378: XS, vc1
-	16116: W, vc1
-	16208: S, vc2
-179	9822: E, vc0
-	10179: XS, vc0
-	11330: W, vc0
-	11850: X, vc1
-	12317: S, vc1
-	16116: W, vc1
-180	9822: E, vc0
-	10550: N, vc0
-	11330: W, vc0
-	11850: W, vc1
-	13354: XS, vc0
-	13378: XS, vc1
-	16070: S, vc2
-181	9381: N, vc0
-	9822: E, vc0
-	11850: W, vc0
-	12317: S, vc0
-182	9822: E, vc0
-	11850: W, vc0
-	13354: XS, vc0
-	13378: XS, vc1
-183	9510: N, vc0
-	9669: N, vc1
-	9822: E, vc0
-	10680: N, vc2
-	13354: S, vc0
-	13378: S, vc1
-184	9510: W, vc0
-	9822: E, vc0
-	13354: XS, vc0
-	13378: XS, vc1
-185	9822: N, vc0
-	9871: N, vc1
-192	16374: N, vc0
-193	12317: X, vc0
-	16116: S, vc0
-194	9302: N, vc0
-	13354: S, vc0
-	13378: S, vc1
-	16208: S, vc2
-195	9277: E, vc0
-	10179: S, vc0
-	12317: XS, vc1
-196	9277: E, vc0
-	10550: N, vc0
-	13354: S, vc0
-	13378: S, vc1
-	16070: S, vc2
-197	9277: E, vc0
-	9381: N, vc0
 	12317: X, vc0
-198	9277: E, vc0
-	13354: S, vc0
-	13378: S, vc1
-199	9277: S, vc0
-	9669: N, vc0
-	10680: N, vc1
-	13354: X, vc1
-	13378: X, vc0
-200	13354: S, vc0
-	13378: S, vc1
-201	9871: N, vc0
-208	16374: N, vc0
-209	16116: S, vc0
-210	9302: N, vc0
-	13354: X, vc1
-	13378: X, vc0
-	16208: S, vc0
-211	9302: W, vc0
+	18706: X, vc3
+19	8945: W, vc0
+	9036: X, vc3
+	9067: X, vc2
+	9920: W, vc1
+	10063: X, vc4
 	10179: X, vc0
-	12317: S, vc0
-	16162: E, vc0
-212	9302: W, vc0
-	10550: N, vc0
+	10940: X, vc1
+	15702: N, vc0
+	15794: E, vc0
+	16490: S, vc0
+20	9036: X, vc3
+	9067: X, vc2
+	9920: W, vc0
+	10063: X, vc4
+	10179: XNW, vc1
+	11720: X, vc1
+	15610: S, vc0
+	15794: E, vc0
+	16070: N, vc1
+21	9510: X, vc0
+	9537: X, vc1
+	9920: W, vc0
+	11720: W, vc1
+	13378: N, vc0
+	15794: S, vc0
+	16116: E, vc0
+22	9614: S, vc0
+	11590: S, vc1
+	11720: S, vc2
+	13354: XN, vc0
+	13378: XEW, vc0
+	16116: S, vc3
+23	13354: W, vc0
+	13378: NE, vc0
+24	8839: S, vc0
+	11720: N, vc0
 	13354: X, vc1
 	13378: X, vc0
-	16070: S, vc0
-	16162: E, vc0
-213	9302: W, vc0
-	16162: S, vc0
-214	9302: W, vc0
-	13354: X, vc1
-	13378: X, vc0
-215	9277: S, vc0
-	9669: N, vc0
-216	9871: E, vc0
-	13354: XS, vc0
-	13378: XS, vc1
-217	9871: N, vc0
-224	16374: N, vc0
-225	16116: X, vc0
-	16374: W, vc0
-226	16208: S, vc0
-	16374: W, vc0
-	16444: X, vc2
-	16490: X, vc0
-227	9485: E, vc0
+	15702: E, vc0
+25	8868: S, vc0
+	15702: S, vc1
+32	8892: X, vc1
+	8921: X, vc3
+	8945: X, vc0
+	9012: N, vc0
+	9090: X, vc2
+	9485: S, vc0
+	9920: S, vc1
+	10420: N, vc1
+	12174: S, vc2
+	15840: E, vc0
+33	9036: X, vc2
+Error setting saddr = 4
+	9067: X, vc1
+	9485: W, vc0
+Error setting daddr = 19
 	12317: X, vc0
-	16444: W, vc0
-228	9485: E, vc0
-	16070: S, vc0
-	16444: W, vc0
-229	9485: E, vc0
-	16162: X, vc0
-	16444: W, vc0
-230	9485: E, vc0
-231	9277: S, vc0
-	9485: E, vc0
-	9669: N, vc0
-232	9485: X, vc0
-	9871: N, vc0
-	13354: S, vc0
-	13378: S, vc1
-242	16208: X, vc0
-	16490: N, vc0
-243	16490: W, vc0
-244	16070: X, vc0
-	16490: W, vc0
-247	9277: X, vc0
-	9669: N, vc0
-248	13354: X, vc1
+Error setting daddr = 183
+	15840: N, vc0
+Error setting daddr = 4
+	16582: S, vc0
+Error setting daddr = 149
+	18706: X, vc3
+Error setting daddr = 226
+Error setting daddr = 247
+Error setting daddr = 20
+Error setting daddr = 68
+Error setting daddr = 100
+Error setting daddr = 36
+Error setting daddr = 38
+Error setting daddr = 85
+Error setting daddr = 53
+34	9641: S, vc0
+Error setting daddr = 181
+Error setting daddr = 70
+Error setting daddr = 72
+Error setting class = 4
+Error setting class = 4
+	12317: WN, vc0
+Error setting class = 4
+	16606: E, vc0
+Error setting class = 4
+35	8945: N, vc0
+Error setting class = 4
+	9036: X, vc2
+Error setting class = 4
+	9067: X, vc1
+Error setting class = 4
+	10940: N, vc1
+Error setting class = 4
+	12317: XW, vc0
+Error setting class = 4
+	15702: N, vc2
+Error setting class = 4
+	16490: E, vc0
+Error setting class = 4
+	16606: S, vc0
+Error setting class = 4
+	18706: X, vc3
+Error setting class = 4
+Error setting class = 4
+36	9036: X, vc3
+Error setting class = 4
+	9067: X, vc2
+Error setting class = 4
+	9614: S, vc0
+Error setting lat = 2
+	10063: X, vc4
+Error setting lat = 14
+	10179: XN, vc0
+Error setting lat = 1
+	10680: X, vc1
+Error setting lat = 10
+	10940: W, vc0
+Error setting lat = 16
+	15610: S, vc1
+Error setting lat = 18
+	15702: W, vc1
+Error setting lat = 1
+	16490: E, vc0
+Error setting lat = 4
+37	9537: N, vc0
+Error setting lat = 6
+	9614: W, vc0
+Error setting lat = 2
+	10179: W, vc1
+Error setting lat = 4
+	10680: W, vc2
+Error setting lat = 6
+	11720: N, vc1
+Error setting lat = 4
+	15794: X, vc0
+Error setting lat = 12
+	16116: N, vc2
+Error setting lat = 6
+	16490: S, vc0
+	16513: E, vc0
+38	9036: X, vc3
+	9067: X, vc2
+Error setting lat = 8
+	9614: W, vc0
+Error setting saddr = 129
+	10063: X, vc4
+Error setting daddr = 213
+	10154: X, vc1
+Error setting daddr = 240
+	10179: XW, vc1
+Error setting daddr = 217
+	10680: W, vc2
+Error setting daddr = 153
+	11590: S, vc1
+Error setting daddr = 176
+Error setting daddr = 241
+Error setting daddr = 160
+Error setting daddr = 128
+Error setting class = 0
+	11720: W, vc3
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+Error setting class = 0
+	13378: N, vc0
+Error setting class = 0
+	15518: S, vc2
+Error setting class = 0
+	16116: S, vc3
+Error setting class = 0
+	16513: E, vc0
+Error setting class = 0
+39	10154: W, vc0
+Error setting class = 0
+	13354: XN, vc0
+Error setting class = 0
+	13378: XW, vc1
+Error setting class = 0
+	16513: S, vc0
+Error setting saddr = 137
+40	8839: S, vc0
+Error setting daddr = 35
+	13354: NW, vc0
+Error setting daddr = 152
+41	8868: S, vc0
+Error setting daddr = 184
+	15702: S, vc1
+Error setting daddr = 120
+48	9485: E, vc0
+Error setting daddr = 150
+	9920: S, vc0
+Error setting daddr = 33
+	10420: N, vc0
+Error setting daddr = 118
+	12174: S, vc1
+Error setting daddr = 163
+	15840: N, vc1
+Error setting daddr = 18
+	16582: S, vc2
+49	9485: S, vc0
+Error setting daddr = 131
+	13354: S, vc1
+Error setting class = 0
+	16582: W, vc0
+Error setting class = 0
+	16606: E, vc0
+Error setting class = 0
+50	9302: S, vc0
+Error setting class = 0
+	9641: E, vc0
+Error setting class = 0
+	13354: XWE, vc1
+Error setting class = 0
+	13378: XS, vc1
+Error setting class = 0
+	16606: N, vc0
+Error setting class = 0
+51	9614: X, vc0
+Error setting class = 0
+	9641: X, vc1
+Error setting class = 0
+	10018: S, vc0
+Error setting class = 0
+	12317: N, vc0
+Error setting class = 0
+	13354: S, vc1
+Error setting class = 0
+	13378: W, vc0
+Error setting class = 0
+	16606: E, vc0
+Error setting class = 0
+52	9614: W, vc0
+Error setting class = 0
+	10940: N, vc0
+Error setting class = 0
+	12110: S, vc0
+Error setting class = 0
+	13354: X, vc1
+Error setting class = 0
+	13378: XW, vc1
+Error setting class = 0
+	15610: S, vc2
+Error setting saddr = 4
+	16606: E, vc0
+Error setting daddr = 9
+53	9036: X, vc3
+Error setting class = 4
+	9067: X, vc2
+Error setting lat = 5
+	9537: N, vc0
+Error setting saddr = 18
+	10063: X, vc4
+Error setting daddr = 51
+	10179: X, vc0
+Error setting class = 1
+	11850: X, vc1
+Error setting class = 1
+	13354: W, vc0
+Error setting saddr = 163
+	16116: N, vc1
+Error setting daddr = 230
+	16490: E, vc0
+Error setting class = 1
+	16606: S, vc0
+Error setting class = 1
+54	9537: W, vc0
+Error setting saddr = 118
+	10179: WN, vc0
+Error setting daddr = 21
+	10680: N, vc1
+Error setting class = 1
+	11590: S, vc0
+Error setting class = 1
+	15518: S, vc1
+Error setting saddr = 33
+	16116: X, vc0
+Error setting daddr = 145
+	16467: S, vc2
+Error setting class = 0
+Error setting class = 0
+Error setting saddr = 150
+	16490: E, vc0
+Error setting daddr = 198
+55	9036: X, vc1
+Error setting class = 0
+	9067: X, vc0
+Error setting class = 0
+	10680: W, vc0
+Error setting saddr = 120
+	13378: ESN, vc0
+Error setting daddr = 168
+	16490: E, vc1
+Error setting class = 1
+	16513: S, vc1
+Error setting class = 1
+	18706: X, vc2
+Error setting saddr = 184
+56	8839: E, vc0
+Error setting daddr = 166
+	11200: S, vc0
+Error setting class = 0
+	13354: XN, vc0
+Error setting class = 0
 	13378: X, vc0
+Error setting saddr = 152
+	16490: S, vc1
+Error setting daddr = 151
+57	8839: S, vc0
+Error setting class = 0
+	8868: S, vc1
+Error setting class = 0
+	15702: S, vc2
+Error setting saddr = 131
+64	9920: E, vc0
+Error setting daddr = 137
+	10420: N, vc0
+Error setting class = 0
+	12174: E, vc1
+Error setting class = 0
+	15840: N, vc1
+Error setting saddr = 104
+	16582: S, vc0
+Error setting daddr = 137
+65	9485: S, vc0
+Error setting class = 3
+	9920: S, vc1
+Error setting class = 3
+	11070: S, vc2
+Error setting saddr = 99
+	12174: S, vc3
+Error setting daddr = 104
+	13354: X, vc1
+Error setting class = 0
+	13378: X, vc0
+Error setting class = 0
+	16606: N, vc0
+Error setting saddr = 100
+66	9302: E, vc0
+Error setting daddr = 99
+	13354: N, vc0
+Error setting class = 0
+	13378: WES, vc0
+Error setting class = 0
+67	9302: S, vc0
+Error setting saddr = 103
+	10018: S, vc1
+	10940: E, vc0
+Error setting daddr = 104
+	12110: S, vc2
+Error setting class = 2
+	12317: N, vc0
+Error setting class = 2
+	13354: X, vc1
+Error setting saddr = 85
+	13378: X, vc0
+Error setting daddr = 103
+	15610: S, vc3
+Error setting class = 0
+	16208: S, vc4
+Error setting class = 0
+68	9036: X, vc3
+Error setting saddr = 54
+	9067: X, vc2
+Error setting daddr = 104
+	10063: X, vc4
+Error setting class = 1
+	10179: XE, vc0
+Error setting class = 1
+	10940: N, vc0
+Error setting saddr = 53
+	11460: X, vc1
+Error setting daddr = 54
+	11850: E, vc1
+Error setting class = 0
+	12110: W, vc0
+Error setting class = 0
+	13378: SN, vc1
+Error setting saddr = 3
+	15610: W, vc1
+Error setting daddr = 104
+	15978: E, vc2
+Error setting class = 3
+	16208: W, vc2
+Error setting class = 3
+69	10179: E, vc0
+Error setting saddr = 20
+	11850: N, vc0
+Error setting daddr = 3
+	11980: S, vc0
+Error setting class = 0
+	13354: XN, vc1
+Error setting class = 0
+	13378: XSW, vc0
+Error setting saddr = 136
+	15978: S, vc2
+Error setting daddr = 137
+	16606: E, vc1
+Error setting class = 1
+70	9036: X, vc3
+Error setting class = 1
+	9067: X, vc2
+	9537: N, vc0
+Error setting saddr = 167
+	10063: X, vc4
+Error setting daddr = 136
+	10179: XEN, vc1
+Error setting class = 2
+	11330: X, vc1
+Error setting class = 2
+	11590: S, vc0
+Error setting saddr = 183
+	13378: W, vc0
+Error setting daddr = 167
+	15518: S, vc1
+Error setting class = 0
+	15932: S, vc2
+Error setting class = 0
+	16467: S, vc3
+Error setting saddr = 133
+	16606: E, vc1
+Error setting daddr = 136
+71	10179: E, vc0
+Error setting class = 0
+	10680: N, vc0
+Error setting class = 0
+	13354: XS, vc0
+Error setting saddr = 68
+	13378: XW, vc0
+Error setting daddr = 133
+	16513: S, vc1
+Error setting class = 0
+	16606: E, vc1
+Error setting class = 0
+72	9036: X, vc3
+Error setting saddr = 116
+	9067: X, vc2
+Error setting daddr = 136
+	10063: X, vc4
+Error setting class = 1
+	10179: X, vc0
+Error setting class = 1
+	11200: X, vc1
+Error setting saddr = 70
+	13354: NW, vc0
+Error setting daddr = 116
+	15886: S, vc0
+Error setting class = 0
+	16490: E, vc0
+Error setting class = 0
+	16606: S, vc1
+Error setting saddr = 114
+73	8839: X, vc0
+Error setting daddr = 136
+	8868: X, vc1
+Error setting class = 3
+	13354: W, vc0
+Error setting class = 3
+	15702: S, vc0
+Error setting saddr = 72
+	16490: S, vc1
+Error setting daddr = 114
+80	9920: S, vc0
+Error setting class = 0
+	10420: N, vc0
+Error setting class = 0
+	12174: S, vc1
+Error setting saddr = 119
+	15840: N, vc1
+Error setting daddr = 137
+	16582: S, vc2
+Error setting class = 2
+81	9485: S, vc0
+Error setting class = 2
+	9920: W, vc0
+Error setting saddr = 1
+	11070: E, vc0
+Error setting daddr = 119
+	12174: W, vc1
+Error setting class = 0
+	13354: S, vc1
+Error setting class = 0
+	16606: N, vc0
+Error setting saddr = 149
+82	9250: E, vc0
+Error setting daddr = 1
+	11070: E, vc1
+Error setting class = 0
+	11850: E, vc2
+Error setting class = 0
+	13354: XWN, vc0
+Error setting saddr = 37
+	13378: XS, vc0
+Error setting daddr = 119
+83	9250: E, vc0
+Error setting class = 4
+	9302: E, vc1
+Error setting class = 4
+	10018: S, vc0
+Error setting saddr = 19
+	11070: E, vc2
+Error setting daddr = 37
+	11850: E, vc3
+Error setting class = 0
+	12110: E, vc4
+Error setting class = 0
+	12317: N, vc0
+Error setting saddr = 229
+	13354: W, vc0
+Error setting daddr = 119
+	15610: S, vc1
+Error setting class = 2
+	16208: S, vc2
+Error setting class = 2
+84	9250: E, vc0
+Error setting saddr = 181
+	9302: E, vc1
+Error setting daddr = 229
+	10179: N, vc0
+Error setting class = 0
+	11070: E, vc2
+Error setting class = 0
+	11460: N, vc1
+Error setting saddr = 88
+	11850: N, vc2
+Error setting daddr = 119
+	12110: E, vc3
+Error setting class = 1
+	13354: XW, vc0
+Error setting class = 1
+	13378: XS, vc0
+Error setting saddr = 36
+	16208: N, vc3
+Error setting daddr = 88
+85	9036: X, vc3
+Error setting class = 0
+	9067: X, vc2
+Error setting class = 0
+	9250: S, vc0
+	9302: S, vc1
+Error setting saddr = 215
+	10063: X, vc4
+Error setting daddr = 119
+	10179: X, vc0
+Error setting class = 3
+	11070: S, vc2
+Error setting class = 3
+	11980: X, vc1
+Error setting saddr = 199
+	12110: S, vc3
+Error setting daddr = 215
+	13354: WN, vc0
+Error setting class = 3
+	13378: E, vc0
+Error setting class = 3
+	15978: S, vc4
+Error setting saddr = 247
+	16162: E, vc1
+Error setting daddr = 199
+86	9537: N, vc0
+Error setting class = 0
+	11330: N, vc1
+Error setting class = 0
+	11590: S, vc0
+Error setting saddr = 212
+	13354: XW, vc0
+	13378: X, vc0
+	15518: S, vc1
+	15886: S, vc2
+	15932: S, vc3
+Error setting daddr = 215
+	16162: S, vc4
+Error setting class = 1
+	16467: E, vc0
+87	13354: WS, vc0
+	15886: W, vc1
+	16467: E, vc0
+	16513: S, vc1
+Error setting class = 1
+88	15702: X, vc0
+	15886: W, vc0
+	16467: S, vc0
+Error setting saddr = 4
+	16559: E, vc0
+	16606: S, vc1
+Error setting daddr = 212
+89	15702: W, vc0
+Error setting class = 0
+	16490: S, vc0
+Error setting class = 0
+	16559: S, vc1
+Error setting saddr = 216
+96	9920: E, vc0
+Error setting daddr = 215
+	10420: N, vc0
+Error setting class = 0
+	12174: E, vc1
+Error setting class = 0
+	15840: N, vc1
+Error setting saddr = 226
+	16582: S, vc0
+Error setting daddr = 216
+97	9250: E, vc0
+Error setting class = 0
+	9485: S, vc0
+Error setting class = 0
+	9920: S, vc1
+Error setting saddr = 165
+	12174: S, vc2
+Error setting daddr = 215
+	13354: X, vc1
+Error setting class = 2
+	13378: X, vc0
+Error setting class = 2
+	16606: N, vc0
+Error setting saddr = 38
+98	9250: N, vc0
+Error setting daddr = 165
+	10018: S, vc0
+Error setting class = 0
+	13378: W, vc0
+Error setting class = 0
+	15610: S, vc1
+Error setting saddr = 164
+	15886: S, vc2
+Error setting daddr = 101
+99	10018: W, vc0
+Error setting class = 0
+	12317: N, vc0
+Error setting class = 0
+	15610: W, vc1
+Error setting saddr = 153
+	15886: W, vc2
+Error setting daddr = 164
+	16208: X, vc0
+Error setting class = 2
+	16325: S, vc0
+Error setting class = 2
+	16421: E, vc0
+Error setting saddr = 241
+100	9036: X, vc3
+Error setting daddr = 164
+	9067: X, vc2
+Error setting class = 1
+	10063: X, vc4
+Error setting class = 1
+	10179: XN, vc0
+Error setting saddr = 177
+	12110: X, vc1
+Error setting daddr = 164
+	13378: S, vc0
+Error setting class = 3
+	15886: W, vc0
+Error setting class = 3
+	15932: S, vc1
+Error setting saddr = 240
+	16208: N, vc1
+Error setting daddr = 177
+	16325: W, vc1
+Error setting class = 3
+	16421: E, vc0
+Error setting class = 3
+101	9250: S, vc0
+Error setting saddr = 213
+	9302: S, vc1
+Error setting daddr = 164
+	10179: SNW, vc0
+Error setting class = 0
+	11070: S, vc3
+Error setting class = 0
+	12110: W, vc1
+Error setting saddr = 160
+	15886: W, vc2
+Error setting daddr = 177
+	15932: W, vc3
+Error setting class = 2
+	15978: S, vc4
+Error setting class = 2
+	16421: E, vc0
+Error setting saddr = 217
+	16760: X, vc0
+Error setting daddr = 177
+102	9537: N, vc0
+Error setting class = 1
+	11590: S, vc0
+Error setting class = 1
+	15518: S, vc1
+Error setting saddr = 176
+	15886: W, vc0
+Error setting daddr = 177
+	15932: W, vc1
+Error setting class = 0
+	16162: E, vc0
+Error setting class = 0
+	16421: E, vc1
+Error setting saddr = 128
+103	13354: S, vc0
+Error setting daddr = 177
+	16162: X, vc0
+Error setting class = 4
+	16421: E, vc0
+Error setting class = 4
+	16444: E, vc1
+Error setting saddr = 22
+	16513: S, vc1
+Error setting daddr = 51
+104	16374: E, vc0
+Error setting class = 0
+	16421: X, vc0
+Error setting class = 0
+	16444: X, vc2
+Error setting saddr = 214
+	16467: X, vc1
+Error setting daddr = 230
+	16490: X, vc3
+Error setting class = 0
+	16606: S, vc0
+Error setting class = 0
+105	16374: S, vc0
+Error setting saddr = 5
+	16490: W, vc0
+Error setting daddr = 21
+	16559: S, vc1
+Error setting class = 0
+112	9485: S, vc0
+Error setting class = 0
+	9920: S, vc1
+Error setting saddr = 148
+	10018: S, vc2
+Error setting daddr = 145
+	10420: N, vc0
+Error setting class = 1
+	12174: S, vc3
+Error setting class = 1
+	15840: N, vc1
+Error setting saddr = 182
+	16582: E, vc0
+Error setting daddr = 198
+113	9485: W, vc0
+Error setting class = 1
+	9920: W, vc1
+Error setting class = 1
+	10018: W, vc2
+Error setting saddr = 135
+	12174: W, vc3
+Error setting daddr = 168
+	16302: S, vc0
+Error setting class = 0
+	16582: E, vc0
+Error setting class = 0
+	16606: N, vc0
+Error setting saddr = 50
+114	10018: W, vc0
+Error setting daddr = 166
+	15610: S, vc0
+Error setting class = 1
+	15886: X, vc0
+Error setting class = 1
+	16302: W, vc1
+Error setting saddr = 97
+	16325: S, vc1
+Error setting daddr = 151
+	16582: E, vc0
+Error setting class = 1
+115	12317: NS, vc0
+Error setting class = 1
+	16325: W, vc0
+Error setting saddr = 52
+	16582: E, vc0
+Error setting daddr = 100
+116	12317: W, vc0
+Error setting class = 1
+	13378: S, vc0
+Error setting class = 1
+	15932: X, vc0
+Error setting saddr = 69
+	16279: S, vc1
+Error setting daddr = 85
+	16325: N, vc0
+Error setting class = 1
+	16582: E, vc0
+Error setting class = 1
+117	9250: S, vc0
+Error setting saddr = 82
+	9302: S, vc1
+Error setting daddr = 53
+	10179: S, vc2
+Error setting class = 1
+	11070: S, vc3
+Error setting class = 1
+	12317: W, vc0
+Error setting saddr = 24
+	15978: S, vc4
+Error setting daddr = 20
+	16582: E, vc0
+Error setting class = 1
+	16760: N, vc0
+Error setting class = 1
+118	9036: X, vc2
+	9067: X, vc1
+	9537: N, vc0
+Error setting saddr = 7
+	11590: S, vc0
+Error setting daddr = 183
+	12317: XSW, vc0
+Error setting class = 1
+	15518: S, vc2
+Error setting class = 1
+	16536: E, vc0
+	16582: E, vc1
+Error setting saddr = 84
+	18706: X, vc3
+Error setting daddr = 68
+119	12317: W, vc0
+Error setting class = 1
+	13354: S, vc0
+Error setting class = 1
+	16349: E, vc0
+Error setting saddr = 86
+	16513: X, vc4
+Error setting daddr = 70
+	16536: X, vc2
+Error setting class = 1
+	16559: X, vc1
+Error setting class = 1
+	16582: X, vc0
+Error setting saddr = 56
+	16606: X, vc3
+Error setting daddr = 72
+120	9036: X, vc2
+Error setting class = 1
+	9067: X, vc1
+Error setting class = 1
+	9381: S, vc0
+Error setting saddr = 65
+	12317: XW, vc0
+Error setting daddr = 149
+	16349: E, vc0
+Error setting class = 1
+	16559: S, vc1
+Error setting class = 1
+	16606: W, vc1
+Error setting saddr = 67
+	18706: X, vc3
+Error setting daddr = 19
+121	16349: S, vc0
+Error setting class = 1
+	16374: S, vc1
+Error setting class = 1
+	16559: W, vc0
+Error setting saddr = 197
+128	9485: E, vc0
+Error setting daddr = 181
+	9696: X, vc0
+Error setting class = 1
+	9920: S, vc0
+Error setting class = 1
+	10018: X, vc1
+Error setting saddr = 71
+	10420: N, vc0
+Error setting daddr = 36
+	12174: E, vc1
+Error setting class = 1
+	15840: N, vc1
+Error setting class = 1
+	16302: S, vc1
+Error setting saddr = 248
+	16878: S, vc2
+Error setting daddr = 247
+129	9485: S, vc0
+Error setting class = 1
+	9696: EW, vc0
+Error setting class = 1
+	12174: X, vc0
+Error setting saddr = 146
+	16302: W, vc1
+Error setting daddr = 4
+	16325: S, vc1
+Error setting class = 1
+	16606: N, vc0
+Error setting class = 1
+130	9696: S, vc0
+Error setting saddr = 231
+	13354: S, vc1
+	15610: S, vc2
+	16325: W, vc0
+131	9036: X, vc2
+Error setting daddr = 226
+	9067: X, vc1
+Error setting class = 1
+	12317: XS, vc0
+Error setting class = 1
+	13354: W, vc0
+Error setting saddr = 39
+	16325: E, vc0
+Error setting daddr = 38
+	18706: X, vc3
+Error setting class = 1
+132	13354: W, vc0
+Error setting class = 1
+	13378: S, vc0
+Error setting saddr = 9
+	16279: E, vc0
+	16325: N, vc0
+133	9250: S, vc0
+	9302: S, vc1
+Error setting daddr = 129
+	10179: S, vc2
+Error setting class = 0
+	11070: S, vc3
+Error setting class = 0
+	15978: X, vc0
+Error setting saddr = 8
+	16256: E, vc0
+Error setting daddr = 73
+	16279: S, vc4
+Error setting class = 0
+	16302: E, vc1
+Error setting class = 0
+	16760: N, vc0
+Error setting saddr = 9
+134	11590: S, vc0
+Error setting daddr = 9
+	12317: S, vc1
+Error setting class = 1
+	15518: S, vc2
+Error setting lat = 1
+	16256: E, vc0
+Error setting saddr = 32
+	16302: E, vc1
+Error setting daddr = 32
+	16536: N, vc0
+Error setting class = 1
+135	9354: S, vc0
+Error setting lat = 1
+	13354: XS, vc1
+Error setting saddr = 8
+	13378: X, vc0
+Error setting daddr = 73
+	16256: E, vc0
+Error setting class = 1
+	16302: E, vc1
+Error setting class = 1
+	16559: N, vc0
+Error setting saddr = 9
+136	9381: S, vc0
+Error setting daddr = 9
+	12317: N, vc0
+Error setting class = 0
+	16231: X, vc2
+Error setting lat = 1
+	16256: X, vc0
+Error setting saddr = 32
+	16279: X, vc1
+Error setting daddr = 32
+	16302: X, vc3
+Error setting class = 3
+	16398: E, vc0
+Error setting lat = 1
+	16559: W, vc0
+Error setting saddr = 4
+137	12317: SW, vc0
+Error setting daddr = 131
+	16325: X, vc0
+Error setting daddr = 35
+	16349: X, vc2
+Error setting daddr = 152
+	16374: X, vc3
+Error setting daddr = 184
+	16398: X, vc1
+Error setting daddr = 120
+144	9920: E, vc0
+Error setting daddr = 150
+	10420: N, vc0
+Error setting daddr = 33
+	15840: N, vc1
+Error setting daddr = 118
+	16302: S, vc0
+Error setting daddr = 163
+	16878: E, vc1
+Error setting daddr = 18
+145	9458: X, vc1
+Error setting daddr = 55
+	9485: X, vc0
+Error setting class = 3
+	9871: E, vc0
+Error setting class = 3
+	9920: E, vc1
+Error setting class = 3
+	10420: W, vc0
+Error setting class = 3
+	16325: S, vc0
+Error setting class = 3
+	16606: N, vc0
+Error setting class = 3
+	16878: E, vc2
+Error setting class = 3
+146	9458: W, vc0
+Error setting class = 3
+	9696: S, vc0
+	9871: S, vc1
+	9920: S, vc2
+	10420: W, vc1
+Error setting class = 3
+	13354: X, vc1
+	13378: X, vc0
+	15610: S, vc3
+Error setting class = 3
+	16878: S, vc4
+Error setting class = 2
+147	12317: S, vc0
+Error setting lat = 9
+	13378: W, vc0
+Error setting lat = 3
+148	9458: S, vc0
+Error setting lat = 13
+	13354: XN, vc0
+Error setting lat = 15
+	13378: XWES, vc1
+Error setting lat = 11
+	16760: E, vc1
+Error setting lat = 11
+149	9036: X, vc3
+Error setting lat = 5
+	9067: X, vc2
+Error setting lat = 9
+	9250: E, vc0
+Error setting lat = 11
+	9302: E, vc1
+Error setting lat = 3
+	10063: X, vc4
+Error setting lat = 6
+	10179: XS, vc0
+Error setting saddr = 101
+	11070: X, vc1
+Error setting daddr = 19
+	13354: W, vc0
+Error setting daddr = 183
+	13378: E, vc2
+Error setting daddr = 4
+	15840: S, vc1
+Error setting daddr = 149
+	16279: S, vc2
+Error setting daddr = 226
+	16302: N, vc0
+Error setting daddr = 247
+	16760: N, vc1
+Error setting daddr = 20
+150	9036: X, vc2
+Error setting daddr = 68
+	9067: X, vc1
+Error setting daddr = 100
+	9250: E, vc0
+Error setting daddr = 36
+	9302: S, vc0
+Error setting daddr = 38
+	9433: S, vc1
+Error setting daddr = 85
+	11590: S, vc2
+Error setting daddr = 53
+	12317: X, vc0
+Error setting daddr = 181
+	13354: W, vc0
+Error setting daddr = 70
+	13378: E, vc1
+Error setting daddr = 72
+	15518: S, vc3
+Error setting class = 0
+	16536: N, vc0
+Error setting class = 0
+	18706: X, vc3
+Error setting class = 0
+151	9250: X, vc1
+Error setting class = 0
+	9277: X, vc0
+Error setting class = 0
+	9354: E, vc0
+Error setting class = 0
+	9669: S, vc0
+Error setting class = 0
+	13354: SW, vc0
+Error setting class = 0
+	13378: N, vc0
+Error setting class = 0
+	16231: E, vc1
+Error setting class = 0
+152	9036: X, vc2
+Error setting class = 0
+	9067: X, vc1
+Error setting class = 0
+	9277: W, vc0
+Error setting class = 0
+	9354: E, vc0
+Error setting class = 0
+	9381: E, vc1
+Error setting class = 0
+	12317: XS, vc0
+Error setting class = 0
+	16231: N, vc0
+Error setting class = 0
+	16279: N, vc1
+Error setting class = 0
+	18706: X, vc3
+Error setting class = 0
+153	9354: S, vc0
+Error setting class = 0
+	9381: S, vc1
+Error setting class = 0
+	9696: X, vc0
+Error setting class = 0
+	9724: X, vc1
+Error setting class = 0
+	12317: W, vc0
+Error setting class = 0
+	16325: N, vc0
+Error setting class = 0
+	16830: S, vc2
+Error setting class = 0
+160	9696: XS, vc0
+Error setting class = 0
+	9773: X, vc1
+Error setting class = 0
+	9871: S, vc1
+Error setting class = 0
+	9920: S, vc2
+Error setting class = 0
+	15840: N, vc0
+Error setting class = 0
+	16302: E, vc0
+Error setting class = 0
+	16924: S, vc3
+Error setting saddr = 32
+161	9696: W, vc0
+Error setting daddr = 16
+	9871: W, vc1
+Error setting class = 0
+	9920: W, vc2
+Error setting class = 0
+	16302: E, vc0
+Error setting saddr = 4
+	16325: S, vc0
+Error setting daddr = 35
+	16606: N, vc0
+Error setting daddr = 19
+162	9458: N, vc0
+Error setting daddr = 183
+	9669: S, vc0
+Error setting daddr = 4
+	9696: W, vc0
+Error setting daddr = 149
+	9871: W, vc1
+Error setting daddr = 8
+	9920: W, vc2
+Error setting daddr = 226
+	15610: S, vc1
+Error setting daddr = 247
+	16302: E, vc0
+Error setting daddr = 20
+	16878: S, vc2
+Error setting daddr = 68
+163	9036: X, vc2
+Error setting daddr = 100
+	9067: X, vc1
+Error setting daddr = 36
+	9458: W, vc0
+Error setting daddr = 9
+	9589: S, vc0
+Error setting daddr = 38
+	9669: W, vc1
+Error setting daddr = 85
+	12317: X, vc0
+Error setting daddr = 55
+	15840: S, vc1
+Error setting daddr = 53
+	16302: E, vc0
+Error setting daddr = 181
+	18706: X, vc3
+Error setting daddr = 70
+164	9458: W, vc0
+Error setting daddr = 152
+	9669: W, vc1
+Error setting daddr = 184
+	13378: S, vc0
+Error setting daddr = 120
+	15840: W, vc2
+Error setting daddr = 150
+	16302: E, vc0
+Error setting daddr = 33
+	16760: N, vc0
+Error setting daddr = 118
+	16784: X, vc0
+Error setting daddr = 163
+	16807: X, vc1
+Error setting daddr = 18
+	16830: X, vc2
+Error setting daddr = 72
+	16854: X, vc3
+Error setting daddr = 131
+165	9669: W, vc0
+Error setting class = 1
+	10179: ES, vc0
+Error setting class = 2
+	15518: X, vc0
+Error setting class = 2
+	15840: W, vc1
+Error setting class = 2
+	16279: E, vc1
+Error setting class = 2
+	16302: N, vc0
+Error setting class = 0
+	16699: S, vc1
+Error setting class = 2
+	16830: W, vc2
+Error setting class = 2
+166	9302: X, vc1
+Error setting class = 2
+	9329: X, vc0
+Error setting class = 2
+	9433: S, vc0
+Error setting class = 2
+	9669: W, vc0
+Error setting class = 2
+	9724: S, vc1
+Error setting class = 2
+	10179: S, vc2
+Error setting class = 2
+	11590: S, vc3
+Error setting class = 2
+	15518: W, vc1
+Error setting class = 0
+	16279: E, vc0
+Error setting class = 2
+	16536: N, vc0
+Error setting class = 2
+	16830: W, vc2
+Error setting class = 2
+167	9329: W, vc0
+Error setting class = 1
+	9669: W, vc1
+Error setting class = 1
+	13354: S, vc0
+Error setting class = 1
+	16024: X, vc0
+Error setting class = 1
+	16231: N, vc0
+Error setting class = 1
+	16279: E, vc0
+Error setting class = 1
+	16830: W, vc2
+Error setting class = 1
+168	9354: X, vc0
+Error setting class = 1
+	9381: X, vc1
+Error setting class = 2
+	9696: E, vc0
+Error setting class = 1
+	9724: E, vc1
+Error setting lat = 3
+	9773: E, vc2
+Error setting lat = 2
+	12317: S, vc0
+Error setting lat = 14
+	16279: N, vc0
+Error setting lat = 1
+	16830: W, vc0
+Error setting lat = 10
+169	9354: W, vc0
+Error setting lat = 4
+	9381: S, vc0
+Error setting lat = 16
+	9696: N, vc0
+Error setting lat = 18
+	9724: N, vc1
+Error setting lat = 1
+	9773: S, vc1
+Error setting lat = 4
+	16325: N, vc2
+Error setting lat = 6
+	16830: W, vc1
+Error setting lat = 2
+176	9696: XS, vc0
+Error setting lat = 5
+	9773: N, vc0
+Error setting lat = 4
+	9871: S, vc1
+Error setting lat = 6
+	9920: X, vc1
+Error setting lat = 6
+	15840: N, vc1
+Error setting lat = 4
+	16901: E, vc0
+Error setting lat = 12
+	16924: E, vc1
+Error setting lat = 6
+	16947: E, vc2
+Error setting lat = 13
+177	15840: W, vc0
+Error setting lat = 15
+	16325: S, vc0
+Error setting lat = 11
+	16606: N, vc0
+Error setting lat = 11
+	16854: E, vc0
+Error setting lat = 5
+	16878: X, vc4
+Error setting lat = 9
+	16901: X, vc0
+Error setting lat = 11
+	16924: X, vc2
+Error setting lat = 3
+	16947: X, vc1
+Error setting lat = 8
+	16970: X, vc3
+Error setting lat = 9
+178	9669: S, vc0
+Error setting saddr = 4
+	15610: S, vc1
+Error setting daddr = 35
+	15840: W, vc0
+Error setting daddr = 19
+	16807: E, vc0
+Error setting daddr = 183
+	16854: E, vc1
+Error setting daddr = 4
+	16878: W, vc1
+Error setting daddr = 149
+	16970: W, vc2
+Error setting daddr = 8
+179	9589: S, vc0
+Error setting daddr = 226
+	15840: W, vc0
+Error setting daddr = 247
+	16807: E, vc0
+Error setting daddr = 20
+	16854: E, vc1
+Error setting daddr = 68
+180	10179: S, vc0
+Error setting daddr = 100
+	13378: E, vc0
+Error setting daddr = 36
+	15748: S, vc1
+Error setting daddr = 9
+	16784: N, vc0
+Error setting daddr = 38
+	16807: N, vc1
+Error setting daddr = 85
+	16854: N, vc2
+Error setting daddr = 55
+181	9036: X, vc3
+Error setting daddr = 53
+	9067: X, vc2
+Error setting daddr = 181
+	10063: X, vc4
+Error setting daddr = 70
+	10179: XW, vc0
+Error setting daddr = 152
+	10810: X, vc1
+Error setting daddr = 184
+	13354: S, vc0
+Error setting daddr = 120
+	13378: E, vc0
+Error setting daddr = 150
+	15748: W, vc1
+Error setting daddr = 33
+	16699: E, vc1
+Error setting daddr = 118
+182	9406: S, vc0
+Error setting daddr = 163
+	9433: S, vc1
+Error setting daddr = 18
+	9724: E, vc0
+Error setting daddr = 72
+	10179: E, vc1
+Error setting daddr = 131
+	11590: E, vc2
+Error setting class = 2
+	13354: XW, vc0
+Error setting class = 3
+	13378: XS, vc2
+Error setting class = 3
+	16536: N, vc0
+Error setting class = 3
+	16699: E, vc3
+Error setting class = 3
+183	9036: X, vc3
+Error setting class = 1
+	9067: X, vc2
+Error setting class = 3
+	9329: N, vc0
+Error setting class = 3
+	9724: E, vc0
+Error setting class = 3
+	9822: E, vc1
+Error setting class = 3
+	10063: X, vc4
+Error setting class = 3
+	10179: X, vc0
+Error setting class = 3
+	11590: X, vc1
+Error setting class = 3
+	13354: W, vc0
+Error setting class = 3
+	16024: N, vc1
+Error setting class = 3
+	16699: S, vc0
+Error setting class = 1
+184	9036: X, vc2
+Error setting class = 3
+	9067: X, vc1
+Error setting class = 3
+	9329: W, vc0
+Error setting class = 3
+	9381: N, vc0
+Error setting class = 2
+	9696: N, vc1
+Error setting class = 2
+	9724: N, vc2
+Error setting class = 2
+	9822: E, vc0
+Error setting class = 2
+	12317: X, vc0
+Error setting class = 2
+	18706: X, vc3
+Error setting class = 2
+185	9381: W, vc0
+Error setting class = 2
+	9773: S, vc0
+Error setting class = 2
+	9822: S, vc1
+Error setting class = 3
+	16325: N, vc0
+Error setting class = 2
+192	9696: S, vc0
+Error setting lat = 3
+Error setting lat = 2
+	9773: N, vc0
+Error setting lat = 14
+	9871: E, vc0
+Error setting lat = 1
+	16947: N, vc1
+Error setting lat = 10
+193	9773: W, vc0
+Error setting lat = 4
+	9871: S, vc0
+	16325: E, vc0
+	16606: N, vc0
+194	9669: S, vc0
+	15610: S, vc1
+	16325: E, vc0
+Error setting lat = 16
+	16606: W, vc0
+Error setting lat = 18
+	16807: N, vc0
+Error setting lat = 1
+	16970: N, vc1
+Error setting lat = 4
+195	9589: S, vc0
+Error setting lat = 6
+	16325: E, vc0
+Error setting lat = 2
+	16606: W, vc0
+Error setting lat = 5
+196	10179: S, vc0
+Error setting lat = 4
+	15748: S, vc1
+Error setting lat = 6
+	16325: E, vc0
+Error setting lat = 6
+	16606: W, vc0
+Error setting lat = 4
+	16784: N, vc0
+Error setting lat = 12
+197	10810: N, vc0
+Error setting lat = 6
+	13354: XS, vc0
+Error setting lat = 13
+	13378: X, vc0
+Error setting lat = 15
+	16325: E, vc0
+Error setting lat = 11
+	16606: W, vc0
+Error setting lat = 11
+198	9406: X, vc1
+Error setting lat = 5
+	9433: X, vc0
+Error setting lat = 9
+	9822: E, vc0
+Error setting lat = 11
+	13378: S, vc0
+Error setting lat = 3
+	16325: E, vc1
+Error setting lat = 8
+	16536: N, vc0
+Error setting lat = 9
+	16606: W, vc0
+199	9822: N, vc0
+	15656: X, vc0
+	16325: E, vc0
+Error setting saddr = 73
+	16606: W, vc0
+Error setting daddr = 39
+	16676: S, vc0
+Error setting daddr = 231
+	16699: S, vc1
+Error setting daddr = 146
+200	9696: N, vc0
+Error setting daddr = 248
+	15656: W, vc0
+Error setting daddr = 71
+	16325: E, vc0
+Error setting daddr = 197
+201	9773: S, vc0
+Error setting daddr = 67
+	9822: S, vc1
+Error setting daddr = 65
+	15656: W, vc0
+Error setting daddr = 56
+	16325: N, vc0
+Error setting daddr = 86
+208	9696: S, vc0
+Error setting daddr = 84
+	16947: N, vc0
+Error setting daddr = 7
+209	9669: S, vc0
+Error setting daddr = 24
+	9773: N, vc0
+Error setting daddr = 82
+	9871: S, vc1
+Error setting daddr = 69
+	16970: E, vc0
+Error setting daddr = 52
+210	9669: W, vc0
+Error setting daddr = 97
+	10290: S, vc0
+Error setting daddr = 50
+	15610: E, vc0
+Error setting daddr = 135
+	16807: N, vc0
+Error setting daddr = 182
+	16970: N, vc1
+Error setting daddr = 148
+211	9589: S, vc0
+Error setting daddr = 5
+	10290: W, vc0
+Error setting daddr = 214
+	15610: E, vc0
+Error setting daddr = 22
+212	10179: S, vc0
+Error setting class = 1
+	10290: W, vc0
+Error setting class = 1
+	15610: X, vc0
+Error setting class = 1
+	15748: S, vc1
+Error setting class = 1
+	16653: E, vc0
+Error setting class = 1
+	16784: N, vc0
+Error setting class = 1
+213	9696: XE, vc0
+Error setting class = 1
+	9969: X, vc1
+Error setting class = 1
+	13354: E, vc1
+Error setting class = 1
+	13378: N, vc0
+	15564: E, vc2
+	16653: S, vc0
+	16784: W, vc0
+Error setting class = 1
+214	9562: S, vc0
+Error setting class = 1
+	9696: E, vc0
+Error setting class = 1
+	13354: XE, vc1
+Error setting class = 1
+	13378: XSW, vc0
+Error setting class = 1
+	15564: E, vc2
+Error setting class = 1
+	16536: N, vc0
+Error setting class = 1
+215	13354: S, vc0
+Error setting class = 1
+	15564: E, vc1
+Error setting class = 1
+	16606: N, vc0
+Error setting class = 1
+	16630: X, vc0
+Error setting class = 1
+	16653: X, vc1
+Error setting class = 1
+	16676: X, vc3
+Error setting class = 1
+	16699: X, vc2
+Error setting class = 1
+216	9696: EN, vc0
+Error setting class = 1
+	15564: X, vc0
+Error setting class = 1
+	16630: W, vc0
+Error setting class = 1
+217	9696: XW, vc0
+Error setting class = 1
+	9773: S, vc0
+	9822: X, vc1
+Error setting class = 1
+	15656: N, vc0
+Error setting class = 1
+	16947: S, vc1
+Error setting class = 1
+224	9696: S, vc0
+Error setting class = 1
+	16947: N, vc0
+Error setting class = 1
+	16970: E, vc0
+Error setting class = 1
+225	9669: S, vc0
+Error setting class = 1
+	9773: N, vc0
+Error setting class = 1
+	9871: S, vc1
+Error setting class = 1
+	16807: E, vc0
+Error setting class = 1
+	16947: W, vc0
+Error setting class = 1
+	16970: N, vc1
+Error setting class = 1
+226	9036: X, vc3
+Error setting class = 1
+	9067: X, vc2
+Error setting class = 1
+	9696: E, vc0
+Error setting class = 1
+	9773: W, vc0
+Error setting class = 1
+	10063: X, vc4
+Error setting class = 1
+	10179: XS, vc0
+Error setting class = 1
+	10290: X, vc1
+Error setting class = 1
+	15564: E, vc1
+Error setting class = 1
+	16807: N, vc0
+Error setting class = 1
+227	9589: E, vc0
+Error setting saddr = 55
+	9696: E, vc1
+Error setting daddr = 39
+	9773: W, vc0
+Error setting daddr = 231
+	10179: W, vc1
+Error setting daddr = 146
+	15564: S, vc0
+Error setting daddr = 248
+228	9589: E, vc0
+Error setting daddr = 71
+	9696: E, vc1
+Error setting daddr = 197
+	10179: W, vc0
+Error setting daddr = 67
+	10290: N, vc0
+Error setting daddr = 65
+	15564: E, vc2
+Error setting daddr = 56
+	15748: S, vc0
+Error setting daddr = 86
+229	9589: E, vc0
+Error setting daddr = 84
+	9696: N, vc0
+Error setting daddr = 7
+	9969: N, vc1
+Error setting daddr = 24
+	10290: W, vc0
+Error setting daddr = 82
+	15564: N, vc2
+Error setting daddr = 69
+	15748: X, vc0
+Error setting daddr = 52
+	16536: E, vc1
+Error setting daddr = 97
+	16653: S, vc0
+Error setting daddr = 50
+230	9562: X, vc0
+Error setting daddr = 135
+	9589: X, vc1
+Error setting daddr = 182
+	9773: S, vc0
+Error setting daddr = 148
+	9969: W, vc0
+Error setting daddr = 5
+	10290: W, vc1
+Error setting daddr = 214
+	13378: E, vc0
+Error setting daddr = 22
+	16536: N, vc0
+Error setting class = 0
+231	9773: W, vc0
+Error setting class = 0
+	10290: W, vc1
+Error setting class = 0
+	13354: XE, vc0
+Error setting class = 0
+	13378: XS, vc0
+Error setting class = 0
+	16653: N, vc0
+Error setting class = 0
+232	9773: W, vc0
+Error setting class = 0
+	13354: S, vc0
+233	9773: W, vc0
+Error setting class = 0
+	15656: N, vc0
+Error setting class = 0
+	16947: S, vc0
+Error setting class = 0
+240	9696: XE, vc0
+Error setting class = 0
+	9871: X, vc1
+Error setting class = 0
+	16970: N, vc0
+Error setting class = 0
+241	9669: X, vc1
+Error setting class = 0
+	9696: XE, vc0
+	9871: W, vc0
+Error setting class = 0
+	16807: N, vc0
+Error setting class = 0
+	16947: N, vc1
+Error setting class = 0
+242	9696: N, vc0
+Error setting class = 0
+	10179: E, vc0
+Error setting class = 0
+	16947: W, vc0
+Error setting class = 0
+243	9773: N, vc0
+Error setting class = 0
+	10179: E, vc0
+Error setting class = 0
+	15564: E, vc1
+Error setting class = 0
+	16947: W, vc0
+Error setting class = 0
+244	9773: W, vc0
+Error setting class = 0
+	10179: E, vc0
+Error setting class = 0
+	15564: N, vc0
+Error setting class = 0
+	15748: E, vc1
+Error setting class = 0
+	16947: W, vc1
+Error setting class = 0
+245	9773: W, vc0
+Error setting class = 0
+	10179: E, vc0
+Error setting class = 0
+	15748: N, vc0
+Error setting class = 0
+	16653: E, vc1
+Error setting class = 0
+	16947: W, vc1
+Error setting class = 0
+246	9773: W, vc0
+Error setting class = 0
+	10179: E, vc0
+Error setting class = 0
+	16653: E, vc1
+Error setting class = 0
+	16947: W, vc1
+Error setting class = 0
+247	9036: X, vc3
+Error setting class = 0
+	9067: X, vc2
+Error setting class = 0
+	10063: X, vc4
+Error setting class = 0
+	10179: X, vc0
+Error setting class = 0
+	10550: X, vc1
+Error setting class = 0
+	13378: E, vc0
+Error setting class = 0
+	15656: E, vc1
+Error setting class = 0
+	16653: N, vc0
+Error setting class = 0
+	16947: W, vc0
+Error setting class = 0
+248	10550: W, vc0
+Error setting class = 0
+	13354: X, vc1
+Error setting saddr = 16
+	13378: X, vc0
+Error setting daddr = 4
+	15656: E, vc0
+Error setting class = 5
+	16947: W, vc1
+Error setting class = 5
+249	15656: N, vc0
+Error setting saddr = 4
+	16947: W, vc0
+Error setting daddr = 8
 Parsed placement file.
+Error setting class = 2
 Set lat 1 from 0 to 0
+Error setting lat = 4
 Set lat 1 from 0 to 0
+Error setting saddr = 4
 Set lat 1 from 0 to 0
+Error setting daddr = 32
 Set lat 1 from 0 to 0
+Error setting class = 2
 Set lat 1 from 0 to 0
+Error setting lat = 6
 Set lat 1 from 0 to 0
+Error setting saddr = 35
 Set lat 1 from 0 to 0
+Error setting daddr = 32
 Set lat 1 from 0 to 0
-Set ejection VC at addr 119 to 0
-Set ejection VC at addr 68 to 0
-Set ejection VC at addr 2 to 0
-Set ejection VC at addr 104 to 0
-Set ejection VC at addr 100 to 0
-Set ejection VC at addr 36 to 0
-Set ejection VC at addr 101 to 0
-Set ejection VC at addr 83 to 0
-Set ejection VC at addr 51 to 0
-Set ejection VC at addr 117 to 0
-Set ejection VC at addr 98 to 0
-Set ejection VC at addr 211 to 0
-Set ejection VC at addr 179 to 0
-Set ejection VC at addr 53 to 0
-Set ejection VC at addr 145 to 0
-Set ejection VC at addr 4 to 0
+Error setting class = 0
+Set ejection VC at addr 19 to 4
+Error setting class = 0
+Set ejection VC at addr 183 to 4
+Error setting saddr = 166
+Set ejection VC at addr 4 to 4
+Error setting daddr = 153
+Set ejection VC at addr 149 to 4
+Error setting class = 1
+Set ejection VC at addr 226 to 4
+Error setting class = 1
+Set ejection VC at addr 247 to 4
+Error setting saddr = 151
+Set ejection VC at addr 20 to 4
+Error setting daddr = 241
+Set ejection VC at addr 68 to 4
+Error setting class = 1
+Set ejection VC at addr 100 to 4
+Error setting class = 1
+Set ejection VC at addr 36 to 4
+Error setting saddr = 145
+Set ejection VC at addr 38 to 4
+Error setting daddr = 240
+Set ejection VC at addr 85 to 4
+Error setting class = 1
+Set ejection VC at addr 53 to 4
+Error setting class = 1
+Set ejection VC at addr 181 to 4
+Error setting saddr = 230
+Set ejection VC at addr 70 to 4
+Error setting daddr = 213
+Set ejection VC at addr 72 to 4
+Error setting class = 1
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 10 from 0 to 0
-Set lat 4 from 0 to 1
-Set lat 2 from 0 to 2
+Error setting class = 1
+Set lat 2 from 0 to 0
+Error setting saddr = 168
+Set lat 14 from 0 to 1
+Set lat 1 from 0 to 2
 Set lat 10 from 0 to 3
-Set lat 6 from 0 to 4
-Set lat 2 from 0 to 5
-Set lat 7 from 0 to 6
-Set lat 6 from 0 to 7
-Set lat 4 from 0 to 8
-Set lat 8 from 0 to 9
-Set lat 8 from 0 to 10
-Set lat 14 from 0 to 11
-Set lat 12 from 0 to 12
-Set lat 4 from 0 to 13
-Set lat 12 from 0 to 14
-Set lat 1 from 0 to 15
-Set ejection VC at addr 55 to 0
-Set ejection VC at addr 57 to 0
-Set ejection VC at addr 89 to 0
-Set ejection VC at addr 80 to 0
-Set ejection VC at addr 121 to 0
-Set ejection VC at addr 70 to 0
-Set ejection VC at addr 105 to 0
-Set ejection VC at addr 137 to 0
+Set lat 16 from 0 to 4
+Set lat 18 from 0 to 5
+Set lat 1 from 0 to 6
+Error setting daddr = 160
+Set lat 4 from 0 to 7
+Error setting class = 1
+Set lat 6 from 0 to 8
+Error setting class = 1
+Set lat 2 from 0 to 9
+Error setting saddr = 198
+Set lat 4 from 0 to 10
+Error setting daddr = 217
+Set lat 6 from 0 to 11
+Error setting class = 1
+Set lat 4 from 0 to 12
+Error setting class = 1
+Set lat 12 from 0 to 13
+Error setting saddr = 21
+Set lat 6 from 0 to 14
+Error setting daddr = 176
+Set lat 8 from 0 to 15
+Error setting class = 1
+Set ejection VC at addr 213 to 0
+Error setting class = 1
+Set ejection VC at addr 240 to 0
+Error setting saddr = 51
+Set ejection VC at addr 217 to 0
+Error setting daddr = 128
+Set ejection VC at addr 153 to 0
+Error setting class = 1
+Set ejection VC at addr 176 to 0
+Error setting class = 1
+Set ejection VC at addr 241 to 0
+== Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
+Set ejection VC at addr 160 to 0
+== Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
+Set ejection VC at addr 128 to 0
+===== MemorySystem 0 =====
 Link specified in placement file.
+CH. 0 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
 Updating dynamic link exit VCs.
+===== MemorySystem 1 =====
 1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
+CH. 1 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set exit class for pos 7 to 0 (rt 9696)
+===== MemorySystem 2 =====
 2 hops for route 9696
-3 hops for route 9696
+CH. 2 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
 1 hops for route 9696
+===== MemorySystem 3 =====
 1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
-1 hops for route 9696
-Set exit class for pos 0 to 0 (rt 9696)
-2 hops for route 9696
-Set exit class for pos 1 to 0 (rt 9696)
-1 hops for route 9696
-1 hops for route 9696
-Set exit class for pos 5 to 0 (rt 9696)
-1 hops for route 9696
+CH. 3 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
 1 hops for route 9696
 Set exit class for pos 3 to 0 (rt 9696)
 2 hops for route 9696
-Set exit class for pos 2 to 0 (rt 9696)
-2 hops for route 9696
 Set exit class for pos 6 to 0 (rt 9696)
+1 hops for route 9696
+1 hops for route 9696
+1 hops for route 9696
+1 hops for route 9696
 2 hops for route 9696
 Set exit class for pos 4 to 0 (rt 9696)
 1 hops for route 9696
-Set exit class for pos 7 to 0 (rt 9696)
-Set ejection VC at addr 129 to 0
-Set ejection VC at addr 195 to 0
-Set ejection VC at addr 161 to 0
-Set ejection VC at addr 197 to 0
-Set ejection VC at addr 193 to 0
-Set ejection VC at addr 227 to 0
-Set ejection VC at addr 20 to 0
+1 hops for route 9696
+1 hops for route 9696
+1 hops for route 9696
+2 hops for route 9696
+Set exit class for pos 0 to 0 (rt 9696)
+1 hops for route 9696
+2 hops for route 9696
+2 hops for route 9696
+Set exit class for pos 2 to 0 (rt 9696)
+1 hops for route 9696
+1 hops for route 9696
+1 hops for route 9696
+1 hops for route 9696
+1 hops for route 9696
+2 hops for route 9696
+Set exit class for pos 1 to 0 (rt 9696)
+2 hops for route 9696
+Set exit class for pos 5 to 0 (rt 9696)
+1 hops for route 9696
+Set ejection VC at addr 35 to 0
 Set ejection VC at addr 152 to 0
-Set ejection VC at addr 135 to 0
-Set ejection VC at addr 97 to 0
+Set ejection VC at addr 184 to 0
+Set ejection VC at addr 120 to 0
+Set ejection VC at addr 150 to 0
+Set ejection VC at addr 33 to 0
+Set ejection VC at addr 118 to 0
+Set ejection VC at addr 163 to 0
+Set ejection VC at addr 18 to 0
+Set ejection VC at addr 131 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 12317
+Set exit class for pos 8 to 0 (rt 12317)
+1 hops for route 12317
+Set exit class for pos 5 to 0 (rt 12317)
+2 hops for route 12317
+2 hops for route 12317
+Set exit class for pos 0 to 0 (rt 12317)
+1 hops for route 12317
+1 hops for route 12317
+1 hops for route 12317
+1 hops for route 12317
+2 hops for route 12317
+1 hops for route 12317
+1 hops for route 12317
+3 hops for route 12317
 Set exit class for pos 6 to 0 (rt 12317)
 1 hops for route 12317
-1 hops for route 12317
-1 hops for route 12317
-1 hops for route 12317
-1 hops for route 12317
+2 hops for route 12317
+Set exit class for pos 3 to 0 (rt 12317)
+2 hops for route 12317
 Set exit class for pos 9 to 0 (rt 12317)
 1 hops for route 12317
 1 hops for route 12317
-1 hops for route 12317
-1 hops for route 12317
-4 hops for route 12317
-Set exit class for pos 0 to 0 (rt 12317)
-1 hops for route 12317
 2 hops for route 12317
-2 hops for route 12317
-2 hops for route 12317
-1 hops for route 12317
-2 hops for route 12317
-Set exit class for pos 8 to 0 (rt 12317)
-1 hops for route 12317
-1 hops for route 12317
-1 hops for route 12317
-1 hops for route 12317
-1 hops for route 12317
-Set exit class for pos 7 to 0 (rt 12317)
-2 hops for route 12317
-Set exit class for pos 2 to 0 (rt 12317)
-1 hops for route 12317
-1 hops for route 12317
-1 hops for route 12317
-1 hops for route 12317
 1 hops for route 12317
 1 hops for route 12317
 Set exit class for pos 4 to 0 (rt 12317)
 2 hops for route 12317
 Set exit class for pos 1 to 0 (rt 12317)
 1 hops for route 12317
-Set exit class for pos 3 to 0 (rt 12317)
+1 hops for route 12317
+Set exit class for pos 7 to 0 (rt 12317)
 1 hops for route 12317
 1 hops for route 12317
-Set exit class for pos 5 to 0 (rt 12317)
+Set exit class for pos 2 to 0 (rt 12317)
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
-Set ejection VC at addr 73 to 0
+Set ejection VC at addr 9 to 4
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 9 from 0 to 0
-Set ejection VC at addr 134 to 0
+Set lat 5 from 0 to 0
+Set ejection VC at addr 51 to 1
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 168 to 0
+Updating dynamic link exit VCs.
+1 hops for route 9641
+1 hops for route 9641
+1 hops for route 9641
+1 hops for route 9641
+Set exit class for pos 0 to 1 (rt 9641)
+Set ejection VC at addr 230 to 1
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 151 to 0
+Updating dynamic link exit VCs.
+1 hops for route 9589
+1 hops for route 9589
+1 hops for route 9589
+1 hops for route 9589
+1 hops for route 9589
+1 hops for route 9589
+1 hops for route 9589
+1 hops for route 9589
+Set exit class for pos 0 to 1 (rt 9589)
+Set ejection VC at addr 21 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 9537
+Set exit class for pos 0 to 1 (rt 9537)
 1 hops for route 9537
 1 hops for route 9537
 1 hops for route 9537
@@ -1259,14 +2548,15 @@ Updating dynamic link exit VCs.
 1 hops for route 9537
 1 hops for route 9537
 1 hops for route 9537
-1 hops for route 9537
-1 hops for route 9537
-1 hops for route 9537
-1 hops for route 9537
-Set exit class for pos 0 to 0 (rt 9537)
-Set ejection VC at addr 232 to 0
+Set ejection VC at addr 145 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 9485
+1 hops for route 9485
+1 hops for route 9485
+1 hops for route 9485
+1 hops for route 9485
+1 hops for route 9485
 1 hops for route 9485
 1 hops for route 9485
 1 hops for route 9485
@@ -1274,90 +2564,104 @@ Updating dynamic link exit VCs.
 1 hops for route 9485
 1 hops for route 9485
 Set exit class for pos 0 to 0 (rt 9485)
-Set ejection VC at addr 177 to 0
+Set ejection VC at addr 198 to 0
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 102 to 0
+Updating dynamic link exit VCs.
+1 hops for route 9433
+1 hops for route 9433
+1 hops for route 9433
+1 hops for route 9433
+Set exit class for pos 0 to 0 (rt 9433)
+Set ejection VC at addr 168 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 9381
 1 hops for route 9381
-Set exit class for pos 0 to 0 (rt 9381)
 1 hops for route 9381
 1 hops for route 9381
 1 hops for route 9381
+Set exit class for pos 0 to 1 (rt 9381)
 1 hops for route 9381
 1 hops for route 9381
 1 hops for route 9381
-Set ejection VC at addr 162 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 247 to 0
+Set ejection VC at addr 166 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 9277
-1 hops for route 9277
-1 hops for route 9277
-1 hops for route 9277
-1 hops for route 9277
-1 hops for route 9277
-1 hops for route 9277
+1 hops for route 9329
+Set exit class for pos 0 to 0 (rt 9329)
+1 hops for route 9329
+1 hops for route 9329
+1 hops for route 9329
+Set ejection VC at addr 151 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
 1 hops for route 9277
 Set exit class for pos 0 to 0 (rt 9277)
-Set ejection VC at addr 128 to 3
+1 hops for route 9277
+Set ejection VC at addr 137 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16325
 1 hops for route 16325
 1 hops for route 16325
 1 hops for route 16325
-Set exit class for pos 0 to 3 (rt 16325)
-Set ejection VC at addr 128 to 1
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+Set exit class for pos 0 to 0 (rt 16325)
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+1 hops for route 16325
+Set ejection VC at addr 137 to 3
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16374
-Set exit class for pos 0 to 1 (rt 16374)
 1 hops for route 16374
 1 hops for route 16374
 1 hops for route 16374
-1 hops for route 16374
-1 hops for route 16374
-1 hops for route 16374
-1 hops for route 16374
-1 hops for route 16374
-Set ejection VC at addr 226 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 242 to 0
+Set exit class for pos 0 to 3 (rt 16374)
+Set ejection VC at addr 104 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 16208
-1 hops for route 16208
-1 hops for route 16208
-1 hops for route 16208
-1 hops for route 16208
-1 hops for route 16208
-1 hops for route 16208
-1 hops for route 16208
-1 hops for route 16208
+1 hops for route 16421
+1 hops for route 16421
+1 hops for route 16421
+1 hops for route 16421
+1 hops for route 16421
+1 hops for route 16421
+Set exit class for pos 0 to 0 (rt 16421)
+Set ejection VC at addr 99 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
 1 hops for route 16208
 1 hops for route 16208
 1 hops for route 16208
 1 hops for route 16208
 1 hops for route 16208
 Set exit class for pos 0 to 0 (rt 16208)
-Set ejection VC at addr 226 to 2
+1 hops for route 16208
+Set ejection VC at addr 104 to 2
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16444
+1 hops for route 16444
 Set exit class for pos 0 to 2 (rt 16444)
-1 hops for route 16444
-1 hops for route 16444
-1 hops for route 16444
-Set ejection VC at addr 229 to 0
+Set ejection VC at addr 103 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16162
@@ -1365,11 +2669,17 @@ Updating dynamic link exit VCs.
 1 hops for route 16162
 1 hops for route 16162
 Set exit class for pos 0 to 0 (rt 16162)
-Set ejection VC at addr 226 to 0
+Set ejection VC at addr 104 to 1
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 225 to 0
+Updating dynamic link exit VCs.
+1 hops for route 16467
+1 hops for route 16467
+1 hops for route 16467
+1 hops for route 16467
+1 hops for route 16467
+1 hops for route 16467
+Set exit class for pos 0 to 1 (rt 16467)
+Set ejection VC at addr 54 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16116
@@ -1379,156 +2689,258 @@ Updating dynamic link exit VCs.
 1 hops for route 16116
 1 hops for route 16116
 Set exit class for pos 0 to 0 (rt 16116)
-Set ejection VC at addr 226 to 0
+Set ejection VC at addr 104 to 3
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16490
-Set exit class for pos 0 to 0 (rt 16490)
 1 hops for route 16490
 1 hops for route 16490
 1 hops for route 16490
-Set ejection VC at addr 244 to 0
+1 hops for route 16490
+1 hops for route 16490
+1 hops for route 16490
+1 hops for route 16490
+1 hops for route 16490
+1 hops for route 16490
+1 hops for route 16490
+1 hops for route 16490
+1 hops for route 16490
+Set exit class for pos 0 to 3 (rt 16490)
+1 hops for route 16490
+Set ejection VC at addr 3 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 16070
-1 hops for route 16070
-1 hops for route 16070
-1 hops for route 16070
-1 hops for route 16070
-1 hops for route 16070
-1 hops for route 16070
-1 hops for route 16070
-1 hops for route 16070
-1 hops for route 16070
 1 hops for route 16070
 Set exit class for pos 0 to 0 (rt 16070)
-Set ejection VC at addr 128 to 0
+1 hops for route 16070
+1 hops for route 16070
+Set ejection VC at addr 137 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16398
 1 hops for route 16398
-1 hops for route 16398
-1 hops for route 16398
-1 hops for route 16398
-Set exit class for pos 0 to 0 (rt 16398)
-Set ejection VC at addr 115 to 3
+Set exit class for pos 0 to 1 (rt 16398)
+Set ejection VC at addr 136 to 2
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16231
+Set exit class for pos 0 to 2 (rt 16231)
 1 hops for route 16231
 1 hops for route 16231
 1 hops for route 16231
-Set exit class for pos 0 to 3 (rt 16231)
-1 hops for route 16231
-1 hops for route 16231
-Set ejection VC at addr 69 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 115 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 116 to 0
+Set ejection VC at addr 167 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 16024
+Set exit class for pos 0 to 0 (rt 16024)
+1 hops for route 16024
+Set ejection VC at addr 136 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 16256
+1 hops for route 16256
+1 hops for route 16256
+1 hops for route 16256
+Set exit class for pos 0 to 0 (rt 16256)
+Set ejection VC at addr 133 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 15978
+1 hops for route 15978
 1 hops for route 15978
 1 hops for route 15978
 1 hops for route 15978
 1 hops for route 15978
 Set exit class for pos 0 to 0 (rt 15978)
-Set ejection VC at addr 115 to 0
+Set ejection VC at addr 136 to 1
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
+Updating dynamic link exit VCs.
+1 hops for route 16279
+1 hops for route 16279
+1 hops for route 16279
+1 hops for route 16279
+Set exit class for pos 0 to 1 (rt 16279)
+1 hops for route 16279
+1 hops for route 16279
+1 hops for route 16279
+1 hops for route 16279
+1 hops for route 16279
+1 hops for route 16279
+Set ejection VC at addr 116 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 15932
+1 hops for route 15932
+1 hops for route 15932
+1 hops for route 15932
+1 hops for route 15932
+1 hops for route 15932
+Set exit class for pos 0 to 0 (rt 15932)
+Set ejection VC at addr 136 to 3
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+Set exit class for pos 0 to 3 (rt 16302)
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
+1 hops for route 16302
 Set ejection VC at addr 114 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 15932
-Set exit class for pos 0 to 0 (rt 15932)
-1 hops for route 15932
-1 hops for route 15932
-1 hops for route 15932
-Set ejection VC at addr 115 to 0
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 16302
-1 hops for route 16302
-1 hops for route 16302
-1 hops for route 16302
-1 hops for route 16302
-1 hops for route 16302
-Set exit class for pos 0 to 0 (rt 16302)
-Set ejection VC at addr 35 to 0
-Link specified in placement file.
-Updating dynamic link exit VCs.
+1 hops for route 15886
+1 hops for route 15886
+1 hops for route 15886
+1 hops for route 15886
+1 hops for route 15886
+1 hops for route 15886
 1 hops for route 15886
 1 hops for route 15886
 1 hops for route 15886
 1 hops for route 15886
 Set exit class for pos 0 to 0 (rt 15886)
-Set ejection VC at addr 128 to 2
+Set ejection VC at addr 137 to 2
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 16349
-1 hops for route 16349
-1 hops for route 16349
-1 hops for route 16349
-1 hops for route 16349
 1 hops for route 16349
 1 hops for route 16349
 1 hops for route 16349
 1 hops for route 16349
 Set exit class for pos 0 to 2 (rt 16349)
-1 hops for route 16349
-1 hops for route 16349
-Set ejection VC at addr 87 to 0
+Set ejection VC at addr 119 to 0
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 88 to 0
+Updating dynamic link exit VCs.
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+1 hops for route 16582
+Set exit class for pos 0 to 0 (rt 16582)
+Set ejection VC at addr 1 to 0
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 87 to 0
+Updating dynamic link exit VCs.
+1 hops for route 15840
+Set exit class for pos 0 to 0 (rt 15840)
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+1 hops for route 15840
+Set ejection VC at addr 119 to 4
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 103 to 0
+Updating dynamic link exit VCs.
+1 hops for route 16513
+1 hops for route 16513
+1 hops for route 16513
+1 hops for route 16513
+1 hops for route 16513
+1 hops for route 16513
+1 hops for route 16513
+1 hops for route 16513
+Set exit class for pos 0 to 4 (rt 16513)
+Set ejection VC at addr 37 to 0
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 87 to 3
+Updating dynamic link exit VCs.
+1 hops for route 15794
+1 hops for route 15794
+1 hops for route 15794
+1 hops for route 15794
+Set exit class for pos 0 to 0 (rt 15794)
+Set ejection VC at addr 119 to 2
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16536
 1 hops for route 16536
+Set exit class for pos 0 to 2 (rt 16536)
 1 hops for route 16536
-Set exit class for pos 0 to 3 (rt 16536)
 1 hops for route 16536
-Set ejection VC at addr 56 to 0
+1 hops for route 16536
+1 hops for route 16536
+1 hops for route 16536
+1 hops for route 16536
+1 hops for route 16536
+1 hops for route 16536
+Set ejection VC at addr 229 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 15748
+1 hops for route 15748
 1 hops for route 15748
 1 hops for route 15748
 1 hops for route 15748
 1 hops for route 15748
 Set exit class for pos 0 to 0 (rt 15748)
-Set ejection VC at addr 87 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 71 to 0
+1 hops for route 15748
+1 hops for route 15748
+Set ejection VC at addr 119 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 16559
+1 hops for route 16559
+1 hops for route 16559
+1 hops for route 16559
+Set exit class for pos 0 to 1 (rt 16559)
+1 hops for route 16559
+1 hops for route 16559
+1 hops for route 16559
+1 hops for route 16559
+Set ejection VC at addr 88 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
+1 hops for route 15702
 1 hops for route 15702
 Set exit class for pos 0 to 0 (rt 15702)
 1 hops for route 15702
-1 hops for route 15702
-1 hops for route 15702
-1 hops for route 15702
-1 hops for route 15702
-Set ejection VC at addr 87 to 0
+Set ejection VC at addr 119 to 3
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16606
@@ -1538,26 +2950,76 @@ Updating dynamic link exit VCs.
 1 hops for route 16606
 1 hops for route 16606
 1 hops for route 16606
-Set exit class for pos 0 to 0 (rt 16606)
-Set ejection VC at addr 66 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 50 to 0
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+Set exit class for pos 0 to 3 (rt 16606)
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+1 hops for route 16606
+Set ejection VC at addr 215 to 3
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 15656
-1 hops for route 15656
-1 hops for route 15656
+1 hops for route 16676
+1 hops for route 16676
+Set exit class for pos 0 to 3 (rt 16676)
+Set ejection VC at addr 199 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
 1 hops for route 15656
 Set exit class for pos 0 to 0 (rt 15656)
-Set ejection VC at addr 66 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 65 to 0
+1 hops for route 15656
+1 hops for route 15656
+1 hops for route 15656
+1 hops for route 15656
+1 hops for route 15656
+1 hops for route 15656
+1 hops for route 15656
+Set ejection VC at addr 215 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 16653
+1 hops for route 16653
+1 hops for route 16653
+Set exit class for pos 0 to 1 (rt 16653)
+1 hops for route 16653
+1 hops for route 16653
+1 hops for route 16653
+1 hops for route 16653
+1 hops for route 16653
+Set ejection VC at addr 212 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 15610
+1 hops for route 15610
+1 hops for route 15610
+1 hops for route 15610
+1 hops for route 15610
+1 hops for route 15610
+1 hops for route 15610
+1 hops for route 15610
+1 hops for route 15610
+1 hops for route 15610
+1 hops for route 15610
+1 hops for route 15610
 1 hops for route 15610
 1 hops for route 15610
 1 hops for route 15610
@@ -1565,169 +3027,258 @@ Updating dynamic link exit VCs.
 1 hops for route 15610
 1 hops for route 15610
 Set exit class for pos 0 to 0 (rt 15610)
-Set ejection VC at addr 66 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 67 to 0
+Set ejection VC at addr 215 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 16630
+Set exit class for pos 0 to 0 (rt 16630)
+1 hops for route 16630
+Set ejection VC at addr 216 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 15564
+1 hops for route 15564
+1 hops for route 15564
 1 hops for route 15564
 Set exit class for pos 0 to 0 (rt 15564)
 1 hops for route 15564
 1 hops for route 15564
 1 hops for route 15564
-Set ejection VC at addr 66 to 0
+1 hops for route 15564
+1 hops for route 15564
+1 hops for route 15564
+Set ejection VC at addr 215 to 2
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 82 to 0
+Updating dynamic link exit VCs.
+1 hops for route 16699
+1 hops for route 16699
+1 hops for route 16699
+1 hops for route 16699
+1 hops for route 16699
+1 hops for route 16699
+Set exit class for pos 0 to 2 (rt 16699)
+Set ejection VC at addr 165 to 0
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 84 to 0
+Updating dynamic link exit VCs.
+1 hops for route 15518
+1 hops for route 15518
+1 hops for route 15518
+1 hops for route 15518
+1 hops for route 15518
+1 hops for route 15518
+1 hops for route 15518
+1 hops for route 15518
+1 hops for route 15518
+Set exit class for pos 0 to 0 (rt 15518)
+1 hops for route 15518
+Set ejection VC at addr 101 to 0
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 85 to 1
+Updating dynamic link exit VCs.
+1 hops for route 16760
+Set exit class for pos 0 to 0 (rt 16760)
+1 hops for route 16760
+1 hops for route 16760
+1 hops for route 16760
+1 hops for route 16760
+1 hops for route 16760
+Set ejection VC at addr 164 to 2
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16830
 1 hops for route 16830
+Set exit class for pos 0 to 2 (rt 16830)
 1 hops for route 16830
 1 hops for route 16830
 1 hops for route 16830
 1 hops for route 16830
-Set exit class for pos 0 to 1 (rt 16830)
-Set ejection VC at addr 85 to 2
+1 hops for route 16830
+Set ejection VC at addr 164 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16807
+Set exit class for pos 0 to 1 (rt 16807)
 1 hops for route 16807
 1 hops for route 16807
-Set exit class for pos 0 to 2 (rt 16807)
-Set ejection VC at addr 85 to 0
+1 hops for route 16807
+1 hops for route 16807
+1 hops for route 16807
+1 hops for route 16807
+1 hops for route 16807
+1 hops for route 16807
+Set ejection VC at addr 164 to 3
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16854
+Set exit class for pos 0 to 3 (rt 16854)
 1 hops for route 16854
 1 hops for route 16854
 1 hops for route 16854
-Set exit class for pos 0 to 0 (rt 16854)
 1 hops for route 16854
-Set ejection VC at addr 72 to 0
+Set ejection VC at addr 177 to 3
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16970
+Set exit class for pos 0 to 3 (rt 16970)
 1 hops for route 16970
-Set exit class for pos 0 to 0 (rt 16970)
 1 hops for route 16970
-Set ejection VC at addr 85 to 3
+1 hops for route 16970
+1 hops for route 16970
+1 hops for route 16970
+1 hops for route 16970
+1 hops for route 16970
+Set ejection VC at addr 164 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16784
+Set exit class for pos 0 to 0 (rt 16784)
 1 hops for route 16784
 1 hops for route 16784
-Set exit class for pos 0 to 3 (rt 16784)
 1 hops for route 16784
 1 hops for route 16784
-Set ejection VC at addr 72 to 2
+Set ejection VC at addr 177 to 2
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 16924
+1 hops for route 16924
 1 hops for route 16924
 Set exit class for pos 0 to 2 (rt 16924)
-1 hops for route 16924
-1 hops for route 16924
-1 hops for route 16924
-Set ejection VC at addr 72 to 1
+Set ejection VC at addr 177 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 16947
 1 hops for route 16947
 Set exit class for pos 0 to 1 (rt 16947)
 1 hops for route 16947
 1 hops for route 16947
-Set ejection VC at addr 72 to 3
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+1 hops for route 16947
+Set ejection VC at addr 177 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 16901
-Set exit class for pos 0 to 3 (rt 16901)
 1 hops for route 16901
-1 hops for route 16901
-1 hops for route 16901
-1 hops for route 16901
-Set ejection VC at addr 72 to 4
+Set exit class for pos 0 to 0 (rt 16901)
+Set ejection VC at addr 177 to 4
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 16878
+1 hops for route 16878
+1 hops for route 16878
+1 hops for route 16878
+1 hops for route 16878
 1 hops for route 16878
 Set exit class for pos 0 to 4 (rt 16878)
 1 hops for route 16878
-1 hops for route 16878
-1 hops for route 16878
-1 hops for route 16878
-1 hops for route 16878
-Set ejection VC at addr 134 to 0
+Set ejection VC at addr 51 to 0
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
+Updating dynamic link exit VCs.
+1 hops for route 9614
+1 hops for route 9614
+1 hops for route 9614
+1 hops for route 9614
+1 hops for route 9614
+Set exit class for pos 0 to 0 (rt 9614)
+1 hops for route 9614
+Set ejection VC at addr 230 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9562
+1 hops for route 9562
+Set exit class for pos 0 to 0 (rt 9562)
+Set ejection VC at addr 21 to 0
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9510
+1 hops for route 9510
+Set exit class for pos 0 to 0 (rt 9510)
+Set ejection VC at addr 145 to 1
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9458
+Set exit class for pos 0 to 1 (rt 9458)
+1 hops for route 9458
+1 hops for route 9458
+1 hops for route 9458
+1 hops for route 9458
+1 hops for route 9458
+Set ejection VC at addr 198 to 1
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9406
+1 hops for route 9406
+Set exit class for pos 0 to 1 (rt 9406)
 Set ejection VC at addr 168 to 0
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
+Updating dynamic link exit VCs.
+1 hops for route 9354
+1 hops for route 9354
+1 hops for route 9354
+1 hops for route 9354
+1 hops for route 9354
+Set exit class for pos 0 to 0 (rt 9354)
+1 hops for route 9354
+Set ejection VC at addr 166 to 1
+Link specified in placement file.
+Updating dynamic link exit VCs.
+1 hops for route 9302
+1 hops for route 9302
+1 hops for route 9302
+1 hops for route 9302
+1 hops for route 9302
+1 hops for route 9302
+1 hops for route 9302
+1 hops for route 9302
+1 hops for route 9302
+1 hops for route 9302
+1 hops for route 9302
+1 hops for route 9302
+Set exit class for pos 0 to 1 (rt 9302)
 Set ejection VC at addr 151 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 9510
-Set exit class for pos 0 to 1 (rt 9510)
-1 hops for route 9510
-1 hops for route 9510
-1 hops for route 9510
-Set ejection VC at addr 232 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 177 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 102 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 162 to 1
+1 hops for route 9250
+1 hops for route 9250
+1 hops for route 9250
+1 hops for route 9250
+1 hops for route 9250
+1 hops for route 9250
+1 hops for route 9250
+1 hops for route 9250
+1 hops for route 9250
+1 hops for route 9250
+1 hops for route 9250
+1 hops for route 9250
+Set exit class for pos 0 to 1 (rt 9250)
+Set ejection VC at addr 100 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 9302
-Set exit class for pos 0 to 1 (rt 9302)
-1 hops for route 9302
-1 hops for route 9302
-1 hops for route 9302
-1 hops for route 9302
-1 hops for route 9302
-1 hops for route 9302
-1 hops for route 9302
-Set ejection VC at addr 247 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 51 to 1
-Link specified in placement file.
-Updating dynamic link exit VCs.
+1 hops for route 12110
+1 hops for route 12110
+1 hops for route 12110
+1 hops for route 12110
+1 hops for route 12110
+1 hops for route 12110
 1 hops for route 12110
 Set exit class for pos 0 to 1 (rt 12110)
 1 hops for route 12110
-1 hops for route 12110
-1 hops for route 12110
-1 hops for route 12110
-1 hops for route 12110
-1 hops for route 12110
-1 hops for route 12110
-1 hops for route 12110
-1 hops for route 12110
-Set ejection VC at addr 211 to 0
+Set ejection VC at addr 85 to 1
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 179 to 1
+Updating dynamic link exit VCs.
+1 hops for route 11980
+1 hops for route 11980
+Set exit class for pos 0 to 1 (rt 11980)
+Set ejection VC at addr 53 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 11850
@@ -1735,64 +3286,88 @@ Set exit class for pos 0 to 1 (rt 11850)
 1 hops for route 11850
 1 hops for route 11850
 1 hops for route 11850
-Set ejection VC at addr 101 to 1
+1 hops for route 11850
+1 hops for route 11850
+Set ejection VC at addr 20 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 11720
+1 hops for route 11720
 1 hops for route 11720
 1 hops for route 11720
 Set exit class for pos 0 to 1 (rt 11720)
 1 hops for route 11720
 1 hops for route 11720
 1 hops for route 11720
-Set ejection VC at addr 68 to 1
+1 hops for route 11720
+1 hops for route 11720
+Set ejection VC at addr 183 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 11590
+1 hops for route 11590
+1 hops for route 11590
+1 hops for route 11590
+1 hops for route 11590
+1 hops for route 11590
+1 hops for route 11590
+1 hops for route 11590
+1 hops for route 11590
+1 hops for route 11590
+1 hops for route 11590
+1 hops for route 11590
 1 hops for route 11590
 1 hops for route 11590
 Set exit class for pos 0 to 1 (rt 11590)
-1 hops for route 11590
-1 hops for route 11590
-Set ejection VC at addr 83 to 1
+Set ejection VC at addr 68 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 11460
-1 hops for route 11460
 Set exit class for pos 0 to 1 (rt 11460)
 1 hops for route 11460
-1 hops for route 11460
-1 hops for route 11460
-1 hops for route 11460
-Set ejection VC at addr 145 to 1
+Set ejection VC at addr 70 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 11330
 Set exit class for pos 0 to 1 (rt 11330)
 1 hops for route 11330
-1 hops for route 11330
-1 hops for route 11330
-1 hops for route 11330
-1 hops for route 11330
-Set ejection VC at addr 4 to 1
+Set ejection VC at addr 72 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 11200
+1 hops for route 11200
 Set exit class for pos 0 to 1 (rt 11200)
-1 hops for route 11200
-1 hops for route 11200
-1 hops for route 11200
-Set ejection VC at addr 104 to 0
+Set ejection VC at addr 149 to 1
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 119 to 0
+Updating dynamic link exit VCs.
+1 hops for route 11070
+1 hops for route 11070
+1 hops for route 11070
+1 hops for route 11070
+1 hops for route 11070
+1 hops for route 11070
+1 hops for route 11070
+1 hops for route 11070
+1 hops for route 11070
+1 hops for route 11070
+Set exit class for pos 0 to 1 (rt 11070)
+Set ejection VC at addr 19 to 1
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 53 to 0
+Updating dynamic link exit VCs.
+1 hops for route 10940
+Set exit class for pos 0 to 1 (rt 10940)
+1 hops for route 10940
+1 hops for route 10940
+1 hops for route 10940
+1 hops for route 10940
+1 hops for route 10940
+Set ejection VC at addr 181 to 1
 Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set ejection VC at addr 117 to 1
+Updating dynamic link exit VCs.
+1 hops for route 10810
+Set exit class for pos 0 to 1 (rt 10810)
+1 hops for route 10810
+Set ejection VC at addr 36 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 10680
@@ -1802,27 +3377,17 @@ Set exit class for pos 0 to 1 (rt 10680)
 1 hops for route 10680
 1 hops for route 10680
 1 hops for route 10680
-1 hops for route 10680
-1 hops for route 10680
-Set ejection VC at addr 36 to 1
+Set ejection VC at addr 247 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 10550
 Set exit class for pos 0 to 1 (rt 10550)
 1 hops for route 10550
-1 hops for route 10550
-1 hops for route 10550
-1 hops for route 10550
-1 hops for route 10550
-1 hops for route 10550
-1 hops for route 10550
-1 hops for route 10550
-1 hops for route 10550
-1 hops for route 10550
-1 hops for route 10550
-Set ejection VC at addr 2 to 1
+Set ejection VC at addr 4 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 10420
+1 hops for route 10420
 1 hops for route 10420
 Set exit class for pos 0 to 1 (rt 10420)
 1 hops for route 10420
@@ -1836,46 +3401,68 @@ Set exit class for pos 0 to 1 (rt 10420)
 1 hops for route 10420
 1 hops for route 10420
 1 hops for route 10420
-Set ejection VC at addr 100 to 1
+1 hops for route 10420
+1 hops for route 10420
+Set ejection VC at addr 226 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 10290
+1 hops for route 10290
+1 hops for route 10290
 1 hops for route 10290
 Set exit class for pos 0 to 1 (rt 10290)
 1 hops for route 10290
 1 hops for route 10290
 1 hops for route 10290
 1 hops for route 10290
-1 hops for route 10290
-Set ejection VC at addr 98 to 1
+Set ejection VC at addr 38 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 10154
 Set exit class for pos 0 to 1 (rt 10154)
 1 hops for route 10154
-1 hops for route 10154
-1 hops for route 10154
-Set ejection VC at addr 39 to 0
+Set ejection VC at addr 129 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
+1 hops for route 12174
 1 hops for route 12174
 Set exit class for pos 0 to 0 (rt 12174)
-1 hops for route 12174
-1 hops for route 12174
-1 hops for route 12174
-1 hops for route 12174
-Set ejection VC at addr 169 to 1
+Set ejection VC at addr 73 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 8839
 1 hops for route 8839
 1 hops for route 8839
 1 hops for route 8839
-Set exit class for pos 0 to 1 (rt 8839)
-Set ejection VC at addr 73 to 0
+1 hops for route 8839
+1 hops for route 8839
+Set exit class for pos 0 to 0 (rt 8839)
+Set ejection VC at addr 9 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 1 from 0 to 0
-Set ejection VC at addr 96 to 0
+Set ejection VC at addr 32 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 1 from 0 to 0
@@ -1912,121 +3499,119 @@ Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
-Set ejection VC at addr 169 to 0
+Set ejection VC at addr 73 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 8868
 1 hops for route 8868
 1 hops for route 8868
 1 hops for route 8868
-Set exit class for pos 0 to 0 (rt 8868)
-Set ejection VC at addr 73 to 0
+1 hops for route 8868
+1 hops for route 8868
+Set exit class for pos 0 to 1 (rt 8868)
+Set ejection VC at addr 9 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 1 from 0 to 0
-Set ejection VC at addr 96 to 0
+Set ejection VC at addr 32 to 3
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 1 from 0 to 0
-Set ejection VC at addr 97 to 0
-Set ejection VC at addr 129 to 0
-Set ejection VC at addr 195 to 0
-Set ejection VC at addr 161 to 0
-Set ejection VC at addr 197 to 0
-Set ejection VC at addr 193 to 0
-Set ejection VC at addr 227 to 0
-Set ejection VC at addr 20 to 0
-Set ejection VC at addr 152 to 0
-Set ejection VC at addr 135 to 0
-Set ejection VC at addr 132 to 0
+Set ejection VC at addr 131 to 3
+Set ejection VC at addr 35 to 3
+Set ejection VC at addr 152 to 3
+Set ejection VC at addr 184 to 3
+Set ejection VC at addr 120 to 3
+Set ejection VC at addr 150 to 3
+Set ejection VC at addr 33 to 3
+Set ejection VC at addr 118 to 3
+Set ejection VC at addr 163 to 3
+Set ejection VC at addr 18 to 3
+Set ejection VC at addr 55 to 2
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 9 from 0 to 0
-Set lat 11 from 0 to 1
+Set lat 3 from 0 to 1
 Set lat 13 from 0 to 2
-Set lat 13 from 0 to 3
-Set lat 13 from 0 to 4
-Set lat 15 from 0 to 5
-Set lat 15 from 0 to 6
-Set lat 1 from 0 to 7
-Set lat 13 from 0 to 8
-Set lat 11 from 0 to 9
-Set lat 8 from 0 to 10
-Set ejection VC at addr 119 to 0
+Set lat 15 from 0 to 3
+Set lat 11 from 0 to 4
+Set lat 11 from 0 to 5
+Set lat 5 from 0 to 6
+Set lat 9 from 0 to 7
+Set lat 11 from 0 to 8
+Set lat 3 from 0 to 9
+Set lat 6 from 0 to 10
+Set ejection VC at addr 19 to 0
+Set ejection VC at addr 183 to 0
+Set ejection VC at addr 4 to 0
+Set ejection VC at addr 149 to 0
+Set ejection VC at addr 226 to 0
+Set ejection VC at addr 247 to 0
+Set ejection VC at addr 20 to 0
 Set ejection VC at addr 68 to 0
-Set ejection VC at addr 2 to 0
-Set ejection VC at addr 104 to 0
 Set ejection VC at addr 100 to 0
 Set ejection VC at addr 36 to 0
-Set ejection VC at addr 101 to 0
-Set ejection VC at addr 83 to 0
-Set ejection VC at addr 51 to 0
-Set ejection VC at addr 117 to 0
-Set ejection VC at addr 98 to 0
-Set ejection VC at addr 211 to 0
-Set ejection VC at addr 179 to 0
+Set ejection VC at addr 38 to 0
+Set ejection VC at addr 85 to 0
 Set ejection VC at addr 53 to 0
-Set ejection VC at addr 145 to 0
-Set ejection VC at addr 4 to 0
+Set ejection VC at addr 181 to 0
+Set ejection VC at addr 70 to 0
+Set ejection VC at addr 72 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 10179
 Set exit class for pos 2 to 0 (rt 10179)
 1 hops for route 10179
-Set exit class for pos 15 to 0 (rt 10179)
-1 hops for route 10179
-1 hops for route 10179
-1 hops for route 10179
-2 hops for route 10179
-Set exit class for pos 5 to 0 (rt 10179)
-1 hops for route 10179
-1 hops for route 10179
-Set exit class for pos 8 to 0 (rt 10179)
-1 hops for route 10179
-1 hops for route 10179
-Set exit class for pos 13 to 0 (rt 10179)
-1 hops for route 10179
-1 hops for route 10179
-2 hops for route 10179
-Set exit class for pos 1 to 0 (rt 10179)
-1 hops for route 10179
-1 hops for route 10179
+Set exit class for pos 0 to 0 (rt 10179)
 3 hops for route 10179
-4 hops for route 10179
-Set exit class for pos 7 to 0 (rt 10179)
-4 hops for route 10179
-3 hops for route 10179
-1 hops for route 10179
-2 hops for route 10179
-1 hops for route 10179
-1 hops for route 10179
-1 hops for route 10179
-Set exit class for pos 10 to 0 (rt 10179)
-1 hops for route 10179
-1 hops for route 10179
-Set exit class for pos 4 to 0 (rt 10179)
-2 hops for route 10179
 Set exit class for pos 6 to 0 (rt 10179)
-1 hops for route 10179
-1 hops for route 10179
-Set exit class for pos 3 to 0 (rt 10179)
-1 hops for route 10179
-1 hops for route 10179
-1 hops for route 10179
+2 hops for route 10179
 Set exit class for pos 9 to 0 (rt 10179)
 1 hops for route 10179
-Set exit class for pos 0 to 0 (rt 10179)
+2 hops for route 10179
+Set exit class for pos 10 to 0 (rt 10179)
 1 hops for route 10179
+Set exit class for pos 12 to 0 (rt 10179)
+2 hops for route 10179
+2 hops for route 10179
+Set exit class for pos 7 to 0 (rt 10179)
 1 hops for route 10179
-1 hops for route 10179
+3 hops for route 10179
 Set exit class for pos 14 to 0 (rt 10179)
 1 hops for route 10179
 1 hops for route 10179
-2 hops for route 10179
-Set exit class for pos 12 to 0 (rt 10179)
+Set exit class for pos 15 to 0 (rt 10179)
 1 hops for route 10179
 1 hops for route 10179
 Set exit class for pos 11 to 0 (rt 10179)
+2 hops for route 10179
+Set exit class for pos 8 to 0 (rt 10179)
+3 hops for route 10179
+1 hops for route 10179
+1 hops for route 10179
+2 hops for route 10179
+Set exit class for pos 3 to 0 (rt 10179)
+2 hops for route 10179
+1 hops for route 10179
+1 hops for route 10179
+2 hops for route 10179
+Set exit class for pos 13 to 0 (rt 10179)
+1 hops for route 10179
+1 hops for route 10179
+Set exit class for pos 1 to 0 (rt 10179)
+1 hops for route 10179
+1 hops for route 10179
+2 hops for route 10179
+Set exit class for pos 4 to 0 (rt 10179)
+1 hops for route 10179
+1 hops for route 10179
+1 hops for route 10179
+1 hops for route 10179
+1 hops for route 10179
+1 hops for route 10179
+1 hops for route 10179
+1 hops for route 10179
+Set exit class for pos 5 to 0 (rt 10179)
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
@@ -2043,326 +3628,331 @@ Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
-Set ejection VC at addr 32 to 0
+Set ejection VC at addr 16 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 9012
 Set exit class for pos 0 to 0 (rt 9012)
 1 hops for route 9012
-1 hops for route 9012
-1 hops for route 9012
-1 hops for route 9012
-Set ejection VC at addr 129 to 0
-Set ejection VC at addr 119 to 0
-Set ejection VC at addr 68 to 0
-Set ejection VC at addr 2 to 0
-Set ejection VC at addr 104 to 0
-Set ejection VC at addr 166 to 0
-Set ejection VC at addr 100 to 0
-Set ejection VC at addr 36 to 0
-Set ejection VC at addr 101 to 0
-Set ejection VC at addr 83 to 0
-Set ejection VC at addr 51 to 0
-Set ejection VC at addr 117 to 0
-Set ejection VC at addr 73 to 0
-Set ejection VC at addr 98 to 0
-Set ejection VC at addr 211 to 0
-Set ejection VC at addr 132 to 0
-Set ejection VC at addr 179 to 0
-Set ejection VC at addr 53 to 0
-Set ejection VC at addr 145 to 0
-Set ejection VC at addr 195 to 0
-Set ejection VC at addr 161 to 0
-Set ejection VC at addr 197 to 0
-Set ejection VC at addr 193 to 0
-Set ejection VC at addr 227 to 0
-Set ejection VC at addr 20 to 0
-Set ejection VC at addr 152 to 0
-Set ejection VC at addr 135 to 0
-Set ejection VC at addr 4 to 0
-Set ejection VC at addr 97 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 11 from 0 to 0
-Set lat 10 from 0 to 1
-Set lat 4 from 0 to 2
-Set lat 2 from 0 to 3
-Set lat 10 from 0 to 4
-Set lat 12 from 0 to 5
-Set lat 6 from 0 to 6
-Set lat 2 from 0 to 7
-Set lat 7 from 0 to 8
-Set lat 6 from 0 to 9
-Set lat 4 from 0 to 10
-Set lat 8 from 0 to 11
-Set lat 9 from 0 to 12
-Set lat 8 from 0 to 13
-Set lat 14 from 0 to 14
-Set lat 8 from 0 to 15
-Set lat 12 from 0 to 16
-Set lat 4 from 0 to 17
-Set lat 12 from 0 to 18
-Set lat 13 from 0 to 19
-Set lat 13 from 0 to 20
-Set lat 13 from 0 to 21
-Set lat 15 from 0 to 22
-Set lat 15 from 0 to 23
-Set lat 1 from 0 to 24
-Set lat 13 from 0 to 25
-Set lat 11 from 0 to 26
-Set lat 1 from 0 to 27
-Set lat 9 from 0 to 28
-Set ejection VC at addr 129 to 0
-Set ejection VC at addr 119 to 0
-Set ejection VC at addr 68 to 0
-Set ejection VC at addr 2 to 0
-Set ejection VC at addr 104 to 0
-Set ejection VC at addr 166 to 0
-Set ejection VC at addr 100 to 0
-Set ejection VC at addr 36 to 0
-Set ejection VC at addr 101 to 0
-Set ejection VC at addr 83 to 0
-Set ejection VC at addr 51 to 0
-Set ejection VC at addr 117 to 0
-Set ejection VC at addr 73 to 0
-Set ejection VC at addr 98 to 0
-Set ejection VC at addr 211 to 0
-Set ejection VC at addr 132 to 0
-Set ejection VC at addr 179 to 0
-Set ejection VC at addr 53 to 0
-Set ejection VC at addr 145 to 0
-Set ejection VC at addr 195 to 0
-Set ejection VC at addr 161 to 0
-Set ejection VC at addr 197 to 0
-Set ejection VC at addr 193 to 0
-Set ejection VC at addr 227 to 0
-Set ejection VC at addr 20 to 0
-Set ejection VC at addr 152 to 0
-Set ejection VC at addr 135 to 0
-Set ejection VC at addr 4 to 0
-Set ejection VC at addr 97 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 11 from 0 to 0
-Set lat 10 from 0 to 1
-Set lat 4 from 0 to 2
-Set lat 2 from 0 to 3
-Set lat 10 from 0 to 4
-Set lat 12 from 0 to 5
-Set lat 6 from 0 to 6
-Set lat 2 from 0 to 7
-Set lat 7 from 0 to 8
-Set lat 6 from 0 to 9
-Set lat 4 from 0 to 10
-Set lat 8 from 0 to 11
-Set lat 9 from 0 to 12
-Set lat 8 from 0 to 13
-Set lat 14 from 0 to 14
-Set lat 8 from 0 to 15
-Set lat 12 from 0 to 16
-Set lat 4 from 0 to 17
-Set lat 12 from 0 to 18
-Set lat 13 from 0 to 19
-Set lat 13 from 0 to 20
-Set lat 13 from 0 to 21
-Set lat 15 from 0 to 22
-Set lat 15 from 0 to 23
-Set lat 1 from 0 to 24
-Set lat 13 from 0 to 25
-Set lat 11 from 0 to 26
-Set lat 1 from 0 to 27
-Set lat 9 from 0 to 28
-Set ejection VC at addr 131 to 1
-Set ejection VC at addr 165 to 1
-Set ejection VC at addr 163 to 1
-Set ejection VC at addr 212 to 1
-Set ejection VC at addr 199 to 1
-Set ejection VC at addr 54 to 1
-Set ejection VC at addr 118 to 1
-Set ejection VC at addr 120 to 1
-Set ejection VC at addr 22 to 1
-Set ejection VC at addr 180 to 1
-Set ejection VC at addr 146 to 1
-Set ejection VC at addr 99 to 1
-Set ejection VC at addr 148 to 1
-Set ejection VC at addr 182 to 1
-Set ejection VC at addr 210 to 1
-Set ejection VC at addr 150 to 1
-Set ejection VC at addr 248 to 1
-Set ejection VC at addr 214 to 1
-Set ejection VC at addr 86 to 1
-Set ejection VC at addr 178 to 1
-Set ejection VC at addr 216 to 1
+Set ejection VC at addr 35 to 1
+Set ejection VC at addr 19 to 2
+Set ejection VC at addr 183 to 2
+Set ejection VC at addr 4 to 2
+Set ejection VC at addr 149 to 2
+Set ejection VC at addr 8 to 0
+Set ejection VC at addr 226 to 2
+Set ejection VC at addr 247 to 2
+Set ejection VC at addr 20 to 2
+Set ejection VC at addr 68 to 2
+Set ejection VC at addr 100 to 2
+Set ejection VC at addr 36 to 2
+Set ejection VC at addr 9 to 2
+Set ejection VC at addr 38 to 2
+Set ejection VC at addr 85 to 2
+Set ejection VC at addr 55 to 0
+Set ejection VC at addr 53 to 2
+Set ejection VC at addr 181 to 2
+Set ejection VC at addr 70 to 2
+Set ejection VC at addr 152 to 1
 Set ejection VC at addr 184 to 1
-Set ejection VC at addr 167 to 1
-Set ejection VC at addr 133 to 1
+Set ejection VC at addr 120 to 1
+Set ejection VC at addr 150 to 1
+Set ejection VC at addr 33 to 1
+Set ejection VC at addr 118 to 1
+Set ejection VC at addr 163 to 1
+Set ejection VC at addr 18 to 1
+Set ejection VC at addr 72 to 2
+Set ejection VC at addr 131 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set lat 2 from 0 to 1
+Set lat 14 from 0 to 2
+Set lat 1 from 0 to 3
+Set lat 10 from 0 to 4
+Set lat 4 from 0 to 5
+Set lat 16 from 0 to 6
+Set lat 18 from 0 to 7
+Set lat 1 from 0 to 8
+Set lat 4 from 0 to 9
+Set lat 6 from 0 to 10
+Set lat 2 from 0 to 11
+Set lat 5 from 0 to 12
+Set lat 4 from 0 to 13
+Set lat 6 from 0 to 14
+Set lat 6 from 0 to 15
+Set lat 4 from 0 to 16
+Set lat 12 from 0 to 17
+Set lat 6 from 0 to 18
+Set lat 13 from 0 to 19
+Set lat 15 from 0 to 20
+Set lat 11 from 0 to 21
+Set lat 11 from 0 to 22
+Set lat 5 from 0 to 23
+Set lat 9 from 0 to 24
+Set lat 11 from 0 to 25
+Set lat 3 from 0 to 26
+Set lat 8 from 0 to 27
+Set lat 9 from 0 to 28
+Set ejection VC at addr 35 to 2
+Set ejection VC at addr 19 to 3
+Set ejection VC at addr 183 to 3
+Set ejection VC at addr 4 to 3
+Set ejection VC at addr 149 to 3
+Set ejection VC at addr 8 to 1
+Set ejection VC at addr 226 to 3
+Set ejection VC at addr 247 to 3
+Set ejection VC at addr 20 to 3
+Set ejection VC at addr 68 to 3
+Set ejection VC at addr 100 to 3
+Set ejection VC at addr 36 to 3
+Set ejection VC at addr 9 to 3
+Set ejection VC at addr 38 to 3
+Set ejection VC at addr 85 to 3
+Set ejection VC at addr 55 to 1
+Set ejection VC at addr 53 to 3
+Set ejection VC at addr 181 to 3
+Set ejection VC at addr 70 to 3
+Set ejection VC at addr 152 to 2
+Set ejection VC at addr 184 to 2
+Set ejection VC at addr 120 to 2
+Set ejection VC at addr 150 to 2
+Set ejection VC at addr 33 to 2
+Set ejection VC at addr 118 to 2
+Set ejection VC at addr 163 to 2
+Set ejection VC at addr 18 to 2
+Set ejection VC at addr 72 to 3
+Set ejection VC at addr 131 to 2
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set lat 2 from 0 to 1
+Set lat 14 from 0 to 2
+Set lat 1 from 0 to 3
+Set lat 10 from 0 to 4
+Set lat 4 from 0 to 5
+Set lat 16 from 0 to 6
+Set lat 18 from 0 to 7
+Set lat 1 from 0 to 8
+Set lat 4 from 0 to 9
+Set lat 6 from 0 to 10
+Set lat 2 from 0 to 11
+Set lat 5 from 0 to 12
+Set lat 4 from 0 to 13
+Set lat 6 from 0 to 14
+Set lat 6 from 0 to 15
+Set lat 4 from 0 to 16
+Set lat 12 from 0 to 17
+Set lat 6 from 0 to 18
+Set lat 13 from 0 to 19
+Set lat 15 from 0 to 20
+Set lat 11 from 0 to 21
+Set lat 11 from 0 to 22
+Set lat 5 from 0 to 23
+Set lat 9 from 0 to 24
+Set lat 11 from 0 to 25
+Set lat 3 from 0 to 26
+Set lat 8 from 0 to 27
+Set lat 9 from 0 to 28
+Set ejection VC at addr 39 to 1
+Set ejection VC at addr 231 to 1
+Set ejection VC at addr 146 to 1
+Set ejection VC at addr 248 to 1
+Set ejection VC at addr 71 to 1
+Set ejection VC at addr 197 to 1
+Set ejection VC at addr 67 to 1
+Set ejection VC at addr 65 to 1
+Set ejection VC at addr 56 to 1
+Set ejection VC at addr 86 to 1
+Set ejection VC at addr 84 to 1
+Set ejection VC at addr 7 to 1
+Set ejection VC at addr 24 to 1
+Set ejection VC at addr 82 to 1
+Set ejection VC at addr 69 to 1
+Set ejection VC at addr 52 to 1
+Set ejection VC at addr 97 to 1
+Set ejection VC at addr 50 to 1
+Set ejection VC at addr 135 to 1
+Set ejection VC at addr 182 to 1
+Set ejection VC at addr 148 to 1
+Set ejection VC at addr 5 to 1
+Set ejection VC at addr 214 to 1
+Set ejection VC at addr 22 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 13354
+Set exit class for pos 21 to 1 (rt 13354)
+2 hops for route 13354
+1 hops for route 13354
+Set exit class for pos 11 to 1 (rt 13354)
+2 hops for route 13354
+Set exit class for pos 23 to 1 (rt 13354)
+1 hops for route 13354
+1 hops for route 13354
+Set exit class for pos 12 to 1 (rt 13354)
+2 hops for route 13354
+Set exit class for pos 0 to 1 (rt 13354)
+2 hops for route 13354
+1 hops for route 13354
+3 hops for route 13354
+Set exit class for pos 17 to 1 (rt 13354)
+1 hops for route 13354
+1 hops for route 13354
+Set exit class for pos 15 to 1 (rt 13354)
+1 hops for route 13354
+2 hops for route 13354
 Set exit class for pos 8 to 1 (rt 13354)
+1 hops for route 13354
+Set exit class for pos 7 to 1 (rt 13354)
+1 hops for route 13354
+1 hops for route 13354
+Set exit class for pos 6 to 1 (rt 13354)
+2 hops for route 13354
+Set exit class for pos 14 to 1 (rt 13354)
+2 hops for route 13354
+Set exit class for pos 4 to 1 (rt 13354)
+2 hops for route 13354
+1 hops for route 13354
+1 hops for route 13354
+3 hops for route 13354
+Set exit class for pos 13 to 1 (rt 13354)
+1 hops for route 13354
+2 hops for route 13354
+Set exit class for pos 10 to 1 (rt 13354)
+2 hops for route 13354
+2 hops for route 13354
+Set exit class for pos 9 to 1 (rt 13354)
+2 hops for route 13354
+1 hops for route 13354
+Set exit class for pos 16 to 1 (rt 13354)
+1 hops for route 13354
+1 hops for route 13354
+1 hops for route 13354
+1 hops for route 13354
+1 hops for route 13354
+2 hops for route 13354
+Set exit class for pos 18 to 1 (rt 13354)
+1 hops for route 13354
+Set exit class for pos 2 to 1 (rt 13354)
+2 hops for route 13354
+Set exit class for pos 20 to 1 (rt 13354)
+1 hops for route 13354
+1 hops for route 13354
+2 hops for route 13354
+1 hops for route 13354
+1 hops for route 13354
+2 hops for route 13354
+Set exit class for pos 19 to 1 (rt 13354)
 1 hops for route 13354
 2 hops for route 13354
 Set exit class for pos 5 to 1 (rt 13354)
 1 hops for route 13354
 2 hops for route 13354
-Set exit class for pos 18 to 1 (rt 13354)
-1 hops for route 13354
-Set exit class for pos 11 to 1 (rt 13354)
-1 hops for route 13354
-1 hops for route 13354
-2 hops for route 13354
-Set exit class for pos 6 to 1 (rt 13354)
-1 hops for route 13354
-Set exit class for pos 7 to 1 (rt 13354)
-2 hops for route 13354
-Set exit class for pos 0 to 1 (rt 13354)
-1 hops for route 13354
-Set exit class for pos 23 to 1 (rt 13354)
-1 hops for route 13354
-1 hops for route 13354
-1 hops for route 13354
-Set exit class for pos 10 to 1 (rt 13354)
-1 hops for route 13354
-1 hops for route 13354
-Set exit class for pos 12 to 1 (rt 13354)
-1 hops for route 13354
-2 hops for route 13354
-Set exit class for pos 15 to 1 (rt 13354)
-1 hops for route 13354
-2 hops for route 13354
-3 hops for route 13354
-Set exit class for pos 2 to 1 (rt 13354)
-3 hops for route 13354
-3 hops for route 13354
-Set exit class for pos 1 to 1 (rt 13354)
-3 hops for route 13354
-3 hops for route 13354
 Set exit class for pos 22 to 1 (rt 13354)
-3 hops for route 13354
 1 hops for route 13354
 2 hops for route 13354
-Set exit class for pos 19 to 1 (rt 13354)
-2 hops for route 13354
-Set exit class for pos 9 to 1 (rt 13354)
-2 hops for route 13354
-Set exit class for pos 13 to 1 (rt 13354)
+Set exit class for pos 1 to 1 (rt 13354)
 1 hops for route 13354
-2 hops for route 13354
-Set exit class for pos 21 to 1 (rt 13354)
-1 hops for route 13354
-1 hops for route 13354
-1 hops for route 13354
-1 hops for route 13354
-Set exit class for pos 4 to 1 (rt 13354)
-1 hops for route 13354
-1 hops for route 13354
-Set exit class for pos 14 to 1 (rt 13354)
 1 hops for route 13354
 Set exit class for pos 3 to 1 (rt 13354)
-1 hops for route 13354
-Set exit class for pos 17 to 1 (rt 13354)
-2 hops for route 13354
-Set exit class for pos 20 to 1 (rt 13354)
-1 hops for route 13354
-1 hops for route 13354
-Set exit class for pos 16 to 1 (rt 13354)
-Set ejection VC at addr 131 to 0
-Set ejection VC at addr 165 to 0
-Set ejection VC at addr 163 to 0
-Set ejection VC at addr 212 to 0
-Set ejection VC at addr 199 to 0
-Set ejection VC at addr 54 to 0
-Set ejection VC at addr 118 to 0
-Set ejection VC at addr 120 to 0
-Set ejection VC at addr 22 to 0
-Set ejection VC at addr 180 to 0
+Set ejection VC at addr 39 to 0
+Set ejection VC at addr 231 to 0
 Set ejection VC at addr 146 to 0
-Set ejection VC at addr 99 to 0
-Set ejection VC at addr 148 to 0
-Set ejection VC at addr 182 to 0
-Set ejection VC at addr 210 to 0
-Set ejection VC at addr 150 to 0
 Set ejection VC at addr 248 to 0
-Set ejection VC at addr 214 to 0
+Set ejection VC at addr 71 to 0
+Set ejection VC at addr 197 to 0
+Set ejection VC at addr 67 to 0
+Set ejection VC at addr 65 to 0
+Set ejection VC at addr 56 to 0
 Set ejection VC at addr 86 to 0
-Set ejection VC at addr 178 to 0
-Set ejection VC at addr 216 to 0
-Set ejection VC at addr 184 to 0
-Set ejection VC at addr 167 to 0
-Set ejection VC at addr 133 to 0
+Set ejection VC at addr 84 to 0
+Set ejection VC at addr 7 to 0
+Set ejection VC at addr 24 to 0
+Set ejection VC at addr 82 to 0
+Set ejection VC at addr 69 to 0
+Set ejection VC at addr 52 to 0
+Set ejection VC at addr 97 to 0
+Set ejection VC at addr 50 to 0
+Set ejection VC at addr 135 to 0
+Set ejection VC at addr 182 to 0
+Set ejection VC at addr 148 to 0
+Set ejection VC at addr 5 to 0
+Set ejection VC at addr 214 to 0
+Set ejection VC at addr 22 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 13378
-Set exit class for pos 8 to 0 (rt 13378)
-1 hops for route 13378
-2 hops for route 13378
-Set exit class for pos 5 to 0 (rt 13378)
-1 hops for route 13378
-2 hops for route 13378
-Set exit class for pos 18 to 0 (rt 13378)
+Set exit class for pos 21 to 0 (rt 13378)
 1 hops for route 13378
 Set exit class for pos 11 to 0 (rt 13378)
 1 hops for route 13378
-1 hops for route 13378
-2 hops for route 13378
-Set exit class for pos 6 to 0 (rt 13378)
-1 hops for route 13378
-Set exit class for pos 7 to 0 (rt 13378)
-1 hops for route 13378
-4 hops for route 13378
-Set exit class for pos 0 to 0 (rt 13378)
-3 hops for route 13378
 3 hops for route 13378
 Set exit class for pos 23 to 0 (rt 13378)
-3 hops for route 13378
 2 hops for route 13378
-2 hops for route 13378
-2 hops for route 13378
-Set exit class for pos 10 to 0 (rt 13378)
 1 hops for route 13378
-2 hops for route 13378
 Set exit class for pos 12 to 0 (rt 13378)
 1 hops for route 13378
 2 hops for route 13378
+Set exit class for pos 0 to 0 (rt 13378)
+2 hops for route 13378
+Set exit class for pos 17 to 0 (rt 13378)
+1 hops for route 13378
+2 hops for route 13378
 Set exit class for pos 15 to 0 (rt 13378)
+3 hops for route 13378
+1 hops for route 13378
+Set exit class for pos 8 to 0 (rt 13378)
+1 hops for route 13378
+Set exit class for pos 7 to 0 (rt 13378)
+3 hops for route 13378
+1 hops for route 13378
+Set exit class for pos 6 to 0 (rt 13378)
+2 hops for route 13378
+3 hops for route 13378
+Set exit class for pos 14 to 0 (rt 13378)
+1 hops for route 13378
+2 hops for route 13378
+Set exit class for pos 4 to 0 (rt 13378)
+2 hops for route 13378
+Set exit class for pos 13 to 0 (rt 13378)
+2 hops for route 13378
+Set exit class for pos 10 to 0 (rt 13378)
+1 hops for route 13378
+1 hops for route 13378
+Set exit class for pos 9 to 0 (rt 13378)
+1 hops for route 13378
+Set exit class for pos 16 to 0 (rt 13378)
 1 hops for route 13378
 1 hops for route 13378
 1 hops for route 13378
+1 hops for route 13378
+1 hops for route 13378
+Set exit class for pos 18 to 0 (rt 13378)
 1 hops for route 13378
 Set exit class for pos 2 to 0 (rt 13378)
 1 hops for route 13378
-1 hops for route 13378
-Set exit class for pos 1 to 0 (rt 13378)
-1 hops for route 13378
-2 hops for route 13378
-Set exit class for pos 22 to 0 (rt 13378)
-1 hops for route 13378
-2 hops for route 13378
-Set exit class for pos 19 to 0 (rt 13378)
-2 hops for route 13378
-Set exit class for pos 9 to 0 (rt 13378)
-2 hops for route 13378
-Set exit class for pos 13 to 0 (rt 13378)
-1 hops for route 13378
-2 hops for route 13378
-Set exit class for pos 21 to 0 (rt 13378)
-1 hops for route 13378
-1 hops for route 13378
-1 hops for route 13378
-1 hops for route 13378
-Set exit class for pos 4 to 0 (rt 13378)
-1 hops for route 13378
-1 hops for route 13378
-Set exit class for pos 14 to 0 (rt 13378)
-1 hops for route 13378
-Set exit class for pos 3 to 0 (rt 13378)
-1 hops for route 13378
-Set exit class for pos 17 to 0 (rt 13378)
-2 hops for route 13378
+4 hops for route 13378
 Set exit class for pos 20 to 0 (rt 13378)
 1 hops for route 13378
 1 hops for route 13378
-Set exit class for pos 16 to 0 (rt 13378)
+1 hops for route 13378
+1 hops for route 13378
+1 hops for route 13378
+1 hops for route 13378
+2 hops for route 13378
+Set exit class for pos 19 to 0 (rt 13378)
+1 hops for route 13378
+Set exit class for pos 5 to 0 (rt 13378)
+1 hops for route 13378
+1 hops for route 13378
+3 hops for route 13378
+Set exit class for pos 22 to 0 (rt 13378)
+1 hops for route 13378
+2 hops for route 13378
+Set exit class for pos 1 to 0 (rt 13378)
+1 hops for route 13378
+1 hops for route 13378
+Set exit class for pos 3 to 0 (rt 13378)
 Set ejection VC at addr 4 to 5
 Link specified in placement file.
 Updating dynamic link exit VCs.
@@ -2373,7 +3963,6 @@ Updating dynamic link exit VCs.
 1 hops for route 8986
 Set exit class for pos 0 to 5 (rt 8986)
 1 hops for route 8986
-1 hops for route 8986
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
@@ -2394,24 +3983,26 @@ Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
 Set lat 1 from 0 to 0
-Set ejection VC at addr 166 to 0
+Set ejection VC at addr 8 to 2
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 12 from 0 to 0
+Set lat 4 from 0 to 0
 Set lat 1 from 0 to 0
-Set ejection VC at addr 96 to 0
+Set ejection VC at addr 32 to 2
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 10 from 0 to 0
-Set ejection VC at addr 96 to 0
+Set lat 6 from 0 to 0
+Set ejection VC at addr 32 to 0
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 8945
+1 hops for route 8945
+1 hops for route 8945
+1 hops for route 8945
+1 hops for route 8945
 Set exit class for pos 0 to 0 (rt 8945)
 1 hops for route 8945
-1 hops for route 8945
-1 hops for route 8945
-Set ejection VC at addr 80 to 1
+Set ejection VC at addr 153 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 9724
@@ -2422,99 +4013,124 @@ Set exit class for pos 0 to 1 (rt 9724)
 1 hops for route 9724
 1 hops for route 9724
 1 hops for route 9724
-1 hops for route 9724
-Set ejection VC at addr 70 to 1
+Set ejection VC at addr 241 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 9669
+1 hops for route 9669
+1 hops for route 9669
+1 hops for route 9669
+1 hops for route 9669
+1 hops for route 9669
+1 hops for route 9669
+1 hops for route 9669
+1 hops for route 9669
+1 hops for route 9669
+1 hops for route 9669
+1 hops for route 9669
 1 hops for route 9669
 Set exit class for pos 0 to 1 (rt 9669)
-1 hops for route 9669
-1 hops for route 9669
-1 hops for route 9669
-1 hops for route 9669
-1 hops for route 9669
-1 hops for route 9669
-1 hops for route 9669
-1 hops for route 9669
-1 hops for route 9669
-1 hops for route 9669
-1 hops for route 9669
-1 hops for route 9669
-Set ejection VC at addr 57 to 1
+Set ejection VC at addr 240 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 9871
+1 hops for route 9871
+1 hops for route 9871
+1 hops for route 9871
+1 hops for route 9871
+1 hops for route 9871
+1 hops for route 9871
+1 hops for route 9871
+1 hops for route 9871
+1 hops for route 9871
 1 hops for route 9871
 Set exit class for pos 0 to 1 (rt 9871)
 1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-Set ejection VC at addr 55 to 1
+Set ejection VC at addr 213 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
 1 hops for route 9969
 Set exit class for pos 0 to 1 (rt 9969)
 1 hops for route 9969
 1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-Set ejection VC at addr 105 to 1
+Set ejection VC at addr 160 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
-1 hops for route 9773
-1 hops for route 9773
-1 hops for route 9773
 1 hops for route 9773
 Set exit class for pos 0 to 1 (rt 9773)
-Set ejection VC at addr 89 to 1
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+Set ejection VC at addr 217 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 9822
+1 hops for route 9822
+1 hops for route 9822
+1 hops for route 9822
+1 hops for route 9822
+1 hops for route 9822
 1 hops for route 9822
 Set exit class for pos 0 to 1 (rt 9822)
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-Set ejection VC at addr 121 to 1
+Set ejection VC at addr 176 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
 1 hops for route 9920
 Set exit class for pos 0 to 1 (rt 9920)
-1 hops for route 9920
-1 hops for route 9920
-1 hops for route 9920
-1 hops for route 9920
-Set ejection VC at addr 137 to 1
+Set ejection VC at addr 128 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 10018
+1 hops for route 10018
+1 hops for route 10018
+1 hops for route 10018
+1 hops for route 10018
 1 hops for route 10018
 1 hops for route 10018
 1 hops for route 10018
 1 hops for route 10018
 Set exit class for pos 0 to 1 (rt 10018)
-Child process has pid 7875
+Child process has pid -31974
 Parsed definitions of all elements.
 Total of 181 links:
   0: SRAM60
@@ -3203,69 +4819,78 @@ Total of 163 nodes:
   160: CE20369
     [TokenIn13269 *4096 /1] [RetimingFIFO5242_RetimingFIFO5300_RetimingFIFO5372_RetimingFIFO5430_RetimingFIFO5488_RetimingFIFO5271_RetimingFIFO5314_RetimingFIFO5401_RetimingFIFO5459_RetimingFIFO5343 *1 /1]  => [SRAM43] 
   161: CE20335
-    [SRAM43 *512 /1] [TokenIn13256 *16384 /1] [ArgIn3881_ArgIn3757_ArgIn10083_ArgIn10219_ArgIn10349_ArgIn10479_ArgIn10609_ArgIn10739_ArgIn10869_ArgIn10999_ArgIn11129_ArgIn11259_ArgIn11389_ArgIn11519_ArgIn11649_ArgIn11779_ArgIn11909_ArgIn12039_ArgIn12210_ArgIn17663_ArgIn17741_ArgIn17803_ArgIn17865_ArgIn17927_ArgIn17989_ArgIn18051_ArgIn18113_ArgIn18175_ArgIn18726 *16384 /1] [ArgIn3864_ArgIn3740_ArgIn10101_ArgIn10237_ArgIn10367_ArgIn10497_ArgIn10627_ArgIn10757_ArgIn10887_ArgIn11017_ArgIn11147_ArgI71
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-1 hops for route 9871
-Set ejection VC at addr 55 to 1
-Link specified in placement file.
+    [SRAM43 *512 /1] [TokenIn13256 *16384 /1] [ArgIn3881_ArgIn3757_ArgIn10083_ArgIn10219_ArgIn10349_ArgIn10479_ArgIn10609_ArgIn10739_ArgIn10869_ArgIn10999_ArgIn11129_ArgIn11259_ArgIn11389_ArgIn11519_ArgIn11649_ArgIn11779_ArgIn11909_ArgIn12039_ArgIn12210_ArgIn17663_ArgIn17741_ArgIn17803_ArgIn17865_ArgIn17927_ArgIn17989_ArgIn18051_ArgIn18113_ArgIn18175_ArgIn18726 *16384 /1] [ArgIn3864_ArgIn3740_ArgIn10101_ArgIn10237_ArgIn10367_ArgIn10497_ArgIn10627_ArgIn10757_ArgIn10887_ArgIn11017_ArgIn11147_ArgIlacement file.
 Updating dynamic link exit VCs.
-1 hops for route 9969
-Set exit class for pos 0 to 1 (rt 9969)
-1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-1 hops for route 9969
-Set ejection VC at addr 105 to 1
-Link specified in placement file.
-Updating dynamic link exit VCs.
-1 hops for route 9773
-1 hops for route 9773
-1 hops for route 9773
 1 hops for route 9773
 Set exit class for pos 0 to 1 (rt 9773)
-Set ejection VC at addr 89 to 1
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+1 hops for route 9773
+Set ejection VC at addr 217 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 9822
+1 hops for route 9822
+1 hops for route 9822
+1 hops for route 9822
+DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
+1 hops for route 9822
+1 hops for route 9822
 1 hops for route 9822
 Set exit class for pos 0 to 1 (rt 9822)
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-1 hops for route 9822
-Set ejection VC at addr 121 to 1
+Set ejection VC at addr 176 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
+1 hops for route 9920
 1 hops for route 9920
 Set exit class for pos 0 to 1 (rt 9920)
-1 hops for route 9920
-1 hops for route 9920
-1 hops for route 9920
-1 hops for route 9920
-Set ejection VC at addr 137 to 1
+Set ejection VC at addr 128 to 1
 Link specified in placement file.
 Updating dynamic link exit VCs.
+1 hops for route 10018
+1 hops for route 10018
+1 hops for route 10018
+1 hops for route 10018
+1 hops for route 10018
 1 hops for route 10018
 1 hops for route 10018
 1 hops for route 10018
@@ -3312,162 +4937,5 @@ n11277_ArgIn11407_ArgIn11537_ArgIn11667_ArgIn11797_ArgIn11927_ArgIn12057_ArgIn12
   162: CE20355
     [TokenIn18573_TokenIn18586_TokenIn18598_TokenIn18610_TokenIn18622_TokenIn18634_TokenIn18646_TokenIn18658_TokenIn18670_TokenIn18682_TokenIn18694 *64 /1]  => [SRAM43] [TokenIn13256] 
 
-10000...
-20000...
-30000...
-40000...
-50000...
-60000...
-70000...
-80000...
-90000...
-100000...
-110000...
-120000...
-130000...
-140000...
-150000...
-160000...
-170000...
-180000...
-190000...
-200000...
-210000...
-220000...
-230000...
-240000...
-250000...
-260000...
-270000...
-280000...
-290000...
-300000...
-310000...
-320000...
-330000...
-340000...
-350000...
-360000...
-370000...
-380000...
-390000...
-400000...
-410000...
-420000...
-430000...
-440000...
-450000...
-460000...
-470000...
-480000...
-490000...
-500000...
-510000...
-520000...
-530000...
-540000...
-550000...
-560000...
-570000...
-580000...
-590000...
-600000...
-610000...
-620000...
-630000...
-640000...
-650000...
-660000...
-670000...
-680000...
-690000...
-700000...
-710000...
-720000...
-730000...
-740000...
-750000...
-760000...
-770000...
-780000...
-790000...
-800000...
-810000...
-820000...
-830000...
-840000...
-850000...
-860000...
-870000...
-880000...
-890000...
-900000...
-910000...
-920000...
-930000...
-940000...
-950000...
-960000...
-970000...
-980000...
-990000...
-1000000...
-1010000...
-1020000...
-1030000...
-1040000...
-1050000...
-1060000...
-1070000...
-1080000...
-1090000...
-1100000...
-1110000...
-1120000...
-1130000...
-1140000...
-1150000...
-1160000...
-1170000...
-1180000...
-1190000...
-1200000...
-1210000...
-1220000...
-1230000...
-1240000...
-Simulation complete at cycle: 1249469
-[[32mpsim[0m] Simulation complete at cycle: 1249469
-CE19015: Active:   0.2 Stalled:  75.6 Starved:  30.3 Total Active:     2048 Total Output:     2048 Expected Active:     2048 Last Activity: 379106 
-[0m[[31merror[0m] [0m(Thread-17) java.lang.NumberFormatException: For input string: "2048 Total Output:     2048"[0m
-java.lang.NumberFormatException: For input string: "2048 Total Output:     2048"
-	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)
-	at java.lang.Long.parseLong(Long.java:589)
-	at java.lang.Long.parseLong(Long.java:631)
-	at scala.collection.immutable.StringLike.toLong(StringLike.scala:306)
-	at scala.collection.immutable.StringLike.toLong$(StringLike.scala:306)
-	at scala.collection.immutable.StringOps.toLong(StringOps.scala:29)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$processOutput$1(PlastisimConfigCodegen.scala:55)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$processOutput$1$adapted(PlastisimConfigCodegen.scala:54)
-	at scala.Option.foreach(Option.scala:257)
-	at pir.codegen.PlastisimConfigCodegen.processOutput(PlastisimConfigCodegen.scala:54)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$runPsim$5(PlastisimConfigCodegen.scala:82)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$runPsim$5$adapted(PlastisimConfigCodegen.scala:82)
-	at prism.util.Misc.$anonfun$shell$7(Misc.scala:88)
-	at prism.util.Misc.$anonfun$shell$7$adapted(Misc.scala:88)
-	at scala.Option.foreach(Option.scala:257)
-	at prism.util.Misc.$anonfun$shell$5(Misc.scala:88)
-	at prism.util.Misc.$anonfun$shell$5$adapted(Misc.scala:88)
-	at scala.sys.process.ProcessLogger$$anon$1.out(ProcessLogger.scala:97)
-	at scala.sys.process.BasicIO$.$anonfun$processOutFully$1(BasicIO.scala:136)
-	at scala.sys.process.BasicIO$.$anonfun$processOutFully$1$adapted(BasicIO.scala:136)
-	at scala.sys.process.BasicIO$.readFully$1(BasicIO.scala:184)
-	at scala.sys.process.BasicIO$.$anonfun$processFully$1$adapted(BasicIO.scala:188)
-	at scala.sys.process.ProcessBuilderImpl$Simple.$anonfun$run$3(ProcessBuilderImpl.scala:76)
-	at scala.sys.process.ProcessImpl$Spawn$$anon$1.run(ProcessImpl.scala:23)
-[0m[[31mtrace[0m] [0mStack trace suppressed: run [34mlast apps/compile:runMain[0m for the full output.[0m
-[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 724091.307444ms
-[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 44584.170909ms
-[pir] Saving node prism.Session@16524c28 to /home/yaqiz/pir/out/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16_dynamic_v0_s0/SGD_minibatch__D_64_N_16384_E_2_ts_1024_mp1_8_mp2_16.sess
-[0m[[32msuccess[0m] [0mTotal time: 1385 s, completed Aug 2, 2018 2:55:27 AM[0m
+/usr/local/bin/sbt: line 1: 27926 Killed                  java -server -Xms1g -Xmx16g -Xss1m -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=1g -XX:ReservedCodeCacheSize=128m -jar /usr/local/lib/sbt/sbt-launch.jar "$@"
 -------------PASS (DONE)------------

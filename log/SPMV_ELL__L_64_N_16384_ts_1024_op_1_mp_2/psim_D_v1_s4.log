@@ -4,58 +4,80 @@ Picked up _JAVA_OPTIONS: -Xss8192k
 [0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
 [0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
 [0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
-[0m[[0minfo[0m] [0mRunning SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2 --out=/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4 --psim-out=/home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4 --debug=false --verbose=true --dot=false --mapping=true --load-pir=true --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --net=dynamic --routing-algo=proute --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --fifo-depth=4 --vfifo=4 --vc=8 --vlink=1 --slink=4[0m
-[pir] args=[--load-pir=false, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4, --psim-out=/home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4, --debug=false, --verbose=true, --dot=false, --mapping=true, --load-pir=true, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --net=dynamic, --routing-algo=proute, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --fifo-depth=4, --vfifo=4, --vc=8, --vlink=1, --slink=4]
-[pir] Output directory set to [36m/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4[0m
-[pir] Loading from /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.pir[pir] Loading PIRDesign() from /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.pir
-[pir] Configuring spade MyDesign ...
-[pir] Loading from /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.sess[[33mwarn[0m] Restore session failed: java.io.InvalidClassException: pir.codegen.PlastisimPlacementCodegen; local class incompatible: stream classdesc serialVersionUID = -8889915444669227093, local class serialVersionUID = -6211842762413206399. Creating a new session ...
+[0m[[0minfo[0m] [0mRunning SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2 --out=/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4 --psim-out=/home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4 --debug=false --verbose=true --dot=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --routing-algo=proute --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --pcu-stage=4 --vc=4 --net=dynamic --vlink=1 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=db --flit-width=512[0m
+[pir] args=[--load-pir=true, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4, --psim-out=/home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4, --debug=false, --verbose=true, --dot=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --routing-algo=proute, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --pcu-stage=4, --vc=4, --net=dynamic, --vlink=1, --slink=4, --fifo-depth=4, --vfifo=4, --proute-algo=route_dor_YX, --link-prop=db, --flit-width=512]
+[pir] Output directory set to [36m/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4[0m
+[pir] Loading from /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.pir[[33mwarn[0m] Restore session failed: java.io.FileNotFoundException: /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.pir (No such file or directory). Creating a new session ...
 [pir] Finishing graph construction for SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2
 [pir] Configuring spade MyDesign ...
-New design elapsed time: 5958.526ms
-[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 402.289576ms
-[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 6.906653ms
-[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 134.429654ms
-[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 603.062717ms
-[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 188.154383ms
-[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 2.733821ms
-[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 257.322995ms
-[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 98.649897ms
-[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 74.564647ms
-[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 924.49257ms
-[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 447.486958ms
-[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 375.395769ms
-[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 275.643443ms
-[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 78.378581ms
-[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 207.550072ms
-[pir] Running 23-CUStatistics ...[pir] Finished 23-CUStatistics to [36mstat.json[0m in 250.595931ms
-[pir] Running 24-IgraphPartioner ...[pir] Finished 24-IgraphPartioner in 2677.076553ms
-[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 1085.981671ms
-[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 570.224416ms
-[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 10.185878ms
-[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 88.532252ms
-[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 50.920602ms
-[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 2268.920849ms
-[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 96.434326ms
-[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 75.708879ms
-[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 979.162196ms
-[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 1577.689235ms
-[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 215.708348ms
-[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 222.300823ms
-[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 166.231797ms
-[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.pir
-[pir] Running 50-PlastisimTraceCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4[0m[0m
-[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/traces
-[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/trace_classes
-[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4 /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4
-[[33mtrace[0m] log in /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/trace.log
-[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 32552.971344ms
-[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 1779.320874ms
-[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 1691.777975ms
-[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 143.079852ms
-[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 2038.519448ms
+New design elapsed time: 6420.620ms
+[pir] Running 00-TestTraversal ...[pir] Finished 00-TestTraversal in 257.506946ms
+[pir] Running 01-ControlPropogation ...[pir] Finished 01-ControlPropogation in 3.628887ms
+[pir] Running 02-FringeElaboration ...[pir] Finished 02-FringeElaboration in 78.894217ms
+[pir] Running 04-DeadCodeElimination ...[pir] Finished 04-DeadCodeElimination in 277.528714ms
+[pir] Running 05-ConstantExpressionEvaluation ...[pir] Finished 05-ConstantExpressionEvaluation in 114.000268ms
+[pir] Running 06-ControlPropogation ...[pir] Finished 06-ControlPropogation in 1.51812ms
+[pir] Running 07-IRCheck ...[pir] Finished 07-IRCheck in 98.513252ms
+[pir] Running 10-UnrollingTransformer ...[pir] Finished 10-UnrollingTransformer in 51.495301ms
+[pir] Running 12-CUInsertion ...[pir] Finished 12-CUInsertion in 53.145097ms
+[pir] Running 13-AccessPulling ...[pir] Finished 13-AccessPulling in 529.086152ms
+[pir] Running 14-DeadCodeElimination ...[pir] Finished 14-DeadCodeElimination in 151.158227ms
+[pir] Running 17-AccessLowering ...[pir] Finished 17-AccessLowering in 158.102118ms
+[pir] Running 19-BankedAccessMerging ...[pir] Finished 19-BankedAccessMerging in 138.94206ms
+[pir] Running 21-MemoryAnalyzer ...[pir] Finished 21-MemoryAnalyzer in 33.507203ms
+[pir] Running 22-ControllerRuntimeAnalyzer ...[pir] Finished 22-ControllerRuntimeAnalyzer in 141.1717ms
+[pir] Running 23-CUStatistics ...[pir] [33mcreating output directory: [36m/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4[0m[0m
+[pir] Finished 23-CUStatistics to [36mstat.json[0m in 166.520419ms
+[pir] Running 24-IgraphPartioner ...[pir] Finished 24-IgraphPartioner in 1034.187017ms
+[pir] Running 28-RouteThroughElimination ...[pir] Finished 28-RouteThroughElimination in 809.315744ms
+[pir] Running 29-DeadCodeElimination ...[pir] Finished 29-DeadCodeElimination in 253.195229ms
+[pir] Running 34-IRCheck ...[pir] Finished 34-IRCheck in 4.057922ms
+[pir] Running 35-ContextInsertion ...[pir] Finished 35-ContextInsertion in 65.318886ms
+[pir] Running 37-MemoryAnalyzer ...[pir] Finished 37-MemoryAnalyzer in 22.799446ms
+[pir] Running 38-ControlAllocation ...[pir] Finished 38-ControlAllocation in 1468.858758ms
+[pir] Running 39-ControlRegInsertion ...[pir] Finished 39-ControlRegInsertion in 88.385444ms
+[pir] Running 40-MemoryAnalyzer ...[pir] Finished 40-MemoryAnalyzer in 81.070559ms
+[pir] Running 42-ControlAllocation ...[pir] Finished 42-ControlAllocation in 572.223033ms
+[pir] Running 43-DeadCodeElimination ...[pir] Finished 43-DeadCodeElimination in 964.301847ms
+[pir] Running 45-ControlLowering ...[pir] Finished 45-ControlLowering in 158.590813ms
+[pir] Running 47-IRCheck ...[pir] Finished 47-IRCheck in 63.531772ms
+[pir] Running 49-CUStatistics ...[pir] Finished 49-CUStatistics to [36mstat.json[0m in 103.85111ms
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.pir
+[pir] Running 50-PlastisimTraceCodegen ...[pir] [33mcreating output directory: [36m/home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4[0m[0m
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4 /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4
+[[33mtrace[0m] log in /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/trace.log
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mSet current project to spmv_ell__l_64_n_16384_ts_1024_op_1_mp_2_psim_d_v1_s4 (in build file:/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/)[0m
+[0m[[0minfo[0m] [0mUpdating {file:/home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/}spmv_ell__l_64_n_16384_ts_1024_op_1_mp_2_psim_d_v1_s4...[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#jline;2.10.3 ...[0m
+
+M[2K[0m[[0minfo[0m] [0mResolving org.fusesource.jansi#jansi;1.4 ...[0m
+[0m[[0minfo[0m] [0mDone updating.[0m
+[0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/target/scala-2.10/classes...[0m
+[0m[[33mwarn[0m] [0mthere were 2 feature warning(s); re-run with -feature for details[0m
+[0m[[33mwarn[0m] [0mone warning found[0m
+[0m[[0minfo[0m] [0mRunning tracer /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/traces[0m
+[0m[[32msuccess[0m] [0mTotal time: 40 s, completed Aug 3, 2018 8:41:08 PM[0m
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 43565.415094ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 1410.870308ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 975.678576ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 94.149869ms
+[pir] Running 54-ControllerDotCodegen ...[pir] Finished 54-ControllerDotCodegen to [36mcontroller.dot[0m in 387.196059ms
+[pir] Running 55-PIRIRDotCodegen ...[pir] Finished 55-PIRIRDotCodegen to [36mtop.dot[0m in 796.879441ms
+[pir] Running 56-SimpleIRDotCodegen ...[pir] Finished 56-SimpleIRDotCodegen to [36msimple.dot[0m in 152.54855ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 1010.18642ms
 [pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
-[pir] Finished 59-CUPlacer in 39664.074639ms
+[pir] Finished 59-CUPlacer in 35184.01943ms
 [pir] Running 60-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
 [pir] 
 [pir] number of cus=29
@@ -93,27 +115,32 @@ New design elapsed time: 5958.526ms
 [pir] AG-ag = 2 / 32 (6.25%)
 [pir] AG-comp = 2 / 32 (6.25%)
 [pir] MC = 5 / 32 (15.63%)
-[pir] Finished 60-CUStatistics to [36mstat.json[0m in 1218.545212ms
-[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 1057.161715ms
-[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 948.0542ms
-[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 805.645658ms
-[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 4.496254ms
-[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 992.086008ms
-[pir] Running 66-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/node.csv -l /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/link.csv -o /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/final.place -r 16 -c 8 -s1 -g /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/proute.dot -x1 -e 4 -i100 -p100 -t1 -d100 -a route_min_directed_valient -s0
-[[33mproute[0m] log in /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/proute.log
-Start scoring thread: 0
-Start scoring thread: 0
-100 scores: min 9.00 	0.00/0.00/18/0.00/0 	max 2311.71 mean 555.06
-Best score is 9.00
+[pir] Finished 60-CUStatistics to [36mstat.json[0m in 481.952503ms
+[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 726.101415ms
+[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 518.015741ms
+[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 484.830751ms
+[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 5.024628ms
+[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 687.003486ms
+[pir] Running 66-PlastisimPlacementCodegen ...[[33mproute[0m] /home/yaqiz/plastiroute/plastiroute -n /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/node.csv -l /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/link.csv -o /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/final.place -r 16 -c 8 -g /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/proute.dot -v /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/summary.csv -x1 -e 4 -a route_dor_YX  -i100 -p100 -t1 -d100 -s0
+[[33mproute[0m] log in /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/proute.log
+100 scores: min 3.50 	0.00/0.00/7/0.00/0 	max 5254.45 mean 970.64
+100 scores: min 3.50 	0.00/0.00/7/0.00/0 	max 2505.89 mean 686.05
+100 scores: min 3.50 	0.00/0.00/7/0.00/0 	max 2012.56 mean 553.80
+All static routes:
+	2962:2:65536	2962:2:65536	3156:2:65536	3156:2:65536	2986:2:65536	2986:2:65536	3180:2:65536	3180:2:65536	2853:1:32768	2153:1:32768	3446:1:32768	2458:1:32768	2710:1:32768	2180:1:32768	2485:1:32768	3509:1:32768	2510:1:32768	3572:1:32768	3383:1:32768	2537:1:32768	2100:1:16384	2129:1:16384	2828:2:8192	2828:2:8192	2685:2:8192	2685:2:8192	2076:1:16384	2047:1:16384	3339:1:8192	2565:1:8192	2595:1:8192	2877:1:8192	3316:1:8192	2734:1:8192	2260:1:1024	2343:1:1024	2207:1:16	2236:1:16	3663:4:1	3663:4:1	3663:4:1	3663:4:1	2367:1:1	2399:1:1	2764:1:1	2430:1:1	2621:1:1	2317:1:1
+All dynamic routes:
+
+Best score is 3.50
 Used 0 VCs for endpoint coloring.
 	Used 0 VCs.
 [[32mproute[0m] 	Used 0 VCs.
-[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 2595.421861ms
-[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 1304.24487ms
-[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/
-[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/config.psim -p /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/final.place -c 100000000 -l B
-[[33mpsim[0m] log in /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/psim.log
-Changing to config directory: /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4
+[[32mproute[0m] DynHopsVec:0, DynHopsScal:0, StatHopsVec:1546240, StatHopsScal:611394
+[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 2079.729663ms
+[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 973.029627ms
+[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/
+[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/config.psim -p /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/final.place -c 100000000 -l B -w 512
+[[33mpsim[0m] log in /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/psim.log
+Changing to config directory: /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4
 Constructing NetworkLink.
 Constructing NetworkLink.
 Constructing NetworkLink.
@@ -140,206 +167,495 @@ Constructing NetworkLink.
 Constructing NetworkLink.
 Constructing NetworkLink.
 Constructing NetworkLink.
+Error setting saddr = 16
 Constructing NetworkLink.
 Constructing NetworkLink.
+Error setting daddr = 5
 Constructing NetworkLink.
+Error setting class = 0
 Constructing NetworkLink.
+Error setting lat = 6
 Constructing NetworkLink.
+Error setting saddr = 20
 Constructing NetworkLink.
+Error setting daddr = 4
 Constructing NetworkLink.
+Error setting class = 1
 Constructing NetworkLink.
+Error setting lat = 1
 Constructing NetworkLink.
+Error setting saddr = 41
 Constructing NetworkLink.
+Error setting daddr = 20
 Constructing NetworkLink.
+Error setting class = 0
 Constructing NetworkLink.
+Error setting lat = 6
 Constructing NetworkLink.
+Error setting saddr = 7
 Added all names to the symbol table.
-Adding static hop for route 3180 (1020->1049, lat 11).
-Adding static hop for route 3180 (1020->1050, lat 13).
-Adding static hop for route 3156 (213->1049, lat 9).
-Adding static hop for route 3156 (213->1050, lat 1).
-Adding static hop for route 2986 (1017->1047, lat 15).
-Adding static hop for route 2986 (1017->1048, lat 3).
+Error setting daddr = 39
+Adding static hop for route 2962 (110->1048, lat 2).
+Error setting class = 0
 Adding static hop for route 2962 (110->1047, lat 2).
-Adding static hop for route 2962 (110->1048, lat 14).
-Adding static hop for route 2828 (1034->1044, lat 2).
-Adding static hop for route 2828 (1034->1055, lat 9).
-Adding static hop for route 2685 (1033->1041, lat 2).
-Adding static hop for route 2685 (1033->1054, lat 1).
-Adding static hop for route 3572 (1048->1055, lat 10).
+Error setting lat = 2
+Adding static hop for route 3156 (213->1050, lat 3).
+Error setting saddr = 24
+Adding static hop for route 3156 (213->1049, lat 1).
+Error setting daddr = 56
+Adding static hop for route 2986 (1017->1048, lat 1).
+Error setting class = 0
+Adding static hop for route 2986 (1017->1047, lat 3).
+Error setting lat = 2
+Adding static hop for route 3180 (1020->1050, lat 1).
+Error setting saddr = 1
+Adding static hop for route 3180 (1020->1049, lat 3).
+Error setting daddr = 6
+Adding static hop for route 2853 (1055->1044, lat 1).
+Error setting class = 0
+Adding static hop for route 2153 (1041->456, lat 2).
+Error setting lat = 7
+Adding static hop for route 3446 (571->1053, lat 6).
+Error setting saddr = 3
+Adding static hop for route 2458 (1049->1037, lat 7).
+Error setting daddr = 4
+Adding static hop for route 2710 (1054->1041, lat 1).
+Error setting class = 0
+Adding static hop for route 2180 (1044->571, lat 1).
+Error setting lat = 1
+Adding static hop for route 2485 (1052->1037, lat 3).
+Error setting saddr = 39
 Adding static hop for route 3509 (1047->1054, lat 2).
-Adding static hop for route 3446 (571->1053, lat 11).
-Adding static hop for route 3383 (456->1052, lat 14).
-Adding static hop for route 2853 (1055->1044, lat 11).
-Adding static hop for route 2710 (1054->1041, lat 3).
+Error setting daddr = 23
+Adding static hop for route 2510 (1050->1038, lat 1).
+Error setting class = 0
+Adding static hop for route 3572 (1048->1055, lat 2).
+Error setting lat = 1
+Adding static hop for route 3383 (456->1052, lat 3).
+Error setting saddr = 25
 Adding static hop for route 2537 (1053->1038, lat 1).
-Adding static hop for route 2510 (1050->1038, lat 5).
-Adding static hop for route 2485 (1052->1037, lat 7).
-Adding static hop for route 2458 (1049->1037, lat 13).
-Adding static hop for route 2180 (1044->571, lat 2).
-Adding static hop for route 2153 (1041->456, lat 15).
-Adding static hop for route 2129 (1019->213, lat 4).
-Adding static hop for route 2100 (1019->213, lat 4).
+Error setting daddr = 22
+Adding static hop for route 2100 (1019->213, lat 2).
+Error setting class = 0
+Adding static hop for route 2129 (1019->213, lat 2).
+Error setting lat = 3
+Adding static hop for route 2828 (1034->1055, lat 1).
+Error setting saddr = 22
+Adding static hop for route 2828 (1034->1044, lat 2).
+Error setting daddr = 6
+Adding static hop for route 2685 (1033->1041, lat 2).
+Error setting class = 1
+Adding static hop for route 2685 (1033->1054, lat 1).
+Error setting lat = 3
 Adding static hop for route 2076 (1016->110, lat 1).
+Error setting saddr = 25
 Adding static hop for route 2047 (1016->110, lat 1).
-Adding static hop for route 3339 (1040->1051, lat 13).
+Error setting daddr = 5
+Adding static hop for route 3339 (1040->1051, lat 6).
+Error setting class = 1
+Adding static hop for route 2565 (1037->1039, lat 4).
+Error setting lat = 5
+Adding static hop for route 2595 (1038->1040, lat 5).
+Error setting saddr = 56
+Adding static hop for route 2877 (1034->1053, lat 5).
+Error setting daddr = 40
 Adding static hop for route 3316 (1039->1051, lat 5).
-Adding static hop for route 2877 (1034->1053, lat 7).
-Adding static hop for route 2734 (1033->1052, lat 7).
-Adding static hop for route 2595 (1038->1040, lat 12).
-Adding static hop for route 2565 (1037->1039, lat 14).
-Adding static hop for route 2343 (839->960, lat 15).
-Adding static hop for route 2260 (1051->839, lat 8).
-Adding static hop for route 3663 (844->1017, lat 14).
-Adding static hop for route 3663 (844->1020, lat 6).
-Adding static hop for route 3663 (844->1033, lat 6).
-Adding static hop for route 3663 (844->1034, lat 10).
-Adding static hop for route 2236 (1027->839, lat 1).
+Error setting class = 0
+Adding static hop for route 2734 (1033->1052, lat 1).
+Error setting lat = 1
+Adding static hop for route 2260 (1051->839, lat 6).
+Error setting saddr = 2
+Adding static hop for route 2343 (839->960, lat 5).
+Error setting daddr = 0
 Adding static hop for route 2207 (1027->839, lat 1).
-Adding static hop for route 2764 (844->1044, lat 12).
+Error setting class = 0
+Adding static hop for route 2236 (1027->839, lat 1).
+Error setting lat = 2
+Adding static hop for route 3663 (844->1034, lat 6).
+Error setting saddr = 9
+Adding static hop for route 3663 (844->1033, lat 4).
+Error setting daddr = 9
+Adding static hop for route 3663 (844->1020, lat 2).
+Error setting class = 1
+Adding static hop for route 3663 (844->1017, lat 4).
+Error setting lat = 1
+Adding static hop for route 2367 (844->1016, lat 5).
+Error setting saddr = 0
+Adding static hop for route 2399 (844->1019, lat 2).
+Error setting daddr = 16
+Adding static hop for route 2764 (844->1044, lat 6).
+Error setting class = 2
+Adding static hop for route 2430 (844->1027, lat 4).
+Error setting lat = 1
 Adding static hop for route 2621 (844->1041, lat 4).
-Adding static hop for route 2430 (844->1027, lat 18).
-Adding static hop for route 2399 (844->1019, lat 14).
-Adding static hop for route 2367 (844->1016, lat 4).
-Adding static hop for route 2317 (960->844, lat 6).
+Error setting saddr = 4
+Adding static hop for route 2317 (960->844, lat 2).
+Error setting daddr = 23
 Printing hop routes
+Error setting class = 2
+0	2100: X, vc0
+	2129: X, vc1
+Error setting lat = 4
+	2430: X, vc2
+1	3156: X, vc0
+Error setting saddr = 4
+	3180: X, vc1
+Error setting daddr = 40
+2	2399: X, vc0
+3	3156: X, vc0
+	3180: X, vc1
+4	2317: X, vc2
+	2510: X, vc0
+	2537: X, vc1
+5	3316: X, vc1
+	3339: X, vc0
+6	2458: X, vc0
+	2485: X, vc1
+7	2962: X, vc0
+	2986: X, vc1
+8	3663: X, vc0
+9	2047: X, vc1
+	2076: X, vc0
+	2367: X, vc2
+16	2207: X, vc2
+	2236: X, vc3
+	2260: X, vc1
+	2595: X, vc0
+19	3663: X, vc0
+20	2877: X, vc1
+	3446: X, vc0
+21	2343: X, vc0
+Error setting class = 2
+Error setting lat = 6
+Error setting saddr = 4
+Error setting daddr = 0
+Error setting class = 2
+Error setting lat = 4
+Error setting saddr = 2
+Error setting daddr = 0
+Error setting class = 1
+Error setting lat = 2
+Error setting saddr = 9
+Error setting daddr = 9
+Error setting class = 0
+Error setting lat = 1
+Error setting saddr = 0
+Error setting daddr = 16
+Error setting class = 3
+Error setting lat = 1
+Error setting saddr = 4
+Error setting daddr = 9
+Error setting class = 2
+Error setting lat = 5
+Error setting saddr = 4
+Error setting daddr = 2
+Error setting class = 0
+22	2734: X, vc1
+Error setting lat = 2
+	3383: X, vc0
+Error setting saddr = 23
+23	2621: X, vc2
+Error setting daddr = 25
+	2685: X, vc1
+Error setting class = 0
+	2710: X, vc0
+Error setting lat = 2
+24	2962: X, vc0
+Error setting saddr = 40
+	2986: X, vc1
+Error setting daddr = 41
+25	2153: X, vc0
+Error setting class = 0
+	2565: X, vc1
+Error setting lat = 1
+38	3663: X, vc0
+Error setting saddr = 38
+39	2685: X, vc1
+Error setting daddr = 23
+	3509: X, vc0
+Error setting daddr = 39
+40	2764: X, vc2
+Error setting class = 1
+	2828: X, vc1
+Error setting class = 1
+	2853: X, vc0
+Error setting lat = 2
+41	2180: X, vc0
+Error setting lat = 1
+55	3663: X, vc0
+Error setting saddr = 55
+56	2828: X, vc1
+Error setting daddr = 40
+	3572: X, vc0
+Error setting daddr = 56
 Parsed placement file.
+Error setting class = 1
 Set lat 1 from 0 to 0
+Error setting class = 1
+Set ejection VC at addr 5 to 0
+Error setting lat = 2
 Link specified in placement file.
+Error setting lat = 1
 Changing link to static with placed latencies.
-Set lat 13 from 0 to 0
+Error setting saddr = 19
+Set lat 6 from 0 to 0
+Error setting daddr = 1
+Set ejection VC at addr 4 to 1
+Error setting daddr = 3
 Link specified in placement file.
+Error setting class = 1
 Changing link to static with placed latencies.
+Error setting class = 1
 Set lat 1 from 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 20 to 0
+Error setting lat = 1
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 1
+Set lat 6 from 0 to 0
+Error setting daddr = 3
+Set ejection VC at addr 39 to 0
+Error setting class = 0
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 11 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
+Error setting class = 0
 Set lat 2 from 0 to 0
+Error setting lat = 1
+Set ejection VC at addr 56 to 0
+Error setting lat = 3
+Link specified in placement file.
+Error setting saddr = 8
+Changing link to static with placed latencies.
+Error setting daddr = 7
+Set lat 2 from 0 to 0
+Error setting daddr = 24
+Set ejection VC at addr 6 to 0
+Error setting class = 1
+Link specified in placement file.
+Error setting class = 1
+Changing link to static with placed latencies.
+Error setting lat = 3
+Set lat 7 from 0 to 0
+Error setting lat = 1
+Set ejection VC at addr 4 to 0
+Error setting saddr = 9
+Link specified in placement file.
+Error setting daddr = 7
+Changing link to static with placed latencies.
+Error setting daddr = 24
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 23 to 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 2
+Set lat 1 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 22 to 0
+Error setting saddr = 16
+Link specified in placement file.
+Error setting daddr = 21
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 3 from 0 to 0
+Error setting lat = 5
+Set ejection VC at addr 6 to 1
+Error setting saddr = 21
+Link specified in placement file.
+Error setting daddr = 4
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Error setting class = 2
+Set ejection VC at addr 5 to 1
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 4
+Changing link to static with placed latencies.
+Error setting daddr = 8
+Set lat 5 from 0 to 0
+Error setting daddr = 19
+Set ejection VC at addr 40 to 0
+Error setting daddr = 38
+Link specified in placement file.
+Error setting daddr = 55
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 4
+Error setting lat = 2
+Set lat 2 from 0 to 0
+Set ejection VC at addr 9 to 1
+Error setting lat = 4
+Link specified in placement file.
+Error setting lat = 6
+Changing link to static with placed latencies.
+Error setting saddr = 5
+Set lat 1 from 0 to 0
+Error setting daddr = 16
+Set ejection VC at addr 16 to 2
+Error setting class = 1
+Link specified in placement file.
+Error setting lat = 6
+Changing link to static with placed latencies.
+Error setting saddr = 4
+Set lat 1 from 0 to 0
+Error setting daddr = 16
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 5
+Set lat 1 from 0 to 0
+Error setting saddr = 38
+Set lat 1 from 0 to 0
+Error setting daddr = 22
+Set ejection VC at addr 23 to 2
+Error setting class = 1
+Link specified in placement file.
+Error setting lat = 1
+Changing link to static with placed latencies.
+Error setting saddr = 55
+Set lat 4 from 0 to 0
+Error setting daddr = 20
+Set ejection VC at addr 40 to 2
+Error setting class = 1
+Link specified in placement file.
+Error setting lat = 5
+Changing link to static with placed latencies.
+Error setting saddr = 6
+Set lat 6 from 0 to 0
+Error setting daddr = 25
+Set ejection VC at addr 0 to 2
+Error setting class = 1
+Link specified in placement file.
+Error setting lat = 4
+Changing link to static with placed latencies.
+== Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
+Set lat 4 from 0 to 0
+== Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
+Set ejection VC at addr 0 to 1
+===== MemorySystem 0 =====
+Link specified in placement file.
+CH. 0 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Changing link to static with placed latencies.
+===== MemorySystem 1 =====
+Set lat 2 from 0 to 0
+CH. 1 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set ejection VC at addr 9 to 0
+===== MemorySystem 2 =====
+Link specified in placement file.
+CH. 2 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Changing link to static with placed latencies.
+===== MemorySystem 3 =====
+Set lat 1 from 0 to 0
+CH. 3 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set ejection VC at addr 16 to 3
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 10 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 13 from 0 to 0
+Set lat 1 from 0 to 0
+Set ejection VC at addr 9 to 2
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 5 from 0 to 0
+Set ejection VC at addr 2 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 25 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set ejection VC at addr 41 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 23 to 1
+Set ejection VC at addr 39 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 40 to 1
+Set ejection VC at addr 56 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 1 to 1
+Set ejection VC at addr 3 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 3 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 1 to 0
+Set ejection VC at addr 3 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 14 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 3 from 0 to 1
+Set ejection VC at addr 7 to 1
+Set ejection VC at addr 24 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
+Set lat 3 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 7 to 0
+Set ejection VC at addr 24 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 2 from 0 to 1
+Set ejection VC at addr 21 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 5 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 11 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 12 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 18 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 1 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 4 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 14 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 15 from 0 to 0
+Set ejection VC at addr 4 to 2
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 2 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set ejection VC at addr 8 to 0
+Set ejection VC at addr 19 to 0
+Set ejection VC at addr 38 to 0
+Set ejection VC at addr 55 to 0
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Set lat 1 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Set lat 9 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 11 from 0 to 0
-Set lat 13 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 9 from 0 to 0
-Set lat 1 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 15 from 0 to 0
-Set lat 3 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 2 from 0 to 0
-Set lat 14 from 0 to 1
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 15 from 0 to 0
+Set lat 4 from 0 to 0
+Set lat 2 from 0 to 1
+Set lat 4 from 0 to 2
+Set lat 6 from 0 to 3
+Set ejection VC at addr 16 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
 Set lat 6 from 0 to 0
+Set ejection VC at addr 16 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Set ejection VC at addr 22 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
 Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
-Set lat 1 from 0 to 0
+Set ejection VC at addr 20 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 14 from 0 to 0
-Set lat 6 from 0 to 1
-Set lat 6 from 0 to 2
-Set lat 10 from 0 to 3
+Set lat 5 from 0 to 0
+Set ejection VC at addr 25 to 1
 Link specified in placement file.
 Changing link to static with placed latencies.
-Set lat 8 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 12 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 7 from 0 to 0
-Link specified in placement file.
-Changing link to static with placed latencies.
-Set lat 14 from 0 to 0
-Child process has pid -26414
+Set lat 4 from 0 to 0
+Child process has pid 32344
 Parsed definitions of all elements.
 Total of 48 links:
   0: SRAM35
@@ -506,8 +822,78 @@ Total of 39 nodes:
   32: CE4095
     [Reg620 *1 /1]  => [RetimingFIFO1737] 
   33: CE4109
-    [DramAddress415 *32768 /1] [Reg351_Reg1755 *4 /1] [RetimingFIFaced latencies.
-Set lat 14 from 0 to 0
+    [DramAddress415 *32768 /1] [Reg351_Reg1755 *4 /1] [RetimingFIFon VC at addr 56 to 1
+DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 1 to 1
+Set ejection VC at addr 3 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 1 to 0
+Set ejection VC at addr 3 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set lat 3 from 0 to 1
+Set ejection VC at addr 7 to 1
+Set ejection VC at addr 24 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set lat 1 from 0 to 1
+Set ejection VC at addr 7 to 0
+Set ejection VC at addr 24 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 2 from 0 to 1
+Set ejection VC at addr 21 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Set ejection VC at addr 4 to 2
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 2 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set ejection VC at addr 8 to 0
+Set ejection VC at addr 19 to 0
+Set ejection VC at addr 38 to 0
+Set ejection VC at addr 55 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
+Set lat 2 from 0 to 1
+Set lat 4 from 0 to 2
+Set lat 6 from 0 to 3
+Set ejection VC at addr 16 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 6 from 0 to 0
+Set ejection VC at addr 16 to 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Set ejection VC at addr 22 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 1 from 0 to 0
+Set ejection VC at addr 20 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Set ejection VC at addr 25 to 1
+Link specified in placement file.
+Changing link to static with placed latencies.
+Set lat 4 from 0 to 0
 I'm the child process!
 GPGPU-Sim uArch: interconnect node map (shaderID+MemID to icntID)
 GPGPU-Sim uArch: Memory nodes ID start from index: 256
@@ -576,40 +962,7 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 30000...
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -628,20 +981,7 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 50000...
-WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -669,33 +1009,7 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 70000...
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -712,32 +1026,7 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 90000...
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -763,20 +1052,6 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 110000...
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -790,23 +1065,7 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 120000...
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -842,13 +1101,6 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 140000...
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -868,26 +1120,7 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 150000...
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -923,6 +1156,12 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
 170000...
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -932,29 +1171,7 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 180000...
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -993,17 +1210,7 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 200000...
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -1034,20 +1241,22 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
 220000...
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -1087,20 +1296,17 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
 240000...
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
-WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -1178,6 +1384,10 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
 260000...
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
@@ -1204,39 +1414,176 @@ WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
 WARNING: Unrequested DRAM token returned!
-Simulation complete at cycle: 264927
-[[32mpsim[0m] Simulation complete at cycle: 264927
-CE3861: Active:  24.7 Stalled:   0.0 Starved:   9.6 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 25351
-[0m[[31merror[0m] [0m(Thread-17) java.lang.NumberFormatException: For input string: "65536 Total Output:    65536"[0m
-java.lang.NumberFormatException: For input string: "65536 Total Output:    65536"
-	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)
-	at java.lang.Long.parseLong(Long.java:589)
-	at java.lang.Long.parseLong(Long.java:631)
-	at scala.collection.immutable.StringLike.toLong(StringLike.scala:306)
-	at scala.collection.immutable.StringLike.toLong$(StringLike.scala:306)
-	at scala.collection.immutable.StringOps.toLong(StringOps.scala:29)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$processOutput$1(PlastisimConfigCodegen.scala:55)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$processOutput$1$adapted(PlastisimConfigCodegen.scala:54)
-	at scala.Option.foreach(Option.scala:257)
-	at pir.codegen.PlastisimConfigCodegen.processOutput(PlastisimConfigCodegen.scala:54)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$runPsim$5(PlastisimConfigCodegen.scala:82)
-	at pir.codegen.PlastisimConfigCodegen.$anonfun$runPsim$5$adapted(PlastisimConfigCodegen.scala:82)
-	at prism.util.Misc.$anonfun$shell$7(Misc.scala:88)
-	at prism.util.Misc.$anonfun$shell$7$adapted(Misc.scala:88)
-	at scala.Option.foreach(Option.scala:257)
-	at prism.util.Misc.$anonfun$shell$5(Misc.scala:88)
-	at prism.util.Misc.$anonfun$shell$5$adapted(Misc.scala:88)
-	at scala.sys.process.ProcessLogger$$anon$1.out(ProcessLogger.scala:97)
-	at scala.sys.process.BasicIO$.$anonfun$processOutFully$1(BasicIO.scala:136)
-	at scala.sys.process.BasicIO$.$anonfun$processOutFully$1$adapted(BasicIO.scala:136)
-	at scala.sys.process.BasicIO$.readFully$1(BasicIO.scala:184)
-	at scala.sys.process.BasicIO$.$anonfun$processFully$1$adapted(BasicIO.scala:188)
-	at scala.sys.process.ProcessBuilderImpl$Simple.$anonfun$run$3(ProcessBuilderImpl.scala:76)
-	at scala.sys.process.ProcessImpl$Spawn$$anon$1.run(ProcessImpl.scala:23)
-[0m[[31mtrace[0m] [0mStack trace suppressed: run [34mlast apps/compile:runMain[0m for the full output.[0m
-[[31merror[0m] failed /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/config.psim -p /home/yaqiz/plastisim/configs/finals/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/final.place -c 100000000 -l B
-[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 62170.137488ms
-[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 1273.218922ms
-[pir] Saving node prism.Session@2093b159 to /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_dynamic_v1_s4/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.sess
-[0m[[32msuccess[0m] [0mTotal time: 188 s, completed Aug 1, 2018 7:46:28 PM[0m
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+270000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+280000...
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+WARNING: Unrequested DRAM token returned!
+Simulation complete at cycle: 283303
+[[32mpsim[0m] Simulation complete at cycle: 283303
+CE3861: Active:  23.1 Stalled:  12.0 Starved:  18.4 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 52003 
+	   65536    65536 
+	DRAM:  14.81 GB/s ( 14.81 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE3875: Active:  23.1 Stalled:  11.7 Starved:  18.2 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 51608 
+	   65536    65536 
+	DRAM:  14.81 GB/s ( 14.81 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE3887: Active:  11.6 Stalled:   0.0 Starved:  88.4 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 229 
+	   32768 
+	DRAM:   4.78 GB/s (  4.78 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE3897: Active:  11.6 Stalled:  54.2 Starved:  48.0 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 869 
+	   32768 
+	DRAM:   4.65 GB/s (  4.65 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE3933: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 283302 
+	
+CE3949: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 1 
+	       1 
+CE3969: Active:   5.8 Stalled:  75.8 Starved:  18.5 Total Active:    16384 Total Output:    16384 Expected Active:    16384 Last Activity: 52269 
+	   16384 
+CE3981: Active:  23.1 Stalled:  58.8 Starved:  18.0 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 51056 
+	   65536 
+CE3993: Active:   5.8 Stalled:  76.0 Starved:  18.3 Total Active:    16384 Total Output:    16384 Expected Active:    16384 Last Activity: 51809 
+	   16384 
+CE4005: Active:  23.1 Stalled:  58.9 Starved:  18.0 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 50904 
+	   65536 
+CE4017: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:       16 Total Output:       16 Expected Active:       16 Last Activity: 283283 
+	      16 
+CE4031: Active:   2.9 Stalled:  97.0 Starved:   0.1 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 289 
+	    8192 
+CE4045: Active:   2.9 Stalled:  96.8 Starved:   0.3 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 952 
+	    8192 
+CE4153: Active:  23.1 Stalled:  13.8 Starved:  64.8 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 51044 
+	   65536    65536 
+CE4141: Active:  11.6 Stalled:  84.4 Starved:   4.0 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 313 
+	   32768 
+CE4177: Active:  23.1 Stalled:  11.4 Starved:  66.9 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 51044 
+	   65536    65536 
+CE4165: Active:  11.6 Stalled:  84.2 Starved:   4.2 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 962 
+	   32768 
+CE4201: Active:  23.1 Stalled:  13.3 Starved:  65.1 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 50893 
+	   65536    65536 
+CE4189: Active:  11.6 Stalled:  84.6 Starved:   3.8 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 185 
+	   32768 
+CE4225: Active:  23.1 Stalled:  11.3 Starved:  67.1 Total Active:    65536 Total Output:    65536 Expected Active:    65536 Last Activity: 50892 
+	   65536    65536 
+CE4213: Active:  11.6 Stalled:  84.5 Starved:   4.0 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 546 
+	   32768 
+CE4273: Active:  11.6 Stalled:   0.0 StarveStarting remote loop
+Dumping flits:
+IPC layer sent 283303 msgs recvd 283303 msgs
+d:  88.4 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 184 
+	   32768    32768 
+CE4261: Active:  11.6 Stalled:   0.0 Starved:  88.4 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 175 
+	   32768 
+CE4297: Active:  11.6 Stalled:  75.4 Starved:  15.3 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 615 
+	   32768    32768 
+CE4285: Active:  11.6 Stalled:  82.2 Starved:   6.3 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 546 
+	   32768 
+CE4059: Active:  11.6 Stalled:   0.0 Starved:  88.4 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 168 
+	   32768    32768 
+CE4073: Active:  11.6 Stalled:  83.1 Starved:   5.5 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 510 
+	   32768    32768 
+CE4323: Active:  11.6 Stalled:  84.5 Starved:   4.0 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 301 
+	   32768 
+CE4311: Active:  11.6 Stalled:   0.0 Starved:  88.4 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 244 
+	   32768    32768 
+CE4347: Active:  11.6 Stalled:  84.2 Starved:   4.2 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 950 
+	   32768 
+CE4335: Active:  11.6 Stalled:   0.0 Starved:  88.4 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 884 
+	   32768    32768 
+CE4085: Active:   2.9 Stalled:   0.0 Starved:  97.1 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 159 
+	    8192 
+CE4095: Active:   2.9 Stalled:  92.4 Starved:   4.9 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 342 
+	    8192 
+CE4109: Active:  11.6 Stalled:   0.0 Starved:  88.4 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 238 
+	   32768    32768    32768 
+CE4127: Active:  11.6 Stalled:   0.0 Starved:  88.4 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 878 
+	   32768    32768    32768 
+CE4249: Active:   2.9 Stalled:   0.0 Starved:  97.1 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 148 
+	    8192     8192 
+CE4237: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:     1024 Total Output:     1024 Expected Active:     1024 Last Activity: 79 
+	    1024 
+CE3911: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:     1024 Total Output:     1024 Expected Active:     1024 Last Activity: 72 
+	    1024     1024     1024 
+	DRAM:   0.23 GB/s (  0.00 GB/s R,   0.23 GB/s W)
+	ROB remaining: 0
+CE3957: Active:   0.4 Stalled:   0.0 Starved:  99.6 Total Active:     1024 Total Output:     1024 Expected Active:     1024 Last Activity: 10 
+	    1024 
+Total DRAM:	  44.65 GB/s ( 44.42 GB/s R,   0.23 GB/s W)
+[[32mpsim[0m] Total DRAM:	  44.65 GB/s ( 44.42 GB/s R,   0.23 GB/s W)
+Pending Read: 0	 Pending Write: 0	
+Sending shutdown IPC message.
+IPC layer sent 283303 msgs recvd 283303 msgs
+[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 63766.17536ms
+[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 852.136392ms
+[pir] Saving node prism.Session@5a79f816 to /home/yaqiz/pir/out/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2_psim_D_v1_s4/SPMV_ELL__L_64_N_16384_ts_1024_op_1_mp_2.sess
+[0m[[32msuccess[0m] [0mTotal time: 174 s, completed Aug 3, 2018 8:43:00 PM[0m
 -------------PASS (DONE)------------

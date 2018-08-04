@@ -55,7 +55,7 @@ link_count()
 
 def runbest():
     opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes() if
-        p.startswith("psim")])
+        p.startswith("psim") and "cd" in p])
 
     for app in bestapps:
         target(app, [], {})

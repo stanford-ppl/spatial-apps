@@ -1,0 +1,2812 @@
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mLoading project definition from /home/yaqiz/pir/project[0m
+[0m[[0minfo[0m] [0mSet current project to default-675fdc (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mSet current project to apps (in build file:/home/yaqiz/pir/)[0m
+[0m[[0minfo[0m] [0mRunning GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1 --out=/home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd --psim-out=/home/yaqiz/plastisim/configs/finals/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd --debug=false --verbose=true --dot=false --save-pir=true --psim=true --trace=true --ctrl=true --bp=false --stat=true --routing-algo=proute --proute-iter=1000 --run-psim=true --arch=MyDesign --row=16 --col=8 --topo=mesh --argin=64 --tokenout=32 --pcu-stage=4 --vc=4 --net=static --vlink=2 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_dor_YX --link-prop=cd --flit-width=512[0m
+[pir] args=[--load-pir=true, --run-psim=false, --trace=false, --net=static, --stat=false, --vlink=2, --slink=6, --vfifo=4, --row=16, --col=8, --topo=mesh, --routing-algo=dor, --psim-timeout=100000000, --mapping=true, --splitting=true, --save-pir=true, --load-spade=false, --save-spade=false, --splitting-algo=alias_weighted_igraph, --ctrl=true, --bp=false, --snapint=10, --snapshot=false, --dot=true, --psim=false, --arch=MyDesign, --nn=false, --dag=true, --pattern=checkerboard, --argin=20, --argout=4, --tokenout=5, --fifo-depth=10, --vc=10, --routing-cost=H-hop, --out=/home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd, --psim-out=/home/yaqiz/plastisim/configs/finals/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd, --debug=false, --verbose=true, --dot=false, --save-pir=true, --psim=true, --trace=true, --ctrl=true, --bp=false, --stat=true, --routing-algo=proute, --proute-iter=1000, --run-psim=true, --arch=MyDesign, --row=16, --col=8, --topo=mesh, --argin=64, --tokenout=32, --pcu-stage=4, --vc=4, --net=static, --vlink=2, --slink=4, --fifo-depth=4, --vfifo=4, --proute-algo=route_dor_YX, --link-prop=cd, --flit-width=512]
+[pir] Output directory set to [36m/home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd[0m
+[pir] Loading from /home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1.pir[pir] Loading PIRDesign() from /home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1.pir
+[pir] Configuring spade MyDesign ...
+[pir] Loading from /home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1.sess[pir] Loading prism.Session@a89e8e5 from /home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1.sess
+[pir] Saving node PIRDesign() to /home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1.pir
+[pir] Running 50-PlastisimTraceCodegen ...[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/traces
+[[33mcommand[0m] mkdir -p /home/yaqiz/plastisim/configs/finals/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/trace_classes
+[[33mtrace[0m] /home/yaqiz/pir/bin/run_trace /home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd /home/yaqiz/plastisim/configs/finals/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd
+[[33mtrace[0m] log in /home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/trace.log
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option MaxPermSize=1g; support was removed in 8.0
+Picked up _JAVA_OPTIONS: -Xss8192k
+[0m[[0minfo[0m] [0mLoading global plugins from /home/yaqiz/.sbt/0.13/plugins[0m
+[0m[[0minfo[0m] [0mSet current project to gda__c_128_r_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd (in build file:/home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/)[0m
+[0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/target/scala-2.10/classes...[0m
+[0m[[33mwarn[0m] [0mthere were 2 feature warning(s); re-run with -feature for details[0m
+[0m[[33mwarn[0m] [0mone warning found[0m
+[0m[[0minfo[0m] [0mRunning tracer /home/yaqiz/plastisim/configs/finals/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/traces[0m
+[0m[[32msuccess[0m] [0mTotal time: 16 s, completed Aug 3, 2018 10:00:43 PM[0m
+[pir] Finished 50-PlastisimTraceCodegen to [36mgen_trace.scala[0m in 35752.184915ms
+[pir] Running 51-PlastisimLinkAnalyzer ...[pir] Finished 51-PlastisimLinkAnalyzer in 39050.587818ms
+[pir] Running 52-PlastisimDotCodegen ...[pir] Finished 52-PlastisimDotCodegen to [36mpsim.dot[0m in 19827.836376ms
+[pir] Running 53-PlastisimCountCheck ...[pir] Finished 53-PlastisimCountCheck in 1104.630545ms
+[pir] Running 54-ControllerDotCodegen ...[pir] Finished 54-ControllerDotCodegen to [36mcontroller.dot[0m in 9419.282873ms
+[pir] Running 55-PIRIRDotCodegen ...[pir] Finished 55-PIRIRDotCodegen to [36mtop.dot[0m in 23925.489049ms
+[pir] Running 56-SimpleIRDotCodegen ...[pir] Finished 56-SimpleIRDotCodegen to [36msimple.dot[0m in 793.437592ms
+[pir] Running 58-CUPruning ...[pir] Finished 58-CUPruning in 3211.257001ms
+[pir] Running 59-CUPlacer ...[[32msuccess[0m] CUPlacer succeeded
+[pir] Finished 59-CUPlacer in 507241.10829ms
+[pir] Running 60-CUStatistics ...[pir] =========== Post-splitting CU Statistics ==================
+[pir] 
+[pir] number of cus=88
+[pir] number of ocu = 1
+[pir] - cin (1.00,1.00,1.00) sin (0.00,0.00,0.00) vin (0.00,0.00,0.00)
+[pir] - cout (1.00,1.00,1.00) sout (0.00,0.00,0.00) vout (0.00,0.00,0.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] number of pcu = 23
+[pir] - cin (0.00,0.09,1.00) sin (0.00,0.13,1.00) vin (0.00,2.74,4.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.00,0.00) vout (1.00,1.00,1.00)
+[pir] - stages (1.00,2.04,3.00)
+[pir] number of dag = 5
+[pir] - cin (0.00,0.00,0.00) sin (1.00,1.40,2.00) vin (0.00,0.00,0.00)
+[pir] - cout (0.00,0.00,0.00) sout (2.00,2.00,2.00) vout (0.00,0.00,0.00)
+[pir] - stages (1.00,2.60,5.00)
+[pir] number of pmu = 53
+[pir] - cin (0.00,0.00,0.00) sin (0.00,0.32,1.00) vin (1.00,1.15,2.00)
+[pir] - cout (0.00,0.00,0.00) sout (0.00,0.00,0.00) vout (1.00,1.00,1.00)
+[pir] - stages (0.00,1.21,4.00)
+[pir] number of dfg = 5
+[pir] - cin (0.00,0.00,0.00) sin (2.00,2.00,2.00) vin (0.00,0.20,1.00)
+[pir] - cout (0.00,0.20,1.00) sout (0.00,0.00,0.00) vout (0.00,0.80,1.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] number of afg = 1
+[pir] - cin (1.00,1.00,1.00) sin (0.00,0.00,0.00) vin (0.00,0.00,0.00)
+[pir] - cout (1.00,1.00,1.00) sout (6.00,6.00,6.00) vout (0.00,0.00,0.00)
+[pir] - stages (0.00,0.00,0.00)
+[pir] compute CU = 24
+[pir] memory CU = 53
+[pir] mc CU = 5
+[pir] Total = 29
+[pir] PCU = 29 / 64 (45.31%)
+[pir] PMU-comp = 0 / 64 (0.00%)
+[pir] PMU-mem = 53 / 64 (82.81%)
+[pir] AG-ag = 0 / 34 (0.00%)
+[pir] AG-comp = 0 / 34 (0.00%)
+[pir] MC = 5 / 34 (14.71%)
+[pir] Finished 60-CUStatistics to [36mstat.json[0m in 1316.11685ms
+[pir] Running 61-PIRNetworkDotCodegen ...[pir] Finished 61-PIRNetworkDotCodegen to [36mcontrol.dot[0m in 1276.352169ms
+[pir] Running 62-PIRNetworkDotCodegen ...[pir] Finished 62-PIRNetworkDotCodegen to [36mscalar.dot[0m in 1407.913191ms
+[pir] Running 63-PIRNetworkDotCodegen ...[pir] Finished 63-PIRNetworkDotCodegen to [36mvector.dot[0m in 1272.897397ms
+[pir] Running 64-TerminalCSVCodegen ...[pir] Finished 64-TerminalCSVCodegen to [36mnode.csv[0m in 4.779014ms
+[pir] Running 65-LinkCSVCodegen ...[pir] Finished 65-LinkCSVCodegen to [36mlink.csv[0m in 20485.776909ms
+[pir] Running 66-PlastisimPlacementCodegen ...[[32mpir[0m] StatHopsScal: 46458,StatHopsCtrl: 4132,StatHopsVec: 84323504
+[pir] Finished 66-PlastisimPlacementCodegen to [36mfinal.place[0m in 17643.091213ms
+[pir] Running 67-PlastisimDotCodegen ...[pir] Finished 67-PlastisimDotCodegen to [36mpsim.dot[0m in 21515.614398ms
+[pir] Running 68-PlastisimConfigCodegen ...[[33mcommand[0m] ln -f /home/yaqiz/plastisim/configs/mesh_generic.cfg /home/yaqiz/plastisim/configs/finals/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/
+[[33mpsim[0m] /home/yaqiz/plastisim/plastisim -f /home/yaqiz/plastisim/configs/finals/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/config.psim -p /home/yaqiz/plastisim/configs/finals/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/final.place -c 100000000 -l C -w 512
+[[33mpsim[0m] log in /home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/psim.log
+Changing to config directory: /home/yaqiz/plastisim/configs/finals/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Constructing NetworkLink.
+Added all names to the symbol table.
+Adding static hop for route 7001 (2178->70, lat 4).
+Adding static hop for route 7030 (2178->70, lat 5).
+Adding static hop for route 7054 (2181->136, lat 6).
+Adding static hop for route 7083 (2181->136, lat 9).
+Adding static hop for route 7107 (2190->236, lat 3).
+Adding static hop for route 7136 (2190->236, lat 4).
+Adding static hop for route 10279 (236->2238, lat 7).
+Adding static hop for route 7160 (2193->334, lat 5).
+Adding static hop for route 7189 (2193->334, lat 6).
+Adding static hop for route 7323 (2102->1968, lat 17).
+Adding static hop for route 7483 (1968->2174, lat 16).
+Adding static hop for route 7510 (1968->2178, lat 13).
+Adding static hop for route 7533 (1968->2181, lat 11).
+Adding static hop for route 7579 (1968->2190, lat 15).
+Adding static hop for route 7373 (1968->2190, lat 15).
+Adding static hop for route 7629 (1968->2193, lat 17).
+Adding static hop for route 7373 (1968->2193, lat 17).
+Adding static hop for route 13127 (1968->2194, lat 13).
+Adding static hop for route 7373 (1968->2194, lat 17).
+Adding static hop for route 8903 (70->2220, lat 2).
+Adding static hop for route 7373 (1968->2220, lat 16).
+Adding static hop for route 8903 (70->2221, lat 3).
+Adding static hop for route 7373 (1968->2221, lat 14).
+Adding static hop for route 8903 (70->2222, lat 5).
+Adding static hop for route 7373 (1968->2222, lat 12).
+Adding static hop for route 8903 (70->2223, lat 7).
+Adding static hop for route 7373 (1968->2223, lat 10).
+Adding static hop for route 8903 (70->2224, lat 9).
+Adding static hop for route 7373 (1968->2224, lat 8).
+Adding static hop for route 8903 (70->2225, lat 4).
+Adding static hop for route 7373 (1968->2225, lat 18).
+Adding static hop for route 8903 (70->2226, lat 3).
+Adding static hop for route 7373 (1968->2226, lat 16).
+Adding static hop for route 8903 (70->2227, lat 5).
+Adding static hop for route 7373 (1968->2227, lat 14).
+Adding static hop for route 9547 (136->2228, lat 10).
+Adding static hop for route 7373 (1968->2228, lat 6).
+Adding static hop for route 9547 (136->2229, lat 6).
+Adding static hop for route 7373 (1968->2229, lat 12).
+Adding static hop for route 9547 (136->2230, lat 8).
+Adding static hop for route 7373 (1968->2230, lat 10).
+Adding static hop for route 9547 (136->2231, lat 10).
+Adding static hop for route 7373 (1968->2231, lat 8).
+Adding static hop for route 9547 (136->2232, lat 5).
+Adding static hop for route 7373 (1968->2232, lat 18).
+Adding static hop for route 9547 (136->2233, lat 4).
+Adding static hop for route 7373 (1968->2233, lat 16).
+Adding static hop for route 9547 (136->2234, lat 6).
+Adding static hop for route 7373 (1968->2234, lat 14).
+Adding static hop for route 9547 (136->2235, lat 8).
+Adding static hop for route 7373 (1968->2235, lat 12).
+Adding static hop for route 13127 (1968->6469, lat 7).
+Adding static hop for route 7373 (1968->6469, lat 3).
+Adding static hop for route 10379 (2194->2239, lat 13).
+Adding static hop for route 10355 (334->2239, lat 9).
+Adding static hop for route 10379 (2194->2240, lat 5).
+Adding static hop for route 10355 (334->2240, lat 6).
+Adding static hop for route 10379 (2194->2241, lat 3).
+Adding static hop for route 10355 (334->2241, lat 5).
+Adding static hop for route 10379 (2194->2242, lat 6).
+Adding static hop for route 10355 (334->2242, lat 7).
+Adding static hop for route 10379 (2194->2243, lat 11).
+Adding static hop for route 10355 (334->2243, lat 9).
+Adding static hop for route 10379 (2194->2244, lat 5).
+Adding static hop for route 10355 (334->2244, lat 8).
+Adding static hop for route 10379 (2194->2245, lat 3).
+Adding static hop for route 10355 (334->2245, lat 6).
+Adding static hop for route 10379 (2194->2246, lat 2).
+Adding static hop for route 10355 (334->2246, lat 7).
+Adding static hop for route 7653 (2239->2196, lat 2).
+Adding static hop for route 7705 (2228->2196, lat 3).
+Adding static hop for route 7730 (2220->2196, lat 12).
+Adding static hop for route 7680 (2238->2196, lat 14).
+Adding static hop for route 7755 (2240->2197, lat 3).
+Adding static hop for route 7801 (2229->2197, lat 3).
+Adding static hop for route 7826 (2221->2197, lat 6).
+Adding static hop for route 7680 (2238->2197, lat 8).
+Adding static hop for route 7851 (2241->2198, lat 6).
+Adding static hop for route 7897 (2230->2198, lat 2).
+Adding static hop for route 7922 (2222->2198, lat 3).
+Adding static hop for route 7680 (2238->2198, lat 13).
+Adding static hop for route 7947 (2242->2199, lat 4).
+Adding static hop for route 7993 (2231->2199, lat 3).
+Adding static hop for route 8018 (2223->2199, lat 3).
+Adding static hop for route 7680 (2238->2199, lat 12).
+Adding static hop for route 8043 (2243->2200, lat 2).
+Adding static hop for route 8089 (2232->2200, lat 13).
+Adding static hop for route 8114 (2224->2200, lat 4).
+Adding static hop for route 7680 (2238->2200, lat 12).
+Adding static hop for route 8139 (2244->2201, lat 3).
+Adding static hop for route 8185 (2233->2201, lat 2).
+Adding static hop for route 8210 (2225->2201, lat 3).
+Adding static hop for route 7680 (2238->2201, lat 7).
+Adding static hop for route 8235 (2245->2202, lat 2).
+Adding static hop for route 8281 (2234->2202, lat 3).
+Adding static hop for route 8306 (2226->2202, lat 3).
+Adding static hop for route 7680 (2238->2202, lat 5).
+Adding static hop for route 8331 (2246->2203, lat 2).
+Adding static hop for route 8377 (2235->2203, lat 3).
+Adding static hop for route 8402 (2227->2203, lat 3).
+Error setting saddr = 0
+Adding static hop for route 7680 (2238->2203, lat 7).
+Error setting daddr = 0
+Adding static hop for route 11181 (2196->2249, lat 6).
+Error setting daddr = 0
+Adding static hop for route 11181 (2196->2250, lat 4).
+Error setting daddr = 0
+Adding static hop for route 11297 (2197->2251, lat 11).
+Error setting daddr = 0
+Adding static hop for route 11297 (2197->2252, lat 13).
+Error setting daddr = 0
+Adding static hop for route 11413 (2198->2253, lat 5).
+Error setting daddr = 0
+Adding static hop for route 11413 (2198->2254, lat 7).
+Error setting daddr = 0
+Adding static hop for route 11529 (2199->2255, lat 8).
+Error setting daddr = 0
+Adding static hop for route 11529 (2199->2256, lat 4).
+Error setting class = 0
+Adding static hop for route 11645 (2200->2257, lat 2).
+Error setting class = 0
+Adding static hop for route 11645 (2200->2258, lat 3).
+Error setting class = 0
+Adding static hop for route 11761 (2201->2259, lat 16).
+Error setting class = 0
+Adding static hop for route 11761 (2201->2260, lat 18).
+Error setting class = 0
+Adding static hop for route 11877 (2202->2261, lat 3).
+Error setting class = 0
+Adding static hop for route 11877 (2202->2262, lat 4).
+Error setting class = 0
+Adding static hop for route 11993 (2203->2263, lat 3).
+Error setting class = 0
+Adding static hop for route 11993 (2203->2264, lat 6).
+Error setting lat = 13
+Adding static hop for route 8427 (2250->2212, lat 2).
+Error setting lat = 5
+Adding static hop for route 8454 (2249->2212, lat 4).
+Error setting lat = 3
+Adding static hop for route 8479 (2252->2213, lat 4).
+Error setting lat = 6
+Adding static hop for route 8506 (2251->2213, lat 2).
+Error setting lat = 11
+Adding static hop for route 8531 (2254->2214, lat 2).
+Error setting lat = 5
+Adding static hop for route 8558 (2253->2214, lat 2).
+Error setting lat = 3
+Adding static hop for route 8583 (2256->2215, lat 2).
+Error setting lat = 2
+Adding static hop for route 8610 (2255->2215, lat 8).
+Error setting saddr = 0
+Adding static hop for route 8635 (2258->2216, lat 4).
+Error setting daddr = 0
+Adding static hop for route 8662 (2257->2216, lat 2).
+Adding static hop for route 8687 (2260->2217, lat 4).
+Adding static hop for route 8714 (2259->2217, lat 2).
+Adding static hop for route 8739 (2262->2218, lat 2).
+Adding static hop for route 8766 (2261->2218, lat 2).
+Adding static hop for route 8791 (2264->2219, lat 2).
+Adding static hop for route 8818 (2263->2219, lat 2).
+Adding static hop for route 12099 (2212->2265, lat 5).
+Adding static hop for route 12149 (2213->2266, lat 4).
+Adding static hop for route 12199 (2214->2267, lat 6).
+Adding static hop for route 12249 (2215->2268, lat 9).
+Adding static hop for route 12299 (2216->2269, lat 7).
+Adding static hop for route 12349 (2217->2270, lat 9).
+Adding static hop for route 12399 (2218->2271, lat 6).
+Adding static hop for route 12449 (2219->2272, lat 3).
+Adding static hop for route 12472 (2265->6472, lat 2).
+Adding static hop for route 12497 (2266->6472, lat 2).
+Adding static hop for route 12520 (2267->6472, lat 4).
+Adding static hop for route 12543 (2268->6472, lat 13).
+Adding static hop for route 12756 (2269->6476, lat 2).
+Adding static hop for route 12733 (2270->6476, lat 2).
+Adding static hop for route 12685 (6472->6475, lat 2).
+Adding static hop for route 12709 (6476->6475, lat 10).
+Adding static hop for route 12662 (2271->6475, lat 4).
+Adding static hop for route 12639 (2272->6475, lat 2).
+Adding static hop for route 7349 (1963->2102, lat 4).
+Adding static hop for route 10179 (2173->2237, lat 3).
+Adding static hop for route 11078 (6474->2247, lat 3).
+Adding static hop for route 7434 (2247->2173, lat 4).
+Adding static hop for route 7459 (2237->2173, lat 2).
+Adding static hop for route 7373 (1968->2173, lat 5).
+Adding static hop for route 10179 (2173->2236, lat 15).
+Adding static hop for route 7373 (1968->2236, lat 20).
+Adding static hop for route 7213 (2174->1963, lat 4).
+Adding static hop for route 7242 (2174->1963, lat 5).
+Adding static hop for route 7266 (2236->1963, lat 5).
+Adding static hop for route 11078 (6474->2248, lat 3).
+Adding static hop for route 12590 (6469->6474, lat 2).
+Adding static hop for route 12615 (6475->6474, lat 8).
+Adding static hop for route 12566 (2248->6474, lat 2).
+Printing hop routes
+Parsed placement file.
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Error setting lat = 9
+Changing link to static with placed latencies.
+Error setting lat = 6
+Set lat 14 from 0 to 0
+Error setting lat = 5
+Set lat 6 from 0 to 1
+Error setting lat = 7
+Set lat 4 from 0 to 2
+Set lat 7 from 0 to 3
+Error setting lat = 9
+Set lat 12 from 0 to 4
+Error setting lat = 8
+Set lat 6 from 0 to 5
+Error setting lat = 6
+Set lat 4 from 0 to 6
+Error setting lat = 7
+Set lat 3 from 0 to 7
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 10 from 0 to 0
+Error setting class = 0
+Set lat 7 from 0 to 1
+Error setting class = 0
+Set lat 6 from 0 to 2
+Error setting class = 0
+Set lat 8 from 0 to 3
+Error setting class = 0
+Set lat 10 from 0 to 4
+Error setting class = 0
+Set lat 9 from 0 to 5
+Error setting class = 0
+Set lat 7 from 0 to 6
+Error setting class = 0
+Set lat 8 from 0 to 7
+Error setting lat = 10
+Set ejection VC at addr 0 to 0
+Error setting lat = 6
+Set ejection VC at addr 0 to 0
+Error setting lat = 8
+Set ejection VC at addr 0 to 0
+Error setting lat = 10
+Set ejection VC at addr 0 to 0
+Error setting lat = 5
+Set ejection VC at addr 0 to 0
+Error setting lat = 4
+Set ejection VC at addr 0 to 0
+Error setting lat = 6
+Set ejection VC at addr 0 to 0
+Error setting lat = 8
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 11 from 0 to 0
+Error setting daddr = 0
+Set lat 7 from 0 to 1
+Error setting daddr = 0
+Set lat 9 from 0 to 2
+Error setting daddr = 0
+Set lat 11 from 0 to 3
+Error setting daddr = 0
+Set lat 6 from 0 to 4
+Error setting daddr = 0
+Set lat 5 from 0 to 5
+Error setting daddr = 0
+Set lat 7 from 0 to 6
+Error setting class = 0
+Set lat 9 from 0 to 7
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting lat = 3
+Link specified in placement file.
+Error setting lat = 5
+Changing link to static with placed latencies.
+Error setting lat = 7
+Set lat 3 from 0 to 0
+Set lat 4 from 0 to 1
+Error setting lat = 9
+Set lat 6 from 0 to 2
+Error setting lat = 4
+Set lat 8 from 0 to 3
+Error setting lat = 3
+Set lat 10 from 0 to 4
+Error setting lat = 5
+Set lat 5 from 0 to 5
+Error setting saddr = 0
+Set lat 4 from 0 to 6
+Error setting daddr = 0
+Set lat 6 from 0 to 7
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 9 from 0 to 0
+Error setting class = 0
+Set lat 8 from 0 to 1
+Error setting class = 0
+Set lat 8 from 0 to 2
+Error setting class = 0
+Set lat 15 from 0 to 3
+Error setting class = 0
+Set lat 13 from 0 to 4
+Error setting lat = 8
+Set lat 14 from 0 to 5
+Error setting lat = 7
+Set lat 13 from 0 to 6
+Error setting lat = 7
+Set lat 6 from 0 to 7
+Error setting lat = 14
+Set lat 1 from 0 to 0
+Error setting lat = 12
+Set ejection VC at addr 0 to 0
+Error setting lat = 13
+Link specified in placement file.
+Error setting lat = 12
+Changing link to static with placed latencies.
+Error setting lat = 5
+Set lat 16 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 15
+Set lat 3 from 0 to 0
+Error setting saddr = 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 2
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Error setting daddr = 0
+Set lat 3 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 5 from 0 to 0
+Error setting class = 0
+Error setting lat = 4
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 3 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 9 from 0 to 0
+Error setting lat = 8
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 2
+Set lat 3 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 4
+Set lat 5 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 10
+Set lat 11 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 2
+Set lat 3 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 2
+Set lat 3 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 2
+Set lat 3 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Error setting lat = 13
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 14 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 3
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 4 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 3
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 4 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 3
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 4 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 4
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 5 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 3
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 4 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 3
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 4 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 6
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 7 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 12
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 13 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 7
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 8 from 0 to 0
+Error setting class = 0
+Error setting lat = 3
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 4 from 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 4 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 3 from 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 4 from 0 to 0
+Error setting lat = 13
+Error setting saddr = 0
+Error setting daddr = 0
+Error setting class = 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 14 from 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 3 from 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 4 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 4 from 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 3 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 6
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 4 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 4
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Error setting class = 0
+Set lat 7 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 5 from 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 3 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 4 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 3 from 0 to 0
+Error setting lat = 4
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 3 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 5 from 0 to 0
+Error setting lat = 5
+Error setting saddr = 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Error setting lat = 2
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 3 from 0 to 0
+Error setting lat = 4
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 6 from 0 to 0
+Error setting lat = 4
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 3 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 5 from 0 to 0
+Error setting lat = 2
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 5 from 0 to 0
+Error setting lat = 6
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Link specified in placement file.
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 3 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Error setting lat = 8
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 3 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 2
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 7 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 9
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 9 from 0 to 0
+Error setting daddr = 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 2
+Link specified in placement file.
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 3 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 4
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 10 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 7
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 3 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 2
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 5 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 4
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 8 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 9
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 3 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 2
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 5 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 2
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 10 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 6
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 3 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 3 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 7 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 3
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 3 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 3 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 2
+Link specified in placement file.
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 4 from 0 to 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 4
+Set lat 3 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Set lat 3 from 0 to 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 16
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 5 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 5
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Set lat 17 from 0 to 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 3
+Set lat 6 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 4
+Set lat 4 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 4
+Set lat 5 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 6
+Set lat 5 from 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 6
+Set lat 7 from 0 to 0
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 4
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 5
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 5
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 9
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 13
+Set lat 1 from 0 to 0
+Error setting lat = 7
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 17
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 0 to 0
+Link specified in placement file.
+Error setting lat = 3
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 7 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Set lat 5 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 15
+Link specified in placement file.
+Error setting lat = 3
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 6 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 6 from 0 to 0
+Error setting lat = 6
+Set ejection VC at addr 0 to 0
+Error setting lat = 4
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 10 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 11
+Changing link to static with placed latencies.
+Error setting lat = 13
+Set lat 14 from 0 to 0
+Error setting saddr = 0
+Set lat 8 from 0 to 1
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 18 from 0 to 0
+Error setting lat = 5
+Set lat 1 from 0 to 0
+Error setting lat = 7
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set lat 1 from 0 to 0
+Error setting lat = 8
+Set lat 1 from 0 to 0
+Error setting lat = 4
+Set lat 1 from 0 to 0
+Error setting saddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting daddr = 0
+Set lat 1 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 2
+Link specified in placement file.
+Error setting lat = 3
+Changing link to static with placed latencies.
+Error setting saddr = 0
+Set lat 4 from 0 to 0
+Error setting daddr = 0
+Set lat 4 from 0 to 1
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting lat = 16
+Changing link to static with placed latencies.
+Error setting lat = 18
+Set lat 16 from 0 to 0
+Error setting saddr = 0
+Set lat 4 from 0 to 1
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 3
+Set lat 7 from 0 to 0
+Error setting lat = 4
+Set lat 5 from 0 to 1
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 12 from 0 to 0
+Error setting lat = 3
+Set lat 14 from 0 to 1
+Error setting lat = 6
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 11
+Set lat 6 from 0 to 0
+Error setting saddr = 0
+Set lat 8 from 0 to 1
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 13
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 9 from 0 to 0
+Error setting class = 0
+Set lat 5 from 0 to 1
+Error setting lat = 4
+Set ejection VC at addr 0 to 0
+Error setting saddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting lat = 17
+Set lat 3 from 0 to 0
+Error setting saddr = 0
+Set lat 4 from 0 to 1
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 5
+Link specified in placement file.
+Error setting saddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 17 from 0 to 0
+Error setting daddr = 0
+Set lat 19 from 0 to 1
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 4 from 0 to 0
+Error setting daddr = 0
+Set lat 5 from 0 to 1
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 4 from 0 to 0
+Error setting daddr = 0
+Set lat 7 from 0 to 1
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 12 from 0 to 0
+Error setting daddr = 0
+Set ejection VC at addr 0 to 0
+Error setting daddr = 0
+Link specified in placement file.
+Error setting daddr = 0
+Changing link to static with placed latencies.
+Error setting daddr = 0
+Set lat 14 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 5 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 18 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Link specified in placement file.
+Error setting class = 0
+Changing link to static with placed latencies.
+Error setting class = 0
+Set lat 6 from 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting class = 0
+Set ejection VC at addr 0 to 0
+Error setting lat = 20
+Set ejection VC at addr 0 to 0
+Error setting lat = 5
+Set ejection VC at addr 0 to 0
+Error setting lat = 17
+Set ejection VC at addr 0 to 0
+Error setting lat = 3
+Set ejection VC at addr 0 to 0
+Error setting lat = 17
+Set ejection VC at addr 0 to 0
+Error setting lat = 16
+Set ejection VC at addr 0 to 0
+Error setting lat = 14
+Set ejection VC at addr 0 to 0
+Error setting lat = 12
+Set ejection VC at addr 0 to 0
+Error setting lat = 10
+Set ejection VC at addr 0 to 0
+Error setting lat = 8
+Set ejection VC at addr 0 to 0
+Error setting lat = 18
+Set ejection VC at addr 0 to 0
+Error setting lat = 16
+Set ejection VC at addr 0 to 0
+Error setting lat = 14
+Link specified in placement file.
+Error setting lat = 6
+Changing link to static with placed latencies.
+Error setting lat = 12
+Set lat 21 from 0 to 0
+Error setting lat = 10
+Set lat 6 from 0 to 1
+Error setting lat = 8
+Set lat 18 from 0 to 2
+Error setting lat = 18
+Set lat 4 from 0 to 3
+Error setting lat = 16
+Set lat 18 from 0 to 4
+Error setting lat = 14
+Set lat 17 from 0 to 5
+Error setting lat = 12
+Set lat 15 from 0 to 6
+Error setting lat = 15
+Set lat 13 from 0 to 7
+== Loading device model file '/home/yaqiz/plastisim/configs/DDR3_micron_64M_8B_x4_sg15.ini' == 
+Set lat 11 from 0 to 8
+== Loading system model file '/home/yaqiz/plastisim/configs/system.ini' == 
+Set lat 9 from 0 to 9
+===== MemorySystem 0 =====
+Set lat 19 from 0 to 10
+CH. 0 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set lat 17 from 0 to 11
+===== MemorySystem 1 =====
+Set lat 15 from 0 to 12
+CH. 1 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set lat 7 from 0 to 13
+===== MemorySystem 2 =====
+Set lat 13 from 0 to 14
+CH. 2 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set lat 11 from 0 to 15
+===== MemorySystem 3 =====
+Set lat 9 from 0 to 16
+CH. 3 TOTAL_STORAGE : 4096MB | 1 Ranks | 16 Devices per rank
+Set lat 19 from 0 to 17
+DRAMSim2 Clock Frequency =800000000Hz, CPU Clock Frequency=1000000000Hz
+Set lat 17 from 0 to 18
+Set lat 15 from 0 to 19
+Set lat 13 from 0 to 20
+Set lat 16 from 0 to 21
+Parsed definitions of all elements.
+Total of 152 links:
+  0: SRAM197
+    
+  1: SRAM196
+    
+  2: SRAM195
+    
+  3: SRAM194
+    
+  4: SRAM193
+    
+  5: SRAM192
+    
+  6: SRAM191
+    
+  7: SRAM190
+    
+  8: RetimingFIFO3902_RetimingFIFO3926_RetimingFIFO3949_RetimingFIFO3972_RetimingFIFO3995_RetimingFIFO4018_RetimingFIFO4041_RetimingFIFO4064
+    
+  9: RetimingFIFO3894_RetimingFIFO3918_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056
+    
+  10: RetimingFIFO3066_RetimingFIFO3124_RetimingFIFO3182_RetimingFIFO3240_RetimingFIFO3269_RetimingFIFO3095_RetimingFIFO3153_RetimingFIFO3211
+    
+  11: RetimingFIFO2834_RetimingFIFO2892_RetimingFIFO2950_RetimingFIFO3008_RetimingFIFO3037_RetimingFIFO2863_RetimingFIFO2921_RetimingFIFO2979
+    
+  12: RetimingFIFO4150_RetimingFIFO4333_RetimingFIFO4516_RetimingFIFO4699_RetimingFIFO4882_RetimingFIFO5065_RetimingFIFO5248_RetimingFIFO5431
+    
+  13: SRAM189
+    
+  14: DramAddress216
+    
+  15: RetimingFIFO3765
+    
+  16: RetimingFIFO2693
+    
+  17: RetimingFIFO2640
+    
+  18: RetimingFIFO6495
+    
+  19: RetimingFIFO6504
+    
+  20: RetimingFIFO3712
+    
+  21: RetimingFIFO3659
+    
+  22: RetimingFIFO6486
+    
+  23: RetimingFIFO3606
+    
+  24: RetimingFIFO3553
+    
+  25: RetimingFIFO6477
+    
+  26: RetimingFIFO3500
+    
+  27: RetimingFIFO5487
+    
+  28: RetimingFIFO5304
+    
+  29: RetimingFIFO5121
+    
+  30: RetimingFIFO4938
+    
+  31: RetimingFIFO4755
+    
+  32: RetimingFIFO4572
+    
+  33: RetimingFIFO4389
+    
+  34: RetimingFIFO4206
+    
+  35: RetimingFIFO3853
+    
+  36: RetimingFIFO4178
+    
+  37: RetimingFIFO4361
+    
+  38: RetimingFIFO4544
+    
+  39: RetimingFIFO4727
+    
+  40: RetimingFIFO4910
+    
+  41: RetimingFIFO5093
+    
+  42: RetimingFIFO5276
+    
+  43: RetimingFIFO5459
+    
+  44: RetimingFIFO4122
+    
+  45: RetimingFIFO4317
+    
+  46: RetimingFIFO4500
+    
+  47: RetimingFIFO4683
+    
+  48: RetimingFIFO4866
+    
+  49: RetimingFIFO5049
+    
+  50: RetimingFIFO5232
+    
+  51: RetimingFIFO5415
+    
+  52: RetimingFIFO5601
+    
+  53: RetimingFIFO5573
+    
+  54: RetimingFIFO5611
+    
+  55: RetimingFIFO5711
+    
+  56: RetimingFIFO5683
+    
+  57: RetimingFIFO5721
+    
+  58: RetimingFIFO5821
+    
+  59: RetimingFIFO5793
+    
+  60: RetimingFIFO5831
+    
+  61: RetimingFIFO5931
+    
+  62: RetimingFIFO5903
+    
+  63: RetimingFIFO5941
+    
+  64: RetimingFIFO6041
+    
+  65: RetimingFIFO6013
+    
+  66: RetimingFIFO6051
+    
+  67: RetimingFIFO6151
+    
+  68: RetimingFIFO6123
+    
+  69: RetimingFIFO6161
+    
+  70: RetimingFIFO6261
+    
+  71: RetimingFIFO6233
+    
+  72: RetimingFIFO6271
+    
+  73: RetimingFIFO6371
+    
+  74: RetimingFIFO6343
+    
+  75: RetimingFIFO6381
+    
+  76: RetimingFIFO3341
+    
+  77: RetimingFIFO3394
+    
+  78: RetimingFIFO3447
+    
+  79: DramAddress1911
+    
+  80: StreamOut284
+    
+  81: StreamOut207
+    
+  82: StreamOut1888
+    
+  83: StreamOut39
+    
+  84: StreamOut105
+    
+  85: SRAM28
+    
+  86: SRAM27
+    
+  87: SRAM26
+    
+  88: SRAM25
+    
+  89: SRAM24
+    
+  90: SRAM23
+    
+  91: SRAM22
+    
+  92: SRAM21
+    
+  93: SRAM29
+    
+  94: SRAM30
+    
+  95: SRAM31
+    
+  96: SRAM32
+    
+  97: SRAM33
+    
+  98: SRAM34
+    
+  99: SRAM35
+    
+  100: SRAM36
+    
+  101: SRAM416
+    
+  102: SRAM417
+    
+  103: SRAM418
+    
+  104: SRAM419
+    
+  105: SRAM420
+    
+  106: SRAM421
+    
+  107: SRAM422
+    
+  108: SRAM423
+    
+  109: SRAM424
+    
+  110: SRAM425
+    
+  111: SRAM426
+    
+  112: SRAM427
+    
+  113: SRAM428
+    
+  114: SRAM429
+    
+  115: SRAM430
+    
+  116: SRAM431
+    
+  117: StreamOut285
+    
+  118: StreamOut208
+    
+  119: StreamOut1889
+    
+  120: StreamOut40
+    
+  121: StreamOut106
+    
+  122: TokenIn13102_TokenIn13115
+    
+  123: DramAddress310
+    
+  124: SRAM378
+    
+  125: SRAM171
+    
+  126: SRAM170
+    
+  127: SRAM377
+    
+  128: SRAM439
+    
+  129: SRAM438
+    
+  130: SRAM437
+    
+  131: SRAM436
+    
+  132: SRAM432
+    
+  133: SRAM433
+    
+  134: SRAM434
+    
+  135: SRAM435
+    
+  136: RetimingFIFO3775_RetimingFIFO3829
+    
+  137: RetimingFIFO2703_RetimingFIFO2757
+    
+  138: RetimingFIFO4216_RetimingFIFO4245
+    
+  139: RetimingFIFO4399_RetimingFIFO4428
+    
+  140: RetimingFIFO4582_RetimingFIFO4611
+    
+  141: RetimingFIFO4765_RetimingFIFO4794
+    
+  142: RetimingFIFO4948_RetimingFIFO4977
+    
+  143: RetimingFIFO5131_RetimingFIFO5160
+    
+  144: RetimingFIFO5314_RetimingFIFO5343
+    
+  145: RetimingFIFO5497_RetimingFIFO5526
+    
+  146: DramAddress116
+    
+  147: DramAddress50
+    
+  148: StreamIn1891
+    
+  149: TokenOut2109
+    
+  150: StreamOut1890
+    
+  151: ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198
+    
+Total of 142 nodes:
+  0: CE13301
+    [StreamOut40 *8 /1] [StreamOut39 *8 /1]  => [RetimingFIFO2834_RetimingFIFO2892_RetimingFIFO2950_RetimingFIFO3008_RetimingFIFO3037_RetimingFIFO2863_RetimingFIFO2921_RetimingFIFO2979] 
+  1: CE13315
+    [StreamOut106 *8 /1] [StreamOut105 *8 /1]  => [RetimingFIFO3066_RetimingFIFO3124_RetimingFIFO3182_RetimingFIFO3240_RetimingFIFO3269_RetimingFIFO3095_RetimingFIFO3153_RetimingFIFO3211] 
+  2: CE13329
+    [StreamOut208 *32 /1] [StreamOut207 *32 /1]  => [RetimingFIFO3853] 
+  3: CE14255
+    [RetimingFIFO3853 *1 /1]  => [SRAM189] 
+  4: CE14245
+    [SRAM189 *512 /1]  => [RetimingFIFO4150_RetimingFIFO4333_RetimingFIFO4516_RetimingFIFO4699_RetimingFIFO4882_RetimingFIFO5065_RetimingFIFO5248_RetimingFIFO5431] 
+  5: CE13343
+    [StreamOut285 *8 /1] [StreamOut284 *8 /1]  => [RetimingFIFO3894_RetimingFIFO3918_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056] 
+  6: CE13383
+     => [DramAddress216] [DramAddress1911] [TokenIn13102_TokenIn13115] [DramAddress310] [DramAddress50] [DramAddress116] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198] 
+  7: CE13401
+    [TokenOut2109 *1 /1]  => 
+  8: CE13439
+    [DramAddress1911 *128 /1]  => [StreamOut1889] [StreamOut1888] 
+  9: CE13453
+    [DramAddress50 *1 /1]  => [StreamOut40] [StreamOut39] 
+  10: CE13467
+    [DramAddress116 *1 /1]  => [StreamOut106] [StreamOut105] 
+  11: CE13483
+    [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *8 /1] [DramAddress216 *8 /1]  => [StreamOut208] [StreamOut207] 
+  12: CE13501
+    [DramAddress310 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [StreamOut285] [StreamOut284] 
+  13: CE13517
+    [TokenIn13102_TokenIn13115 *32768 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *32768 /1]  => [RetimingFIFO3902_RetimingFIFO3926_RetimingFIFO3949_RetimingFIFO3972_RetimingFIFO3995_RetimingFIFO4018_RetimingFIFO4041_RetimingFIFO4064] 
+  14: CE13831
+    [RetimingFIFO2834_RetimingFIFO2892_RetimingFIFO2950_RetimingFIFO3008_RetimingFIFO3037_RetimingFIFO2863_RetimingFIFO2921_RetimingFIFO2979 *1 /1]  => [SRAM21] 
+  15: CE13819
+    [SRAM21 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO4206] 
+  16: CE13855
+    [RetimingFIFO2834_RetimingFIFO2892_RetimingFIFO2950_RetimingFIFO3008_RetimingFIFO3037_RetimingFIFO2863_RetimingFIFO2921_RetimingFIFO2979 *1 /1]  => [SRAM22] 
+  17: CE13843
+    [SRAM22 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO4389] 
+  18: CE13879
+    [RetimingFIFO2834_RetimingFIFO2892_RetimingFIFO2950_RetimingFIFO3008_RetimingFIFO3037_RetimingFIFO2863_RetimingFIFO2921_RetimingFIFO2979 *1 /1]  => [SRAM23] 
+  19: CE13867
+    [SRAM23 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO4572] 
+  20: CE13903
+    [RetimingFIFO2834_RetimingFIFO2892_RetimingFIFO2950_RetimingFIFO3008_RetimingFIFO3037_RetimingFIFO2863_RetimingFIFO2921_RetimingFIFO2979 *1 /1]  => [SRAM24] 
+  21: CE13891
+    [SRAM24 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO4755] 
+  22: CE13927
+    [RetimingFIFO2834_RetimingFIFO2892_RetimingFIFO2950_RetimingFIFO3008_RetimingFIFO3037_RetimingFIFO2863_RetimingFIFO2921_RetimingFIFO2979 *1 /1]  => [SRAM25] 
+  23: CE13915
+    [SRAM25 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO4938] 
+  24: CE13951
+    [RetimingFIFO2834_RetimingFIFO2892_RetimingFIFO2950_RetimingFIFO3008_RetimingFIFO3037_RetimingFIFO2863_RetimingFIFO2921_RetimingFIFO2979 *1 /1]  => [SRAM26] 
+  25: CE13939
+    [SRAM26 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO5121] 
+  26: CE13975
+    [RetimingFIFO2834_RetimingFIFO2892_RetimingFIFO2950_RetimingFIFO3008_RetimingFIFO3037_RetimingFIFO2863_RetimingFIFO2921_RetimingFIFO2979 *1 /1]  => [SRAM27] 
+  27: CE13963
+    [SRAM27 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO5304] 
+  28: CE13999
+    [RetimingFIFO2834_RetimingFIFO2892_RetimingFIFO2950_RetimingFIFO3008_RetimingFIFO3037_RetimingFIFO2863_RetimingFIFO2921_RetimingFIFO2979 *1 /1]  => [SRAM28] 
+  29: CE13987
+    [SRAM28 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO5487] 
+  30: CE14023
+    [RetimingFIFO3066_RetimingFIFO3124_RetimingFIFO3182_RetimingFIFO3240_RetimingFIFO3269_RetimingFIFO3095_RetimingFIFO3153_RetimingFIFO3211 *1 /1]  => [SRAM29] 
+  31: CE14011
+    [SRAM29 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO4178] 
+  32: CE14047
+    [RetimingFIFO3066_RetimingFIFO3124_RetimingFIFO3182_RetimingFIFO3240_RetimingFIFO3269_RetimingFIFO3095_RetimingFIFO3153_RetimingFIFO3211 *1 /1]  => [SRAM30] 
+  33: CE14035
+    [SRAM30 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO4361] 
+  34: CE14071
+    [RetimingFIFO3066_RetimingFIFO3124_RetimingFIFO3182_RetimingFIFO3240_RetimingFIFO3269_RetimingFIFO3095_RetimingFIFO3153_RetimingFIFO3211 *1 /1]  => [SRAM31] 
+  35: CE14059
+    [SRAM31 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO4544] 
+  36: CE14095
+    [RetimingFIFO3066_RetimingFIFO3124_RetimingFIFO3182_RetimingFIFO3240_RetimingFIFO3269_RetimingFIFO3095_RetimingFIFO3153_RetimingFIFO3211 *1 /1]  => [SRAM32] 
+  37: CE14083
+    [SRAM32 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO4727] 
+  38: CE14119
+    [RetimingFIFO3066_RetimingFIFO3124_RetimingFIFO3182_RetimingFIFO3240_RetimingFIFO3269_RetimingFIFO3095_RetimingFIFO3153_RetimingFIFO3211 *1 /1]  => [SRAM33] 
+  39: CE14107
+    [SRAM33 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO4910] 
+  40: CE14143
+    [RetimingFIFO3066_RetimingFIFO3124_RetimingFIFO3182_RetimingFIFO3240_RetimingFIFO3269_RetimingFIFO3095_RetimingFIFO3153_RetimingFIFO3211 *1 /1]  => [SRAM34] 
+  41: CE14131
+    [SRAM34 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO5093] 
+  42: CE14167
+    [RetimingFIFO3066_RetimingFIFO3124_RetimingFIFO3182_RetimingFIFO3240_RetimingFIFO3269_RetimingFIFO3095_RetimingFIFO3153_RetimingFIFO3211 *1 /1]  => [SRAM35] 
+  43: CE14155
+    [SRAM35 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO5276] 
+  44: CE14191
+    [RetimingFIFO3066_RetimingFIFO3124_RetimingFIFO3182_RetimingFIFO3240_RetimingFIFO3269_RetimingFIFO3095_RetimingFIFO3153_RetimingFIFO3211 *1 /1]  => [SRAM36] 
+  45: CE14179
+    [SRAM36 *4096 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *4096 /1]  => [RetimingFIFO5459] 
+  46: CE14979
+    [TokenIn13102_TokenIn13115 *524288 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *524288 /1]  => [RetimingFIFO6495] 
+  47: CE14277
+    [RetimingFIFO3894_RetimingFIFO3918_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056 *1 /1] [RetimingFIFO3902_RetimingFIFO3926_RetimingFIFO3949_RetimingFIFO3972_RetimingFIFO3995_RetimingFIFO4018_RetimingFIFO4041_RetimingFIFO4064 *1 /1]  => [SRAM190] 
+  48: CE14265
+    [SRAM190 *512 /1]  => [RetimingFIFO4122] 
+  49: CE14301
+    [RetimingFIFO3894_RetimingFIFO3918_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056 *1 /1] [RetimingFIFO3902_RetimingFIFO3926_RetimingFIFO3949_RetimingFIFO3972_RetimingFIFO3995_RetimingFIFO4018_RetimingFIFO4041_RetimingFIFO4064 *1 /1]  => [SRAM191] 
+  50: CE14289
+    [SRAM191 *512 /1]  => [RetimingFIFO4317] 
+  51: CE14325
+    [RetimingFIFO3894_RetimingFIFO3918_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056 *1 /1] [RetimingFIFO3902_RetimingFIFO3926_RetimingFIFO3949_RetimingFIFO3972_RetimingFIFO3995_RetimingFIFO4018_RetimingFIFO4041_RetimingFIFO4064 *1 /1]  => [SRAM192] 
+  52: CE14313
+    [SRAM192 *512 /1]  => [RetimingFIFO4500] 
+  53: CE14349
+    [RetimingFIFO3894_RetimingFIFO3918_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056 *1 /1] [RetimingFIFO3902_RetimingFIFO3926_RetimingFIFO3949_RetimingFIFO3972_RetimingFIFO3995_RetimingFIFO4018_RetimingFIFO4041_RetimingFIFO4064 *1 /1]  => [SRAM193] 
+  54: CE14337
+    [SRAM193 *512 /1]  => [RetimingFIFO4683] 
+  55: CE14373
+    [RetimingFIFO3894_RetimingFIFO3918_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056 *1 /1] [RetimingFIFO3902_RetimingFIFO3926_RetimingFIFO3949_RetimingFIFO3972_RetimingFIFO3995_RetimingFIFO4018_RetimingFIFO4041_RetimingFIFO4064 *1 /1]  => [SRAM194] 
+  56: CE14361
+    [SRAM194 *512 /1]  => [RetimingFIFO4866] 
+  57: CE14397
+    [RetimingFIFO3894_RetimingFIFO3918_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056 *1 /1] [RetimingFIFO3902_RetimingFIFO3926_RetimingFIFO3949_RetimingFIFO3972_RetimingFIFO3995_RetimingFIFO4018_RetimingFIFO4041_RetimingFIFO4064 *1 /1]  => [SRAM195] 
+  58: CE14385
+    [SRAM195 *512 /1]  => [RetimingFIFO5049] 
+  59: CE14421
+    [RetimingFIFO3894_RetimingFIFO3918_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056 *1 /1] [RetimingFIFO3902_RetimingFIFO3926_RetimingFIFO3949_RetimingFIFO3972_RetimingFIFO3995_RetimingFIFO4018_RetimingFIFO4041_RetimingFIFO4064 *1 /1]  => [SRAM196] 
+  60: CE14409
+    [SRAM196 *512 /1]  => [RetimingFIFO5232] 
+  61: CE14445
+    [RetimingFIFO3894_RetimingFIFO3918_RetimingFIFO3941_RetimingFIFO3964_RetimingFIFO3987_RetimingFIFO4010_RetimingFIFO4033_RetimingFIFO4056 *1 /1] [RetimingFIFO3902_RetimingFIFO3926_RetimingFIFO3949_RetimingFIFO3972_RetimingFIFO3995_RetimingFIFO4018_RetimingFIFO4041_RetimingFIFO4064 *1 /1]  => [SRAM197] 
+  62: CE14433
+    [SRAM197 *512 /1]  => [RetimingFIFO5415] 
+  63: CE13535
+    [RetimingFIFO4150_RetimingFIFO4333_RetimingFIFO4516_RetimingFIFO4699_RetimingFIFO4882_RetimingFIFO5065_RetimingFIFO5248_RetimingFIFO5431 *1 /1] [RetimingFIFO4122 *1 /1] [RetimingFIFO4178 *1 /1] [RetimingFIFO4206 *1 /1]  => [RetimingFIFO4216_RetimingFIFO4245] 
+  64: CE13557
+    [RetimingFIFO4150_RetimingFIFO4333_RetimingFIFO4516_RetimingFIFO4699_RetimingFIFO4882_RetimingFIFO5065_RetimingFIFO5248_RetimingFIFO5431 *1 /1] [RetimingFIFO4317 *1 /1] [RetimingFIFO4361 *1 /1] [RetimingFIFO4389 *1 /1]  => [RetimingFIFO4399_RetimingFIFO4428] 
+  65: CE13579
+    [RetimingFIFO4150_RetimingFIFO4333_RetimingFIFO4516_RetimingFIFO4699_RetimingFIFO4882_RetimingFIFO5065_RetimingFIFO5248_RetimingFIFO5431 *1 /1] [RetimingFIFO4500 *1 /1] [RetimingFIFO4544 *1 /1] [RetimingFIFO4572 *1 /1]  => [RetimingFIFO4582_RetimingFIFO4611] 
+  66: CE13601
+    [RetimingFIFO4150_RetimingFIFO4333_RetimingFIFO4516_RetimingFIFO4699_RetimingFIFO4882_RetimingFIFO5065_RetimingFIFO5248_RetimingFIFO5431 *1 /1] [RetimingFIFO4683 *1 /1] [RetimingFIFO4727 *1 /1] [RetimingFIFO4755 *1 /1]  => [RetimingFIFO4765_RetimingFIFO4794] 
+  67: CE13623
+    [RetimingFIFO4150_RetimingFIFO4333_RetimingFIFO4516_RetimingFIFO4699_RetimingFIFO4882_RetimingFIFO5065_RetimingFIFO5248_RetimingFIFO5431 *1 /1] [RetimingFIFO4866 *1 /1] [RetimingFIFO4910 *1 /1] [RetimingFIFO4938 *1 /1]  => [RetimingFIFO4948_RetimingFIFO4977] 
+  68: CE13645
+    [RetimingFIFO4150_RetimingFIFO4333_RetimingFIFO4516_RetimingFIFO4699_RetimingFIFO4882_RetimingFIFO5065_RetimingFIFO5248_RetimingFIFO5431 *1 /1] [RetimingFIFO5049 *1 /1] [RetimingFIFO5093 *1 /1] [RetimingFIFO5121 *1 /1]  => [RetimingFIFO5131_RetimingFIFO5160] 
+  69: CE13667
+    [RetimingFIFO4150_RetimingFIFO4333_RetimingFIFO4516_RetimingFIFO4699_RetimingFIFO4882_RetimingFIFO5065_RetimingFIFO5248_RetimingFIFO5431 *1 /1] [RetimingFIFO5232 *1 /1] [RetimingFIFO5276 *1 /1] [RetimingFIFO5304 *1 /1]  => [RetimingFIFO5314_RetimingFIFO5343] 
+  70: CE13689
+    [RetimingFIFO4150_RetimingFIFO4333_RetimingFIFO4516_RetimingFIFO4699_RetimingFIFO4882_RetimingFIFO5065_RetimingFIFO5248_RetimingFIFO5431 *1 /1] [RetimingFIFO5415 *1 /1] [RetimingFIFO5459 *1 /1] [RetimingFIFO5487 *1 /1]  => [RetimingFIFO5497_RetimingFIFO5526] 
+  71: CE14507
+    [RetimingFIFO4216_RetimingFIFO4245 *1 /1]  => [SRAM416] 
+  72: CE14497
+    [SRAM416 *1024 /1]  => [RetimingFIFO5601] 
+  73: CE14527
+    [RetimingFIFO4216_RetimingFIFO4245 *1 /1]  => [SRAM417] 
+  74: CE14517
+    [SRAM417 *1024 /1]  => [RetimingFIFO5573] 
+  75: CE14547
+    [RetimingFIFO4399_RetimingFIFO4428 *1 /1]  => [SRAM418] 
+  76: CE14537
+    [SRAM418 *1024 /1]  => [RetimingFIFO5711] 
+  77: CE14567
+    [RetimingFIFO4399_RetimingFIFO4428 *1 /1]  => [SRAM419] 
+  78: CE14557
+    [SRAM419 *1024 /1]  => [RetimingFIFO5683] 
+  79: CE14587
+    [RetimingFIFO4582_RetimingFIFO4611 *1 /1]  => [SRAM420] 
+  80: CE14577
+    [SRAM420 *1024 /1]  => [RetimingFIFO5821] 
+  81: CE14607
+    [RetimingFIFO4582_RetimingFIFO4611 *1 /1]  => [SRAM421] 
+  82: CE14597
+    [SRAM421 *1024 /1]  => [RetimingFIFO5793] 
+  83: CE14627
+    [RetimingFIFO4765_RetimingFIFO4794 *1 /1]  => [SRAM422] 
+  84: CE14617
+    [SRAM422 *1024 /1]  => [RetimingFIFO5931] 
+  85: CE14647
+    [RetimingFIFO4765_RetimingFIFO4794 *1 /1]  => [SRAM423] 
+  86: CE14637
+    [SRAM423 *1024 /1]  => [RetimingFIFO5903] 
+  87: CE14667
+    [RetimingFIFO4948_RetimingFIFO4977 *1 /1]  => [SRAM424] 
+  88: CE14657
+    [SRAM424 *1024 /1]  => [RetimingFIFO6041] 
+  89: CE14687
+    [RetimingFIFO4948_RetimingFIFO4977 *1 /1]  => [SRAM425] 
+  90: CE14677
+    [SRAM425 *1024 /1]  => [RetimingFIFO6013] 
+  91: CE14707
+    [RetimingFIFO5131_RetimingFIFO5160 *1 /1]  => [SRAM426] 
+  92: CE14697
+    [SRAM426 *1024 /1]  => [RetimingFIFO6151] 
+  93: CE14727
+    [RetimingFIFO5131_RetimingFIFO5160 *1 /1]  => [SRAM427] 
+  94: CE14717
+    [SRAM427 *1024 /1]  => [RetimingFIFO6123] 
+  95: CE14747
+    [RetimingFIFO5314_RetimingFIFO5343 *1 /1]  => [SRAM428] 
+  96: CE14737
+    [SRAM428 *1024 /1]  => [RetimingFIFO6261] 
+  97: CE14767
+    [RetimingFIFO5314_RetimingFIFO5343 *1 /1]  => [SRAM429] 
+  98: CE14757
+    [SRAM429 *1024 /1]  => [RetimingFIFO6233] 
+  99: CE14787
+    [RetimingFIFO5497_RetimingFIFO5526 *1 /1]  => [SRAM430] 
+  100: CE14777
+    [SRAM430 *1024 /1]  => [RetimingFIFO6371] 
+  101: CE14807
+    [RetimingFIFO5497_RetimingFIFO5526 *1 /1]  => [SRAM431] 
+  102: CE14797
+    [SRAM431 *1024 /1]  => [RetimingFIFO6343] 
+  103: CE13707
+    [RetimingFIFO5573 *1 /1] [RetimingFIFO5601 *1 /1]  => [RetimingFIFO5611] 
+  104: CE13721
+    [RetimingFIFO5683 *1 /1] [RetimingFIFO5711 *1 /1]  => [RetimingFIFO5721] 
+  105: CE13735
+    [RetimingFIFO5793 *1 /1] [RetimingFIFO5821 *1 /1]  => [RetimingFIFO5831] 
+  106: CE13749
+    [RetimingFIFO5903 *1 /1] [RetimingFIFO5931 *1 /1]  => [RetimingFIFO5941] 
+  107: CE13763
+    [RetimingFIFO6013 *1 /1] [RetimingFIFO6041 *1 /1]  => [RetimingFIFO6051] 
+  108: CE13777
+    [RetimingFIFO6123 *1 /1] [RetimingFIFO6151 *1 /1]  => [RetimingFIFO6161] 
+  109: CE13791
+    [RetimingFIFO6233 *1 /1] [RetimingFIFO6261 *1 /1]  => [RetimingFIFO6271] 
+  110: CE13805
+    [RetimingFIFO6343 *1 /1] [RetimingFIFO6371 *1 /1]  => [RetimingFIFO6381] 
+  111: CE14827
+    [RetimingFIFO5611 *1 /1]  => [SRAM432] 
+  112: CE14817
+    [SRAM432 *1024 /1]  => [RetimingFIFO3341] 
+  113: CE14847
+    [RetimingFIFO5721 *1 /1]  => [SRAM433] 
+  114: CE14837
+    [SRAM433 *1024 /1]  => [RetimingFIFO3394] 
+  115: CE14867
+    [RetimingFIFO5831 *1 /1]  => [SRAM434] 
+  116: CE14857
+    [SRAM434 *1024 /1]  => [RetimingFIFO3447] 
+  117: CE14887
+    [RetimingFIFO5941 *1 /1]  => [SRAM435] 
+  118: CE14877
+    [SRAM435 *1024 /1]  => [RetimingFIFO3500] 
+  119: CE14907
+    [RetimingFIFO6051 *1 /1]  => [SRAM436] 
+  120: CE14897
+    [SRAM436 *1024 /1]  => [RetimingFIFO3553] 
+  121: CE14927
+    [RetimingFIFO6161 *1 /1]  => [SRAM437] 
+  122: CE14917
+    [SRAM437 *1024 /1]  => [RetimingFIFO3606] 
+  123: CE14947
+    [RetimingFIFO6271 *1 /1]  => [SRAM438] 
+  124: CE14937
+    [SRAM438 *1024 /1]  => [RetimingFIFO3659] 
+  125: CE14967
+    [RetimingFIFO6381 *1 /1]  => [SRAM439] 
+  126: CE14957
+    [SRAM439 *1024 /1]  => [RetimingFIFO3712] 
+  127: CE14997
+    [RetimingFIFO3341 *1 /1] [RetimingFIFO3394 *1 /1] [RetimingFIFO3447 *1 /1] [RetimingFIFO3500 *1 /1]  => [RetimingFIFO6477] 
+  128: CE15055
+    [RetimingFIFO3606 *1 /1] [RetimingFIFO3553 *1 /1]  => [RetimingFIFO6486] 
+  129: CE15037
+    [RetimingFIFO3712 *1 /1] [RetimingFIFO3659 *1 /1] [RetimingFIFO6477 *1 /1] [RetimingFIFO6486 *1 /1]  => [RetimingFIFO6504] 
+  130: CE13409
+    [StreamIn1891 *1 /1]  => [TokenOut2109] 
+  131: CE14235
+    [RetimingFIFO2703_RetimingFIFO2757 *1 /1]  => [SRAM171] 
+  132: CE14225
+    [SRAM171 *1024 /1]  => [RetimingFIFO2693] 
+  133: CE14467
+    [RetimingFIFO3775_RetimingFIFO3829 *1 /1]  => [SRAM377] 
+  134: CE14457
+    [SRAM377 *1024 /1]  => [RetimingFIFO2640] 
+  135: CE13423
+    [RetimingFIFO2640 *1 /1] [RetimingFIFO2693 *1 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *8192 /1]  => [RetimingFIFO2703_RetimingFIFO2757] 
+  136: CE14213
+    [RetimingFIFO2703_RetimingFIFO2757 *1 /1] [ArgIn2400_ArgIn2567_ArgIn2533_ArgIn8855_ArgIn8939_ArgIn9019_ArgIn9099_ArgIn9179_ArgIn9259_ArgIn9339_ArgIn9419_ArgIn9499_ArgIn9583_ArgIn9663_ArgIn9743_ArgIn9823_ArgIn9903_ArgIn9983_ArgIn10063_ArgIn10131_ArgIn13147_ArgIn13198 *8192 /1]  => [SRAM170] 
+  137: CE14201
+    [SRAM170 *1024 /1]  => [StreamOut1890] 
+  138: CE13359
+    [StreamOut1889 *8 /1] [StreamOut1890 *1 /1] [StreamOut1888 *8 /1]  => [StreamIn1891] 
+  139: CE14487
+    [RetimingFIFO3775_RetimingFIFO3829 *1 /1]  => [SRAM378] 
+  140: CE14477
+    [SRAM378 *1024 /1]  => [RetimingFIFO3765] 
+  141: CE15017
+    [RetimingFIFO3765 *1 /1] [RetimingFIFO6495 *1 /1] [RetimingFIFO6504 *1 /1]  => [RetimingFIFO3775_RetimingFIFO3829] 
+
+10000...
+20000...
+30000...
+40000...
+50000...
+60000...
+70000...
+80000...
+90000...
+100000...
+110000...
+120000...
+130000...
+140000...
+150000...
+160000...
+170000...
+180000...
+190000...
+200000...
+210000...
+220000...
+230000...
+240000...
+250000...
+260000...
+270000...
+280000...
+290000...
+300000...
+310000...
+320000...
+330000...
+340000...
+350000...
+360000...
+370000...
+380000...
+390000...
+400000...
+410000...
+420000...
+430000...
+440000...
+450000...
+460000...
+470000...
+480000...
+490000...
+500000...
+510000...
+520000...
+530000...
+540000...
+550000...
+560000...
+570000...
+580000...
+590000...
+600000...
+610000...
+620000...
+630000...
+640000...
+650000...
+660000...
+670000...
+680000...
+690000...
+700000...
+710000...
+720000...
+730000...
+740000...
+750000...
+760000...
+770000...
+780000...
+790000...
+800000...
+810000...
+820000...
+830000...
+840000...
+850000...
+860000...
+870000...
+880000...
+890000...
+900000...
+910000...
+920000...
+930000...
+940000...
+950000...
+960000...
+970000...
+980000...
+990000...
+1000000...
+1010000...
+1020000...
+1030000...
+1040000...
+1050000...
+1060000...
+1070000...
+1080000...
+1090000...
+1100000...
+1110000...
+1120000...
+1130000...
+1140000...
+1150000...
+1160000...
+1170000...
+1180000...
+1190000...
+1200000...
+1210000...
+1220000...
+1230000...
+1240000...
+1250000...
+1260000...
+1270000...
+1280000...
+1290000...
+1300000...
+1310000...
+1320000...
+1330000...
+1340000...
+1350000...
+1360000...
+1370000...
+1380000...
+1390000...
+1400000...
+1410000...
+1420000...
+1430000...
+1440000...
+1450000...
+1460000...
+1470000...
+1480000...
+1490000...
+1500000...
+1510000...
+1520000...
+1530000...
+1540000...
+1550000...
+1560000...
+1570000...
+1580000...
+1590000...
+1600000...
+1610000...
+1620000...
+1630000...
+1640000...
+1650000...
+1660000...
+1670000...
+1680000...
+1690000...
+1700000...
+1710000...
+1720000...
+1730000...
+1740000...
+1750000...
+1760000...
+1770000...
+1780000...
+1790000...
+1800000...
+1810000...
+1820000...
+1830000...
+1840000...
+1850000...
+1860000...
+1870000...
+1880000...
+1890000...
+1900000...
+1910000...
+1920000...
+1930000...
+1940000...
+1950000...
+1960000...
+1970000...
+1980000...
+1990000...
+2000000...
+2010000...
+2020000...
+2030000...
+2040000...
+2050000...
+2060000...
+2070000...
+2080000...
+2090000...
+2100000...
+2110000...
+2120000...
+2130000...
+2140000...
+2150000...
+2160000...
+2170000...
+2180000...
+2190000...
+2200000...
+2210000...
+2220000...
+2230000...
+2240000...
+2250000...
+2260000...
+2270000...
+2280000...
+2290000...
+2300000...
+2310000...
+2320000...
+2330000...
+2340000...
+2350000...
+2360000...
+2370000...
+2380000...
+2390000...
+2400000...
+2410000...
+2420000...
+2430000...
+2440000...
+2450000...
+2460000...
+2470000...
+2480000...
+2490000...
+2500000...
+2510000...
+2520000...
+2530000...
+2540000...
+2550000...
+2560000...
+2570000...
+2580000...
+2590000...
+2600000...
+2610000...
+2620000...
+2630000...
+2640000...
+2650000...
+2660000...
+2670000...
+2680000...
+2690000...
+2700000...
+2710000...
+2720000...
+2730000...
+2740000...
+2750000...
+2760000...
+2770000...
+2780000...
+2790000...
+2800000...
+2810000...
+2820000...
+2830000...
+2840000...
+2850000...
+2860000...
+2870000...
+2880000...
+2890000...
+2900000...
+2910000...
+2920000...
+2930000...
+2940000...
+2950000...
+2960000...
+2970000...
+2980000...
+2990000...
+3000000...
+3010000...
+3020000...
+3030000...
+3040000...
+3050000...
+3060000...
+3070000...
+3080000...
+3090000...
+3100000...
+3110000...
+3120000...
+3130000...
+3140000...
+3150000...
+3160000...
+3170000...
+3180000...
+3190000...
+3200000...
+3210000...
+3220000...
+3230000...
+3240000...
+3250000...
+3260000...
+3270000...
+3280000...
+3290000...
+3300000...
+3310000...
+3320000...
+3330000...
+3340000...
+3350000...
+3360000...
+3370000...
+3380000...
+3390000...
+3400000...
+3410000...
+3420000...
+3430000...
+3440000...
+3450000...
+3460000...
+3470000...
+3480000...
+3490000...
+3500000...
+3510000...
+3520000...
+3530000...
+3540000...
+3550000...
+3560000...
+3570000...
+3580000...
+3590000...
+3600000...
+3610000...
+3620000...
+3630000...
+3640000...
+3650000...
+3660000...
+3670000...
+3680000...
+3690000...
+3700000...
+3710000...
+Simulation complete at cycle: 3715031
+[[32mpsim[0m] Simulation complete at cycle: 3715031
+CE13301: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714982 
+	       8        8 
+	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE13315: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714982 
+	       8        8 
+	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE13329: Active:   0.0 Stalled:  10.3 Starved: 100.0 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 3714138 
+	     256      256 
+	DRAM:   0.00 GB/s (  0.00 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE14255: Active:   0.0 Stalled:  22.6 Starved:  89.7 Total Active:      256 Total Output:      256 Expected Active:      256 Last Activity: 3331884 
+	     256 
+CE14245: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 120737 
+	    4096 
+CE13343: Active:   0.9 Stalled:  10.2 Starved:  88.9 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 3303861 
+	   32768    32768 
+	DRAM:   0.56 GB/s (  0.56 GB/s R,   0.00 GB/s W)
+	ROB remaining: 0
+CE13383: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 3715030 
+	
+CE13401: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 1 
+	       1 
+CE13439: Active:   0.0 Stalled: 100.0 Starved:   0.0 Total Active:      128 Total Output:      128 Expected Active:      128 Last Activity: 1014 
+	     128 
+CE13453: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 3715002 
+	       1 
+CE13467: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        1 Total Output:        1 Expected Active:        1 Last Activity: 3715006 
+	       1 
+CE13483: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714986 
+	       8        8 
+CE13501: Active:   0.1 Stalled:  10.9 Starved:  89.0 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 3305197 
+	    4096     4096 
+CE13517: Active:   0.9 Stalled:  10.2 Starved:  88.9 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 3303437 
+	   32768    32768 
+CE13831: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714924 
+	       8 
+CE13819: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 122739 
+	    4096     4096 
+CE13855: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714923 
+	       8 
+CE13843: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 123237 
+	    4096     4096 
+CE13879: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714921 
+	       8 
+CE13867: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 122259 
+	    4096     4096 
+CE13903: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714919 
+	       8 
+CE13891: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 120746 
+	    4096     4096 
+CE13927: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714917 
+	       8 
+CE13915: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 121811 
+	    4096     4096 
+CE13951: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714922 
+	       8 
+CE13939: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 120813 
+	    4096     4096 
+CE13975: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714923 
+	       8 
+CE13963: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 122252 
+	    4096     4096 
+CE13999: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714921 
+	       8 
+CE13987: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 123749 
+	    4096     4096 
+CE14023: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714909 
+	       8 
+CE14011: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 122748 
+	    4096     4096 
+CE14047: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714913 
+	       8 
+CE14035: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 123240 
+	    4096     4096 
+CE14071: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714911 
+	       8 
+CE14059: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 122260 
+	    4096     4096 
+CE14095: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714909 
+	       8 
+CE14083: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 120746 
+	    4096     4096 
+CE14119: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714914 
+	       8 
+CE14107: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 121802 
+	    4096     4096 
+CE14143: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714915 
+	       8 
+CE14131: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 120814 
+	    4096     4096 
+CE14167: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714913 
+	       8 
+CE14155: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 122252 
+	    4096     4096 
+CE14191: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:        8 Total Output:        8 Expected Active:        8 Last Activity: 3714911 
+	       8 
+CE14179: Active:   0.1 Stalled:  96.6 Starved:   3.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 123749 
+	    4096     4096 
+CE14979: Active:  14.1 Stalled:  85.6 Starved:   0.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11093 
+	  524288   524288 
+CE14277: Active:   0.9 Stalled:  16.4 Starved:  94.3 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 3303368 
+	   32768    32768 
+CE14265: Active:   0.1 Stalled:  95.9 Starved:   4.1 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 122749 
+	    4096 
+CE14301: Active:   0.9 Stalled:  16.3 Starved:  94.3 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 3303376 
+	   32768    32768 
+CE14289: Active:   0.1 Stalled:  95.9 Starved:   4.1 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 123240 
+	    4096 
+CE14325: Active:   0.9 Stalled:  16.4 Starved:  94.3 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 3303378 
+	   32768    32768 
+CE14313: Active:   0.1 Stalled:  95.9 Starved:   4.1 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 122256 
+	    4096 
+CE14349: Active:   0.9 Stalled:  16.5 Starved:  94.2 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 3303375 
+	   32768    32768 
+CE14337: Active:   0.1 Stalled:  95.9 Starved:   4.0 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 120745 
+	    4096 
+CE14373: Active:   0.9 Stalled:  16.4 Starved:  94.2 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 3303370 
+	   32768    32768 
+CE14361: Active:   0.1 Stalled:  95.9 Starved:   4.1 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 121813 
+	    4096 
+CE14397: Active:   0.9 Stalled:  16.5 Starved:  94.2 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 3303376 
+	   32768    32768 
+CE14385: Active:   0.1 Stalled:  95.9 Starved:   4.0 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 120813 
+	    4096 
+CE14421: Active:   0.9 Stalled:  16.4 Starved:  94.3 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 3303378 
+	   32768    32768 
+CE14409: Active:   0.1 Stalled:  95.9 Starved:   4.1 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 122253 
+	    4096 
+CE14445: Active:   0.9 Stalled:  16.3 Starved:  94.3 Total Active:    32768 Total Output:    32768 Expected Active:    32768 Last Activity: 3303378 
+	   32768    32768 
+CE14433: Active:   0.1 Stalled:  95.9 Starved:   4.1 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 123750 
+	    4096 
+CE13535: Active:   0.1 Stalled:  74.2 Starved:  33.1 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 115585 
+	    4096     4096     4096     4096 
+CE13557: Active:   0.1 Stalled:  69.7 Starved:  39.4 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 116073 
+	    4096     4096     4096     4096 
+CE13579: Active:   0.1 Stalled:  79.3 Starved:  26.4 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 115082 
+	    4096     4096     4096     4096 
+CE13601: Active:   0.1 Stalled:  96.1 Starved:   4.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 113563 
+	    4096     4096     4096     4096 
+CE13623: Active:   0.1 Stalled:  83.7 Starved:  20.5 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 114661 
+	    4096     4096     4096     4096 
+CE13645: Active:   0.1 Stalled:  96.0 Starved:   5.4 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 113630 
+	    4096     4096     4096     4096 
+CE13667: Active:   0.1 Stalled:  79.2 Starved:  26.2 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 115075 
+	    4096     4096     4096     4096 
+CE13689: Active:   0.1 Stalled:  64.4 Starved:  46.0 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 116578 
+	    4096     4096     4096     4096 
+CE14507: Active:   0.1 Stalled:  94.8 Starved:   5.6 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 108420 
+	    4096 
+CE14497: Active:  14.1 Stalled:  83.5 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 58254 
+	  524288 
+CE14527: Active:   0.1 Stalled:  94.8 Starved:   5.6 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 108422 
+	    4096 
+CE14517: Active:  14.1 Stalled:  83.5 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 58256 
+	  524288 
+CE14547: Active:   0.1 Stalled:  94.4 Starved:   6.1 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 108897 
+	    4096 
+CE14537: Active:  14.1 Stalled:  83.5 Starved:   2.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 58753 
+	  524288 
+CE14567: Active:   0.1 Stalled:  94.4 Starved:   6.1 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 108895 
+	    4096 
+CE14557: Active:  14.1 Stalled:  83.5 Starved:   2.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 58749 
+	  524288 
+CE14587: Active:   0.1 Stalled:  95.1 Starved:   5.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 107910 
+	    4096 
+CE14577: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57752 
+	  524288 
+CE14607: Active:   0.1 Stalled:  95.0 Starved:   5.3 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 107908 
+	    4096 
+CE14597: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57752 
+	  524288 
+CE14627: Active:   0.1 Stalled:  96.3 Starved:   4.0 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 106388 
+	    4096 
+CE14617: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 56234 
+	  524288 
+CE14647: Active:   0.1 Stalled:  96.2 Starved:   4.0 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 106392 
+	    4096 
+CE14637: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 56240 
+	  524288 
+CE14667: Active:   0.1 Stalled:  95.6 Starved:   4.7 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 107492 
+	    4096 
+CE14657: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57329 
+	  524288 
+CE14687: Active:   0.1 Stalled:  95.6 Starved:   4.7 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 107491 
+	    4096 
+CE14677: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57327 
+	  524288 
+CE14707: Active:   0.1 Stalled:  96.0 Starved:   4.5 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 106447 
+	    4096 
+CE14697: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 56313 
+	  524288 
+CE14727: Active:   0.1 Stalled:  96.0 Starved:   4.5 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 106445 
+	    4096 
+CE14717: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 56311 
+	  524288 
+CE14747: Active:   0.1 Stalled:  95.1 Starved:   5.2 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 107905 
+	    4096 
+CE14737: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57742 
+	  524288 
+CE14767: Active:   0.1 Stalled:  95.1 Starved:   5.2 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 107904 
+	    4096 
+CE14757: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57742 
+	  524288 
+CE14787: Active:   0.1 Stalled:  94.4 Starved:   5.9 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 109408 
+	    4096 
+CE14777: Active:  14.1 Stalled:  83.5 Starved:   2.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 59247 
+	  524288 
+CE14807: Active:   0.1 Stalled:  94.4 Starved:   5.9 Total Active:     4096 Total Output:     4096 Expected Active:     4096 Last Activity: 109405 
+	    4096 
+CE14797: Active:  14.1 Stalled:  83.5 Starved:   2.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 59247 
+	  524288 
+CE13707: Active:  14.1 Stalled:  83.5 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 58234 
+	  524288   524288 
+CE13721: Active:  14.1 Stalled:  78.5 Starved:   7.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 58731 
+	  524288   524288 
+CE13735: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57726 
+	  524288   524288 
+CE13749: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 56202 
+	  524288   524288 
+CE13763: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57287 
+	  524288   524288 
+CE13777: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 56275 
+	  524288   524288 
+CE13791: Active:  14.1 Stalled:  83.6 Starved:   2.3 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57716 
+	  524288   524288 
+CE13805: Active:  14.1 Stalled:  83.5 Starved:   2.4 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 59233 
+	  524288   524288 
+CE14827: Active:  14.1 Stalled:  55.5 Starved:  30.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 58205 
+	  524288 
+CE14817: Active:  14.1 Stalled:  84.7 Starved:   1.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11093 
+	  524288 
+CE14847: Active:  14.1 Stalled:  62.5 Starved:  23.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 58713 
+	  524288 
+CE14837: Active:  14.1 Stalled:  84.7 Starved:   1.1 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11093 
+	  524288 
+CE14867: Active:  14.1 Stalled:  48.5 Starved:  37.6 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57692 
+	  524288 
+CE14857: Active:  14.1 Stalled:  84.7 Starved:   1.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11091 
+	  524288 
+CE14887: Active:  14.1 Stalled:  27.4 Starved:  58.7 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 56153 
+	  524288 
+CE14877: Active:  14.1 Stalled:  84.7 Starved:   1.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11082 
+	  524288 
+CE14907: Active:  14.1 Stalled:  41.5 Starved:  44.6 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57248 
+	  524288 
+CE14897: Active:  14.1 Stalled:  84.7 Starved:   1.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11155 
+	  524288 
+CE14927: Active:  14.1 Stalled:  27.4 Starved:  58.7 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 56226 
+	  524288 
+CE14917: Active:  14.1 Stalled:  84.7 Starved:   1.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11155 
+	  524288 
+CE14947: Active:  14.1 Stalled:  48.5 Starved:  37.6 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 57682 
+	  524288 
+CE14937: Active:  14.1 Stalled:  84.7 Starved:   1.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11081 
+	  524288 
+CE14967: Active:  14.1 Stalled:  69.6 Starved:  16.5 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 59214 
+	  524288 
+CE14957: Active:  14.1 Stalled:  84.8 Starved:   1.1 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11083 
+	  524288 
+CE14997: Active:  14.1 Stalled:   0.0 Starved:  85.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11039 
+	  524288   524288   524288   524288 
+CE15055: Active:  14.1 Stalled:  84.7 Starved:   1.2 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11101 
+	  524288   524288 
+CE15037: Active:  14.1 Stalled:   0.0 Starved:  85.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11029 
+	  524288   524288   524288   524288 
+CE13409: Active:   0.0 Stalled:   0.0 Starved: 100.0 Total Active:     1024 Total Output:     1024 Expected Active:     1024 Last Activity: 26 
+	    1024 
+CE14235: Active:   0.2 Stalled:   0.0 Starved:  99.8 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 2809 
+	    8192 
+CE14225: Active:   0.2 Stalled:  99.8 Starved:   0.0 Total Active:     8202 Total Output:     8198 Expected Active:     8192 Last Activity: 2792 STALL
+	    8192 
+CE14467: Active:  14.1 Stalled:   0.0 Starved:  85.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11002 
+	  524288 
+CE14457: Active:   0.2 Stalled:   1.5 Starved:  98.3 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 2936 
+	    8192 
+CE13423: Active:   0.2 Stalled:   1.5 Starved:  98.3 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 2851 
+	    8192     8193     8192 
+CE14213: Active:   0.2 Stalled:   0.0 Starved:  99.8 Total Active:     8192 Total Output:     8192 Expected Active:     8192 Last Activity: 2797 
+	    8192     8192 
+CE14201: Active:   0.0 Stalled:   0.0 Starved:  99.9 Total Active:     1024 Total Output:     1024 Expected Active:     1024 Last Activity: 586 
+	    1024 
+CE13359: Active:   0.0 Stalled:   0.0 Starved:  99.9 Total Active:     1024 Total Output:     1024 Expected Active:     1024 Last Activity: 541 
+	    1024     1024     1024 
+	DRAM:   0.02 GB/s (  0.00 GB/s R,   0.02 GB/s W)
+	ROB remaining: 0
+CE14487: Active:  14.1 Stalled:   0.0 Starved:  85.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11002 
+	  524288 
+CE14477: Active:  14.1 Stalled:  85.3 Starved:   1.0 Total Active:   524298 Total Output:   524294 Expected Active:   524288 Last Activity: 10985 STALL
+	  524288 
+CE15017: Active:  14.1 Stalled:   0.0 Starved:  85.9 Total Active:   524288 Total Output:   524288 Expected Active:   524288 Last Activity: 11013 
+	  524289   524288   524288 
+Total DRAM:	   0.59 GB/s (  0.57 GB/s R,   0.02 GB/s W)
+[[32mpsim[0m] Total DRAM:	   0.59 GB/s (  0.57 GB/s R,   0.02 GB/s W)
+Pending Read: 0	 Pending Write: 0	
+[pir] Finished 68-PlastisimConfigCodegen to [36mconfig.psim[0m in 101619.066739ms
+[pir] Running 69-PlastisimDotCodegen ...[pir] Finished 69-PlastisimDotCodegen to [36mpsim.dot[0m in 20934.751086ms
+[pir] Saving node prism.Session@a89e8e5 to /home/yaqiz/pir/out/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1_psim_v2_s4_cd/GDA__C_128_R_4096_ts_512_op_1_mp1_8_mp2_1.sess
+[0m[[32msuccess[0m] [0mTotal time: 847 s, completed Aug 3, 2018 10:13:56 PM[0m
+-------------PASS (DONE)------------
