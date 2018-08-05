@@ -82,6 +82,14 @@ def runJob(app, args, params):
     for passName in passes():
         runPass(fullname, passName)
 
+def clearJob(app, args, params):
+    fullname = getFullName(app, args, params)
+    for passName in passes():
+        if toclear(passName):
+            log = logs(fullname, passName)
+            rm(log)
+    show(fullname)
+
 def launchJob(app, args, params):
     print('Running {} args={} and params=[{}]'.format(app, str(args),
         ' '.join(['{}={}'.format(p,params[p]) for p in params])))
@@ -285,4 +293,6 @@ def target(app, args, params):
         summarize(app, args, params)
     if opts.git:
         git_add(app, args, params)
+    if opts.clear:
+        clearJob(app, args, params)
 

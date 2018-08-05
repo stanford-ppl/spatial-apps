@@ -174,6 +174,7 @@ def write(log, msg):
 
 parser = argparse.ArgumentParser(description='Run experiments')
 parser.add_argument('--run', dest='run', action='store_true', default=False) 
+parser.add_argument('--clear', dest='clear', action='store_true', default=False) 
 parser.add_argument('--single', dest='single', action='store_true', default=False) 
 parser.add_argument('--status', dest='status', action='store_true', default=False) 
 parser.add_argument('--dse', dest='dse', action='store_true', default=False) 
