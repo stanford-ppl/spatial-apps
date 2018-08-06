@@ -52,6 +52,9 @@ psim_generic("psim_D_v1_s4_f256" , ["psim_p2p_ideal"] , "--net=dynamic --vlink=1
 psim_generic("psim_D_v0_s4"      , ["psim_p2p_ideal"] , "--net=dynamic --vlink=0 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_min_directed_valient --link-prop=db --flit-width=512" )
 psim_generic("psim_D_v2_s4"      , ["psim_p2p_ideal"] , "--net=dynamic --vlink=2 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_min_directed_valient --link-prop=db --flit-width=512" )
 psim_generic("psim_D_v0_s0"      , ["psim_p2p_ideal"] , "--net=dynamic --vlink=0 --slink=0 --fifo-depth=4 --vfifo=4 --proute-algo=route_min_directed_valient --link-prop=db --flit-width=512" )
+psim_generic("psim_D_v1_s4_rq1_q4"   , ["psim_p2p_ideal"] , "--net=dynamic --vlink=1 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_min_directed_valient --link-prop=db --flit-width=512 --proute-q=1 --psim-q=4" )
+psim_generic("psim_D_v1_s4_rq1_q8"   , ["psim_p2p_ideal"] , "--net=dynamic --vlink=1 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_min_directed_valient --link-prop=db --flit-width=512 --proute-q=1 --psim-q=8" )
+psim_generic("psim_D_v1_s4_rq1_q16"  , ["psim_p2p_ideal"] , "--net=dynamic --vlink=1 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_min_directed_valient --link-prop=db --flit-width=512 --proute-q=1 --psim-q=16" )
 
 psim_generic("psim_D_v1_s4_rq4_q4"   , ["psim_p2p_ideal"] , "--net=dynamic --vlink=1 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_min_directed_valient --link-prop=db --flit-width=512 --proute-q=4 --psim-q=4" )
 psim_generic("psim_D_v1_s4_rq4_q8"   , ["psim_p2p_ideal"] , "--net=dynamic --vlink=1 --slink=4 --fifo-depth=4 --vfifo=4 --proute-algo=route_min_directed_valient --link-prop=db --flit-width=512 --proute-q=4 --psim-q=8" )
