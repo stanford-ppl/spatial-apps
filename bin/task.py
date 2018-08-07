@@ -118,8 +118,9 @@ def kill(fullname, passName):
 def act(fullname, resp):
     def getPass():
         ps = []
-        for passName in passes():
-            if passName in resp:
+        if " " in resp:
+            resppass = resp.split(" ")[1].split(",")
+            for passName in resppass:
                 ps.append(passName)
         if len(ps) == 0:
             for passName in reversed(passes()):
