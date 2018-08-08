@@ -1,7 +1,6 @@
-# pilot specific
-data/pilot*
-src/pilot*
-
+# sbt specific
+target/
+src/*hotfix*
 
 *.class
 *.log
@@ -39,9 +38,6 @@ apps/resources/application.conf
 
 bin/commit
 
-# Personal apps
-src/hotfix*
-
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
@@ -63,10 +59,6 @@ src/spatial/codegen/chiselgen/resources/altera-goodies/README.md
 *.o
 *.d
 
-*__*.scala
-*.swp
-*.pyc
-
 # Altera specifics
 spatial/core/resources/chiselgen/template-level/fringeDE1SoC/.qsys_edit/*
 spatial/core/resources/chiselgen/template-level/fringeDE1SoC/Top_bak
@@ -75,6 +67,26 @@ regTests.sh
 ./VideoSysSim
 ./moduleSims
 
+# Apps data files
+data
+!data/scripts
+parameters/*
+p3/*
+np-sims/*.csv
+np-sims/__pycache__
+src/*.csv
+
+# Others
+SpatialDebug.scala
+LSTM.lua
+char-rnn
+check
+sims/charRNN/__pycache__/
+sims/tanh/__pycache__/
+models/
+chisel-templates/
+
+# Mac
 .DS_Store
-.pyc
-exp.conf
+._.DS_Store
+
