@@ -10,7 +10,7 @@ object PensieveStream extends SpatialApp {
 	@virtualize
 	def predict() = {
 
-		val project_dir = "/home/tushar/spatial-lang/apps/src/pensieve/PENSIEVE_LUTs/"
+		val project_dir = s"${sys.env("SPATIAL_HOME")}/apps/src/pensieve/PENSIEVE_LUTs/"
 		
 		val input_pad_file = project_dir + "INPUT_LUT.csv"
 		
@@ -77,7 +77,7 @@ object PensieveStream extends SpatialApp {
 		//setArg(x, X)
 
 
-		Accel {
+		Accel(*) {
 
 			val s_reg = Reg[Float](0)
 			
@@ -105,9 +105,10 @@ object PensieveStream extends SpatialApp {
 			// First layer - combination of 1d convolutions and neurons
 			Pipe {
 
-				s_reg := stream_in.value
+        Pipe {
+				  s_reg := stream_in.value
+        }
 
-					
 					// 1d Convolutions
 					Foreach(0 until num_1d_convs){ c =>
 						Foreach(0 until window_size){ i => 
