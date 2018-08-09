@@ -31,23 +31,13 @@ from dse import *
 def main():
     mkdir('{}/gen'.format(SPATIAL_HOME))
 
-    if opts.summary or opts.plot or opts.best:
-        load_summary()
-    elif opts.dse:
-        runExp()
-    else:
-        target(args[0], [], {})
-
-    if opts.summary:
-        summaryToCsv()
-
-    if opts.best:
-        bestSummary()
-
-    if opts.plot:
-        plot()
+    opts.dse=True
+    opts.parallel=20
+    opts.torun='gen_pir,psim_p2p'
+    runExp()
     #################################################################################################################
 
 if __name__ == "__main__":
     main()
+
 

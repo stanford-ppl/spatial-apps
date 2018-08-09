@@ -1,48 +1,39 @@
-from os import listdir
-from os.path import isfile, isdir, join, splitext, basename, dirname 
-from collections import OrderedDict
-import os
+from os.path import join
 import argparse
 import subprocess
-import commands
 import time
 import pickle
-import signal
-import psutil
-import shutil
-import numpy as np
-import types
-import csv
+from collections import OrderedDict
 
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib.ticker as ticker
 import os, sys
 import math
 
 SPATIAL_HOME = os.environ['SPATIAL_HOME']
 PIR_HOME = os.environ['PIR_HOME']
-
-passes=["GEN_PIR","FIT_PIR","GEN_CHISEL","MAKE_VCS","MAP_PIR","RUN_SIMULATION"]
-apps = ['DotProduct', 'TPCHQ6', 'GDA', 'BlackScholes', 'Kmeans_plasticine', 'Kmeans23', 'PageRank_plasticine', 'SPMV_CRS', 'GEMM_Blocked']
-
+PAPER_HOME = os.environ['HOME'] + "/papers/"
+CONF_PATH = SPATIAL_HOME + '/apps/bin/exp.conf'
+LOG_DIR='{}/apps/log'.format(SPATIAL_HOME)
 APP_DIR='{}/apps/src/'.format(SPATIAL_HOME)
 JOB_PATH="{}/gen/job_list.pickle".format(SPATIAL_HOME)
-SUMMARY_PATH="{}/apps/summary.pickle".format(SPATIAL_HOME)
-SUMMARY_CSV_PATH="{}/apps/summary.csv".format(SPATIAL_HOME)
-BEST_SUMMARY_CSV_PATH="{}/apps/best.csv".format(SPATIAL_HOME)
 
-cycle_cache = {}
+dependency = OrderedDict()
+commands = OrderedDict()
 
-dependency = {
-        "GEN_PIR":[],
-        "FIT_PIR":["GEN_PIR"],
-        "GEN_CHISEL":[],
-        "MAKE_VCS":["GEN_CHISEL"],
-        "MAP_PIR":["GEN_PIR"],
-        "RUN_SIMUlATION":["MAKE_VCS"]
-        }
+def passes():
+    return dependency.keys()
+
+def addPass(passName, deps, command):
+    dependency[passName] = deps
+    commands[passName] = command
+
+def gen_pir():
+    addPass("gen_pir", [], lambda fullapp: "{}/apps/bin/{} {}".format(SPATIAL_HOME, fullapp, opts.pirsrc))
+
+def psim_generic(name, deps, opts):
+    addPass(name, deps, lambda fullapp: "{}/apps/bin/psim_generic {} {} {}".format(SPATIAL_HOME, fullapp, name, opts))
+
+def link_count():
+    addPass("link_count", ["psim_p2p"], lambda fullapp: "{}/apps/bin/link_count {}".format(SPATIAL_HOME, fullapp))
 
 class bcolors:
     HEADER    = '\033[95m'
@@ -69,6 +60,11 @@ colors = {
         "NOTRUN"  : bcolors.YELLOW,
         }
 
+lanes = 16
+bankSize = 32 * 1024 / 4
+peak_bw = 12.8*4
+pmuSize = 256 / 4 * 1024 # 256 kB / (4 word / Byte) = 64 * 1024 = 65536 word
+
 def rm(path):
     if os.path.exists(path):
         # print("rm {}".format(path))
@@ -79,12 +75,12 @@ def cat(path):
         for line in f:
             sys.stdout.write(line)
 
-def vim(path):
-    subprocess.call("vim {}".format(path), shell=True)
-
 def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+def vim(path):
+    subprocess.call("vim {}".format(path), shell=True)
 
 def grep(path, patterns):
     found = []
@@ -98,11 +94,7 @@ def grep(path, patterns):
     return found
 
 def openfile(path, flag):
-    try:
-        return open(path, flag)
-    except e:
-        time.sleep(1)
-        return openfile(path, flat)
+    return open(path, flag)
         
 def check_pid(pid):        
     """ Check For the existence of a unix pid. """
@@ -119,7 +111,11 @@ def checkProcess():
         job_list = {}
         print("New job_list!")
     else:
-        job_list = pickle.load(openfile(JOB_PATH, 'rb'))
+        try:
+          job_list = pickle.load(openfile(JOB_PATH, 'rb'))
+        except EOFError:
+          time.sleep(1)
+          job_list = pickle.load(openfile(JOB_PATH, 'rb'))
     for key in job_list.keys():
         pid = job_list[key]
         if not check_pid(pid):
@@ -143,7 +139,7 @@ def getpid(fullapp, passName):
         return None
 
 def setpid(fullapp, passName, pid):
-    job_list = pickle.load(openfile(JOB_PATH, 'rb'))
+    job_list = checkProcess()
     job_list[(fullapp, passName)] = pid
     pickle.dump(job_list, openfile(JOB_PATH, 'wb'))
 
@@ -151,14 +147,16 @@ def sargs(args):
     return '_'.join([str(a) for a in args])
 
 def getFullName(app, args, params):
-    postfix = sargs(args) 
-    postfix = postfix + ''.join(["_{}_{}".format(k,str(params[k])) for k in params ]) 
+    postfix = ''.join(["_{}_{}".format(k,str(params[k])) for k in params ]) 
     if postfix != "":
         fullname = '{}_{}'.format(app, postfix)
     else:
         fullname = app
     fullname = fullname.replace('.','d')
     return fullname
+
+def logs(app, passName):
+    return '{}/{}/{}.log'.format(LOG_DIR, app, passName)
 
 def irange(start, stop, step):
     r = range(start, stop, step)
@@ -170,42 +168,46 @@ def irange(start, stop, step):
         r.append(stop)
     return r
 
-def logs(app, passName):
-    if passName=="GEN_PIR":
-        return '{}/gen/{}/gen_pir.log'.format(SPATIAL_HOME, app)
-    elif passName=="FIT_PIR":
-        return '{}/out/{}/fit_pir.log'.format(PIR_HOME,app)
-    elif passName=="GEN_CHISEL":
-        return '{}/gen/{}/gen_chisel.log'.format(SPATIAL_HOME,app)
-    elif passName=="MAKE_VCS":
-        return '{}/gen/{}/vcs.log'.format(SPATIAL_HOME,app)
-    elif passName=="MAP_PIR":
-        return '{}/out/{}/map_pir.log'.format(PIR_HOME,app)
-    elif passName=="RUN_SIMULATION":
-        return '{}/gen/{}/sim.log'.format(SPATIAL_HOME, app)
-    elif passName=="Utilization":
-        return '{}/out/{}/ResourceAnalysis.log'.format(PIR_HOME, app)
-
 def write(log, msg):
     with open(log, 'a') as f:
         f.write(msg)
 
 parser = argparse.ArgumentParser(description='Run experiments')
-parser.add_argument('--parallel', dest='parallel', nargs='?', default=1, type=int)
-parser.add_argument('--single', dest='single', action='store_true', default=False) 
 parser.add_argument('--run', dest='run', action='store_true', default=False) 
+parser.add_argument('--clear', dest='clear', action='store_true', default=False) 
+parser.add_argument('--single', dest='single', action='store_true', default=False) 
 parser.add_argument('--status', dest='status', action='store_true', default=False) 
 parser.add_argument('--dse', dest='dse', action='store_true', default=False) 
+parser.add_argument('--git', dest='git', action='store_true', default=False) 
 parser.add_argument('--app', dest='app', action='store', default='ALL',help='App name')
-parser.add_argument('--regen', dest='regen', action='store', default='false',
+parser.add_argument('--rerun', dest='rerun', action='store', default='false',
     help='force pass to rerun' )
+parser.add_argument('--toclear', dest='toclear', action='store', default='false',
+    help='clear status in pass' )
 parser.add_argument('--torun', dest='torun', action='store', default='ALL',
     help='Pass to run')
 parser.add_argument('--regression', dest='regression', action='store_true', default=False) 
-parser.add_argument('--summary', dest='summary', action='store_true', default=False) 
 parser.add_argument('--best', dest='best', action='store_true', default=False) 
-parser.add_argument('--plot', dest='plot', action='store_true', default=False) 
+parser.add_argument('--summarize', dest='summarize', action='store_true', default=False) 
 
 global opts
 (opts, args) = parser.parse_known_args()
 
+opts.apps = args
+
+opts.pirsrc = '{}/pir/apps/src/gen'.format(PIR_HOME) if opts.dse else '{}/pir/apps/src'.format(PIR_HOME)
+
+opts.parallel = 1
+if os.path.exists(CONF_PATH.format(SPATIAL_HOME)):
+    with open(CONF_PATH, 'r') as f:
+        for row in f:
+            if not row.startswith("#"):
+                k,v, = row.split("=")
+                v = v.strip()
+                if v.isdigit():
+                    v = int(v)
+                elif v in ["True", "true"]:
+                    v = True
+                elif  v in ['False','false']:
+                    v = False
+                setattr(opts, k, v)

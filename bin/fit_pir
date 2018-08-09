@@ -1,10 +1,27 @@
 #!/bin/bash
 
 app=$1
-log=$2
 
-cd $PIR_HOME
-mkdir -p $PIR_HOME/out/$app
-$PIR_HOME/bin/pir $app --debug --mapping=false --verbose --simulate=false --arch=SN16x8_LD >> $log 2>&1
+outDir=$PIR_HOME/out/${app}
 
-echo "-------------PASS (DONE)------------" >> $log
+export _JAVA_OPTIONS="-Xss8192k" 
+$PIR_HOME/bin/pir $app \
+  --out=$outDir \
+  --debug \
+  --mapping=false \
+  --load-pir=false \
+  --save-pir=true \
+  --dot=false \
+  --psim=false \
+  --ctrl=true \
+  --bp=false \
+  --stat=true \
+  --arch=MyDesign \
+  --net=p2p \
+  --topo=mesh \
+  --row=16 --col=8 \
+  --argin=64 \
+  --tokenout=32 \
+  --vfifo=4
+
+echo "-------------PASS (DONE)------------"

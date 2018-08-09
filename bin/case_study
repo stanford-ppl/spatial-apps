@@ -26,28 +26,22 @@ import math
 from util import *
 from stat import *
 from task import *
-from dse import *
 
-def main():
-    mkdir('{}/gen'.format(SPATIAL_HOME))
+bestapps = []
 
-    if opts.summary or opts.plot or opts.best:
-        load_summary()
-    elif opts.dse:
-        runExp()
-    else:
-        target(args[0], [], {})
+bestapps += ['BlackScholes__N_1048576_ts_65536_op_1']
 
-    if opts.summary:
-        summaryToCsv()
+gen_pir()
+psim_generic("psim_D_v1_s4_fifo8"   , ["psim_p2p"] , "--net=dynamic --vlink=1 --slink=4 --fifo-depth=3 --vfifo=8 --proute-algo=route_dor_YX --link-prop=db" )
 
-    if opts.best:
-        bestSummary()
+def run():
+    opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes() if
+        p.startswith("psim") and 'D' in p])
 
-    if opts.plot:
-        plot()
+    for app in bestapps:
+        target(app, [], {})
     #################################################################################################################
 
-if __name__ == "__main__":
-    main()
 
+if __name__ == "__main__":
+    run()

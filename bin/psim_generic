@@ -1,0 +1,44 @@
+#!/bin/bash
+
+app=$1
+outName=$2
+opts="${@:3}"
+
+outDir=$PIR_HOME/out/${app}_$outName
+psimOutDir=$PLASTISIM_HOME/configs/finals/${app}_$outName
+config=${outDir}/config.psim
+
+[ -e $config ] && rm $config
+export _JAVA_OPTIONS="-Xss8192k" 
+$PIR_HOME/bin/pir $app \
+  --out=$outDir \
+  --psim-out=$psimOutDir \
+  --debug=false \
+  --verbose=true \
+  --dot=false \
+  --load-pir=true \
+  --save-pir=true \
+  --psim=true \
+  --trace=true \
+  --ctrl=true \
+  --bp=false \
+  --stat=true \
+  --routing-algo=proute \
+  --proute-iter=1000 \
+  --run-psim=true \
+  --arch=MyDesign \
+  --row=16 --col=8 \
+  --topo=mesh \
+  --argin=64 \
+  --tokenout=32 \
+  --pcu-stage=4 \
+  --vc=4 \
+  $opts
+  #--net=$net \
+  #--vlink=${vlink} \
+  #--slink=${slink}
+  #--fifo-depth=4 \
+  #--vfifo=4 \
+  #--proute-algo
+
+echo "-------------PASS (DONE)------------"
