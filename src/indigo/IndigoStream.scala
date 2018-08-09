@@ -10,7 +10,7 @@ object IndigoStream extends SpatialApp {
 	@virtualize
 	def predict() = {
 
-		val project_dir = "/home/tushar/spatial-lang/apps/src/spatial-network-apps/INDIGO_LUTs/"
+		val project_dir = s"${sys.env("SPATIAL_HOME")}/apps/src/indigo/INDIGO_LUTs/"
 		
 		val input_file = project_dir + "INPUT_LUT.csv"
 		
@@ -40,7 +40,7 @@ object IndigoStream extends SpatialApp {
 		val num_l2_neurons = 5
 
 
-		//val stream_in  = StreamIn[Float](GPInput1); countOf(stream_in) = 1024l
+		//val stream_in  = StreamIn[Float](GPInput2); countOf(stream_in) = 1024l
 		//val stream_out = StreamOut[Float](GPOutput1)
 	    
 		val stream_count = 1024l
@@ -49,7 +49,7 @@ object IndigoStream extends SpatialApp {
 
 		
   		//val x = ArgIn[Float]
-  		val x = StreamIn[Float](GPInput1); countOf(x) = stream_count
+  	val x = StreamIn[Float](GPInput1); countOf(x) = stream_count
 		val stream_out = StreamOut[Float](GPOutput1)
     		//val out = ArgOut[Float]
 		//setArg(x, X)
@@ -88,7 +88,7 @@ object IndigoStream extends SpatialApp {
 
 
 			val s_reg = Reg[Float](0)
-			val L1_h = RegFile.buffer[Float](num_l1_units)
+			val L1_h = RegFile[Float](num_l1_units)
 			val L1_tmp = RegFile[Float](num_l1_units * num_lstm_weights)
 			//val L1_tmp_2 = RegFile[Float](num_l1_units * num_lstm_weights)
 
@@ -97,8 +97,7 @@ object IndigoStream extends SpatialApp {
 				L1_h(i) = 0
 			}
 
-			val L1_C = RegFile.buffer[Float](num_l1_units)
-			val L1_C_p = RegFile[Float](num_l1_units)
+			val L1_C = RegFile[Float](num_l1_units)
 			
 			Foreach(0 until num_l1_units){ i =>
 				L1_C(i) = 0
@@ -109,7 +108,7 @@ object IndigoStream extends SpatialApp {
 			val input = LUT.fromFile[Float](input_size, timesteps)(input_file)
 
 			val L1_W_LUT = LUT.fromFile[Float](input_size + num_l1_units, num_lstm_weights * num_l1_units)(L1_weight_file)
-      			val L1_B_LUT = LUT.fromFile[Float](num_l1_units * num_lstm_weights)(L1_bias_file)
+      val L1_B_LUT = LUT.fromFile[Float](num_l1_units * num_lstm_weights)(L1_bias_file)
       			
 			
 			val L2_W_LUT = LUT.fromFile[Float](num_l1_units, num_l2_neurons)(L2_weight_file)
@@ -155,18 +154,20 @@ object IndigoStream extends SpatialApp {
 			}
 			*/
 
+			val L1_h_p = RegFile[Float](num_l1_units)
 			// First layer activation functions
+			//val L1_C_p = RegFile[Float](num_l1_units)
 			Pipe {
 
 				Pipe {
 					Foreach(0 until num_l1_units) { i =>
 						val l1 = L1_C(i) * sigmoid_synth(L1_tmp(i + 2*(num_l1_units)) + 1.0f) + sigmoid_synth(L1_tmp(i)) * tanh_synth(L1_tmp(i + 1*(num_l1_units)))
-						L1_h(i) = tanh_synth(l1) * sigmoid_synth(L1_tmp(i + 3*(num_l1_units))) 
-						L1_C_p(i) = l1
+						L1_h_p(i) = tanh_synth(l1) * sigmoid_synth(L1_tmp(i + 3*(num_l1_units))) 
+						//L1_C_p(i) = l1
 					}
-					Foreach(0 until num_l1_units) { i =>
-						L1_C(i) = L1_C_p(i)
-					}
+					//Foreach(0 until num_l1_units) { i =>
+						//L1_C(i) = L1_C_p(i)
+					//}
 				}
 
 
@@ -180,7 +181,7 @@ object IndigoStream extends SpatialApp {
 					val w = Reg[Float]
 					
 					w := Reduce(Reg[Float](0.to[Float]))(num_l1_units by 1){ j =>
-						L1_h(j) * L2_W_LUT(j,i)
+						L1_h_p(j) * L2_W_LUT(j,i)
 					}{_+_}
 					
 					L2_tmp(i) = w + L2_B_LUT(i)
