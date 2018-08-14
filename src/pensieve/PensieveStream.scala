@@ -8,7 +8,7 @@ object PensieveStream extends SpatialApp {
 
 
 	@virtualize
-	def predict() = {
+	def predict(X : Float) = {
 
 		val project_dir = s"${sys.env("SPATIAL_HOME")}/apps/src/pensieve/PENSIEVE_LUTs/"
 		
@@ -26,19 +26,21 @@ object PensieveStream extends SpatialApp {
 		val L3_softmax_bias_file = project_dir + "L3_SOFTMAX_B_LUT.csv"
 		
 		/* 
-		 * First Layer parameters
+		 * First Layer p1
 		 */
 
+		val hyperparam = 32
+
 		// 1D Convolution layer parameters
-		val num_1d_convs = 2
-		val num_filters = 2
-		val filter_size = 2
+		val num_1d_convs = 3
+		val num_filters = hyperparam
+		val filter_size = 4
 		val window_size = 8
 		val padding = filter_size - 1
 
 		// First layer neuron paramters
-		val num_l1_neurons = 2
-		val l1_neuron_size = 2
+		val num_l1_neurons = 3
+		val l1_neuron_size = hyperparam
 
 		
 		
@@ -56,7 +58,7 @@ object PensieveStream extends SpatialApp {
 
 		// Second Layer neuron paramters
 		val l2_neuron_size = L1_res_size
-		val num_l2_neurons = 2
+		val num_l2_neurons = hyperparam
 
 
 
@@ -64,10 +66,10 @@ object PensieveStream extends SpatialApp {
 		 * Third Layer Parameters
 		 */
 
-		val num_actions = 2
+		val num_actions = 4
 
 
-		val stream_in  = StreamIn[Float](GPInput1)
+		val stream_in  = StreamIn[Float](GPInput1); countOf(stream_in) = 1l
 	    
 		val stream_out = StreamOut[Float](GPOutput1)
 	    
@@ -105,18 +107,19 @@ object PensieveStream extends SpatialApp {
 			// First layer - combination of 1d convolutions and neurons
 			Pipe {
 
-        Pipe {
-				  s_reg := stream_in.value
-        }
+				Pipe {
+					s_reg := stream_in.value
+					//s_reg := x
+        			}
 
 					// 1d Convolutions
-					Foreach(0 until num_1d_convs){ c =>
+					Foreach(0 until num_1d_convs par 1){ c =>
 						Foreach(0 until window_size){ i => 
 
 							Foreach(0 until num_filters){ k =>
 							
 								val w = Reg[Float](0)
-								w := Reduce(Reg[Float](0.to[Float]))(filter_size by 1){ j =>
+								w := Reduce(Reg[Float](0.to[Float]))(filter_size by 1 par 1){ j =>
 									Conv_Filter_LUT(c, k * num_filters + j) * input_pad(i + j)
 								
 								}{_ + _}
@@ -128,7 +131,7 @@ object PensieveStream extends SpatialApp {
 					}
 
 					// Regular neurons
-					Foreach(0 until num_l1_neurons){ i =>
+					Foreach(0 until num_l1_neurons par 1){ i =>
 						Foreach(0 until l1_neuron_size){ j => 
 							
 							val w = Reg[Float]
@@ -155,11 +158,11 @@ object PensieveStream extends SpatialApp {
 		        // Layer 2 - just regular neurons
 			Pipe {
 
-				Foreach(0 until num_l2_neurons){ i => 
+				Foreach(0 until num_l2_neurons par 1){ i => 
 
 					val w = Reg[Float]
 
-					w := Reduce(Reg[Float](0.to[Float]))(l2_neuron_size by 1){ j =>
+					w := Reduce(Reg[Float](0.to[Float]))(l2_neuron_size by 1 par 1){ j =>
 						L2_W_LUT(i,j).to[Float] * L1_res(j)
 					}{_ + _}
 
@@ -175,18 +178,20 @@ object PensieveStream extends SpatialApp {
 				val numerators = RegFile[Float](num_actions)
 				val denominator = Reg[Float](0)
 
-				Foreach(0 until num_actions){ i =>
+				Foreach(0 until num_actions par 1){ i =>
 				
 					val wx = Reg[Float]
 
-					wx := Reduce(Reg[Float](0.to[Float]))(num_l2_neurons by 1){ j =>
+					wx := Reduce(Reg[Float](0.to[Float]))(num_l2_neurons by 1 par 1){ j =>
 						L3_SM_W_LUT(i, j) * L2_res(j)
 					}{_ + _}
 
-					numerators(i) = exp_taylor(wx + L3_SM_B_LUT(i))
+					//numerators(i) = exp_taylor(wx + L3_SM_B_LUT(i))
 				
 				}
 
+				stream_out := L2_res(0)
+/*
 
 				Pipe {
 					denominator := Reduce(Reg[Float](0.to[Float]))(num_actions by 1){ i =>
@@ -205,7 +210,7 @@ object PensieveStream extends SpatialApp {
 					stream_out := L3_res(0)
 				}
 
-
+*/
 			}
 			
 			
@@ -220,7 +225,7 @@ object PensieveStream extends SpatialApp {
 	@virtualize
 	def main() = {
 
-		predict()
+		predict(4.0)
 	}
 
 }
