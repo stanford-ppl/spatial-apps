@@ -39,7 +39,7 @@ def count(key, log):
     line = grep(log, [key])
     if len(line) == 0:
       return 0
-    return int(line[0].split(key)[1].split(",")[0])
+    return int(line[0].split(key)[1].split(",")[0].strip().split(" ")[0].strip())
 
 def drambw(log):
     if not os.path.exists(log): return None
