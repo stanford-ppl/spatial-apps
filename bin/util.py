@@ -27,7 +27,7 @@ def addPass(passName, deps, command):
     commands[passName] = command
 
 def gen_pir():
-    addPass("gen_pir", [], lambda fullapp: "{}/apps/bin/{} {}".format(SPATIAL_HOME, fullapp, opts.pirsrc))
+    addPass("gen_pir", [], lambda fullapp: "{}/apps/bin/gen_pir {} {}".format(SPATIAL_HOME, fullapp, opts.pirsrc))
 
 def psim_generic(name, deps, opts):
     addPass(name, deps, lambda fullapp: "{}/apps/bin/psim_generic {} {} {}".format(SPATIAL_HOME, fullapp, name, opts))

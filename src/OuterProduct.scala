@@ -9,8 +9,8 @@ object OuterProduct extends SpatialApp { // Regression (Dense) // Args: 640 640
   val N = 1024 // param pmuSize / 16
   val ts1 = 32 // param [pmuSize / 1024] | <N> % p == 0
   val ts2 = 32 // param [pmuSize / <ts1>] | <N> % p == 0
-  val op1 = 1 // param [1] # (2, 16, 2) | <M> / <ts1> % p == 0
-  val op2 = 1 // param [2] # (2, 16, 2) | (<N> / <ts2> % p == 0) and (p * <op1> <= 16) and (p * <op1> >= 8)
+  val op1 = 2 // param [1] # (2, 16, 2) | <M> / <ts1> % p == 0
+  val op2 = 2 // param [2] # (2, 16, 2) | (<N> / <ts2> % p == 0) and (p * <op1> <= 16) and (p * <op1> >= 8)
   val ip = 16
   val ip2 = 16 // param [16] # (8, 16, 8)
   val ip1 = ip / ip2 // param 16 / <ip2>

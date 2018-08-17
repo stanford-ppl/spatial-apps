@@ -14,7 +14,7 @@ object GEMM_Blocked extends SpatialApp { // Regression (Dense) // Args: 128
   val loop_jj = 1 // param [1] #(1, <DIM> / <ts>, 2)
   val loop_kk = 1 // param [1] #(1, <DIM> / <ts>, 2)
   val loop_i = 1 // param [1] #(1, 6, 2)
-  val loop_k = 8 // param (8, 16, 8) | <ts> % p == 0
+  val loop_k = 2 // param (8, 16, 8) | <ts> % p == 0
 
   val ip = 16
   type T = FixPt[TRUE,_16,_16] // Fatter type so that ts is burst aligned

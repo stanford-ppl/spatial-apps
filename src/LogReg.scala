@@ -8,8 +8,8 @@ object LogReg extends SpatialApp {
   val D = 128 // param [128]
   val N = 1024 // param [pmuSize / <D> * 16]
   val ts = 64 // param [pmuSize / <D>] | <N> % p == 0
-  val op = 1 // param [1] | <N> / <ts> % p == 0
-  val mp = 1 // param [1,2,4,6,8] | <ts> % p == 0
+  val op = 2 // param [1] | <N> / <ts> % p == 0
+  val mp = 2 // param [1,2,4,6,8] | <ts> % p == 0
 
   type X = Float //FixPt[TRUE,_16,_16]
 

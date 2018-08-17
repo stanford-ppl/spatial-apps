@@ -28,12 +28,14 @@ from stat import *
 from task import *
 from dse import *
 
+gen_pir()
+psim_generic("psim_p2p_ideal"        , ["gen_pir"]        , "--net=p2p --vlink=0 --slink=0 --fifo-depth=20 --vfifo=4 --link-prop=db --flit-width=512")
+
 def main():
     mkdir('{}/gen'.format(SPATIAL_HOME))
 
     opts.dse=True
     opts.parallel=20
-    opts.torun='gen_pir,psim_p2p'
     runExp()
     #################################################################################################################
 
