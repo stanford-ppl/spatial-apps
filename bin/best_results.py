@@ -43,7 +43,7 @@ gen_pir()
 psim_generic("psim_p2p_ideal"        , ["gen_pir"]        , "--net=p2p --vlink=0 --slink=0 --fifo-depth=20 --vfifo=4 --link-prop=db --flit-width=512")
 psim_generic("psim_p2p"              , ["psim_p2p_ideal"] , "--net=p2p --vlink=0 --slink=0 --fifo-depth=4  --vfifo=4 --link-prop=db --flit-width=512" )
 psim_generic("psim_v3_s4"            , ["psim_p2p_ideal"] , "--net=static --vlink=3 --slink=4 --fifo-depth=4 --vfifo=4 --link-prop=db --flit-width=512" )
-psim_generic("psim_v2_s4"            , ["psim_p2p_ideal"] , "--net=static --vlink=2 --slink=4 --fifo-depth=4 --vfifo=4 --link-prop=db --flit-width=512 --proute-seed=2 --run-psim=false" )
+psim_generic("psim_v2_s4"            , ["psim_p2p_ideal"] , "--net=static --vlink=2 --slink=4 --fifo-depth=4 --vfifo=4 --link-prop=db --flit-width=512 --proute-seed=2" )
 psim_generic("psim_v2_s4_cd"         , ["psim_p2p_ideal"] , "--net=static --vlink=2 --slink=4 --fifo-depth=4 --vfifo=4 --link-prop=cd --flit-width=512" )
 psim_generic("psim_v3_s4_cd"         , ["psim_p2p_ideal"] , "--net=static --vlink=3 --slink=4 --fifo-depth=4 --vfifo=4 --link-prop=cd --flit-width=512" )
 
@@ -68,7 +68,7 @@ link_count()
 
 def runbest():
     opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes() if
-        p.startswith("psim") and "D" in p])
+        p.startswith("psim")])
     # opts.toclear = reduce(lambda a,b: "{},{}".format(a,b), [ p for p in passes() if
         # p=='link_count'])
     if opts.run:
